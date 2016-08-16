@@ -25,6 +25,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <climits>
+#include <cstdint>
 #include <utility>
 #include <deque>
 #include <queue>
@@ -54,10 +55,10 @@ using hfst::HfstOneLevelPaths;
 using hfst::StringVector;
 using hfst::StringPairVector;
 
-typedef unsigned short SymbolNumber;
-typedef unsigned int TransitionTableIndex;
-typedef unsigned int TransitionNumber;
-typedef unsigned int StateIdNumber;
+typedef uint16_t SymbolNumber;
+typedef uint32_t TransitionTableIndex;
+typedef uint32_t TransitionNumber;
+typedef uint32_t StateIdNumber;
 typedef short ValueNumber;
 typedef float Weight;
 typedef std::set<SymbolNumber> SymbolNumberSet;
@@ -119,6 +120,14 @@ inline bool indexes_transition_index_table(const TransitionTableIndex i)
     return i < TRANSITION_TARGET_TABLE_START;
 }
 
+// These functions are to support a portable binary format.
+
+bool is_big_endian(void);
+void write_uint16_flipping_endianness(uint16_t val, std::ostream& os);
+void write_uint32_flipping_endianness(uint32_t val, std::ostream& os);
+void write_bool_as_uint32(bool val, std::ostream& os);
+void write_float_flipping_endianness(float val, std::ostream& os);
+
 class TransducerHeader
 {
 private:
@@ -155,6 +164,7 @@ private:
     template<class T>
     static void write_property(T prop, std::ostream& os)
         { os.write(reinterpret_cast<const char*>(&prop), sizeof(prop)); }
+
     static bool read_bool_property(std::istream& is)
         {
             unsigned int prop;
@@ -365,6 +375,25 @@ public:
             write_bool_property(has_unweighted_input_epsilon_cycles, os);
         }
   
+    void write_flipping_endianness(std::ostream& os) const
+        {
+            write_uint16_flipping_endianness(number_of_input_symbols, os);
+            write_uint16_flipping_endianness(number_of_symbols, os);
+            write_uint32_flipping_endianness(size_of_transition_index_table, os);
+            write_uint32_flipping_endianness(size_of_transition_target_table, os);
+            write_uint32_flipping_endianness(number_of_states, os);
+            write_uint32_flipping_endianness(number_of_transitions, os);
+            write_bool_as_uint32(weighted, os);
+            write_bool_as_uint32(deterministic, os);
+            write_bool_as_uint32(input_deterministic, os);
+            write_bool_as_uint32(minimized, os);
+            write_bool_as_uint32(cyclic, os);
+            write_bool_as_uint32(has_epsilon_epsilon_transitions, os);
+            write_bool_as_uint32(has_input_epsilon_transitions, os);
+            write_bool_as_uint32(has_input_epsilon_cycles, os);
+            write_bool_as_uint32(has_unweighted_input_epsilon_cycles, os);
+        }
+  
     friend class ConvertTransducerHeader;
 };
 
@@ -484,7 +513,13 @@ public:
                          sizeof(first_transition_index));
             }
         }
-  
+
+    void write_flipping_endianness(std::ostream& os) const
+        {
+            write_uint16_flipping_endianness(input_symbol, os);
+            write_uint32_flipping_endianness(first_transition_index, os);
+        }
+
     void display() const;
   
     TransitionTableIndex get_target(void) const
@@ -578,6 +613,14 @@ public:
             }
         }
 
+    virtual void write_flipping_endianness(std::ostream& os) const
+        {
+            write_uint16_flipping_endianness(input_symbol, os);
+            write_uint16_flipping_endianness(output_symbol, os);
+            write_uint32_flipping_endianness(target_index, os);
+            write_float_flipping_endianness(0.0, os);
+        }
+
     virtual void display() const;
 
     TransitionTableIndex get_target(void) const {return target_index;}
@@ -618,6 +661,14 @@ public:
                 os.write(reinterpret_cast<const char*>(&transition_weight),
                          sizeof(transition_weight));
             }
+        }
+    
+    void write_flipping_endianness(std::ostream& os) const
+        {
+            write_uint16_flipping_endianness(input_symbol, os);
+            write_uint16_flipping_endianness(output_symbol, os);
+            write_uint32_flipping_endianness(target_index, os);
+            write_float_flipping_endianness(transition_weight, os);
         }
   
     void display() const;
@@ -946,6 +997,7 @@ public:
     virtual ~Transducer();
 
     void write(std::ostream& os) const;
+    void write_portable(std::ostream& os) const;
     Transducer * copy(Transducer * t, bool weighted = false);
     void display() const;
 

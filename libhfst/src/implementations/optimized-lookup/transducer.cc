@@ -21,6 +21,61 @@ bool should_ascii_tokenize(unsigned char c)
 //    return ((c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z'));
 }
 
+bool is_big_endian(void)
+{
+    union {
+        uint32_t i;
+        int8_t c[4];
+    } to_check = {0x01000000};
+    return to_check.c[0] == 1;
+}
+
+void write_uint16_flipping_endianness(uint16_t val, std::ostream& os)
+{
+    union {
+        uint16_t uint;
+        int8_t c[2];
+    } to_reverse;
+    to_reverse.uint = val;
+    os.put(to_reverse.c[1]);
+    os.put(to_reverse.c[0]);
+}
+
+void write_uint32_flipping_endianness(uint32_t val, std::ostream& os)
+{
+    union {
+        uint32_t uint;
+        int8_t c[4];
+    } to_reverse;
+    to_reverse.uint = val;
+    os.put(to_reverse.c[3]);
+    os.put(to_reverse.c[2]);
+    os.put(to_reverse.c[1]);
+    os.put(to_reverse.c[0]);
+}
+
+void write_bool_as_uint32(bool val, std::ostream& os)
+{
+    os.put(val ? 1: 0);
+    os.put(0);
+    os.put(0);
+    os.put(0);
+}
+
+void write_float_flipping_endianness(float val, std::ostream& os)
+{
+    union {
+        float f;
+        int8_t c[4];
+    } to_reverse;
+    to_reverse.f = val;
+    os.put(to_reverse.c[3]);
+    os.put(to_reverse.c[2]);
+    os.put(to_reverse.c[1]);
+    os.put(to_reverse.c[0]);
+}
+
+
 TransducerAlphabet::TransducerAlphabet(std::istream& is,
                                        SymbolNumber symbol_count,
                                        bool preserve_diacritic_strings)
@@ -799,6 +854,20 @@ void Transducer::write(std::ostream& os) const
         tables->get_index(i).write(os, header->probe_flag(Weighted));
     for(size_t i=0;i<header->target_table_size();i++)
         tables->get_transition(i).write(os, header->probe_flag(Weighted));
+}
+
+void Transducer::write_portable(std::ostream& os) const
+{
+    if (is_big_endian()) {
+        header->write_flipping_endianness(os);
+        alphabet->write(os);
+        for(size_t i=0;i<header->index_table_size();i++)
+            tables->get_index(i).write_flipping_endianness(os);
+        for(size_t i=0;i<header->target_table_size();i++)
+            tables->get_transition(i).write_flipping_endianness(os);
+    } else {
+        write(os);
+    }
 }
 
 Transducer * Transducer::copy(Transducer * t, bool weighted)
