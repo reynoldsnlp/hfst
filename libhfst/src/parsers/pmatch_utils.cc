@@ -1095,8 +1095,11 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         begins_and_ends_with_non_whitespace.concatenate(anything);
         begins_and_ends_with_non_whitespace.concatenate(not_whitespace);
         begins_and_ends_with_non_whitespace.compose(*(retval["TOP"]));
+        HfstTransducer is_single_non_whitespace(not_whitespace);
+        is_single_non_whitespace.compose(*(retval["TOP"]));
         HfstTransducer empty(format);
-        if (begins_and_ends_with_non_whitespace.compare(empty) == false) {
+        if (begins_and_ends_with_non_whitespace.compare(empty) == false ||
+            is_single_non_whitespace.compare(empty) == false) {
             HfstTransducer whitespace_punct_context(*(get_utils()->latin1_whitespace_acceptor));
             whitespace_punct_context.disjunct(*(get_utils()->latin1_punct_acceptor));
             whitespace_punct_context.disjunct(HfstTransducer("@BOUNDARY@", format));
