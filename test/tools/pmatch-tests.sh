@@ -51,7 +51,7 @@ Define TOP "foo";'
 # Bug/feature (reported 2013-01-22)
 
 check_compile_run 'Define name containing a 0' \
-    'Define T0 [Alpha+ EndTag(A)]; Define TOP T0;' \
+    'set need-separators off Define T0 [Alpha+ EndTag(A)]; Define TOP T0;' \
     '0abc1' '0<A>abc</A>1'
 
 
