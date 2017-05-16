@@ -1111,6 +1111,12 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
             delete retval["TOP"];
             retval["TOP"] = add_pmatch_delimiters(top_with_boundaries);
             (retval["TOP"])->minimize();
+            if (hfst::pmatch::verbose) {
+                double duration = (clock() - hfst::pmatch::timer) /
+                    (double) CLOCKS_PER_SEC;
+                hfst::pmatch::timer = clock();
+                std::cerr << "added automatic context separators in " << duration << " seconds\n";
+            }
         }
     }
     for(std::map<std::string, std::string>::iterator it = variables.begin();
