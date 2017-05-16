@@ -1110,6 +1110,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
             top_with_boundaries->concatenate(RC);
             delete retval["TOP"];
             retval["TOP"] = add_pmatch_delimiters(top_with_boundaries);
+            (retval["TOP"])->minimize();
         }
     }
     for(std::map<std::string, std::string>::iterator it = variables.begin();
