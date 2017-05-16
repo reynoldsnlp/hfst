@@ -409,13 +409,14 @@ void Transducer::try_epsilon_transitions(unsigned int input_pos,
         SymbolNumber output = tables->get_transition_output(i);
         TransitionTableIndex target = tables->get_transition_target(i);
         Weight weight = tables->get_weight(i);
+        Weight old_weight = current_weight;
         if (input == 0) // epsilon
         {
             output_tape.write(output_pos, input, output);
             current_weight += weight;
             get_analyses(input_pos, output_pos + 1, target);
             found_transition = true;
-            current_weight -= weight;
+            current_weight = old_weight;
             ++i;
         } else if (alphabet->is_flag_diacritic(input)) {
             FlagDiacriticState flags = flag_state.get_values();
@@ -435,7 +436,7 @@ void Transducer::try_epsilon_transitions(unsigned int input_pos,
                 current_weight += weight;
                 get_analyses(input_pos, output_pos + 1, target);
                 found_transition = true;
-                current_weight -= weight;
+                current_weight = old_weight;
                 traversal_states.erase(flag_reachable);
             }
             flag_state.assign_values(flags);
@@ -470,6 +471,7 @@ void Transducer::find_transitions(SymbolNumber input,
     {
         if (tables->get_transition_input(i) == input)
         {
+            Weight old_weight = current_weight;
             // We're not going to find an epsilon / flag loop
             traversal_states.clear();
             SymbolNumber output = tables->get_transition_output(i);
@@ -485,7 +487,7 @@ void Transducer::find_transitions(SymbolNumber input,
             get_analyses(input_pos,
                          output_pos + 1,
                          tables->get_transition_target(i));
-            current_weight -= tables->get_weight(i);
+            current_weight = old_weight;
             found_transition = true;
         }
         else
@@ -545,9 +547,10 @@ void Transducer::get_analyses(unsigned int input_pos,
             if (max_lookups < 0 || (ssize_t)lookup_paths->size() < max_lookups) {
                 output_tape.write(output_pos, NO_SYMBOL_NUMBER, NO_SYMBOL_NUMBER);
                 if (tables->get_transition_finality(i)) {
+                    Weight old_weight = current_weight;
                     current_weight += tables->get_weight(i);
                     note_analysis();
-                    current_weight -= tables->get_weight(i);
+                    current_weight = old_weight;
                 }
             }
         }
@@ -594,9 +597,12 @@ void Transducer::get_analyses(unsigned int input_pos,
             if (max_lookups < 0 || (ssize_t)lookup_paths->size() < max_lookups) {
                 output_tape.write(output_pos, NO_SYMBOL_NUMBER, NO_SYMBOL_NUMBER);
                 if (tables->get_index_finality(i)) {
+                    Weight old_weight = current_weight;
+                    std::cerr << current_weight << "\t";
                     current_weight += tables->get_final_weight(i);
+                    std::cerr << current_weight << std::endl;
                     note_analysis();
-                    current_weight -= tables->get_final_weight(i);
+                    current_weight = old_weight;
                 }
             }
         }
