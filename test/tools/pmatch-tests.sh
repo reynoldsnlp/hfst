@@ -69,7 +69,7 @@ done
 test_begin 'Semicolons'
 
 check_compile_run \
-    --codetempl 'Define TOP @1@ EndTag(X);' \
+    --codetempl 'set need-separators off Define TOP @1@ EndTag(X);' \
     --descrtempl 'Semicolon to be marked: @1@' \
     --templarg-single '[{;}]' '({;})' '{;}' '";"' '%;'\
     --inout '' 'a;b' 'a<X>;</X>b'
@@ -932,7 +932,7 @@ test_begin "Ins maximizing globally"
 check_compile_run \
     --code 'Ins followed by a character contained in Ins expression' \
     'Define A [Alpha+]; Define TOP [Ins(A) {a} EndTag(A)];' \
-    --inout '' 'aa' 'aa'
+    --inout '' 'aa' '<A>aa</A>'
 
 check_compile_run \
     --code 'Ins followed by a character not contained in Ins expression' \
