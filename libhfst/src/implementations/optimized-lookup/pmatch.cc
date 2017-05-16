@@ -990,8 +990,12 @@ std::string PmatchAlphabet::stringify(const DoubleTape & str)
 {
     std::string retval;
     std::stack<unsigned int> start_tag_pos;
+    bool input_contained_printable_symbol = false;
     for (DoubleTape::const_iterator it = str.begin();
          it != str.end(); ++it) {
+        if (!input_contained_printable_symbol && is_printable(it->input)) {
+            input_contained_printable_symbol = true;
+        }
         SymbolNumber output = it->output;
         if (output == special_symbols[entry]) {
             start_tag_pos.push(hfst::size_t_to_uint(retval.size()));
@@ -1000,7 +1004,7 @@ std::string PmatchAlphabet::stringify(const DoubleTape & str)
                 start_tag_pos.pop();
             }
         } else if (is_end_tag(output)) {
-            if (container->count_patterns) {
+            if (container->count_patterns && input_contained_printable_symbol) {
                 if ((container->pattern_counts).count(start_tag(output)) == 0) {
                     (container->pattern_counts)[start_tag(output)] = 1;
                 } else {
@@ -1017,7 +1021,7 @@ std::string PmatchAlphabet::stringify(const DoubleTape & str)
             if (container->delete_patterns) {
                 size_t how_much_to_delete = retval.size() - pos;
                 retval.replace(pos, how_much_to_delete, start_tag(output));
-            } else if (container->mark_patterns) {
+            } else if (container->mark_patterns && input_contained_printable_symbol) {
                 retval.insert(pos, start_tag(output));
                 retval.append(end_tag(output));
             }
