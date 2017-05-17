@@ -98,4 +98,30 @@ C12 = hfst.concatenate((pi, vars['bier'], vars['BlueMaster'], pi))
 # 13. The German smokes Prince
 C13 = hfst.concatenate((pi, vars['German'], Drink, vars['Prince'], pi))
 
-C13.write_to_file('Result')
+# 14. The Norwegian lives next to the blue house
+C141 = hfst.concatenate((pi, vars['Norwegian'], pi_house, HouseSeparator, vars['blue'], pi))
+C142 = hfst.concatenate((pi, vars['blue'], pi_house, HouseSeparator, Color, vars['Norwegian'], pi))
+C14 = hfst.disjunct((C141, C142))
+C14.minimize()
+
+# 15. The Blend smoker has a neighbor who drinks water
+C151 = hfst.concatenate((pi, vars['Blend'], Pet, HouseSeparator, pi_house, vars['water'], pi))
+C152 = hfst.concatenate((pi, vars['water'], pi_house, HouseSeparator, pi_house, vars['Blend'], pi))
+C15 = hfst.disjunct((C151, C152))
+C15.minimize()
+
+# Let's minimize the constraint transducers to carry out conjunction more efficiently:
+Result = None
+j = 1
+for i in (C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15):
+    print("constraint #" + str(j) + "...")
+    i.minimize()
+    # Let's conjunct Houses with the constraints one by one:
+    if Result == None:
+        Result = i
+    else:
+        Result.conjunct(i)
+        Result.minimize()
+    j = j + 1
+
+Result.write_to_file('Result')

@@ -213,11 +213,19 @@ do
 
 	if ! [ "$PYTHON" == "" ]; then
 	    if [ -e python-scripts/$example.hfst.py ]; then
-		echo "  compiling script with HFST python API using back-end format "$format".."
-		if ! ($PYTHON python-scripts/$example.hfst.py $format $PYTHONPATH); then
-		    echo "ERROR: compilation of script with HFST python API failed"
-		    cat LOG;
-		    exit 1;
+		if [ "$example" = "EinsteinsPuzzle" ]; then
+		    echo "EinsteinsPuzzle is too slow to compile with python, using hfst script instead"
+		    if ! ($SH hfst-scripts/$example.hfst.script $format $tooldir); then
+			echo "ERROR: compilation of hfst script failed"
+			exit 1
+		    fi
+		else
+		    echo "  compiling script with HFST python API using back-end format "$format".."
+		    if ! ($PYTHON python-scripts/$example.hfst.py $format $PYTHONPATH); then
+			echo "ERROR: compilation of script with HFST python API failed"
+			cat LOG;
+			exit 1;
+		    fi
 		fi
 	    else
 		echo "  no python script found for "$example", using hfst script instead"
@@ -242,12 +250,14 @@ do
             "$example" = "Palindromes" ]; then
             # special case 1
             if [ "$example" = "EinsteinsPuzzle" ]; then
+		echo '(generating all word forms from xfst result, this can take a while)'
                 if ! ($tooldir/hfst-fst2strings --xfst=print-space Result_from_xfst | grep "German coffee Prince fish" > /dev/null); then
                     echo "  FAIL: Results differ"
                     if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
                         exit 1;
                     fi
                 fi
+		echo '(generating all word forms from hfst result, this can take a while)'
                 if ! ($tooldir/hfst-fst2strings Result_from_hfst_script_$format | \
                       grep "fish" | grep "German coffee Prince fish" > /dev/null); then
                     echo "  FAIL: Results differ"
