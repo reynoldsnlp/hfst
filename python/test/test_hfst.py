@@ -269,12 +269,15 @@ for type in types:
     # Special inputs
     test_fst('*** FOO ***', '{*** FOO ***}')
 
-    try:
-        foo = hfst.fst('')
-        raise RuntimeError(get_linenumber())
-    except RuntimeError as e:
-        if not e.__str__() == 'Empty word.':
-            raise RuntimeError(get_linenumber())
+    foo = hfst.fst('')
+    eps = hfst.epsilon_fst()
+    assert(foo.compare(eps))
+    #try:
+    #    foo = hfst.fst('')
+    #    raise RuntimeError(get_linenumber())
+    #except RuntimeError as e:
+    #    if not e.__str__() == 'Empty word.':
+    #        raise RuntimeError(get_linenumber())
 
     # Create transducer:
     # unweighted
@@ -292,18 +295,24 @@ for type in types:
     # Special inputs
     test_fst({'*** FOO ***':'+++ BAR +++'}, '{*** FOO ***}:{+++ BAR +++}')
 
-    try:
-        foo = hfst.fst({'':'foo'})
-        raise RuntimeError(get_linenumber())
-    except RuntimeError as e:
-        if not e.__str__() == 'Empty word.':
-            raise RuntimeError(get_linenumber())
-    try:
-        foo = hfst.fst({'foo':''})
-        raise RuntimeError(get_linenumber())
-    except RuntimeError as e:
-        if not e.__str__() == 'Empty word.':
-            raise RuntimeError(get_linenumber())
+    foo = hfst.fst({'':'foo'})
+    tr = hfst.regex('0:{foo}')
+    assert(foo.compare(tr))
+    foo = hfst.fst({'foo':''})
+    tr = hfst.regex('{foo}:0')
+    assert(foo.compare(tr))
+    #try:
+    #    foo = hfst.fst({'':'foo'})
+    #    raise RuntimeError(get_linenumber())
+    #except RuntimeError as e:
+    #    if not e.__str__() == 'Empty word.':
+    #        raise RuntimeError(get_linenumber())
+    #try:
+    #    foo = hfst.fst({'foo':''})
+    #    raise RuntimeError(get_linenumber())
+    #except RuntimeError as e:
+    #    if not e.__str__() == 'Empty word.':
+    #        raise RuntimeError(get_linenumber())
 
     # Tokenized input
     def test_tokenized(tok, pathin, pathout, exp, weight=0):
