@@ -334,10 +334,10 @@ do
     rm -f Result_from_hfst_script_$format
 done
 
-rm -f tmpdir/NumbersToNumerals
-if [ -d "tmpdir" ]; then
-    rmdir tmpdir
-fi
+#rm -f tmpdir/NumbersToNumerals
+#if [ -d "tmpdir" ]; then
+#    rmdir tmpdir
+#fi
 
 echo ""
 echo "**********"
