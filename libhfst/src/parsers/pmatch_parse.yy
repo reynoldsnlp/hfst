@@ -102,7 +102,7 @@ LTR_LONGEST_MATCH LTR_SHORTEST_MATCH
 //  MAP_LEFT
 %right DEFINE SET_VARIABLE
 LIT_LEFT INS_LEFT REGEX DEFINS DEFINED_LIST CAP_LEFT OPTCAP_LEFT OPT_TOLOWER_LEFT TOLOWER_LEFT
-OPT_TOUPPER_LEFT TOUPPER_LEFT ANY_CASE_LEFT IMPLODE_LEFT EXPLODE_LEFT DEFINE_LEFT ENDTAG_LEFT LIKE_LEFT LC_LEFT RC_LEFT NLC_LEFT NRC_LEFT OR_LEFT AND_LEFT
+OPT_TOUPPER_LEFT TOUPPER_LEFT ANY_CASE_LEFT IMPLODE_LEFT EXPLODE_LEFT DEFINE_LEFT ENDTAG_LEFT LIKE_LEFT UNLIKE_LEFT LC_LEFT RC_LEFT NLC_LEFT NRC_LEFT OR_LEFT AND_LEFT
 TAG_LEFT LST_LEFT EXC_LEFT INTERPOLATE_LEFT SIGMA_LEFT COUNTER_LEFT
 %%
 
@@ -605,7 +605,30 @@ LIKE_LEFT ARGLIST RIGHT_PARENTHESIS CATENATE_N {
                                             $2->operator[](1), $4);
     }
     delete($2);
-}
+} |
+UNLIKE_LEFT ARGLIST RIGHT_PARENTHESIS {
+    if ($2->size() < 2) {
+        std::stringstream err;
+        err << "Unlike() operation takes exactly 2 arguments, got " << $2->size();
+        pmatcherror(err.str().c_str());
+    } else {
+        $$ = hfst::pmatch::compile_like_arc($2->operator[](1),
+                                            $2->operator[](0), 10, true);
+    }
+    delete($2);
+} |
+UNLIKE_LEFT ARGLIST RIGHT_PARENTHESIS CATENATE_N {
+    if ($2->size() < 2) {
+        std::stringstream err;
+        err << "Unlike() operation takes exactly 2 arguments, got " << $2->size();
+        pmatcherror(err.str().c_str());
+    } else {
+        $$ = hfst::pmatch::compile_like_arc($2->operator[](1),
+                                            $2->operator[](0), $4, true);
+    }
+    delete($2);
+};
+
 
 ENDTAG: ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
     $$ = hfst::pmatch::make_end_tag($2);

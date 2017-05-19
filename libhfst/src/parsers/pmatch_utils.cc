@@ -66,7 +66,14 @@ pmatcherror(const char *msg)
 void pmatchwarning(const char *msg)
 {
     if (hfst::pmatch::verbose) {
-        std::cerr << "pmatch: "<< msg << std::endl;
+        std::string warnmsg = "pmatch: ";
+        warnmsg.append(msg);
+        warnmsg.append(" on line ");
+        std::ostringstream ss;
+        ss << pmatchlineno;
+        warnmsg.append(ss.str());
+        warnmsg.append("\n");
+        std::cerr << warnmsg;
     }
 }
 
@@ -90,6 +97,7 @@ hfst::ImplementationType format;
 size_t len;
 bool verbose;
 bool flatten;
+bool include_cosine_distances;
 std::string includedir;
 clock_t timer;
 int minimization_guard_count;
@@ -351,9 +359,16 @@ struct CosineSimilarityProjectedToPlaneComparison {
     std::vector<WordVecFloat> comparison_point;
     WordVecFloat translation_term;
     WordVecFloat plane_vec_square_sum;
+    bool negative;
     CosineSimilarityProjectedToPlaneComparison(
-        std::vector<WordVecFloat> plane_vec_, std::vector<WordVecFloat> comparison_point_, WordVecFloat translation_term_):
-        plane_vec(plane_vec_), comparison_point(comparison_point_), translation_term(translation_term_)
+        std::vector<WordVecFloat> plane_vec_,
+        std::vector<WordVecFloat> comparison_point_,
+        WordVecFloat translation_term_,
+        bool negative_):
+        plane_vec(plane_vec_),
+            comparison_point(comparison_point_),
+            translation_term(translation_term_),
+            negative(negative_)
         {
             plane_vec_square_sum = square_sum(plane_vec_);
         }
@@ -367,8 +382,15 @@ struct CosineSimilarityProjectedToPlaneComparison {
         WordVecFloat right_scaler = (translation_term - dot_product(right.vector, plane_vec)) / plane_vec_square_sum;
         left_scaler *= vector_similarity_projection_factor;
         right_scaler *= vector_similarity_projection_factor;
-        std::vector<WordVecFloat> new_left = pointwise_plus(left.vector, pointwise_multiplication(left_scaler, plane_vec));
-        std::vector<WordVecFloat> new_right = pointwise_plus(right.vector, pointwise_multiplication(right_scaler, plane_vec));
+        std::vector<WordVecFloat> new_left;
+        std::vector<WordVecFloat> new_right;
+        if (negative) {
+            new_left = pointwise_minus(left.vector, pointwise_multiplication(left_scaler, plane_vec));
+            new_right = pointwise_minus(right.vector, pointwise_multiplication(right_scaler, plane_vec));
+        } else {
+            new_left = pointwise_plus(left.vector, pointwise_multiplication(left_scaler, plane_vec));
+            new_right = pointwise_plus(right.vector, pointwise_multiplication(right_scaler, plane_vec));
+        }
         // Then calculate cosine similarity
         WordVecFloat left_accumulator = 0.0;
         WordVecFloat right_accumulator = 0.0;
@@ -458,7 +480,7 @@ WordVecFloat cosine_distance(std::vector<WordVecFloat> left, std::vector<WordVec
 }
 
 PmatchObject * compile_like_arc(std::string word1, std::string word2,
-                                unsigned int nwords)
+                                unsigned int nwords, bool is_negative)
 {
     WordVector this_word1;
     WordVector this_word2;
@@ -477,6 +499,7 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
         PmatchString * word1_o = new PmatchString(word1);
         PmatchString * word2_o = new PmatchString(word2);
         word1_o->multichar = true; word2_o->multichar = true;
+        pmatchwarning("no matches for arguments to Like() operation");
         return new PmatchBinaryOperation(Disjunct, word1_o, word2_o);
     }
 
@@ -492,6 +515,7 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
             tmp.set_final_weights(cosine_distance(word_vectors[i], this_word));
             retval->disjunct(tmp);
         }
+        pmatchwarning("only one match for arguments to Like() operation, using nearest neighbours");
         return new PmatchTransducerContainer(retval);
     }
 
@@ -513,17 +537,27 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
      * translation term. |B - A| = 0 would be the set of vectors orthogonal to
      * |B - A|. We set d so that the distance from the hyperplane to A is
      * half of the norm of |B - A|.
+     *
      */
         
     std::vector<WordVecFloat> B_minus_A = pointwise_minus(
         this_word1.vector, this_word2.vector);
-    std::vector<WordVecFloat> halfway_point = pointwise_plus(
-        this_word2.vector, pointwise_multiplication(
-            static_cast<WordVecFloat>(0.5), B_minus_A));
     WordVecFloat hyperplane_translation_term = dot_product(B_minus_A, this_word1.vector)
         - square_sum(B_minus_A) * 0.5;
+
+    std::vector<WordVecFloat> comparison_point;
+    if (is_negative == true) {
+        WordVecFloat comparison_scaler =
+            (hyperplane_translation_term - dot_product(this_word1.vector, B_minus_A)) / square_sum(B_minus_A);
+        comparison_scaler *= vector_similarity_projection_factor;
+        comparison_point = pointwise_minus(this_word1.vector, pointwise_multiplication(comparison_scaler, B_minus_A));
+    } else {
+        comparison_point = pointwise_plus(this_word2.vector, pointwise_multiplication(
+                                              static_cast<WordVecFloat>(0.5), B_minus_A));
+    }
+    
     CosineSimilarityProjectedToPlaneComparison comparison_object(
-        B_minus_A, halfway_point, hyperplane_translation_term);
+        B_minus_A, comparison_point, hyperplane_translation_term, is_negative);
     std::sort(word_vectors.begin(), word_vectors.end(), comparison_object);
 
     HfstTokenizer tok;
@@ -532,13 +566,17 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
         HfstTransducer tmp(word_vectors[i].word, tok, format);
         std::vector<WordVecFloat> projected_i = get_projected_vector(
             word_vectors[i].vector, B_minus_A, hyperplane_translation_term);
-        tmp.set_final_weights(cosine_distance(projected_i, halfway_point));
+        if (include_cosine_distances) {
+            tmp.set_final_weights(cosine_distance(projected_i, comparison_point));
+        }
         retval->disjunct(tmp);
-        for (size_t j = i + 1; j < word_vectors.size() && j <= nwords; ++j) {
-            HfstTransducer tmp2(word_vectors[i].word + "_cos_" + word_vectors[j].word, tok, format);
-            tmp2.set_final_weights(cosine_distance(projected_i,
-                                                   get_projected_vector(word_vectors[j].vector, B_minus_A, hyperplane_translation_term)));
-            retval->disjunct(tmp2);
+        if (include_cosine_distances) {
+            for (size_t j = i + 1; j < word_vectors.size() && j <= nwords; ++j) {
+                HfstTransducer tmp2(word_vectors[i].word + "_cos_" + word_vectors[j].word, tok, format);
+                tmp2.set_final_weights(cosine_distance(projected_i,
+                                                       get_projected_vector(word_vectors[j].vector, B_minus_A, hyperplane_translation_term)));
+                retval->disjunct(tmp2);
+            }
         }
     }
     return new PmatchTransducerContainer(retval);
@@ -983,6 +1021,7 @@ void init_globals(void)
 std::map<std::string, HfstTransducer*>
 compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         ImplementationType impl, bool be_verbose, bool do_flatten,
+        bool do_include_cosine_distances,
         std::string includedir_)
 {
     // lock here?
@@ -992,6 +1031,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     len = strlen(data);
     verbose = be_verbose;
     flatten = do_flatten;
+    include_cosine_distances = do_include_cosine_distances;
     includedir = includedir_;
     vector_similarity_projection_factor = 1.0;
     for (map<string, HfstTransducer*>::iterator it = defs.begin();

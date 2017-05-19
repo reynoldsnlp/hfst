@@ -45,7 +45,8 @@ std::map<std::string, HfstTransducer*>
 PmatchCompiler::compile(const std::string& pmatch)
 {
     return hfst::pmatch::compile(pmatch, definitions_, format_,
-                                 verbose, flatten, includedir);
+                                 verbose, flatten, include_cosine_distances,
+                                 includedir);
 }
 
 void PmatchCompiler::set_include_path(std::string path)

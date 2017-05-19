@@ -40,6 +40,7 @@ class PmatchCompiler
 private:
     bool flatten;
     bool verbose;
+    bool include_cosine_distances;
     std::string includedir;
   public:
   //! @brief Construct compiler for unknown format transducers.
@@ -49,6 +50,8 @@ private:
 
   void set_flatten(bool val) { flatten = val; }
   void set_verbose(bool val) { verbose = val; }
+  void set_include_cosine_distances(bool val)
+        { include_cosine_distances = val; }
 
   //! @brief Add a definition macro.
   //!        Compilers will replace arcs labeled @a name, with the transducer

@@ -53,6 +53,7 @@ extern std::vector<WordVector> word_vectors;
 extern ImplementationType format;
 extern bool verbose;
 extern bool flatten;
+extern bool include_cosine_distances;
 extern std::string includedir;
 extern clock_t timer;
 extern int minimization_guard_count;
@@ -138,7 +139,7 @@ template<typename T> T square_sum(std::vector<T> v);
 template<typename T> T norm(std::vector<T> v);
 WordVecFloat cosine_distance(WordVector left, WordVector right);
 PmatchObject * compile_like_arc(std::string word1, std::string word2 = "",
-    unsigned int nwords = 10);
+                                unsigned int nwords = 10, bool is_negative = false);
 PmatchTransducerContainer * make_counter(std::string name);
 HfstTransducer * make_list(HfstTransducer * t,
                            ImplementationType f = format);
@@ -185,6 +186,7 @@ std::map<std::string, HfstTransducer*>
             std::map<std::string,hfst::HfstTransducer*>& defs,
             hfst::ImplementationType type,
             bool be_verbose = false, bool do_flatten = false,
+            bool include_cosine_distances = false,
             std::string includedir = "");
 
 void print_size_info(HfstTransducer * net);

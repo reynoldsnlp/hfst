@@ -93,6 +93,7 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 "Lst(" { return LST_LEFT; }
 "Exc(" { return EXC_LEFT; }
 "Like(" { return LIKE_LEFT; }
+"Unlike(" { return UNLIKE_LEFT; }
 "Interpolate(" { return INTERPOLATE_LEFT; }
 "Sigma(" { return SIGMA_LEFT; }
 "Counter(" { return COUNTER_LEFT; }

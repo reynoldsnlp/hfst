@@ -77,6 +77,7 @@ static char *epsilonname=NULL;
 static bool disjunct_expressions=false;
 static bool line_separated = false;
 static bool flatten = false;
+static bool include_cosine_distances = false;
 static clock_t timer;
 
 #if HAVE_OPENFST
@@ -100,7 +101,8 @@ print_usage()
     print_common_unary_program_options(message_out);
     fprintf(message_out, "String and format options:\n"
             "  -e, --epsilon=EPS         Map EPS as zero\n"
-            "      --flatten             Compile in all RTNs\n");
+            "      --flatten             Compile in all RTNs\n"
+            "      --cosine-distances    When compiling Like() operations, include cosine distance info\n");
     fprintf(message_out, "\n");
 
     fprintf(message_out,
@@ -133,11 +135,12 @@ parse_options(int argc, char** argv)
                 HFST_GETOPT_UNARY_LONG,
                 {"epsilon", required_argument, 0, 'e'},
                 {"flatten", no_argument, 0, '1'},
+                {"cosine-distances", no_argument, 0, '2'},
                 {0,0,0,0}
             };
         int option_index = 0;
         int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "e:1:",
+                             HFST_GETOPT_UNARY_SHORT "e:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -153,6 +156,9 @@ parse_options(int argc, char** argv)
             break;
         case '1':
             flatten = true;
+            break;
+        case '2':
+            include_cosine_distances = true;
             break;
 #include "inc/getopt-cases-error.h"
         }
@@ -194,6 +200,7 @@ process_stream(HfstOutputStream& outstream)
     PmatchCompiler comp(compilation_format);
     comp.set_verbose(verbose);
     comp.set_flatten(flatten);
+    comp.set_include_cosine_distances(include_cosine_distances);
     std::string file_contents;
     std::map<std::string, HfstTransducer*> definitions;
     int c;
