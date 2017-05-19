@@ -985,15 +985,27 @@ def fsa(arg):
     deftok = HfstTokenizer()
     retval = HfstBasicTransducer()
     if isinstance(arg, str):
-       retval.disjunct(deftok.tokenize(_check_word(arg)), 0)
+       if len(arg) == 0:
+           retval.set_final_weight(0, 0) # epsilon transducer with zero weight
+       else:
+           retval.disjunct(deftok.tokenize(_check_word(arg)), 0)
     elif _is_weighted_word(arg):
-       retval.disjunct(deftok.tokenize(_check_word(arg[0])), arg[1])
+       if len(arg) == 0:
+           retval.set_final_weight(0, arg[1]) # epsilon transducer with weight
+       else:
+           retval.disjunct(deftok.tokenize(_check_word(arg[0])), arg[1])
     elif isinstance(arg, tuple) or isinstance(arg, list):
        for word in arg:
            if _is_weighted_word(word):
-              retval.disjunct(deftok.tokenize(_check_word(word[0])), word[1])
+              if len(word) == 0:
+                  retval.set_final_weight(0, word[1]) # epsilon transducer with weight
+              else:
+                  retval.disjunct(deftok.tokenize(_check_word(word[0])), word[1])
            elif isinstance(word, str):
-              retval.disjunct(deftok.tokenize(_check_word(word)), 0)
+              if len(word) == 0:
+                  retval.set_final_weight(0, 0) # epsilon transducer with zero weight
+              else:
+                  retval.disjunct(deftok.tokenize(_check_word(word)), 0)
            else:
               raise RuntimeError('Tuple/list element not a string or tuple of string and weight.')
     else:
