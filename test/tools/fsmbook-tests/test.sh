@@ -220,19 +220,11 @@ do
 
 	if ! [ "$PYTHON" == "" ]; then
 	    if [ -e python-scripts/$example.hfst.py ]; then
-		if [ "$example" = "EinsteinsPuzzle" ]; then
-		    echo "EinsteinsPuzzle is too slow to compile with python, using hfst script instead"
-		    if ! ($SH hfst-scripts/$example.hfst.script $format $tooldir); then
-			echo "ERROR: compilation of hfst script failed"
-			exit 1
-		    fi
-		else
-		    echo "  compiling script with HFST python API using back-end format "$format".."
-		    if ! ($PYTHON python-scripts/$example.hfst.py $format $PYTHONPATH); then
-			echo "ERROR: compilation of script with HFST python API failed"
-			cat LOG;
-			exit 1;
-		    fi
+		echo "  compiling script with HFST python API using back-end format "$format".."
+		if ! ($PYTHON python-scripts/$example.hfst.py $format $PYTHONPATH); then
+		    echo "ERROR: compilation of script with HFST python API failed"
+		    cat LOG;
+		    exit 1;
 		fi
 	    else
 		echo "  no python script found for "$example", using hfst script instead"
