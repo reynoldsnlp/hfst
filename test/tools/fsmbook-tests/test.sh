@@ -300,7 +300,7 @@ do
             if ! [ -d log ]; then
                 mkdir log
             fi
-            cp Result_from_xfst log/$example.result_from_xfst_script_using_xfst_tool
+            cp Expected_result log/$example.result_from_xfst_script_using_xfst_tool
             cp Result_from_hfst_script_$format log/$example.result_from_hfst_script_using_backend_format_$format
             if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
                 exit 1;
