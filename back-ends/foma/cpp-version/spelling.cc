@@ -65,7 +65,7 @@ void print_match(struct apply_med_handle *medh, struct apply_med_handle::astarno
     printptr = 0;
     if (medh->outstring_length < 2*wordlen) {
 	medh->outstring_length *= 2;
-	medh->outstring = xxrealloc(medh->outstring, medh->outstring_length*sizeof(char));
+	medh->outstring = (char *)xxrealloc(medh->outstring, medh->outstring_length*sizeof(char));
     }
     while (!(int_stack_isempty())) {
         sym = int_stack_pop();
@@ -92,7 +92,7 @@ void print_match(struct apply_med_handle *medh, struct apply_med_handle::astarno
     printptr = 0;
     if (medh->instring_length < 2*wordlen) {
 	medh->instring_length *= 2;
-	medh->instring = xxrealloc(medh->instring, medh->instring_length*sizeof(char));
+	medh->instring = (char *)xxrealloc(medh->instring, medh->instring_length*sizeof(char));
     }
     for (i = 0; !(int_stack_isempty()); ) {
         sym = int_stack_pop();
@@ -149,13 +149,13 @@ struct apply_med_handle *apply_med_init(struct fsm *net) {
 
     struct apply_med_handle *medh;
     struct sigma *sigma;
-    medh = xxcalloc(1,sizeof(struct apply_med_handle));
+    medh = (struct apply_med_handle *)xxcalloc(1,sizeof(struct apply_med_handle));
     medh->net = net;
-    medh->agenda = xxmalloc(sizeof(struct apply_med_handle::astarnode)*INITIAL_AGENDA_SIZE);
+    medh->agenda = (struct apply_med_handle::astarnode *)xxmalloc(sizeof(struct apply_med_handle::astarnode)*INITIAL_AGENDA_SIZE);
     medh->agenda->f = -1;
     medh->agenda_size = INITIAL_AGENDA_SIZE;
     
-    medh->heap = xxmalloc(sizeof(int)*INITIAL_HEAP_SIZE);
+    medh->heap = (int *)xxmalloc(sizeof(int)*INITIAL_HEAP_SIZE);
     medh->heap_size = INITIAL_HEAP_SIZE;
     *(medh->heap) = 0; /* Points to sentinel */
     medh->astarcount = 1;
@@ -176,9 +176,9 @@ struct apply_med_handle *apply_med_init(struct fsm *net) {
 
     fsm_create_letter_lookup(medh, net);
 
-    medh->instring = xxmalloc(sizeof(char)*INITIAL_STRING_SIZE);
+    medh->instring = (char *)xxmalloc(sizeof(char)*INITIAL_STRING_SIZE);
     medh->instring_length = INITIAL_STRING_SIZE;
-    medh->outstring = xxmalloc(sizeof(char)*INITIAL_STRING_SIZE);
+    medh->outstring = (char *)xxmalloc(sizeof(char)*INITIAL_STRING_SIZE);
     medh->outstring_length = INITIAL_STRING_SIZE;
     
     medh->med_limit = MED_DEFAULT_LIMIT;
@@ -253,7 +253,7 @@ char *apply_med(struct apply_med_handle *medh, char *word) {
     if (medh->intword != NULL) {
 	xxfree(medh->intword);
     }
-    medh->intword = xxmalloc(sizeof(int)*(medh->utf8len+1));
+    medh->intword = (int *)xxmalloc(sizeof(int)*(medh->utf8len+1));
 
    /* intword -> sigma numbers of word */
     for (i=0, j=0; i < medh->wordlen; i += thisskip, j++) {
@@ -482,7 +482,7 @@ int node_insert(struct apply_med_handle *medh, int wordpos, int fsmstate, int g,
 	    return 0;
 	}
         medh->agenda_size *= 2;
-        medh->agenda = xxrealloc(medh->agenda, sizeof(struct apply_med_handle::astarnode)*medh->agenda_size);
+        medh->agenda = (struct apply_med_handle::astarnode *)xxrealloc(medh->agenda, sizeof(struct apply_med_handle::astarnode)*medh->agenda_size);
     }
     f = g + h;
     (medh->agenda+i)->wordpos = wordpos;
@@ -499,7 +499,7 @@ int node_insert(struct apply_med_handle *medh, int wordpos, int fsmstate, int g,
     medh->heapcount++;
 
     if (medh->heapcount == medh->heap_size-1) {
-        medh->heap = xxrealloc(medh->heap, sizeof(int)*medh->heap_size*2);
+        medh->heap = (int *)xxrealloc(medh->heap, sizeof(int)*medh->heap_size*2);
         medh->heap_size *= 2;
     }
     /*                                     >= makes fifo */
@@ -593,10 +593,10 @@ void fsm_create_letter_lookup(struct apply_med_handle *medh, struct fsm *net) {
     num_symbols = sigma_max(net->sigma);
     
     medh->bytes_per_letter_array = BITNSLOTS(num_symbols+1);
-    medh->letterbits = xxcalloc(medh->bytes_per_letter_array*num_states,sizeof(uint8_t));
-    medh->nletterbits = xxcalloc(medh->bytes_per_letter_array*num_states,sizeof(uint8_t));
+    medh->letterbits = (uint8_t *)xxcalloc(medh->bytes_per_letter_array*num_states,sizeof(uint8_t));
+    medh->nletterbits = (uint8_t *)xxcalloc(medh->bytes_per_letter_array*num_states,sizeof(uint8_t));
 
-    sccinfo = xxcalloc(num_states,sizeof(struct sccinfo));
+    sccinfo = (struct sccinfo *)xxcalloc(num_states,sizeof(struct sccinfo));
     
     index = 1;
     curr_ptr = net->states;
@@ -607,7 +607,7 @@ void fsm_create_letter_lookup(struct apply_med_handle *medh, struct fsm *net) {
 
     while(!ptr_stack_isempty()) {
 
-        curr_ptr = ptr_stack_pop();
+        curr_ptr = (struct fsm_state*)ptr_stack_pop();
 
         v = curr_ptr->state_no; /* source state number */
         vp = curr_ptr->target;  /* target state number */
@@ -698,7 +698,7 @@ void fsm_create_letter_lookup(struct apply_med_handle *medh, struct fsm *net) {
         ptr_stack_push((medh->state_array+v)->transitions);
         int_stack_push(0);
         while (!ptr_stack_isempty()) {
-            curr_ptr = ptr_stack_pop();
+	    curr_ptr = (struct fsm_state*)ptr_stack_pop();
             depth = int_stack_pop();
         looper:
             if (depth == medh->maxdepth)
@@ -806,10 +806,10 @@ void cmatrix_print(struct fsm *net) {
 void cmatrix_init(struct fsm *net) {
     int maxsigma, *cm, i, j;
     if (net->medlookup == NULL) {
-        net->medlookup = xxcalloc(1,sizeof(struct medlookup));
+        net->medlookup = (struct medlookup *)xxcalloc(1,sizeof(struct medlookup));
     }
     maxsigma = sigma_max(net->sigma)+1;
-    cm = xxcalloc(maxsigma*maxsigma, sizeof(int));
+    cm = (int *)xxcalloc(maxsigma*maxsigma, sizeof(int));
     net->medlookup->confusion_matrix = cm;
     for (i = 0; i < maxsigma; i++) {
         for (j = 0; j < maxsigma; j++) {

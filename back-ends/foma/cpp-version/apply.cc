@@ -1357,14 +1357,14 @@ void apply_create_sigmatch(struct apply_handle *h) {
 void apply_add_flag(struct apply_handle *h, char *name) {
     struct apply_handle::flag_list *flist, *flist_prev;
     if (h->flag_list == NULL) {
-	flist = h->flag_list = xxmalloc(sizeof(struct apply_handle::flag_list));
+        flist = h->flag_list = (struct apply_handle::flag_list*)xxmalloc(sizeof(struct apply_handle::flag_list));
     } else {
 	for (flist = h->flag_list; flist != NULL; flist_prev = flist, flist = flist->next) {
 	    if (strcmp(flist->name, name) == 0) {
 		return;
 	    }
 	}
-	flist = xxmalloc(sizeof(struct apply_handle::flag_list));
+	flist = (struct apply_handle::flag_list*)xxmalloc(sizeof(struct apply_handle::flag_list));
 	flist_prev->next = flist;
     }
     flist->name = name;

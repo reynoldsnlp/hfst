@@ -77,7 +77,7 @@ int sigma_add_special (int symbol, struct sigma *sigma) {
     } else {
         for (;(sigma != NULL) && (sigma->number < symbol) && (sigma->number!=-1); sigma_previous=sigma,sigma = sigma->next) {
       }
-      sigma_splice = xxmalloc(sizeof(struct sigma));
+      sigma_splice = (struct sigma *)xxmalloc(sizeof(struct sigma));
       if (sigma_previous != NULL) {
 	(sigma_previous)->next = sigma_splice;
 	sigma_splice->number = symbol;
@@ -122,7 +122,7 @@ int sigma_add (char *symbol, struct sigma *sigma) {
     } else {
       for (; sigma->next != NULL; sigma = sigma->next) {
       }
-      sigma->next = xxmalloc(sizeof(struct sigma));
+      sigma->next = (struct sigma *)xxmalloc(sizeof(struct sigma));
       if ((sigma->number)+1 < 3) {
 	(sigma->next)->number = 3;
       } else {
@@ -140,11 +140,11 @@ int sigma_add (char *symbol, struct sigma *sigma) {
     } else {
       for (;(sigma != NULL) && (sigma->number < assert) && (sigma->number!=-1); sigma_previous=sigma,sigma = sigma->next) {
       }
-      sigma_splice = xxmalloc(sizeof(struct sigma));
+      sigma_splice = (struct sigma *)xxmalloc(sizeof(struct sigma));
       if (sigma_previous != NULL) {
 	(sigma_previous)->next = sigma_splice;
 	sigma_splice->number = assert;
-	sigma_splice->symbol = xxmalloc(sizeof(char)*(strlen(symbol)+1));
+	sigma_splice->symbol = (char *)xxmalloc(sizeof(char)*(strlen(symbol)+1));
 	strcpy(sigma_splice->symbol, symbol);
 	(sigma_splice)->next = sigma;
 	return(assert);
@@ -153,7 +153,7 @@ int sigma_add (char *symbol, struct sigma *sigma) {
 	sigma_splice->number = sigma->number;
 	sigma_splice->next = sigma->next;
 	sigma->number = assert;
-	sigma->symbol = xxmalloc(sizeof(char)*(strlen(symbol)+1));
+	sigma->symbol = (char *)xxmalloc(sizeof(char)*(strlen(symbol)+1));
 	strcpy(sigma->symbol, symbol);
 	sigma->next = sigma_splice;
 	return(assert);
@@ -184,7 +184,7 @@ void sigma_cleanup (struct fsm *net, int force) {
 
     maxsigma = sigma_max(net->sigma);
     if (maxsigma < 0) { return; }
-    attested = xxmalloc(sizeof(int)*(maxsigma+1));
+    attested = (int *)xxmalloc(sizeof(int)*(maxsigma+1));
     for (i=0; i<=maxsigma; i++)
         *(attested+i) = 0;
     fsm = net->states;
@@ -249,7 +249,7 @@ int sigma_size(struct sigma *sigma) {
 struct fsm_sigma_list *sigma_to_list(struct sigma *sigma) {
     struct fsm_sigma_list *sl;
     struct sigma *s;
-    sl = xxcalloc(sigma_max(sigma)+1,sizeof(struct fsm_sigma_list));
+    sl = (struct fsm_sigma_list *)xxcalloc(sigma_max(sigma)+1,sizeof(struct fsm_sigma_list));
     for (s = sigma; s != NULL && s->number != -1; s = s->next) {
         (sl+(s->number))->symbol = s->symbol;
     }
@@ -268,7 +268,7 @@ int sigma_add_number(struct sigma *sigma, char *symbol, int number) {
     for (newsigma = sigma; newsigma != NULL; newsigma = newsigma->next) {
         prev_sigma = newsigma;
     }
-    newsigma = xxmalloc(sizeof(struct sigma));
+    newsigma = (struct sigma *)xxmalloc(sizeof(struct sigma));
     newsigma->symbol = xxstrdup(symbol);
     newsigma->number = number;
     newsigma->next = NULL;
@@ -353,11 +353,11 @@ struct sigma *sigma_copy(struct sigma *sigma) {
     struct sigma *copy_sigma, *copy_sigma_s;
 
     if (sigma == NULL) { return NULL; }
-    copy_sigma_s = xxmalloc(sizeof(struct sigma));
+    copy_sigma_s = (struct sigma *)xxmalloc(sizeof(struct sigma));
 
     for (copy_sigma = copy_sigma_s; sigma != NULL; sigma=sigma->next) {
 	if (f == 1) {
-	    copy_sigma->next = xxmalloc(sizeof(struct sigma));
+	    copy_sigma->next = (struct sigma *)xxmalloc(sizeof(struct sigma));
 	    copy_sigma = copy_sigma->next;
 	}
 	copy_sigma->number = sigma->number;
@@ -387,7 +387,7 @@ int sigma_sort(struct fsm *net) {
   
   size = sigma_max(net->sigma);
   if (size < 0) { return 1; }
-  ssort = xxmalloc(sizeof(struct ssort)*size);
+  ssort = (struct ssort *)xxmalloc(sizeof(struct ssort)*size);
 
   for (i=0, sigma=net->sigma; sigma != NULL; sigma=sigma->next) {
     if (sigma->number > IDENTITY) {
@@ -398,7 +398,7 @@ int sigma_sort(struct fsm *net) {
   }
   max = i;
   qsort(ssort, max, sizeof(struct ssort), comp);
-  replacearray = xxmalloc(sizeof(int)*(size+3));
+  replacearray = (int *)xxmalloc(sizeof(int)*(size+3));
   for (i=0; i<max; i++)
       replacearray[(ssort+i)->number] = i+3;
 
@@ -424,7 +424,7 @@ int sigma_sort(struct fsm *net) {
 
 struct sigma *sigma_create() {
   struct sigma *sigma;
-  sigma = xxmalloc(sizeof(struct sigma));
+  sigma = (struct sigma *)xxmalloc(sizeof(struct sigma));
   sigma->number = -1; /*Empty sigma*/
   sigma->next = NULL;
   sigma->symbol = NULL;

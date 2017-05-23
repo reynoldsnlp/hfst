@@ -45,12 +45,12 @@ struct fsm *fsm_topsort (struct fsm *net) {
 
     fsm = net->states;
     
-    statemap = xxmalloc(sizeof(int)*net->statecount);
-    order = xxmalloc(sizeof(int)*net->statecount);
-    pathcount = xxmalloc(sizeof(long long)*net->statecount);
-    newnum = xxmalloc(sizeof(int)*net->statecount);
-    invcount = xxmalloc(sizeof(unsigned short int)*net->statecount);
-    treated =  xxmalloc(sizeof(unsigned char)*net->statecount);
+    statemap = (int*)xxmalloc(sizeof(int)*net->statecount);
+    order = (int*)xxmalloc(sizeof(int)*net->statecount);
+    pathcount = (long long*)xxmalloc(sizeof(long long)*net->statecount);
+    newnum = (int*)xxmalloc(sizeof(int)*net->statecount);
+    invcount = (unsigned short int*)xxmalloc(sizeof(unsigned short int)*net->statecount);
+    treated =  (unsigned char*)xxmalloc(sizeof(unsigned char)*net->statecount);
    
     for (i=0; i < net->statecount; i++) {
 	*(statemap+i) = -1;
@@ -127,7 +127,7 @@ struct fsm *fsm_topsort (struct fsm *net) {
         goto cyclic;
     }
 
-    new_fsm = xxmalloc(sizeof(struct fsm_state) * (lc+1));
+    new_fsm = (struct fsm_state*)xxmalloc(sizeof(struct fsm_state) * (lc+1));
     for (i=0, j=0 ; i < net->statecount; i++) {
 
         curr_state = *(order+i);

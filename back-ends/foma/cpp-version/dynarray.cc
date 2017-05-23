@@ -58,11 +58,11 @@ static struct sigma_lookup *slookup;
 /* fsm_state_close() adds the sentinel entry and clears values */
 
 struct fsm_state *fsm_state_init(int sigma_size) {
-    current_fsm_head = xxmalloc(INITIAL_SIZE * sizeof(struct fsm_state));
+    current_fsm_head = (struct fsm_state *)xxmalloc(INITIAL_SIZE * sizeof(struct fsm_state));
     current_fsm_size = INITIAL_SIZE;
     current_fsm_linecount = 0;
     ssize = sigma_size+1;
-    slookup = xxcalloc(ssize*ssize,sizeof(struct sigma_lookup));
+    slookup = (struct sigma_lookup *)xxcalloc(ssize*ssize,sizeof(struct sigma_lookup));
     mainloop = 1;
     is_deterministic = 1;
     is_epsilon_free = 1;
@@ -129,7 +129,7 @@ void fsm_state_add_arc(int state_no, int in, int out, int target, int final_stat
     current_trans = 1;
     if (current_fsm_linecount >= current_fsm_size) {
         current_fsm_size *= 2;
-        current_fsm_head = xxrealloc(current_fsm_head, current_fsm_size * sizeof(struct fsm_state));
+        current_fsm_head = (struct fsm_state *)xxrealloc(current_fsm_head, current_fsm_size * sizeof(struct fsm_state));
         if (current_fsm_head == NULL) {
             perror("Fatal error: out of memory\n");
             exit(1);
@@ -147,7 +147,7 @@ void fsm_state_add_arc(int state_no, int in, int out, int target, int final_stat
 
 void fsm_state_close(struct fsm *net) {
     fsm_state_add_arc(-1,-1,-1,-1,-1,-1);
-    current_fsm_head = xxrealloc(current_fsm_head, current_fsm_linecount * sizeof(struct fsm_state));
+    current_fsm_head = (struct fsm_state *)xxrealloc(current_fsm_head, current_fsm_linecount * sizeof(struct fsm_state));
     net->arity = arity;
     net->arccount = arccount;
     net->statecount = statecount;
@@ -173,12 +173,12 @@ void fsm_state_close(struct fsm *net) {
 
 struct fsm_construct_handle *fsm_construct_init(char *name) {
     struct fsm_construct_handle *handle;
-    handle = xxmalloc(sizeof(struct fsm_construct_handle));
-    handle->fsm_state_list = xxcalloc(1024,sizeof(struct fsm_state_list));
+    handle = (struct fsm_construct_handle *)xxmalloc(sizeof(struct fsm_construct_handle));
+    handle->fsm_state_list = (struct fsm_state_list *)xxcalloc(1024,sizeof(struct fsm_state_list));
     handle->fsm_state_list_size = 1024;
-    handle->fsm_sigma_list = xxcalloc(1024,sizeof(struct fsm_sigma_list));
+    handle->fsm_sigma_list = (struct fsm_sigma_list *)xxcalloc(1024,sizeof(struct fsm_sigma_list));
     handle->fsm_sigma_list_size = 1024;
-    handle->fsm_sigma_hash = xxcalloc(SIGMA_HASH_SIZE,sizeof(struct fsm_sigma_hash));
+    handle->fsm_sigma_hash = (struct fsm_sigma_hash *)xxcalloc(SIGMA_HASH_SIZE,sizeof(struct fsm_sigma_hash));
     handle->maxstate = -1;
     handle->maxsigma = -1;
     handle->numfinals = 0;
@@ -197,7 +197,7 @@ void fsm_construct_check_size(struct fsm_construct_handle *handle, int state_no)
     oldsize = handle->fsm_state_list_size;
     if (oldsize <= state_no) {
         newsize = next_power_of_two(state_no);
-        handle->fsm_state_list = xxrealloc(handle->fsm_state_list, newsize*sizeof(struct fsm_state_list));
+        handle->fsm_state_list = (struct fsm_state_list *)xxrealloc(handle->fsm_state_list, newsize*sizeof(struct fsm_state_list));
         handle->fsm_state_list_size = newsize;
         sl = handle->fsm_state_list;
         for (i=oldsize; i<newsize;i++) {
@@ -252,7 +252,7 @@ void fsm_construct_add_arc(struct fsm_construct_handle *handle, int source, int 
     sl->used = 1;
     sl = (handle->fsm_state_list)+source;
     sl->used = 1;
-    tl = xxmalloc(sizeof(struct fsm_trans_list));
+    tl = (struct fsm_trans_list *)xxmalloc(sizeof(struct fsm_trans_list));
     tl->next = sl->fsm_trans_list;
     sl->fsm_trans_list = tl;
     if ((symin = fsm_construct_check_symbol(handle,in)) == -1)
@@ -288,7 +288,7 @@ void fsm_construct_add_arc_nums(struct fsm_construct_handle *handle, int source,
     sl->used = 1;
     sl = (handle->fsm_state_list)+source;
     sl->used = 1;
-    tl = xxmalloc(sizeof(struct fsm_trans_list));
+    tl = (struct fsm_trans_list *)xxmalloc(sizeof(struct fsm_trans_list));
     tl->next = sl->fsm_trans_list;
     sl->fsm_trans_list = tl;
     tl->in = in;
@@ -313,7 +313,7 @@ void fsm_construct_copy_sigma(struct fsm_construct_handle *handle, struct sigma 
 	symbol = sigma->symbol;
 	if (symnum >= handle->fsm_sigma_list_size) {
 	    handle->fsm_sigma_list_size = next_power_of_two(handle->fsm_sigma_list_size);
-	    handle->fsm_sigma_list = xxrealloc(handle->fsm_sigma_list, (handle->fsm_sigma_list_size) * sizeof(struct fsm_sigma_list));
+	    handle->fsm_sigma_list = (struct fsm_sigma_list *)xxrealloc(handle->fsm_sigma_list, (handle->fsm_sigma_list_size) * sizeof(struct fsm_sigma_list));
 	}
 	/* Insert into list */
 	symdup = xxstrdup(symbol);
@@ -326,7 +326,7 @@ void fsm_construct_copy_sigma(struct fsm_construct_handle *handle, struct sigma 
 	    fh->symbol = symdup;
 	    fh->sym = symnum;
 	} else {
-	    newfh = xxcalloc(1,sizeof(struct fsm_sigma_hash));
+	    newfh = (struct fsm_sigma_hash *)xxcalloc(1,sizeof(struct fsm_sigma_hash));
 	    newfh->next = fh->next;
 	    fh->next = newfh;
 	    newfh->symbol = symdup;
@@ -362,7 +362,7 @@ int fsm_construct_add_symbol(struct fsm_construct_handle *handle, char *symbol) 
 
     if (symnum >= handle->fsm_sigma_list_size) {
         handle->fsm_sigma_list_size = next_power_of_two(handle->fsm_sigma_list_size);
-        handle->fsm_sigma_list = xxrealloc(handle->fsm_sigma_list, (handle->fsm_sigma_list_size) * sizeof(struct fsm_sigma_list));
+        handle->fsm_sigma_list = (struct fsm_sigma_list *)xxrealloc(handle->fsm_sigma_list, (handle->fsm_sigma_list_size) * sizeof(struct fsm_sigma_list));
     }
     /* Insert into list */
     symdup = xxstrdup(symbol);
@@ -375,7 +375,7 @@ int fsm_construct_add_symbol(struct fsm_construct_handle *handle, char *symbol) 
         fh->symbol = symdup;
         fh->sym = symnum;
     } else {
-        newfh = xxcalloc(1,sizeof(struct fsm_sigma_hash));
+        newfh = (struct fsm_sigma_hash *)xxcalloc(1,sizeof(struct fsm_sigma_hash));
         newfh->next = fh->next;
         fh->next = newfh;
         newfh->symbol = symdup;
@@ -407,7 +407,7 @@ struct sigma *fsm_construct_convert_sigma(struct fsm_construct_handle *handle) {
     sl = handle->fsm_sigma_list;
     for (i=0; i <= handle->maxsigma; i++) {
         if ((sl+i)->symbol != NULL) {
-            newsigma = xxmalloc(sizeof(struct sigma));
+            newsigma = (struct sigma *)xxmalloc(sizeof(struct sigma));
             newsigma->number = i;
             newsigma->symbol = (sl+i)->symbol;
             newsigma->next = NULL;
@@ -508,12 +508,12 @@ struct fsm_read_handle *fsm_read_init(struct fsm *net) {
     if (net == NULL) {return (NULL);}
 
     num_states = net->statecount;
-    lookuptable = xxcalloc(num_states, sizeof(unsigned char));
+    lookuptable = (unsigned char *)xxcalloc(num_states, sizeof(unsigned char));
     
     num_initials = num_finals = 0;
 
-    handle = xxcalloc(1,sizeof(struct fsm_read_handle));
-    states_head = xxcalloc(num_states+1,sizeof(struct fsm **));
+    handle = (struct fsm_read_handle *)xxcalloc(1,sizeof(struct fsm_read_handle));
+    states_head = (struct fsm_state **)xxcalloc(num_states+1,sizeof(struct fsm **));
 
     laststate = -1;
     for (i=0, fsm=net->states; (fsm+i)->state_no != -1; i++) {
@@ -540,8 +540,8 @@ struct fsm_read_handle *fsm_read_init(struct fsm *net) {
 	laststate = (fsm+i)->state_no;
     }
     
-    finals_head = xxcalloc(num_finals+1,sizeof(int));
-    initials_head = xxcalloc(num_initials+1,sizeof(int));
+    finals_head = (int *)xxcalloc(num_finals+1,sizeof(int));
+    initials_head = (int *)xxcalloc(num_initials+1,sizeof(int));
 
 
     for (i=j=k=0; i < num_states; i++) {

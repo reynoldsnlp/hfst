@@ -176,7 +176,7 @@ struct fsm *fsm_symbol(char *symbol) {
   if (strcmp(symbol,"@_EPSILON_SYMBOL_@")==0) {
     /* Epsilon */
     (void)sigma_add_special(EPSILON, net->sigma);
-    net->states = xxmalloc(sizeof(struct fsm_state)*2);
+    net->states = (struct fsm_state *)xxmalloc(sizeof(struct fsm_state)*2);
     add_fsm_arc(net->states, 0, 0, -1,-1,-1,1,1);
     add_fsm_arc(net->states, 1, -1,-1,-1,-1,-1,-1);
     net->arccount = 0;
@@ -192,7 +192,7 @@ struct fsm *fsm_symbol(char *symbol) {
     } else {
       symbol_no = sigma_add(symbol,net->sigma);
     }
-    net->states = xxmalloc(sizeof(struct fsm_state)*3);
+    net->states = (struct fsm_state *)xxmalloc(sizeof(struct fsm_state)*3);
     add_fsm_arc(net->states, 0, 0, symbol_no, symbol_no, 1, 0, 1);
     add_fsm_arc(net->states, 1, 1, -1, -1, -1, 1, 0);
     add_fsm_arc(net->states, 2, -1, -1, -1, -1, -1, -1);
@@ -253,7 +253,7 @@ struct state_arr *init_state_pointers(struct fsm_state *fsm_state) {
   int states, i, sold;
   sold = -1;
   states = fsm_count_states(fsm_state);
-  state_arr = xxmalloc(sizeof(struct state_arr)*(states+1));
+  state_arr = (struct state_arr *)xxmalloc(sizeof(struct state_arr)*(states+1));
   for (i=0; i<states; i++) {
     (state_arr+i)->final = 0;
     (state_arr+i)->start = 0;
@@ -292,10 +292,10 @@ struct triplethash {
 struct triplethash *triplet_hash_init() {
     struct triplethash *th;
     int i;
-    th = xxmalloc(sizeof(struct triplethash));
+    th = (struct triplethash *)xxmalloc(sizeof(struct triplethash));
     th->tablesize = 128;
     th->occupancy = 0;
-    th->triplets = xxmalloc(sizeof(struct triplethash_triplets) * th->tablesize);
+    th->triplets = (struct triplethash_triplets *)xxmalloc(sizeof(struct triplethash_triplets) * th->tablesize);
     for (i = 0; i < th->tablesize; i++) {
 	(th->triplets+i)->key = -1;
     }
@@ -366,7 +366,7 @@ void triplet_hash_rehash(struct triplethash *th) {
     newtablesize = th->tablesize * 2;
     oldtablesize = th->tablesize;
     oldtriplets = th->triplets;
-    th->triplets = xxmalloc(sizeof(struct triplethash_triplets) * newtablesize);
+    th->triplets = (struct triplethash_triplets *)xxmalloc(sizeof(struct triplethash_triplets) * newtablesize);
     th->tablesize = newtablesize;
     for (i = 0; i < newtablesize; i++) {
 	(th->triplets+i)->key = -1;
@@ -423,7 +423,7 @@ struct fsm *fsm_intersect(struct fsm *net1, struct fsm *net2) {
     machine_b = net2->states;
 
     sigma2size = sigma_max(net2->sigma)+1;
-    array = xxcalloc(sigma2size*sigma2size, sizeof(struct blookup));
+    array = (struct blookup *)xxcalloc(sigma2size*sigma2size, sizeof(struct blookup));
     mainloop = 0;
 
     /* Intersect two networks by the running-in-parallel method */
@@ -605,7 +605,7 @@ struct fsm *fsm_compose(struct fsm *net1, struct fsm *net2) {
     if (g_flag_is_epsilon) {
         /* Create lookup table for quickly checking if a symbol is a flag */
         struct sigma *sig1;
-        is_flag = xxmalloc(sizeof(Boolean)*(sigma_max(net1->sigma)+1));
+        is_flag = (bool *)xxmalloc(sizeof(Boolean)*(sigma_max(net1->sigma)+1));
         for (sig1 = net1->sigma; sig1 != NULL; sig1=sig1->next) {
             if (flag_check(sig1->symbol)) {
                 *(is_flag+(sig1->number)) = 1;
@@ -630,8 +630,8 @@ struct fsm *fsm_compose(struct fsm *net1, struct fsm *net2) {
     /* UNKNOWN and IDENTITY are indexed as UNKNOWN because we need to find both */
     /* as they share some semantics */
 
-    index = xxcalloc(max2sigma+1, sizeof(struct index));
-    outarray = xxcalloc((max2sigma+2)*(max2sigma+1), sizeof(struct outarray));
+    index = (struct index *)xxcalloc(max2sigma+1, sizeof(struct index));
+    outarray = (struct outarray *)xxcalloc((max2sigma+2)*(max2sigma+1), sizeof(struct outarray));
 
     for (i=0; i <= max2sigma; i++) {
         (index+i)->tail = outarray + ((max2sigma+2)*i);
@@ -846,7 +846,7 @@ struct mergesigma *add_to_mergesigma(struct mergesigma *msigma, struct sigma *si
   if (msigma->number == -1) {
     number = 2;
   } else {
-    msigma->next = xxmalloc(sizeof(struct mergesigma));
+    msigma->next = (struct mergesigma *)xxmalloc(sizeof(struct mergesigma));
     number = msigma->number;
     msigma = msigma->next;
     msigma->next = NULL;
@@ -870,10 +870,10 @@ struct sigma *copy_mergesigma(struct mergesigma *mergesigma) {
     sigma = new_sigma = NULL;
     while(mergesigma != NULL) {
 	if (sigma == NULL) {
-	    sigma = xxmalloc(sizeof(struct sigma));
+	    sigma = (struct sigma *)xxmalloc(sizeof(struct sigma));
 	    new_sigma = sigma;
 	} else {
-	    sigma->next = xxmalloc(sizeof(struct sigma));
+	    sigma->next = (struct sigma *)xxmalloc(sizeof(struct sigma));
 	    sigma = sigma->next;
 	}
 	sigma->next = NULL;
@@ -914,12 +914,12 @@ void fsm_merge_sigma(struct fsm *net1, struct fsm *net2) {
 
   sigmasizes = sigma_size(sigma_1) + sigma_size(sigma_2);
 
-  mapping_1 = xxmalloc(sizeof(int)*(sigmasizes+3));
-  mapping_2 = xxmalloc(sizeof(int)*(sigmasizes+3));
+  mapping_1 = (int *)xxmalloc(sizeof(int)*(sigmasizes+3));
+  mapping_2 = (int *)xxmalloc(sizeof(int)*(sigmasizes+3));
 
   /* Fill mergesigma */
 
-  mergesigma = xxmalloc(sizeof(struct mergesigma));
+  mergesigma = (struct mergesigma *)xxmalloc(sizeof(struct mergesigma));
   mergesigma->number = -1;
   mergesigma->symbol = NULL;
   mergesigma->next = NULL;
@@ -1057,7 +1057,7 @@ void fsm_merge_sigma(struct fsm *net1, struct fsm *net2) {
 	net_adds += net_unk*net_unk - net_unk + 2*net_unk;
     }
 
-    new_1_state = xxmalloc(sizeof(struct fsm_state)*(net_adds+net_lines+1));
+    new_1_state = (struct fsm_state *)xxmalloc(sizeof(struct fsm_state)*(net_adds+net_lines+1));
     for(i=0,j=0; (fsm_state+i)->state_no != -1; i++) {
       
       if ((fsm_state+i)->in == IDENTITY) {
@@ -1146,7 +1146,7 @@ void fsm_merge_sigma(struct fsm *net1, struct fsm *net2) {
     }
 
     /* We need net_add new lines in fsm_state */
-    new_2_state = xxmalloc(sizeof(struct fsm_state)*(net_adds+net_lines+1));
+    new_2_state = (struct fsm_state *)xxmalloc(sizeof(struct fsm_state)*(net_adds+net_lines+1));
     for(i=0,j=0; (fsm_state+i)->state_no != -1; i++) {
 
       if ((fsm_state+i)->in == IDENTITY) {
@@ -1321,7 +1321,7 @@ struct fsm *fsm_concat(struct fsm *net1, struct fsm *net2) {
   /* Add |fsm1| states to the state numbers of fsm2 */
   fsm_add_to_states(net2, net1->statecount);
 
-  new_fsm = xxmalloc(((sizeof(struct fsm_state))*(net1->linecount + net2->linecount + net1->finalcount + 2 )));
+  new_fsm = (struct fsm_state *)xxmalloc(((sizeof(struct fsm_state))*(net1->linecount + net2->linecount + net1->finalcount + 2 )));
   current_final = -1;
   /* Copy fsm1, fsm2 after each other, adding appropriate epsilon arcs */
   for(i=0,j=0; (fsm1+i)->state_no != -1; i++) {
@@ -1368,7 +1368,7 @@ struct fsm *fsm_union(struct fsm *net1, struct fsm *net2) {
 
     net1_offset = 1;
     net2_offset = net1->statecount + 1;
-    new_fsm = xxmalloc((net1->linecount + net2->linecount + 2) * sizeof(struct fsm_state));
+    new_fsm = (struct fsm_state *)xxmalloc((net1->linecount + net2->linecount + 2) * sizeof(struct fsm_state));
 
     j = 0;
 
@@ -1431,9 +1431,9 @@ struct fsm *fsm_completes(struct fsm *net, int operation) {
 
   fsm_count(net);
   statecount = net->statecount;
-  starts = xxmalloc(sizeof(short)*(statecount+1)); /* +1 for sink state */
-  finals = xxmalloc(sizeof(short)*(statecount+1));
-  sinks = xxmalloc(sizeof(short)*(statecount+1));
+  starts = (short *)xxmalloc(sizeof(short)*(statecount+1)); /* +1 for sink state */
+  finals = (short *)xxmalloc(sizeof(short)*(statecount+1));
+  sinks = (short *)xxmalloc(sizeof(short)*(statecount+1));
 
   /* Init starts, finals, sinks arrays */
 
@@ -1513,7 +1513,7 @@ struct fsm *fsm_completes(struct fsm *net, int operation) {
 
   sigsize += 2;
 
-  state_table = xxmalloc(sizeof(int)*sigsize*statecount);
+  state_table = (int *)xxmalloc(sizeof(int)*sigsize*statecount);
 
   /* Init state table */
   /* i = state #, j = sigma # */
@@ -1539,7 +1539,7 @@ struct fsm *fsm_completes(struct fsm *net, int operation) {
     }
   }
   
-  new_fsm = xxmalloc(sizeof(struct fsm_state)*(sigsize*statecount+1));
+  new_fsm = (struct fsm_state *)xxmalloc(sizeof(struct fsm_state)*(sigsize*statecount+1));
   
 /* Complement requires toggling final, nonfinal states */
 /*   if (operation == COMPLEMENT) */
@@ -1589,7 +1589,7 @@ struct fsm *fsm_kleene_closure(struct fsm *net, int operation) {
 
     fsm = net->states;
     
-    new_fsm = xxmalloc( (net->linecount + net->finalcount + 1) * sizeof(struct fsm_state));
+    new_fsm = (struct fsm_state *)xxmalloc( (net->linecount + net->finalcount + 1) * sizeof(struct fsm_state));
 
     j = 0;
     if (operation == KLEENE_STAR)
@@ -2277,7 +2277,7 @@ struct fsm *fsm_universal() {
     int s;
     net = fsm_create("");
     fsm_update_flags(net, YES, YES, YES, YES, NO, NO);
-    net->states = xxmalloc(sizeof(struct fsm_state)*2);
+    net->states = (struct fsm_state *)xxmalloc(sizeof(struct fsm_state)*2);
     s = sigma_add_special(IDENTITY,net->sigma);
     add_fsm_arc(net->states, 0, 0, s, s, 0, 1, 1);
     add_fsm_arc(net->states, 1, -1, -1, -1, -1, -1, -1);
@@ -2407,14 +2407,14 @@ struct fsm *fsm_ignore(struct fsm *net1, struct fsm *net2, int operation) {
   }
 
   malloc_size = lines1 + (states1 * (lines2 + net2->finalcount + 1));
-  new_fsm = xxmalloc(sizeof(struct fsm_state)*(malloc_size+1));
+  new_fsm = (struct fsm_state *)xxmalloc(sizeof(struct fsm_state)*(malloc_size+1));
 
   /* Mark if a state has been handled with ignore */
-  handled_states1 = xxmalloc(sizeof(short)*states1);
-  handled_states2 = xxmalloc(sizeof(short)*states2);
+  handled_states1 = (short *)xxmalloc(sizeof(short)*states1);
+  handled_states2 = (short *)xxmalloc(sizeof(short)*states2);
 
   /* Mark which ignores return to which state */
-  return_state = xxmalloc(sizeof(int)*states1);
+  return_state = (int *)xxmalloc(sizeof(int)*states1);
   splice_size = states2;
   start_splice = states1;
   for (k=0; k<states1; k++)
@@ -2493,8 +2493,8 @@ void fsm_compact(struct fsm *net) {
     fsm = net->states;
     numsymbols = sigma_max(net->sigma);
     
-    potential = xxmalloc(sizeof(Boolean)*(numsymbols+1));
-    checktable = xxmalloc(sizeof(struct checktable)*(numsymbols+1));
+    potential = (bool *)xxmalloc(sizeof(Boolean)*(numsymbols+1));
+    checktable = (struct checktable *)xxmalloc(sizeof(struct checktable)*(numsymbols+1));
 
     for (i=0; i <= numsymbols; i++) {
         *(potential+i) =  1;
@@ -2819,7 +2819,7 @@ struct fsm *fsm_left_rewr(struct fsm *net, struct fsm *rewr) {
     fsm_construct_copy_sigma(outh, net->sigma);
     maxsigma = sigma_max(net->sigma);
     maxsigma++;
-    sigmatable = xxmalloc(maxsigma * sizeof(int));
+    sigmatable = (int *)xxmalloc(maxsigma * sizeof(int));
     for (i = 0; i < maxsigma; i++) {
 	*(sigmatable+i) = -1;
     }
@@ -2882,7 +2882,7 @@ struct fsm *fsm_add_sink(struct fsm *net, int final) {
     fsm_construct_copy_sigma(outh, net->sigma);
     maxsigma = sigma_max(net->sigma);
     maxsigma++;
-    sigmatable = xxmalloc(maxsigma * sizeof(int));
+    sigmatable = (int *)xxmalloc(maxsigma * sizeof(int));
     for (i = 0; i < maxsigma; i++) {
 	*(sigmatable+i) = -1;
     }
@@ -2980,7 +2980,7 @@ struct fsm *fsm_mark_fsm_tail(struct fsm *net, struct fsm *marker) {
     outh = fsm_construct_init(net->name);
     fsm_construct_copy_sigma(outh, net->sigma);
 
-    mappings = xxcalloc(net->statecount, sizeof(int));
+    mappings = (int *)xxcalloc(net->statecount, sizeof(int));
     maxstate = net->statecount;
     
     while (fsm_get_next_arc(inh)) {

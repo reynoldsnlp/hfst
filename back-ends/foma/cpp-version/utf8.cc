@@ -71,7 +71,7 @@ char *escape_string(char *string, char chr) {
         }
     }
     if (j>0) {
-        newstring = xxcalloc((strlen(string)+j),sizeof(char));
+        newstring = (char *)xxcalloc((strlen(string)+j),sizeof(char));
         for (i=0,j=0; i<strlen(string); i++, j++) {
             if (string[i] == chr) {
                 newstring[j++] = '\\';
@@ -229,7 +229,7 @@ unsigned char *utf8code16tostr(char *str) {
 
 unsigned char *int2utf8str(int codepoint) {
   unsigned char *value;
-  value = xxmalloc(sizeof(unsigned char)*5);
+  value = (unsigned char *)xxmalloc(sizeof(unsigned char)*5);
 
   if (codepoint < 0x80) {
     *(value) = (unsigned char)(codepoint);

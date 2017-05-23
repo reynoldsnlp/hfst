@@ -37,10 +37,10 @@ struct fsm *fsm_coaccessible(struct fsm *net) {
   new_arccount = 0;
   /* printf("statecount %i\n",net->statecount); */
   old_statecount = net->statecount;
-  inverses = xxcalloc(net->statecount, sizeof(struct invtable));
-  coacc = xxmalloc(sizeof(int)*(net->statecount));
-  mapping = xxmalloc(sizeof(int)*(net->statecount));
-  added = xxmalloc(sizeof(int)*(net->statecount));
+  inverses = (struct invtable *)xxcalloc(net->statecount, sizeof(struct invtable));
+  coacc = (int *)xxmalloc(sizeof(int)*(net->statecount));
+  mapping = (int *)xxmalloc(sizeof(int)*(net->statecount));
+  added = (int *)xxmalloc(sizeof(int)*(net->statecount));
 
   for (i=0; i < (net->statecount); i++) {
     (inverses+i)->state = -1;
@@ -56,7 +56,7 @@ struct fsm *fsm_coaccessible(struct fsm *net) {
       if (((inverses+t)->state) == -1) {
 	(inverses+t)->state = s;
       } else {
-        temp_i = xxmalloc(sizeof(struct invtable));
+        temp_i = (struct invtable *)xxmalloc(sizeof(struct invtable));
 	temp_i->next = (inverses+t)->next;
 	(inverses+t)->next = temp_i;
 	temp_i->state = s;

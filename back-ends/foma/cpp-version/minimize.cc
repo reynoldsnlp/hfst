@@ -300,7 +300,7 @@ static struct fsm *rebuild_machine(struct fsm *net) {
   }
   
   add_fsm_arc(fsm, j, -1, -1, -1, -1, -1, -1);
-  fsm = xxrealloc(fsm,sizeof(struct fsm_state)*(new_linecount+1));
+  fsm = (struct fsm_state *)(struct fsm_state *)xxrealloc(fsm,sizeof(struct fsm_state)*(new_linecount+1));
   net->states = fsm;
   net->linecount = j+1;
   net->arccount = arccount;
@@ -471,10 +471,10 @@ static void init_PE() {
   struct agenda *ag;
 
   mainloop = 1;
-  memo_table = xxcalloc(num_states,sizeof(int));
-  temp_move = xxcalloc(num_states,sizeof(int));
-  temp_group = xxcalloc(num_states,sizeof(int));
-  Phead = P = Pnext = xxcalloc(num_states+1, sizeof(struct p));
+  memo_table = (int *)xxcalloc(num_states,sizeof(int));
+  temp_move = (int *)xxcalloc(num_states,sizeof(int));
+  temp_group = (int *)xxcalloc(num_states,sizeof(int));
+  Phead = P = Pnext = (struct p *)xxcalloc(num_states+1, sizeof(struct p));
   nonFP = Pnext++;
   FP = Pnext++;
   nonFP->next = FP;
@@ -488,7 +488,7 @@ static void init_PE() {
   FP->inv_count = nonFP->inv_count = FP->inv_t_count = nonFP->inv_t_count = 0;
   
   /* How many groups can we put on the agenda? */
-  Agenda_top = Agenda_next = xxcalloc(num_states*2, sizeof(struct agenda));
+  Agenda_top = Agenda_next = (struct agenda *)xxcalloc(num_states*2, sizeof(struct agenda));
   Agenda_head = NULL;
 
   P = NULL;
@@ -522,7 +522,7 @@ static void init_PE() {
   }
   
   /* Initialize doubly linked list E */
-  E = xxcalloc(num_states,sizeof(struct e));
+  E = (struct e *)xxcalloc(num_states,sizeof(struct e));
 
   last_f = NULL;
   last_nonf = NULL;
@@ -568,8 +568,8 @@ static void generate_inverse(struct fsm *net) {
 
     int i, source, target, offsetcount, symbol, size;
     fsm = net->states;
-    trans_array = xxcalloc(net->statecount, sizeof(struct trans_array_struct));
-    trans_list = xxcalloc(net->arccount, sizeof(struct trans_list_struct));
+    trans_array = (struct trans_array_struct *)xxcalloc(net->statecount, sizeof(struct trans_array_struct));
+    trans_list = (struct trans_list_struct *)xxcalloc(net->arccount, sizeof(struct trans_list_struct));
 
     /* Figure out the number of transitions each one has */
     for (i=0; (fsm+i)->state_no != -1; i++) {
@@ -619,8 +619,8 @@ static void sigma_to_pairs(struct fsm *net) {
 
   maxsigma++;
 
-  single_sigma_array = xxmalloc(2*maxsigma*maxsigma*sizeof(int));
-  double_sigma_array = xxmalloc(maxsigma*maxsigma*sizeof(int));
+  single_sigma_array = (int *)xxmalloc(2*maxsigma*maxsigma*sizeof(int));
+  double_sigma_array = (int *)xxmalloc(maxsigma*maxsigma*sizeof(int));
   
   for (i=0; i < maxsigma; i++) {
     for (j=0; j< maxsigma; j++) {
@@ -642,7 +642,7 @@ static void sigma_to_pairs(struct fsm *net) {
 
   /* Table for checking whether a state is final */
 
-  finals = xxcalloc(num_states, sizeof(Boolean));
+  finals = (bool *)xxcalloc(num_states, sizeof(Boolean));
   x = 0; num_finals = 0;
   net->arity = 1;
   for (i=0; (fsm+i)->state_no != -1; i++) {

@@ -144,7 +144,7 @@ struct fsm *flag_create_symbol(int type, char *name, char *value) {
     if (value == NULL)
         value = "";
 
-    string = xxmalloc(sizeof(char)*strlen(name)+strlen(value)+6);
+    string = (char*)xxmalloc(sizeof(char)*strlen(name)+strlen(value)+6);
     *string = '\0';
     strcat(string, "@");
     strcat(string, flag_type_to_char(type));
@@ -268,7 +268,7 @@ void flag_purge (struct fsm *net, char *name) {
     int i, *ftable, sigmasize;
     char *csym;
     sigmasize = sigma_max(net->sigma)+1;
-    ftable = xxmalloc(sizeof(int) * sigmasize);
+    ftable = (int*)xxmalloc(sizeof(int) * sigmasize);
     fsm = net->states;
     for (i=0; i<sigmasize; i++)
         *(ftable+i)=0;
@@ -315,7 +315,7 @@ struct flags *flag_extract (struct fsm *net) {
     flags = NULL;
     for (sigma = net->sigma ; sigma != NULL; sigma = sigma->next) {
         if (flag_check(sigma->symbol)) {
-            flagst = xxmalloc(sizeof(struct flags));
+	    flagst = (struct flags*)xxmalloc(sizeof(struct flags));
             flagst->next = flags;
             flags = flagst;
             
@@ -448,7 +448,7 @@ struct fsm *flag_twosided(struct fsm *net) {
   
   /* Mark flag symbols */
   maxsigma = sigma_max(net->sigma);
-  isflag = xxcalloc(maxsigma+1, sizeof(int));
+  isflag = (int*)xxcalloc(maxsigma+1, sizeof(int));
   fsm = net->states;
   for (sigma = net->sigma ; sigma != NULL; sigma = sigma->next) {
     if (flag_check(sigma->symbol)) {
@@ -485,7 +485,7 @@ struct fsm *flag_twosided(struct fsm *net) {
     }
     return net;
   }
-  net->states = xxrealloc(net->states, sizeof(struct fsm)*(i+newarcs));
+  net->states = (struct fsm_state*)xxrealloc(net->states, sizeof(struct fsm)*(i+newarcs));
   fsm = net->states;
   tail = j = i;
   maxstate++;
