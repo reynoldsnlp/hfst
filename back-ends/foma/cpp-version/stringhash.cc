@@ -23,8 +23,8 @@ unsigned int sh_hashf(char *string);
 
 struct sh_handle *sh_init() {
     struct sh_handle *sh;
-    sh = xxmalloc(sizeof(struct sh_handle));
-    sh->hash = xxcalloc(STRING_HASH_SIZE, sizeof(struct sh_hashtable));
+    sh = (struct sh_handle*)xxmalloc(sizeof(struct sh_handle));
+    sh->hash = (struct sh_hashtable*)xxcalloc(STRING_HASH_SIZE, sizeof(struct sh_hashtable));
     return(sh);
 }
 
@@ -81,7 +81,7 @@ char *sh_add_string(struct sh_handle *sh, char *string, int value) {
 	hash->value = value;
 	return(hash->string);
     } else {
-	newhash = xxmalloc(sizeof(struct sh_hashtable));
+        newhash = (struct sh_hashtable*)xxmalloc(sizeof(struct sh_hashtable));
 	newhash->string = xxstrdup(string);
 	newhash->value = value;
 	newhash->next = hash->next;

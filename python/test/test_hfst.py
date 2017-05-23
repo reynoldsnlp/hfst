@@ -21,10 +21,11 @@ if hfst.HfstTransducer.is_implementation_type_available(hfst.ImplementationType.
     types.append(hfst.ImplementationType.TROPICAL_OPENFST_TYPE)
 if hfst.HfstTransducer.is_implementation_type_available(hfst.ImplementationType.FOMA_TYPE):
     types.append(hfst.ImplementationType.FOMA_TYPE)
+    print('HERE!!!')
 
 for type in types:
 
-    # print('\n--- Testing implementation type %s ---\n' % hfst.fst_type_to_string(type))
+    print('\n--- Testing implementation type %s ---\n' % hfst.fst_type_to_string(type))
 
     hfst.set_default_fst_type(type)
 

@@ -25,9 +25,9 @@ unsigned int trie_hashf(unsigned int source, char *insym, char *outsym);
 struct fsm_trie_handle *fsm_trie_init() {
     struct fsm_trie_handle *th;
 
-    th = xxcalloc(1,sizeof(struct fsm_trie_handle));
-    th->trie_hash = xxcalloc(THASH_TABLESIZE, sizeof(struct trie_hash));
-    th->trie_states = xxcalloc(TRIE_STATESIZE, sizeof(struct trie_states));
+    th = (struct fsm_trie_handle*)xxcalloc(1,sizeof(struct fsm_trie_handle));
+    th->trie_hash = (struct trie_hash*)xxcalloc(THASH_TABLESIZE, sizeof(struct trie_hash));
+    th->trie_states = (struct trie_states*)xxcalloc(TRIE_STATESIZE, sizeof(struct trie_states));
     th->statesize = TRIE_STATESIZE;
     th->trie_cursor = 0;
     th->sh_hash = sh_init();
@@ -40,7 +40,7 @@ struct fsm *fsm_trie_done(struct fsm_trie_handle *th) {
     struct fsm_construct_handle *newh;
     unsigned int i;
 
-    newh = fsm_construct_init("name");
+    newh = (struct fsm_construct_handle*)fsm_construct_init("name");
     for (i = 0; i < THASH_TABLESIZE; i++) {
 	thash = (th->trie_hash)+i;
 	for ( ; thash != NULL; thash = thash->next) {
@@ -116,7 +116,7 @@ void fsm_trie_symbol(struct fsm_trie_handle *th, char *insym, char *outsym) {
 	thash->sourcestate = th->trie_cursor;
 	thash->targetstate = th->used_states;
     } else {
-	newthash = xxcalloc(1, sizeof(struct trie_hash));
+        newthash = (struct trie_hash*)xxcalloc(1, sizeof(struct trie_hash));
 	newthash->next = thash->next;
 	newthash->insym = sh_find_add_string(th->sh_hash, insym,1);
 	newthash->outsym = sh_find_add_string(th->sh_hash, outsym,1);
@@ -129,7 +129,7 @@ void fsm_trie_symbol(struct fsm_trie_handle *th, char *insym, char *outsym) {
     /* Realloc */
     if (th->used_states >= th->statesize) {
 	th->statesize = next_power_of_two(th->statesize);
-	th->trie_states = xxrealloc(th->trie_states, th->statesize * sizeof(struct trie_states));
+	th->trie_states = (struct trie_states*)xxrealloc(th->trie_states, th->statesize * sizeof(struct trie_states));
     }
     (th->trie_states+th->used_states)->is_final = 0;
 }

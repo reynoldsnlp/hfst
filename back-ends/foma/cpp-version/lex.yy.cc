@@ -1753,7 +1753,7 @@ int yyerror(YYLTYPE* yylloc, yyscan_t scanner, char *msg) {
 struct fsm *fsm_parse_regex(char *regex, struct defined_networks *defined_nets, struct defined_functions *defined_funcs) {
     char *newregex;
     current_parse = NULL;
-    newregex = xxmalloc(sizeof(char)*(strlen(regex)+2));
+    newregex = (char*)xxmalloc(sizeof(char)*(strlen(regex)+2));
     strcpy(newregex, regex);
     strcat(newregex, ";");
     if (my_yyparse(newregex, 1, defined_nets, defined_funcs) == 0) {

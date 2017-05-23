@@ -139,7 +139,7 @@ struct fsm *function_apply(struct defined_networks *defined_nets, struct defined
 
 void add_context_pair(struct fsm *L, struct fsm *R) {
     struct fsmcontexts *newcontext;
-    newcontext = xxcalloc(1,sizeof(struct fsmcontexts));
+    newcontext = (struct fsmcontexts*)xxcalloc(1,sizeof(struct fsmcontexts));
     newcontext->left = L;
     newcontext->right = R;
     newcontext->next = contexts;
@@ -179,7 +179,7 @@ void clear_rewrite_ruleset(struct rewrite_set *rewrite_rules) {
 void add_rewrite_rule() {
     struct rewrite_set *new_rewrite_rule;
     if (rules != NULL) {
-        new_rewrite_rule = xxmalloc(sizeof(struct rewrite_set));
+        new_rewrite_rule = (struct rewrite_set*)xxmalloc(sizeof(struct rewrite_set));
         new_rewrite_rule->rewrite_rules = rules;
         new_rewrite_rule->rewrite_contexts = contexts;
         new_rewrite_rule->next = rewrite_rules;
@@ -195,7 +195,7 @@ void add_rewrite_rule() {
 void add_eprule(struct fsm *R, struct fsm *R2, int type) {
     struct fsmrules *newrule;
     rewrite = 1;
-    newrule = xxmalloc(sizeof(struct fsmrules));
+    newrule = (struct fsmrules*)xxmalloc(sizeof(struct fsmrules));
     newrule->left = fsm_empty_string();
     newrule->right = R;
     newrule->right2 = R2;
@@ -208,7 +208,7 @@ void add_rule(struct fsm *L, struct fsm *R, struct fsm *R2, int type) {
     struct fsm *test;
     struct fsmrules *newrule;
     rewrite = 1;
-    newrule = xxmalloc(sizeof(struct fsmrules));
+    newrule = (struct fsmrules*)xxmalloc(sizeof(struct fsmrules));
 
     if ((type & ARROW_DOTTED) != 0) {
         newrule->left = fsm_minus(fsm_copy(L), fsm_empty_string());
@@ -229,7 +229,7 @@ void add_rule(struct fsm *L, struct fsm *R, struct fsm *R2, int type) {
         /* Add empty [..] -> B for dotted rules (only if LHS contains the empty string) */
         test = fsm_intersect(L,fsm_empty_string());
         if (!fsm_isempty(test)) {
-            newrule = xxmalloc(sizeof(struct fsmrules));
+	    newrule = (struct fsmrules*)xxmalloc(sizeof(struct fsmrules));
             newrule->left = test;
             newrule->right = fsm_copy(R);
             newrule->right2 = fsm_copy(R2);
