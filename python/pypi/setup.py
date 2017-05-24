@@ -51,9 +51,7 @@ def hfst_specific_option(option):
 # ----- C++ STANDARD  -----
 
 # Use C++ standard C++11 unless compiling for Python 2.7 for Windows (requires msvc 2008 which does not support C++11)
-# or for OS X (C++11 requires libc++ instead of libstdc++ and minimum version requirement 10.7 instead of 10.6 as well
-# as setting option -std=c++0x which clang refuses to accept when compiling C code of foma backend; the latter is a
-# potential issue also for other environments).
+# or for OS X (C++11 requires libc++ instead of libstdc++ and minimum version requirement 10.7 instead of 10.6).
 CPP_STD_11=True
 if (platform == "darwin") or (platform == "win32" and sys.version_info[0] == 2):
     CPP_STD_11=False
@@ -62,6 +60,14 @@ if hfst_specific_option('--with-c++11'):
     CPP_STD_11=True
 if hfst_specific_option('--without-c++11'):
     CPP_STD_11=False
+
+# By default, use the C++ version of foma backend. C++11 requires option -std=c++0x to be set for C/C++ compiler
+# (this cannot de defined for each file separately) and some compilers refuse to compile C with that option.
+CPP_FOMA=True
+if hfst_specific_option('--with-c++-foma'):
+    CPP_FOMA=True
+if hfst_specific_option('--with-c-foma'):
+    CPP_FOMA=False
 
 # Experimental...
 if platform == "darwin" and CPP_STD_11:
@@ -157,19 +163,22 @@ if platform == "darwin" and CPP_STD_11:
 # define error handling mechanism on windows
 if platform == "win32":
     ext_extra_compile_args = ["/EHsc"]
-ext_extra_compile_args.extend(['-fpermissive'])
+
 
 # ----- C++ SOURCE FILES -----
 
-# on windows, c++ source files have 'cpp' extension
-cpp = ".cc"
-if platform == "win32":
-    cpp = ".cpp"
+# C++ source files have 'cpp' extension
+cpp = ".cpp"
 
 # on windows, openfst back-end is in directory 'openfstwin'
 openfstdir = "openfst"
 if platform == "win32":
     openfstdir = "openfstwin"
+
+# foma source file extension (C++ by default)
+fe = cpp
+if not CPP_FOMA:
+    fe = ".c"
 
 # all c++ extension source files
 libhfst_source_files = ["libhfst/src/parsers/XfstCompiler" + cpp,
@@ -263,29 +272,29 @@ libhfst_source_files = ["libhfst/src/parsers/XfstCompiler" + cpp,
                         "libhfst/src/parsers/commandline_src/CommandLine" + cpp,
                         "libhfst/src/parsers/alphabet_src/Alphabet" + cpp ]
 
-foma_source_files = [ "back-ends/foma/int_stack.cc",
-                      "back-ends/foma/define.cc",
-                      "back-ends/foma/determinize.cc",
-                      "back-ends/foma/apply.cc",
-                      "back-ends/foma/rewrite.cc",
-                      "back-ends/foma/topsort.cc",
-                      "back-ends/foma/flags.cc",
-                      "back-ends/foma/minimize.cc",
-                      "back-ends/foma/reverse.cc",
-                      "back-ends/foma/extract.cc",
-                      "back-ends/foma/sigma.cc",
-                      "back-ends/foma/structures.cc",
-                      "back-ends/foma/constructions.cc",
-                      "back-ends/foma/coaccessible.cc",
-                      "back-ends/foma/io.cc",
-                      "back-ends/foma/utf8.cc",
-                      "back-ends/foma/spelling.cc",
-                      "back-ends/foma/dynarray.cc",
-                      "back-ends/foma/mem.cc",
-                      "back-ends/foma/stringhash.cc",
-                      "back-ends/foma/trie.cc",
-                      "back-ends/foma/lex.yy.cc",
-                      "back-ends/foma/regex.cc" ]
+foma_source_files = [ "back-ends/foma/int_stack" + fe,
+                      "back-ends/foma/define" + fe,
+                      "back-ends/foma/determinize" + fe,
+                      "back-ends/foma/apply" + fe,
+                      "back-ends/foma/rewrite" + fe,
+                      "back-ends/foma/topsort" + fe,
+                      "back-ends/foma/flags" + fe,
+                      "back-ends/foma/minimize" + fe,
+                      "back-ends/foma/reverse" + fe,
+                      "back-ends/foma/extract" + fe,
+                      "back-ends/foma/sigma" + fe,
+                      "back-ends/foma/structures" + fe,
+                      "back-ends/foma/constructions" + fe,
+                      "back-ends/foma/coaccessible" + fe,
+                      "back-ends/foma/io" + fe,
+                      "back-ends/foma/utf8" + fe,
+                      "back-ends/foma/spelling" + fe,
+                      "back-ends/foma/dynarray" + fe,
+                      "back-ends/foma/mem" + fe,
+                      "back-ends/foma/stringhash" + fe,
+                      "back-ends/foma/trie" + fe,
+                      "back-ends/foma/lex.yy" + fe,
+                      "back-ends/foma/regex" + fe ]
 
 openfst_source_files =  [ "back-ends/" + openfstdir + "/src/lib/compat" + cpp,
                           "back-ends/" + openfstdir + "/src/lib/flags" + cpp,
@@ -298,8 +307,7 @@ openfst_source_files =  [ "back-ends/" + openfstdir + "/src/lib/compat" + cpp,
 libhfst_source_files = libhfst_source_files + openfst_source_files
 
 if include_foma_backend:
-    libhfst_source_files = foma_source_files + libhfst_source_files
-#    libhfst_source_files = libhfst_source_files + foma_source_files
+    libhfst_source_files = libhfst_source_files + foma_source_files
 
 
 # (Is this needed?)

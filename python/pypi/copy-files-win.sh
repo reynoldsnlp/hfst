@@ -1,14 +1,22 @@
 #!/bin/sh
 
 if [ "$1" = "--help" -o "$1" = "-h" ]; then
+    echo "copy-files.sh [--with-c-foma]"
     echo ""
     echo "Copy files needed for pypi distribution on Windows."
+    echo ""
+    echo "--with-c-foma:   copy the C version of foma backend (instead oc C++)"
     echo ""
     echo "NOTE: flex/bison-generated cc and hh files are copied as such to"
     echo "avoid dependency on swig. Make sure you have a fresh version of them"
     echo "(run 'compile-cc-files-win.sh' in '../../libhfst/src/parsers', if needed)."
     echo ""
     exit 0
+fi
+
+CPP_FOMA="true"
+if [ "$1" = "--with-c-foma" ]; then
+    CPP_FOMA="false"
 fi
 
 if ! [ -d "back-ends" ]; then mkdir back-ends; fi
@@ -29,6 +37,11 @@ hfst_sfst_extensions.cc libhfst.i docstrings.i ;
 do
     cp ../$file $file
 done
+
+# Copy all files that have a c++ version as backend files to be compiled.
+if [ "$CPP_FOMA" = "true" ]; then
+    cp back-ends/foma/cpp-version/* back-ends/foma/
+fi
 
 # .cc -> .cpp
 for dir in back-ends libhfst;
