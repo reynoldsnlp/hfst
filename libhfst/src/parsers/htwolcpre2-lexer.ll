@@ -24,7 +24,7 @@
 
 #include "../HfstExceptionDefs.h"
 
-extern int htwolcpre2error(const char*);
+extern void htwolcpre2error(const char*);
 
 #undef YY_FATAL_ERROR
 #define YY_FATAL_ERROR(msg) htwolcpre2error(msg);
