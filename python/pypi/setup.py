@@ -269,7 +269,6 @@ libhfst_source_files = ["libhfst/src/parsers/XfstCompiler" + cpp,
                         "libhfst/src/parsers/rule_src/Rule" + cpp,
                         "libhfst/src/parsers/rule_src/RuleContainer" + cpp,
                         "libhfst/src/parsers/rule_src/TwolCGrammar" + cpp,
-                        "libhfst/src/parsers/commandline_src/CommandLine" + cpp,
                         "libhfst/src/parsers/alphabet_src/Alphabet" + cpp ]
 
 foma_source_files = [ "back-ends/foma/int_stack" + fe,

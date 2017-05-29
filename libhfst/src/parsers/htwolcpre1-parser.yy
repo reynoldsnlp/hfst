@@ -27,7 +27,6 @@
 #include "grammar_defs.h"
 #include "variable_src/RuleSymbolVector.h"
 #include "variable_src/RuleVariables.h"
-#include "common_globals.h"
 #include "../HfstExceptionDefs.h"
 
   extern int htwolcpre1lineno;

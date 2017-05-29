@@ -30,7 +30,6 @@
 #include "alphabet_src/Alphabet.h"
 #include "string_src/string_manipulation.h"
 #include <cstdio>
-#include "common_globals.h"
 
 #ifdef DEBUG_TWOLC_3_GRAMMAR
 #define YYDEBUG 1

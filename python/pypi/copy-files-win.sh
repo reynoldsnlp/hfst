@@ -54,7 +54,7 @@ for file in xfst-lexer htwolcpre1-lexer htwolcpre2-lexer htwolcpre3-lexer sfst-s
 do
     sed -i 's/#include <unistd.h>/#include <io.h>/' libhfst/src/parsers/$file.cpp
 done
-for file in lex.cmatrix.c lex.yy.c;
+for file in lex.cmatrix.cpp lex.yy.cpp;
 do
     sed -i 's/#include <unistd.h>/#include <io.h>/' back-ends/foma/$file
 done
