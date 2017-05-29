@@ -53,7 +53,8 @@ def hfst_specific_option(option):
 # Use C++ standard C++11 unless compiling for Python 2.7 for Windows (requires msvc 2008 which does not support C++11)
 # or for OS X (C++11 requires libc++ instead of libstdc++ and minimum version requirement 10.7 instead of 10.6).
 CPP_STD_11=True
-if (platform == "darwin") or (platform == "win32" and sys.version_info[0] == 2):
+from sys import version_info
+if (platform == "darwin") or (platform == "win32" and version_info[0] == 2):
     CPP_STD_11=False
 # Override default behaviour, if requested.
 if hfst_specific_option('--with-c++11'):
@@ -81,7 +82,6 @@ if platform == "darwin" and CPP_STD_11:
 swig_include_dir = "libhfst/src/"
 # Generate wrapper for C++
 ext_swig_opts = ["-c++", "-I" + swig_include_dir, "-Wall"]
-from sys import version_info
 # for python3.3 and python3.4 on windows, add SDK include directory
 if platform == "win32" and version_info[0] == 3 and (version_info[1] == 3 or version_info[1] == 4):
     ext_swig_opts.extend(["-IC:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Include"])
