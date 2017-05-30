@@ -28,16 +28,16 @@ Installation
 ############
 
 We recommend using ``pip`` tool for installation. For python version 3, it is
-usually named ``pip3``, plain ``pip`` being used for python version 2.
+usually named ``pip3``, plain ``pip`` being used for python version 2:
 
-``pip3 install [--upgrade] hfst``
-``pip install [--upgrade] hfst``
+| ``pip3 install [--upgrade] hfst``
+| ``pip install [--upgrade] hfst``
 
-Starting from python 3.4.0 and python 2.7.9, pip is included by default
-and can be called via python with option ``-m pip``.
+Starting from python 3.4.0 and 2.7.9, pip is included by default
+and can be called via python with option ``-m pip``:
 
-``python3 -m pip install [--upgrade] hfst``
-``python -m pip install [--upgrade] hfst``
+| ``python3 -m pip install [--upgrade] hfst``
+| ``python -m pip install [--upgrade] hfst``
 
 The commands above are run in a shell/terminal/command prompt, but they can
 also be run on python command line or via a graphical user interface 
