@@ -19,7 +19,7 @@ Compiling the extensions requires python, swig and a C++ compiler,
 all located on a directory listed on system PATH. On linux and OS X,
 readline and getline must be available.
 
-The setup script has been tested on linux with gcc 4.6.3, swig 3.0.12 and
+The setup script has been tested on linux with gcc 5.4.0, swig 3.0.12 and
 python 3.4 and on windows with swig 3.0.5 and msvc 10.0 (with python 3.3.
 and 3.4) and msvc 14.0 (with python 3.5 and 3.6).
 
@@ -332,7 +332,7 @@ libhfst_module = Extension('_libhfst',
                            )
 
 setup(name = 'hfst',
-      version = '3.12.2.2_beta',
+      version = '3.12.2.3_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',

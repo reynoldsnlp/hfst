@@ -30,10 +30,10 @@ cp -R ../hfst/* hfst/
 cp -R ../test/* test/
 
 # files under ../
-for file in hfst_extensions.cc hfst_file_extensions.cc hfst_lexc_extensions.cc \
-hfst_lookup_extensions.cc hfst_pmatch_extensions.cc hfst_prolog_extensions.cc \
-hfst_regex_extensions.cc hfst_rules_extensions.cc hfst_xfst_extensions.cc \
-hfst_sfst_extensions.cc libhfst.i docstrings.i ;
+for file in hfst_extensions.cpp hfst_file_extensions.cpp hfst_lexc_extensions.cpp \
+hfst_lookup_extensions.cpp hfst_pmatch_extensions.cpp hfst_prolog_extensions.cpp \
+hfst_regex_extensions.cpp hfst_rules_extensions.cpp hfst_xfst_extensions.cpp \
+hfst_sfst_extensions.cpp libhfst.i docstrings.i ;
 do
     cp ../$file $file
 done
