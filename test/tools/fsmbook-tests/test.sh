@@ -22,14 +22,6 @@ PYTHONPATH=""
 
 HFST_TOOL="../../../tools/src/parsers/hfst-xfst"
 
-if [ "$PYTHON" == "" ]; then
-    if [ "$COMPILE_XFST_SCRIPT" = "true" ]; then
-	if ! (ls $HFST_TOOL > /dev/null); then
-            echo "ERROR: Could not find "$HFST_TOOL" that is needed to run the tests"
-            exit 1
-	fi
-    fi
-fi
 if [ "$COMPILE_FROM_SCRATCH" = "true" ]; then
     if ! (which xfst > /dev/null); then
         echo "ERROR: Could not find program 'xfst' that is needed to run the tests"
@@ -82,6 +74,15 @@ if [ "$2" = "--python" ]; then
     PYTHON=$3
     if [ "$4" = "--pythonpath" ]; then
 	PYTHONPATH=$5
+    fi
+fi
+
+if [ "$PYTHON" == "" ]; then
+    if [ "$COMPILE_XFST_SCRIPT" = "true" ]; then
+	if ! (ls $HFST_TOOL > /dev/null); then
+            echo "ERROR: Could not find "$HFST_TOOL" that is needed to run the tests"
+            exit 1
+	fi
     fi
 fi
 
