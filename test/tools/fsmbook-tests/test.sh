@@ -206,19 +206,35 @@ do
 		    exit 1;
 		fi
 	    fi
-            if ! ($tooldir/hfst-compare $compare_flags Expected_result Result_from_hfst_xfst); then
-                echo "FAIL: results from xfst and hfst-xfst ("$format") are not equivalent, storing results in files:"
-                echo "    log/"$example.result_from_xfst_script_using_xfst_tool 
-                echo "    log/"$example.result_from_hfst_xfst_using_backend_format_$format
-                if ! [ -d log ]; then
-                    mkdir log
-                fi
-                cp Expected_result log/$example.result_from_xfst_script_using_xfst_tool
-                cp Result_from_hfst_xfst log/$example.result_from_hfst_xfst_using_backend_format_$format
-                if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
-                    exit 1;
-                fi
-            fi
+	    if ! [ "$PYTHON" = "" ]; then
+		if ! ($PYTHON compare.py Expected_result Result_from_hfst_xfst $compare_flags $PYTHONPATH); then
+		    echo "FAIL: results from xfst and hfst-xfst ("$format") are not equivalent, storing results in files:"
+                    echo "    log/"$example.result_from_xfst_script_using_xfst_tool 
+                    echo "    log/"$example.result_from_hfst_xfst_using_backend_format_$format
+                    if ! [ -d log ]; then
+			mkdir log
+                    fi
+                    cp Expected_result log/$example.result_from_xfst_script_using_xfst_tool
+                    cp Result_from_hfst_xfst log/$example.result_from_hfst_xfst_using_backend_format_$format
+                    if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
+			exit 1;
+                    fi
+		fi
+	    else
+		if ! ($tooldir/hfst-compare $compare_flags Expected_result Result_from_hfst_xfst); then
+                    echo "FAIL: results from xfst and hfst-xfst ("$format") are not equivalent, storing results in files:"
+                    echo "    log/"$example.result_from_xfst_script_using_xfst_tool 
+                    echo "    log/"$example.result_from_hfst_xfst_using_backend_format_$format
+                    if ! [ -d log ]; then
+			mkdir log
+                    fi
+                    cp Expected_result log/$example.result_from_xfst_script_using_xfst_tool
+                    cp Result_from_hfst_xfst log/$example.result_from_hfst_xfst_using_backend_format_$format
+                    if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
+			exit 1;
+                    fi
+		fi
+	    fi
 	    rm -f Result_from_hfst_xfst
         done
     fi
@@ -279,20 +295,39 @@ do
         # special case 1
         if [ "$example" = "EinsteinsPuzzle" ]; then
 	    echo '(generating all word forms from xfst result, this can take a while)'
-            if ! ($tooldir/hfst-fst2strings --xfst=print-space Expected_result | grep "German coffee Prince fish" > /dev/null); then
-                echo "  FAIL: Results differ"
-                if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
-                    exit 1;
-                fi
-            fi
+	    if ! [ "$PYTHON" = "" ]; then
+		if ! (cat Expected_result | $PYTHON fst2strings_space.py $PYTHONPATH | grep "German coffee Prince fish" > /dev/null); then
+                    echo "  FAIL: Results differ"
+                    if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
+			exit 1;
+                    fi
+		fi
+	    else
+		if ! ($tooldir/hfst-fst2strings --xfst=print-space Expected_result | grep "German coffee Prince fish" > /dev/null); then
+                    echo "  FAIL: Results differ"
+                    if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
+			exit 1;
+                    fi
+		fi
+	    fi
 	    echo '(generating all word forms from hfst result, this can take a while)'
-            if ! ($tooldir/hfst-fst2strings Result_from_hfst_script_$format | \
-			 grep "fish" | grep "German coffee Prince fish" > /dev/null); then
-                echo "  FAIL: Results differ"
-                if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
-                    exit 1;
-                fi
-            fi
+	    if ! [ "$PYTHON" = "" ]; then
+		if ! (cat Result_from_hfst_script_$format | $PYTHON fst2strings.py $PYTHONPATH | \
+			     grep "fish" | grep "German coffee Prince fish" > /dev/null); then
+                    echo "  FAIL: Results differ"
+                    if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
+			exit 1;
+                    fi
+		fi
+	    else
+		if ! ($tooldir/hfst-fst2strings Result_from_hfst_script_$format | \
+			     grep "fish" | grep "German coffee Prince fish" > /dev/null); then
+                    echo "  FAIL: Results differ"
+                    if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
+			exit 1;
+                    fi
+		fi
+	    fi
             continue
         fi
         # special case 2
@@ -318,19 +353,35 @@ do
             continue
         fi
 
-        if ! ($tooldir/hfst-compare $compare_flags Expected_result Result_from_hfst_script_$format); then
-            echo "  FAIL: Results from xfst and hfst scripts ("$format") differ in test "$example", storing results in files:"
-            echo "    log/"$example.result_from_xfst_script_using_xfst_tool 
-            echo "    log/"$example.result_from_hfst_script_using_backend_format_$format
-            if ! [ -d log ]; then
-                mkdir log
+	if ! [ "$PYTHON" = "" ]; then
+	    if ! ($PYTHON compare.py Expected_result Result_from_hfst_script_$format $compare_flags $PYTHONPATH); then
+		echo "  FAIL: Results from xfst and hfst scripts ("$format") differ in test "$example", storing results in files:"
+		echo "    log/"$example.result_from_xfst_script_using_xfst_tool 
+		echo "    log/"$example.result_from_hfst_script_using_backend_format_$format
+		if ! [ -d log ]; then
+                    mkdir log
+		fi
+		cp Expected_result log/$example.result_from_xfst_script_using_xfst_tool
+		cp Result_from_hfst_script_$format log/$example.result_from_hfst_script_using_backend_format_$format
+		if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
+                    exit 1;
+		fi
             fi
-            cp Expected_result log/$example.result_from_xfst_script_using_xfst_tool
-            cp Result_from_hfst_script_$format log/$example.result_from_hfst_script_using_backend_format_$format
-            if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
-                exit 1;
+	else
+            if ! ($tooldir/hfst-compare $compare_flags Expected_result Result_from_hfst_script_$format); then
+		echo "  FAIL: Results from xfst and hfst scripts ("$format") differ in test "$example", storing results in files:"
+		echo "    log/"$example.result_from_xfst_script_using_xfst_tool 
+		echo "    log/"$example.result_from_hfst_script_using_backend_format_$format
+		if ! [ -d log ]; then
+                    mkdir log
+		fi
+		cp Expected_result log/$example.result_from_xfst_script_using_xfst_tool
+		cp Result_from_hfst_script_$format log/$example.result_from_hfst_script_using_backend_format_$format
+		if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then
+                    exit 1;
+		fi
             fi
-        fi            
+	fi
     done
     fi
 
