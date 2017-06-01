@@ -22,10 +22,12 @@ PYTHONPATH=""
 
 HFST_TOOL="../../../tools/src/parsers/hfst-xfst"
 
-if [ "$COMPILE_XFST_SCRIPT" = "true" ]; then
-    if ! (ls $HFST_TOOL > /dev/null); then
-        echo "ERROR: Could not find "$HFST_TOOL" that is needed to run the tests"
-        exit 1
+if [ "$PYTHON" == "" ]; then
+    if [ "$COMPILE_XFST_SCRIPT" = "true" ]; then
+	if ! (ls $HFST_TOOL > /dev/null); then
+            echo "ERROR: Could not find "$HFST_TOOL" that is needed to run the tests"
+            exit 1
+	fi
     fi
 fi
 if [ "$COMPILE_FROM_SCRATCH" = "true" ]; then
@@ -143,10 +145,18 @@ do
     fi
     # convert from prolog to openfst-tropical for comparing.
     cp Result Result.prolog
-    if ! (cat Result | $tooldir/hfst-txt2fst --prolog -f $common_format > tmp && \
-		 mv tmp Expected_result); then
-        echo "ERROR: in converting result from xfst/foma to hfst format"
-        exit 1;
+    if ! [ "$PYTHON" == "" ]; then
+	if ! (cat Result | $PYTHON prolog2fst.py $common_format $PYTHONPATH > tmp && \
+		     mv tmp Expected_result); then
+            echo "ERROR: in converting result from xfst/foma to hfst format"
+            exit 1;
+	fi
+    else
+	if ! (cat Result | $tooldir/hfst-txt2fst --prolog -f $common_format > tmp && \
+		     mv tmp Expected_result); then
+            echo "ERROR: in converting result from xfst/foma to hfst format"
+            exit 1;
+	fi
     fi
     rm -f Result.prolog
     # The expected result is now in file 'Expected_result' in prolog format
@@ -156,6 +166,10 @@ do
         for format in $backend_formats; 
         do
 	    if ! [ "$PYTHON" == "" ]; then
+		if (! $PYTHON list_formats.py $PYTHONPATH | grep $format > /dev/null); then
+                    echo "  skipping compilation with hfst-xfst using back-end format "$format" as it is not available"
+                    continue;
+		fi
 		echo "  compiling xfst with HFST python API using back-end format "$format".."
 		if ! ($PYTHON compile_xfst.py $format xfst-scripts/$example.xfst.script $PYTHONPATH); then
 		    echo "ERROR: compilation of xfst with HFST python API failed"
@@ -179,11 +193,19 @@ do
 		fi
 	    fi
             # and convert from prolog to openfst-tropical and compare the results.
-            if ! (cat Result | $tooldir/hfst-txt2fst --prolog -f $common_format > tmp && \
-			 mv tmp Result_from_hfst_xfst); then
-                echo "ERROR: in converting result from hfst prolog to binary format"
-                exit 1;
-            fi
+	    if ! [ "$PYTHON" == "" ]; then
+		if ! (cat Result | $PYTHON prolog2fst.py $common_format $PYTHONPATH> tmp && \
+			     mv tmp Result_from_hfst_xfst); then
+		    echo "ERROR: in converting result from hfst prolog to binary format"
+		    exit 1;
+		fi
+	    else
+		if ! (cat Result | $tooldir/hfst-txt2fst --prolog -f $common_format > tmp && \
+			     mv tmp Result_from_hfst_xfst); then
+		    echo "ERROR: in converting result from hfst prolog to binary format"
+		    exit 1;
+		fi
+	    fi
             if ! ($tooldir/hfst-compare $compare_flags Expected_result Result_from_hfst_xfst); then
                 echo "FAIL: results from xfst and hfst-xfst ("$format") are not equivalent, storing results in files:"
                 echo "    log/"$example.result_from_xfst_script_using_xfst_tool 
@@ -205,10 +227,17 @@ do
     if [ "$COMPILE_HFST_SCRIPT" = "true" ]; then
     for format in $backend_formats; 
     do
-        if (! $tooldir/hfst-format --list-formats | grep $format > /dev/null); then
-            echo "  skipping compilation of hfst script using back-end format "$format" as it is not available"
-            continue;
-        fi
+	if ! [ "$PYTHON" == "" ]; then
+	    if (! $PYTHON list_formats.py $PYTHONPATH | grep $format > /dev/null); then
+		echo "  skipping compilation of hfst script using back-end format "$format" as it is not available"
+		continue;
+            fi
+	else
+            if (! $tooldir/hfst-format --list-formats | grep $format > /dev/null); then
+		echo "  skipping compilation of hfst script using back-end format "$format" as it is not available"
+		continue;
+            fi
+	fi
 
         if [ "$example" = "FinnishNumerals" ]; then
             if ! [ -f tmpdir/NumbersToNumerals ]; then
@@ -240,7 +269,11 @@ do
 		exit 1
             fi
 	fi
-        cat Result | $tooldir/hfst-fst2fst -f $common_format > tmp
+	if ! [ "$PYTHON" = "" ]; then
+	    cat Result | $PYTHON fst2fst.py $common_format > tmp
+	else
+            cat Result | $tooldir/hfst-fst2fst -f $common_format > tmp
+	fi
         mv tmp Result_from_hfst_script_$format
         
         # special case 1
