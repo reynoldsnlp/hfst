@@ -4,7 +4,7 @@ if len(sys.argv) < 2 or len(sys.argv) > 3:
 if len(sys.argv) == 3:
     import sys
     sys.path.insert(0, sys.argv[2])
-    import hfst
+import hfst
     
 if (sys.argv[1] == 'sfst'):
     if (hfst.HfstTransducer.is_implementation_type_available(hfst.ImplementationType.SFST_TYPE)):
