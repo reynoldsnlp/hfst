@@ -195,7 +195,7 @@ do
 	    fi
             # and convert from prolog to openfst-tropical and compare the results.
 	    if ! [ "$PYTHON" == "" ]; then
-		if ! (cat Result | $PYTHON prolog2fst.py $common_format $PYTHONPATH> tmp && \
+		if ! (cat Result | $PYTHON prolog2fst.py $common_format $PYTHONPATH > tmp && \
 			     mv tmp Result_from_hfst_xfst); then
 		    echo "ERROR: in converting result from hfst prolog to binary format"
 		    exit 1;
@@ -287,7 +287,7 @@ do
             fi
 	fi
 	if ! [ "$PYTHON" = "" ]; then
-	    cat Result | $PYTHON fst2fst.py $common_format > tmp
+	    cat Result | $PYTHON fst2fst.py $common_format $PYTHONPATH > tmp
 	else
             cat Result | $tooldir/hfst-fst2fst -f $common_format > tmp
 	fi
@@ -337,8 +337,13 @@ do
                 mkdir tmpdir
             fi
             cp Expected_result tmpdir/NumbersToNumerals # needed in FinnishNumerals
-            $tooldir/hfst-fst2strings Expected_result | sort > tmp_xfst
-            $tooldir/hfst-fst2strings Result_from_hfst_script_$format | sort > tmp_hfst
+	    if ! [ "$PYTHON" = "" ]; then
+		cat Expected_result | $PYTHON fst2strings.py $PYTHONPATH | sort > tmp_xfst
+		cat Result_from_hfst_script_$format | $PYTHON fst2strings.py $PYTHONPATH | sort > tmp_hfst
+	    else
+		$tooldir/hfst-fst2strings Expected_result | sort > tmp_xfst
+		$tooldir/hfst-fst2strings Result_from_hfst_script_$format | sort > tmp_hfst
+	    fi
             if ! (diff tmp_xfst tmp_hfst); then
                 echo "  FAIL: Results differ"
                 if [ "$EXIT_IF_NOT_EQUIVALENT" = "true" ]; then

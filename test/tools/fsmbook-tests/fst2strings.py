@@ -9,7 +9,7 @@ istr = hfst.HfstInputStream()
 while(True):
     try:
         tr = istr.read()
-        print(tr.extract_paths(output='text'))
+        print((tr.extract_paths(output='text')).replace(hfst.EPSILON, ''))
     except hfst.exceptions.EndOfStreamException as e:
         break
 

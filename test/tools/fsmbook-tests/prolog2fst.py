@@ -24,9 +24,18 @@ else:
     raise RuntimeError('Transducer format "' + sys.argv[1] + '" not recognized.')
 
 ostr = hfst.HfstOutputStream()
+
+# Works for python 3 only
+input_stream=None
+if sys.version_info[0] > 2:
+	import io
+	input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
+else:
+	raise RuntimeError('Cannot read utf-8 input from standard input with python version 2.')
+
 while(True):
     try:
-        tr = hfst.read_prolog_transducer(sys.stdin)
+        tr = hfst.read_prolog_transducer(input_stream)
         ostr.write(tr)
         ostr.flush()
     except hfst.exceptions.EndOfStreamException as e:
