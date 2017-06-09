@@ -376,21 +376,6 @@ REGULAR_EXPRESSION: RE_LIST
   $$ = &$1->apply(&HfstTransducer::subtract,*$3);
   delete $3;
 }
-| REGULAR_EXPRESSION FREELY_INSERT RE_LIST
-{
-  $1->apply
-    (&HfstTransducer::insert_freely,
-     SymbolPair(TWOLC_FREELY_INSERT,TWOLC_FREELY_INSERT),
-     true);
-  $1->apply
-    (&HfstTransducer::substitute,
-     SymbolPair(TWOLC_FREELY_INSERT,TWOLC_FREELY_INSERT),
-     *$3,
-     true);
-  $$ = $1;
-
-  delete $3;
-}
 
 RE_LIST: /* empty */
 { $$ = new OtherSymbolTransducer(HFST_EPSILON); }
@@ -429,6 +414,21 @@ RE: PAIR
 { $$ = $2; }
 | LEFT_PARENTHESIS REGULAR_EXPRESSION RIGHT_PARENTHESIS
 { $$ = &$2->apply(&HfstTransducer::optionalize); }
+| RE FREELY_INSERT RE
+{
+  $1->apply
+    (&HfstTransducer::insert_freely,
+     SymbolPair(TWOLC_FREELY_INSERT,TWOLC_FREELY_INSERT),
+     true);
+  $1->apply
+    (&HfstTransducer::substitute,
+     SymbolPair(TWOLC_FREELY_INSERT,TWOLC_FREELY_INSERT),
+     *$3,
+     true);
+  $$ = $1;
+
+  delete $3;
+}
 
 SET_LIST: /* empty */
 | SET_LIST SET_DEFINITION
