@@ -22,6 +22,7 @@
 #include <time.h>
 #include <iomanip>
 #include <cmath>
+#include <algorithm>
 #include "HfstTransducer.h"
 #include "HfstXeroxRules.h"
 #include "xre_utils.h"
@@ -127,6 +128,20 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex);
  */
 PmatchTransducerContainer * epsilon_to_symbol_container(std::string s);
 PmatchTransducerContainer * make_end_tag(std::string tag);
+
+std::vector<std::pair<WordVector, WordVecFloat> > get_top_n(
+    size_t n,
+    const std::vector<WordVector> & vecs,
+    WordVector & comparison_point);
+
+std::vector<std::pair<WordVector, WordVecFloat> > get_top_n_transformed(
+    size_t n,
+    const std::vector<WordVector> & vecs,
+    std::vector<WordVecFloat> plane_vec,
+    std::vector<WordVecFloat> comparison_point,
+    WordVecFloat translation_term,
+    bool negative);
+
 template<typename T> std::vector<T> pointwise_minus(std::vector<T> l,
                                                     std::vector<T> r);
 template<typename T> std::vector<T> pointwise_plus(std::vector<T> l,
@@ -138,8 +153,10 @@ template<typename T> T dot_product(std::vector<T> l,
 template<typename T> T square_sum(std::vector<T> v);
 template<typename T> T norm(std::vector<T> v);
 WordVecFloat cosine_distance(WordVector left, WordVector right);
-PmatchObject * compile_like_arc(std::string word1, std::string word2 = "",
+PmatchObject * compile_like_arc(std::string word1, std::string word2,
                                 unsigned int nwords = 10, bool is_negative = false);
+PmatchObject * compile_like_arc(std::string word,
+                                unsigned int nwords = 10);
 PmatchTransducerContainer * make_counter(std::string name);
 HfstTransducer * make_list(HfstTransducer * t,
                            ImplementationType f = format);

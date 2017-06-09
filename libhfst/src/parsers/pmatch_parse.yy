@@ -599,7 +599,7 @@ LIKE_LEFT ARGLIST RIGHT_PARENTHESIS CATENATE_N {
     if ($2->size() == 0) {
         $$ = hfst::pmatch::compile_like_arc("");
     } else if ($2->size() == 1) {
-        $$ = hfst::pmatch::compile_like_arc($2->operator[](0), "", $4);
+        $$ = hfst::pmatch::compile_like_arc($2->operator[](0), $4);
     } else {
         $$ = hfst::pmatch::compile_like_arc($2->operator[](0),
                                             $2->operator[](1), $4);
