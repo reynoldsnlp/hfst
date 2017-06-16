@@ -150,15 +150,10 @@ in='X <A>y</A>'
 out='<X>X y</X>'
 
 check_compile_run \
-    --codetempl 'Define TOP {X } [{<A>} -> 0] @1@+ [{</A>} -> 0] EndTag(X);' \
+    --codetempl 'Define TOP {X } ([{<A>}:0]) @1@+ ([{</A>}:0]) EndTag(X);' \
     --descrtempl 'Remove tags (@1@)' \
     --templarg-single Alpha LowercaseAlpha \
     --inout '' "$in" "$out"
-
-check_compile_run 'Remove tags only if they exist (Alpha)' \
-    'Define TOP {X } [{<A>} .o. [{<A>} -> 0]] Alpha+ [{</A>} .o. [{</A>} -> 0]] EndTag(X);' \
-    "$in" "$out"
-
 
 # Bug (reported 2013-02-07)
 
