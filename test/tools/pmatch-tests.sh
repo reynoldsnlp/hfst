@@ -17,8 +17,6 @@ exclude_tests="(Converting tags with replacement)\
 |(OptCap, ToUpper, ToLower)\
 |(Named expressions in OptCap, ToUpper)\
 |(Long input lines)\
-|(Any character except in a set)\
-|(Referring to a double quote in a regexp)\
 |(Character literal escapes)\
 |(Named expressions in replace)"
 
@@ -76,26 +74,16 @@ check_compile_run \
 
 
 # Missing feature (reported 2013-01-23)
+# [\Whitespace] works too, but the test script expands the complement symbol \
+# so that part of the test was moved to pmatch2fst-functionality.sh
 
 test_begin "Any character except in a set"
 
 check_compile_run \
     --codetempl 'Define TOP @1@ EndTag(A);' \
     --descrtempl 'Any except Whitespace: @1@' \
-    --templarg-single '[\Whitespace]+' '[? - Whitespace]+' \
+    --templarg-single '[? - Whitespace]+' \
     --inout '' 'ab c  de' '<A>ab</A> <A>c</A>  <A>de</A>'
-
-
-# Bug (reported 2013-01-22)
-
-test_begin "Referring to a double quote in a regexp"
-
-check_compile_run \
-    --codetempl 'Define TOP @1@ EndTag(Q);' \
-    --descrtempl 'Double quote as @1@' \
-    --templarg-single '"\x22"' '"\""' '{"}' '%"' \
-    --inout '' 'a "b" c' 'a <Q>"</Q>b<Q>"</Q> c'
-
 
 # Bug (reported 2013-01-14): RC() required a character between
 # recognized string and context
