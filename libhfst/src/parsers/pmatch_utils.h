@@ -160,7 +160,10 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
                                 unsigned int nwords = 10, bool is_negative = false);
 PmatchObject * compile_like_arc(std::string word,
                                 unsigned int nwords = 10);
+
 PmatchTransducerContainer * make_counter(std::string name);
+
+hfst::StringSet get_non_special_alphabet(HfstTransducer * t);
 HfstTransducer * make_list(HfstTransducer * t,
                            ImplementationType f = format);
 HfstTransducer * make_exc_list(HfstTransducer * t,
@@ -197,6 +200,8 @@ int* get_n_to_k(const char* s);
 double get_weight(const char* s);
 
 void init_globals(void);
+
+string expand_includes(const string & script);
 
 /**
  * @brief compile new transducer

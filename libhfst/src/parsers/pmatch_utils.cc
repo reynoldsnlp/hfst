@@ -630,18 +630,27 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
 PmatchTransducerContainer * make_counter(std::string name)
 { return epsilon_to_symbol_container("@PMATCH_COUNTER_" + name + "@"); }
 
+hfst::StringSet get_non_special_alphabet(HfstTransducer * t)
+{
+    hfst::StringSet retval;
+    hfst::StringSet const & alphabet = t->get_alphabet();
+    for (hfst::StringSet::const_iterator it = alphabet.begin();
+         it != alphabet.end(); ++it) {
+        if (hfst_ol::PmatchAlphabet::is_printable(*it)) {
+            retval.insert(*it);
+        }
+    }
+    return retval;
+}
+
 HfstTransducer * make_list(HfstTransducer * t, ImplementationType f)
 {
     std::string arc = "@L.";
-    hfst::StringSet alphabet = t->get_alphabet();
+    hfst::StringSet alphabet = get_non_special_alphabet(t);
     for (hfst::StringSet::const_iterator it = alphabet.begin();
          it != alphabet.end(); ++it) {
-        if (!hfst_ol::PmatchAlphabet::is_special(*it) &&
-            *it != hfst::internal_epsilon && *it != hfst::internal_unknown &&
-            *it != hfst::internal_identity && *it != hfst::internal_default) {
-            arc.append(*it);
-            arc.append("_");
-        }
+        arc.append(*it);
+        arc.append("_");
     }
     arc.append("@");
     return new HfstTransducer(arc, f);
@@ -650,15 +659,11 @@ HfstTransducer * make_list(HfstTransducer * t, ImplementationType f)
 HfstTransducer * make_exc_list(HfstTransducer * t, ImplementationType f)
 {
     std::string arc = "@X.";
-    hfst::StringSet alphabet = t->get_alphabet();
+    hfst::StringSet alphabet = get_non_special_alphabet(t);
     for (hfst::StringSet::const_iterator it = alphabet.begin();
          it != alphabet.end(); ++it) {
-        if (!hfst_ol::PmatchAlphabet::is_special(*it) &&
-            *it != hfst::internal_epsilon && *it != hfst::internal_unknown &&
-            *it != hfst::internal_identity && *it != hfst::internal_default) {
-            arc.append(*it);
-            arc.append("_");
-        }
+        arc.append(*it);
+        arc.append("_");
     }
     arc.append("@");
     return new HfstTransducer(arc, f);
@@ -668,14 +673,10 @@ HfstTransducer * make_sigma(HfstTransducer * t)
 {
     HfstTransducer * retval =
         new HfstTransducer(format);
-    hfst::StringSet alphabet = t->get_alphabet();
+    hfst::StringSet alphabet = get_non_special_alphabet(t);
     for (hfst::StringSet::const_iterator it = alphabet.begin();
          it != alphabet.end(); ++it) {
-        if (!hfst_ol::PmatchAlphabet::is_special(*it) &&
-            *it != hfst::internal_epsilon && *it != hfst::internal_unknown &&
-            *it != hfst::internal_identity && *it != hfst::internal_default) {
             retval->disjunct(HfstTransducer(*it, format));
-        }
     }
     return retval;
 }
@@ -1064,6 +1065,13 @@ void init_globals(void)
     pmatchnerrs = 0;
 }
 
+string expand_includes(const string & script)
+{
+    return string(script);
+    
+//     string filepath = hfst::pmatch::path_from_filename($1);
+}
+
 std::map<std::string, HfstTransducer*>
 compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         ImplementationType impl, bool be_verbose, bool do_flatten,
@@ -1072,7 +1080,8 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
 {
     // lock here?
     init_globals();
-    data = strdup(pmatch.c_str());
+    string expanded_script = expand_includes(pmatch);
+    data = strdup(expanded_script.c_str());
     startptr = data;
     len = strlen(data);
     verbose = be_verbose;
@@ -1894,7 +1903,11 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
     } else if (op == TermComplement) {
         HfstTransducer* any = new HfstTransducer(hfst::internal_identity,
                                                  hfst::pmatch::format);
-        any->subtract(*retval);
+        hfst::StringSet alphabet = get_non_special_alphabet(retval);
+        for (hfst::StringSet::iterator it = alphabet.begin(); it != alphabet.end(); ++it) {
+            HfstTransducer symbol(*it, hfst::pmatch::format);
+            any->subtract(symbol);
+        }
         delete retval;
         retval = any;
     } else if (op == Cap) {
