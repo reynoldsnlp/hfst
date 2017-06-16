@@ -69,7 +69,7 @@
 %type <restrictionContext> RESTR_CONTEXT
 %type <restrictionContexts> RESTR_CONTEXTS
 %type <replType> CONTEXT_MARK
-%type <pmatchObject> INSERTION FUNCALL EXPLODE IMPLODE ENDTAG LIKE READ_FROM CONTEXT_CONDITION PMATCH_CONTEXT PMATCH_OR_CONTEXT PMATCH_AND_CONTEXT
+%type <pmatchObject> INSERTION FUNCALL EXPLODE IMPLODE ENDTAG CAPTURE LIKE READ_FROM CONTEXT_CONDITION PMATCH_CONTEXT PMATCH_OR_CONTEXT PMATCH_AND_CONTEXT
 PMATCH_RIGHT_CONTEXT PMATCH_LEFT_CONTEXT PMATCH_NEGATIVE_RIGHT_CONTEXT PMATCH_NEGATIVE_LEFT_CONTEXT
 %type <pmatchObject_vector> PMATCH_CONTEXTS
 
@@ -102,7 +102,7 @@ LTR_LONGEST_MATCH LTR_SHORTEST_MATCH
 //  MAP_LEFT
 %right DEFINE SET_VARIABLE
 LIT_LEFT INS_LEFT REGEX DEFINS DEFINED_LIST CAP_LEFT OPTCAP_LEFT OPT_TOLOWER_LEFT TOLOWER_LEFT
-OPT_TOUPPER_LEFT TOUPPER_LEFT ANY_CASE_LEFT IMPLODE_LEFT EXPLODE_LEFT DEFINE_LEFT ENDTAG_LEFT LIKE_LEFT UNLIKE_LEFT LC_LEFT RC_LEFT NLC_LEFT NRC_LEFT OR_LEFT AND_LEFT
+OPT_TOUPPER_LEFT TOUPPER_LEFT ANY_CASE_LEFT IMPLODE_LEFT EXPLODE_LEFT DEFINE_LEFT ENDTAG_LEFT CAPTURE_LEFT LIKE_LEFT UNLIKE_LEFT LC_LEFT RC_LEFT NLC_LEFT NRC_LEFT OR_LEFT AND_LEFT
 TAG_LEFT LST_LEFT EXC_LEFT INTERPOLATE_LEFT SIGMA_LEFT COUNTER_LEFT
 %%
 
@@ -503,6 +503,9 @@ INTERPOLATE_LEFT FUNCALL_ARGLIST RIGHT_PARENTHESIS { $$ = new PmatchBuiltinFunct
 SIGMA_LEFT EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(MakeSigma, $2); } |
 COUNTER_LEFT SYMBOL RIGHT_PARENTHESIS { $$ = hfst::pmatch::make_counter($2); free($2); } |
 ENDTAG { $$ = $1; hfst::pmatch::need_delimiters = true; } |
+CAPTURE {
+    $$ = $1;
+    hfst::pmatch::need_delimiters = true; } |
 CONTEXT_CONDITION {
     $$ = $1;
     // We will wrap the current definition with entry and exit guards
@@ -635,6 +638,24 @@ ENDTAG: ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
     free($2);
 } | ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
     $$ = hfst::pmatch::make_end_tag($2);
+    free($2);
+};
+
+CAPTURE: CAPTURE_LEFT SYMBOL RIGHT_PARENTHESIS {
+    $$ = hfst::pmatch::make_capture_tag($2);
+    PmatchObject * captured = hfst::pmatch::make_captured_tag($2);
+    std::pair<std::string, PmatchObject*> captured_def($2, captured);
+    if (definitions.count(captured_def.first) != 0) {
+        std::stringstream warning;
+        warning << "definition of " << captured_def.first << " on line " << pmatchlineno
+                << " shadows earlier definition\n";
+        warn(warning.str());
+        delete definitions[captured_def.first];
+    }
+    definitions.insert(captured_def);
+    free($2);
+} | CAPTURE_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
+    $$ = hfst::pmatch::make_capture_tag($2);
     free($2);
 };
 

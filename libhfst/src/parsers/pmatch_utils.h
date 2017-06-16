@@ -50,6 +50,7 @@ extern std::set<std::string> inserted_names;
 extern std::set<std::string> unsatisfied_insertions;
 extern std::set<std::string> used_definitions;
 extern std::set<std::string> function_names;
+extern std::set<std::string> capture_names;
 extern std::vector<WordVector> word_vectors;
 extern ImplementationType format;
 extern bool verbose;
@@ -128,6 +129,8 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex);
  */
 PmatchTransducerContainer * epsilon_to_symbol_container(std::string s);
 PmatchTransducerContainer * make_end_tag(std::string tag);
+PmatchTransducerContainer * make_capture_tag(std::string tag);
+PmatchTransducerContainer * make_captured_tag(std::string tag);
 
 std::vector<std::pair<WordVector, WordVecFloat> > get_top_n(
     size_t n,

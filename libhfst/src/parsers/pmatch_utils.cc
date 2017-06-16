@@ -91,6 +91,7 @@ std::set<std::string> inserted_names;
 std::set<std::string> unsatisfied_insertions;
 std::set<std::string> used_definitions;
 std::set<std::string> function_names;
+std::set<std::string> capture_names;
 std::vector<WordVector> word_vectors;
 char* startptr;
 hfst::ImplementationType format;
@@ -311,6 +312,12 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex)
 
 PmatchTransducerContainer * make_end_tag(std::string tag)
 { return epsilon_to_symbol_container("@PMATCH_ENDTAG_" + tag + "@"); }
+
+PmatchTransducerContainer * make_capture_tag(std::string tag)
+{ return epsilon_to_symbol_container("@PMATCH_CAPTURE_" + tag + "@"); }
+
+PmatchTransducerContainer * make_captured_tag(std::string tag)
+{ return epsilon_to_symbol_container("@PMATCH_CAPTURED_" + tag + "@"); }
 
 // Get the n best candidates in the original space using an insertion sort
 std::vector<std::pair<WordVector, WordVecFloat> > get_top_n(size_t n,
@@ -1051,6 +1058,7 @@ void init_globals(void)
     unsatisfied_insertions.clear();
     used_definitions.clear();
     function_names.clear();
+    capture_names.clear();
     zero_minimization_guard();
     need_delimiters = false;
     pmatchnerrs = 0;

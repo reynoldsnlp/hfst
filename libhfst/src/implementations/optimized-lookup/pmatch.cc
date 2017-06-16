@@ -27,9 +27,12 @@ PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
     // with false, then flip those that actually do to true
     printable_vector = std::vector<bool>(orig_symbol_count, false);
     for (SymbolNumber i = 1; i < symbol_table.size(); ++i) {
-        add_special_symbol(symbol_table[i], i);
-        if (is_flag_diacritic(i)) {
-            printable_vector[i] = false;
+        if (is_special(symbol_table[i])) {
+            add_special_symbol(symbol_table[i], i);
+        } else {
+            if (!is_flag_diacritic(i)) {
+                printable_vector[i] = true;
+            }
         }
     }
 }
@@ -46,9 +49,12 @@ PmatchAlphabet::PmatchAlphabet(TransducerAlphabet const & a,
     // with false, then flip those that actually do to true
     printable_vector = std::vector<bool>(orig_symbol_count, false);
     for (SymbolNumber i = 1; i < symbol_table.size(); ++i) {
-        add_special_symbol(symbol_table[i], i);
-        if (is_flag_diacritic(i)) {
-            printable_vector[i] = false;
+        if (is_special(symbol_table[i])) {
+            add_special_symbol(symbol_table[i], i);
+        } else {
+            if (!is_flag_diacritic(i)) {
+                printable_vector[i] = true;
+            }
         }
     }
 }
@@ -120,6 +126,14 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
         end_tag_map[symbol_number] = str.substr(
             sizeof("@PMATCH_ENDTAG_") - 1,
             str.size() - (sizeof("@PMATCH_ENDTAG_@") - 1));
+    } else if (is_capture_tag(str)) {
+        capture_tag_map[symbol_number] = str.substr(
+            sizeof("@PMATCH_CAPTURE_") - 1,
+            str.size() - (sizeof("@PMATCH_CAPTURE_@") - 1));
+    } else if (is_captured_tag(str)) {
+        captured_tag_map[symbol_number] = str.substr(
+            sizeof("@PMATCH_CAPTURED_") - 1,
+            str.size() - (sizeof("@PMATCH_CAPTURED_@") - 1));
     } else if (is_insertion(str)) {
         rtn_names[name_from_insertion(str)] = symbol_number;
     } else if (is_guard(str)) {
@@ -129,8 +143,8 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
     } else if (is_counter(str)) {
         process_counter(str, symbol_number);
     } else {
-        // it's a regular symbol
-        printable_vector[symbol_number] = true;
+        // it's a regular symbol, we shouldn't be here!
+        std::cerr << "pmatch: warning: symbol " << str << " was wrongly given as a special symbol\n";
     }
 }
 
@@ -577,6 +591,28 @@ bool PmatchAlphabet::is_end_tag(const SymbolNumber symbol) const
     return end_tag_map.count(symbol) == 1;
 }
 
+bool PmatchAlphabet::is_capture_tag(const std::string & symbol)
+{
+    return symbol.find("@PMATCH_CAPTURE_") == 0 &&
+        symbol.rfind("@") == symbol.size() - 1;
+}
+
+bool PmatchAlphabet::is_capture_tag(const SymbolNumber symbol) const
+{
+    return capture_tag_map.count(symbol) == 1;
+}
+
+bool PmatchAlphabet::is_captured_tag(const std::string & symbol)
+{
+    return symbol.find("@PMATCH_CAPTURED_") == 0 &&
+        symbol.rfind("@") == symbol.size() - 1;
+}
+
+bool PmatchAlphabet::is_captured_tag(const SymbolNumber symbol) const
+{
+    return captured_tag_map.count(symbol) == 1;
+}
+
 bool PmatchAlphabet::is_insertion(const std::string & symbol)
 {
     return symbol.find("@I.") == 0 && symbol.rfind("@") == symbol.size() - 1;
@@ -599,7 +635,7 @@ bool PmatchAlphabet::is_list(const std::string & symbol)
 
 bool PmatchAlphabet::is_special(const std::string & symbol)
 {
-    if (symbol.size() == 0) {
+    if (symbol.size() < 3) {
         return false;
     }
     if (is_insertion(symbol) || symbol == "@BOUNDARY@") {
@@ -1105,6 +1141,19 @@ bool PmatchContainer::has_queued_input(unsigned int input_pos)
     return input_pos < input.size() && (input_pos + 1 != 0);
 }
 
+bool PmatchContainer::vector_matches_input(unsigned int pos, SymbolNumberVector & vec)
+{
+    if (pos + vec.size() > input.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < vec.size(); ++i) {
+        if (input[pos + i] != vec[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 PmatchTransducer::PmatchTransducer(std::istream & is,
                                    TransitionTableIndex index_table_size,
                                    TransitionTableIndex transition_table_size,
@@ -1602,6 +1651,24 @@ void PmatchContainer::grab_location(unsigned int input_pos, unsigned int tape_po
     tape_locations.push_back(rv);
 }
 
+SymbolNumberVector PmatchContainer::get_longest_matching_capture(
+    SymbolNumber key, unsigned int input_pos)
+{
+    SymbolNumberVector longest_so_far;
+    for (std::vector<std::pair<unsigned int, unsigned int> >::iterator it =
+             captures.begin(); it != captures.end(); ++it) {
+        SymbolNumberVector slice(input.begin() + it->first, input.begin() + it->second);
+        if (vector_matches_input(input_pos, slice)) {
+            if (slice.size() <= longest_so_far.size()) {
+                continue;
+            } else {
+                longest_so_far = slice;
+            }
+        }
+    }
+    return longest_so_far;
+}
+
 void PmatchTransducer::take_epsilons(unsigned int input_pos,
                                      unsigned int tape_pos,
                                      TransitionTableIndex i)
@@ -1628,14 +1695,31 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                         container->entry_stack.push(input_pos);
                     } else if (output == alphabet.get_special(exit)) {
                         container->entry_stack.pop();
+                    } else if (alphabet.is_capture_tag(output)) {
+                        // if it's a capture tag, do the capture
+                        container->captures.push_back(
+                            std::pair<unsigned int, unsigned int>(container->entry_stack.back(), input_pos));
+                    } else if (alphabet.is_captured_tag(output)) {
+                        // if it's a captured tag, try each previously
+                        // captured sequence
+                        SymbolNumberVector cap = container->get_longest_matching_capture(output, input_pos);
+                        if (cap.size() != 0) {
+                            container->tape.write(tape_pos, cap);
+                            get_analyses(input_pos + cap.size(), tape_pos + cap.size(), target);
+                        }
+                        ++i;
+                        container->set_weight(old_weight);
+                        continue;
                     }
                     
                     get_analyses(input_pos, tape_pos + 1, target);
                     
                     if (output == alphabet.get_special(entry)) {
-                        container->entry_stack.pop();
+                        container->entry_stack.pop_back();
                     } else if (output == alphabet.get_special(exit)) {
                         container->entry_stack.unpop();
+                    } else if (alphabet.is_capture_tag(output)) {
+                        container->captures.pop_back();
                     }
                 } else {
                     check_context(input_pos, tape_pos, i);

@@ -834,6 +834,16 @@ struct DoubleTape: public std::vector<SymbolPair>
             this->operator[](pos) = SymbolPair(in, out);
         }
 
+    void write(unsigned int pos, std::vector<SymbolNumber> & vec)
+        {
+            while (pos + vec.size() >= this->size()) {
+                this->push_back(SymbolPair());
+            }
+            for (size_t i = 0; i < vec.size(); ++i) {
+                this->operator[](pos + i) = SymbolPair(vec[i], vec[i]);
+            }
+        }
+
     DoubleTape extract_slice(unsigned int start, unsigned int stop)
         {
             DoubleTape retval;

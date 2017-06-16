@@ -74,6 +74,7 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 "Lit(" { return LIT_LEFT; }
 "Ins(" { return INS_LEFT; }
 "EndTag(" { return ENDTAG_LEFT; }
+"Capture(" { return CAPTURE_LEFT; }
 "Cap(" { return CAP_LEFT; }
 "OptCap(" { return OPTCAP_LEFT; }
 "DownCase(" { return TOLOWER_LEFT; }
