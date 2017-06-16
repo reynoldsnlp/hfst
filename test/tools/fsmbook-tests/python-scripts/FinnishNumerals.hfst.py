@@ -26,8 +26,9 @@ eleven_to_nineteen = hfst.concatenate((one_to_eps, one_to_nine, eps_to_toista))
 # From 20 to 99, i.e.  [ 2to9 0:kymmentä ( "0":0 | 1to9 ) ]:
 eps_to_kymmenta = hfst.fst({'':'kymmentä'})
 zero_to_eps = hfst.fst({'0':''})
-tmp = hfst.concatenate((two_to_nine, eps_to_kymmenta))
-twenty_to_ninetynine = hfst.disjunct((tmp, zero_to_eps, one_to_nine))
+TMP = hfst.concatenate((two_to_nine, eps_to_kymmenta))
+tmp = hfst.disjunct((one_to_nine, zero_to_eps))
+twenty_to_ninetynine = hfst.concatenate((TMP, tmp))
 
 # Finally, from 1 to 99:
 FinnishNumerals = hfst.disjunct((one_to_nine, ten, eleven_to_nineteen, twenty_to_ninetynine))

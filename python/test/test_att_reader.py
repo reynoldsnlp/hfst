@@ -27,3 +27,14 @@ with open('testfile_fail.att', 'r') as f:
 
 assert(f.closed)
 assert(len(transducers)) == 4
+
+transducers = []
+with open('testfile_unicode.att', 'r') as f:
+    r = hfst.AttReader(f)
+    for tr in r:
+        transducers.append(tr)
+
+assert(f.closed)
+assert(len(transducers)) == 1
+TR = hfst.regex('föö:bär::0.5')
+assert(TR.compare(transducers[0]))

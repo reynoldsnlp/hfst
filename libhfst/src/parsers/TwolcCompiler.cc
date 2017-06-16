@@ -10,7 +10,6 @@
 //   You should have received a copy of the GNU General Public License
 //   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "commandline_src/CommandLine.h"
 #include "HfstTwolcDefs.h"
 #include "io_src/InputReader.h"
 #include "grammar_defs.h"

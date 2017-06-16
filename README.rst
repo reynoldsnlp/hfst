@@ -29,22 +29,42 @@ Installation packages for Debian and Ubuntu
 
 Debian packages for HFST are distributed via `Apertium project
 <http://apertium.projectjj.com/apt/nightly/pool/main/h/hfst/>`_. This folder
-contains debian packages for HFST API library and tool packages.
+contains debian packages for HFST API library, command line tools and Python bindings.
 The debian packages are experimental; the requirements of debian or ubuntu
 installations are same as main packages. SFST is excluded from the packages
-as it has portability issues with hash_maps and hash_sets. The python packages
-contain binaries for swig-generated Python bindings for HFST.
+as it has portability issues with hash_maps and hash_sets.
+For installation instructions, see our
+`KitWiki pages <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstDownloads#Installing_HFST_to_Linux>`_.
 
 Binaries for Windows
 --------------------
 
 Binaries for Windows are distributed via `Apertium project
 <http://apertium.projectjj.com/win32/nightly/>`_. This folder contains
-ready-compiled HFST library and command line tools. Performing
+ready-compiled HFST library and command line tools.
+For installation instructions, see our
+`KitWiki pages <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstDownloads#Installing_HFST_to_Windows>`_.
+Python bindings for Windows are currently available as wheels for 32-bit
+Python versions 2.7, 3.4, 3.5 and 3.6 on our `PyPI page
+<https://pypi.python.org/pypi/hfst>`_.
+Performing
 `installation from the sources`_ is also possible on Windows with MinGW
-and Cygwin. Python bindings for Windows are currently available only for 64-bit
-Python versions 3.3 and 3.4 on our `download page
-<https://hfst.github.io/downloads/index.html>`_.
+and Cygwin, if Python bindings are not needed.
+
+Binaries for Mac OS X
+---------------------
+
+Binaries for OS X are distributed via `Apertium project
+<http://apertium.projectjj.com/osx/nightly/>`_. This folder contains
+ready-compiled HFST library and command line tools.
+For installation instructions, see our
+`KitWiki pages <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstDownloads#Installing_HFST_to_Mac_OS_X>`_.
+Python bindings for OS X are currently available as wheels for
+Python versions 2.7, 3.4, 3.5 and 3.6 on our `PyPI page
+<https://pypi.python.org/pypi/hfst>`_.
+Performing
+`installation from the sources`_ is also possible on Mac.
+
 
 Installation for Gentoo Linux
 -----------------------------

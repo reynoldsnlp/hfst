@@ -49,7 +49,7 @@
 #
 # \section download_hfst Download
 #
-#   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstPython">Download and install</a> HFST Python API
+#   - <a href="https://pypi.python.org/pypi/hfst">Download and install</a> HFST Python API
 #
 #
 #\section links Links

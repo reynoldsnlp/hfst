@@ -19,7 +19,7 @@ Compiling the extensions requires python, swig and a C++ compiler,
 all located on a directory listed on system PATH. On linux and OS X,
 readline and getline must be available.
 
-The setup script has been tested on linux with gcc 4.6.3, swig 3.0.12 and
+The setup script has been tested on linux with gcc 5.4.0, swig 3.0.12 and
 python 3.4 and on windows with swig 3.0.5 and msvc 10.0 (with python 3.3.
 and 3.4) and msvc 14.0 (with python 3.5 and 3.6).
 
@@ -51,17 +51,24 @@ def hfst_specific_option(option):
 # ----- C++ STANDARD  -----
 
 # Use C++ standard C++11 unless compiling for Python 2.7 for Windows (requires msvc 2008 which does not support C++11)
-# or for OS X (C++11 requires libc++ instead of libstdc++ and minimum version requirement 10.7 instead of 10.6 as well
-# as setting option -std=c++0x which clang refuses to accept when compiling C code of foma backend; the latter is a
-# potential issue also for other environments).
+# or for OS X (C++11 requires libc++ instead of libstdc++ and minimum version requirement 10.7 instead of 10.6).
 CPP_STD_11=True
-if (platform == "darwin") or (platform == "win32" and sys.version_info[0] == 2):
+from sys import version_info
+if (platform == "darwin") or (platform == "win32" and version_info[0] == 2):
     CPP_STD_11=False
 # Override default behaviour, if requested.
 if hfst_specific_option('--with-c++11'):
     CPP_STD_11=True
 if hfst_specific_option('--without-c++11'):
     CPP_STD_11=False
+
+# By default, use the C++ version of foma backend. C++11 requires option -std=c++0x to be set for C/C++ compiler
+# (this cannot de defined for each file separately) and some compilers refuse to compile C with that option.
+CPP_FOMA=True
+if hfst_specific_option('--with-c++-foma'):
+    CPP_FOMA=True
+if hfst_specific_option('--with-c-foma'):
+    CPP_FOMA=False
 
 # Experimental...
 if platform == "darwin" and CPP_STD_11:
@@ -75,7 +82,6 @@ if platform == "darwin" and CPP_STD_11:
 swig_include_dir = "libhfst/src/"
 # Generate wrapper for C++
 ext_swig_opts = ["-c++", "-I" + swig_include_dir, "-Wall"]
-from sys import version_info
 # for python3.3 and python3.4 on windows, add SDK include directory
 if platform == "win32" and version_info[0] == 3 and (version_info[1] == 3 or version_info[1] == 4):
     ext_swig_opts.extend(["-IC:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Include"])
@@ -110,7 +116,7 @@ else:
 # ----- CONFIGURATION -----
 
 # Include foma implementation for OS X only when c++11 is disabled.
-include_foma_backend=False
+include_foma_backend=True
 if platform == "linux" or platform == "linux2" or platform == "win32" or (platform == "darwin" and not CPP_STD_11):
     include_foma_backend=True
 ext_define_macros = []
@@ -161,15 +167,18 @@ if platform == "win32":
 
 # ----- C++ SOURCE FILES -----
 
-# on windows, c++ source files have 'cpp' extension
-cpp = ".cc"
-if platform == "win32":
-    cpp = ".cpp"
+# C++ source files have 'cpp' extension
+cpp = ".cpp"
 
 # on windows, openfst back-end is in directory 'openfstwin'
 openfstdir = "openfst"
 if platform == "win32":
     openfstdir = "openfstwin"
+
+# foma source file extension (C++ by default)
+fe = cpp
+if not CPP_FOMA:
+    fe = ".c"
 
 # all c++ extension source files
 libhfst_source_files = ["libhfst/src/parsers/XfstCompiler" + cpp,
@@ -260,32 +269,31 @@ libhfst_source_files = ["libhfst/src/parsers/XfstCompiler" + cpp,
                         "libhfst/src/parsers/rule_src/Rule" + cpp,
                         "libhfst/src/parsers/rule_src/RuleContainer" + cpp,
                         "libhfst/src/parsers/rule_src/TwolCGrammar" + cpp,
-                        "libhfst/src/parsers/commandline_src/CommandLine" + cpp,
                         "libhfst/src/parsers/alphabet_src/Alphabet" + cpp ]
 
-foma_source_files = [ "back-ends/foma/int_stack.c",
-                      "back-ends/foma/define.c",
-                      "back-ends/foma/determinize.c",
-                      "back-ends/foma/apply.c",
-                      "back-ends/foma/rewrite.c",
-                      "back-ends/foma/topsort.c",
-                      "back-ends/foma/flags.c",
-                      "back-ends/foma/minimize.c",
-                      "back-ends/foma/reverse.c",
-                      "back-ends/foma/extract.c",
-                      "back-ends/foma/sigma.c",
-                      "back-ends/foma/structures.c",
-                      "back-ends/foma/constructions.c",
-                      "back-ends/foma/coaccessible.c",
-                      "back-ends/foma/io.c",
-                      "back-ends/foma/utf8.c",
-                      "back-ends/foma/spelling.c",
-                      "back-ends/foma/dynarray.c",
-                      "back-ends/foma/mem.c",
-                      "back-ends/foma/stringhash.c",
-                      "back-ends/foma/trie.c",
-                      "back-ends/foma/lex.yy.c",
-                      "back-ends/foma/regex.c" ]
+foma_source_files = [ "back-ends/foma/int_stack" + fe,
+                      "back-ends/foma/define" + fe,
+                      "back-ends/foma/determinize" + fe,
+                      "back-ends/foma/apply" + fe,
+                      "back-ends/foma/rewrite" + fe,
+                      "back-ends/foma/topsort" + fe,
+                      "back-ends/foma/flags" + fe,
+                      "back-ends/foma/minimize" + fe,
+                      "back-ends/foma/reverse" + fe,
+                      "back-ends/foma/extract" + fe,
+                      "back-ends/foma/sigma" + fe,
+                      "back-ends/foma/structures" + fe,
+                      "back-ends/foma/constructions" + fe,
+                      "back-ends/foma/coaccessible" + fe,
+                      "back-ends/foma/io" + fe,
+                      "back-ends/foma/utf8" + fe,
+                      "back-ends/foma/spelling" + fe,
+                      "back-ends/foma/dynarray" + fe,
+                      "back-ends/foma/mem" + fe,
+                      "back-ends/foma/stringhash" + fe,
+                      "back-ends/foma/trie" + fe,
+                      "back-ends/foma/lex.yy" + fe,
+                      "back-ends/foma/regex" + fe ]
 
 openfst_source_files =  [ "back-ends/" + openfstdir + "/src/lib/compat" + cpp,
                           "back-ends/" + openfstdir + "/src/lib/flags" + cpp,
@@ -324,7 +332,7 @@ libhfst_module = Extension('_libhfst',
                            )
 
 setup(name = 'hfst',
-      version = '3.12.2.2_beta',
+      version = '3.12.2.3_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',

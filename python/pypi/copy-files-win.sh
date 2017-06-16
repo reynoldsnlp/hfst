@@ -1,14 +1,22 @@
 #!/bin/sh
 
 if [ "$1" = "--help" -o "$1" = "-h" ]; then
+    echo "copy-files.sh [--with-c-foma]"
     echo ""
     echo "Copy files needed for pypi distribution on Windows."
+    echo ""
+    echo "--with-c-foma:   copy the C version of foma backend (instead oc C++)"
     echo ""
     echo "NOTE: flex/bison-generated cc and hh files are copied as such to"
     echo "avoid dependency on swig. Make sure you have a fresh version of them"
     echo "(run 'compile-cc-files-win.sh' in '../../libhfst/src/parsers', if needed)."
     echo ""
     exit 0
+fi
+
+CPP_FOMA="true"
+if [ "$1" = "--with-c-foma" ]; then
+    CPP_FOMA="false"
 fi
 
 if ! [ -d "back-ends" ]; then mkdir back-ends; fi
@@ -22,13 +30,18 @@ cp -R ../hfst/* hfst/
 cp -R ../test/* test/
 
 # files under ../
-for file in hfst_extensions.cc hfst_file_extensions.cc hfst_lexc_extensions.cc \
-hfst_lookup_extensions.cc hfst_pmatch_extensions.cc hfst_prolog_extensions.cc \
-hfst_regex_extensions.cc hfst_rules_extensions.cc hfst_xfst_extensions.cc \
-hfst_sfst_extensions.cc libhfst.i docstrings.i ;
+for file in hfst_extensions.cpp hfst_file_extensions.cpp hfst_lexc_extensions.cpp \
+hfst_lookup_extensions.cpp hfst_pmatch_extensions.cpp hfst_prolog_extensions.cpp \
+hfst_regex_extensions.cpp hfst_rules_extensions.cpp hfst_xfst_extensions.cpp \
+hfst_sfst_extensions.cpp libhfst.i docstrings.i ;
 do
     cp ../$file $file
 done
+
+# Copy all files that have a c++ version as backend files to be compiled.
+if [ "$CPP_FOMA" = "true" ]; then
+    cp back-ends/foma/cpp-version/* back-ends/foma/
+fi
 
 # .cc -> .cpp
 for dir in back-ends libhfst;
@@ -41,7 +54,7 @@ for file in xfst-lexer htwolcpre1-lexer htwolcpre2-lexer htwolcpre3-lexer sfst-s
 do
     sed -i 's/#include <unistd.h>/#include <io.h>/' libhfst/src/parsers/$file.cpp
 done
-for file in lex.cmatrix.c lex.yy.c;
+for file in lex.cmatrix.cpp lex.yy.cpp;
 do
     sed -i 's/#include <unistd.h>/#include <io.h>/' back-ends/foma/$file
 done

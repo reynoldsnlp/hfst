@@ -598,9 +598,7 @@ void Transducer::get_analyses(unsigned int input_pos,
                 output_tape.write(output_pos, NO_SYMBOL_NUMBER, NO_SYMBOL_NUMBER);
                 if (tables->get_index_finality(i)) {
                     Weight old_weight = current_weight;
-                    std::cerr << current_weight << "\t";
                     current_weight += tables->get_final_weight(i);
-                    std::cerr << current_weight << std::endl;
                     note_analysis();
                     current_weight = old_weight;
                 }
