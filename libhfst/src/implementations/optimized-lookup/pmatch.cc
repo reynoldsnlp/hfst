@@ -143,8 +143,9 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
     } else if (is_counter(str)) {
         process_counter(str, symbol_number);
     } else {
+        printable_vector[symbol_number] = true;
         // it's a regular symbol, we shouldn't be here!
-        std::cerr << "pmatch: warning: symbol " << str << " was wrongly given as a special symbol\n";
+//        std::cerr << "pmatch: warning: symbol " << str << " was wrongly given as a special symbol\n";
     }
 }
 
