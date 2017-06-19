@@ -91,6 +91,7 @@ std::set<std::string> inserted_names;
 std::set<std::string> unsatisfied_insertions;
 std::set<std::string> used_definitions;
 std::set<std::string> function_names;
+std::set<std::string> capture_names;
 std::vector<WordVector> word_vectors;
 char* startptr;
 hfst::ImplementationType format;
@@ -312,97 +313,112 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex)
 PmatchTransducerContainer * make_end_tag(std::string tag)
 { return epsilon_to_symbol_container("@PMATCH_ENDTAG_" + tag + "@"); }
 
-struct DotProductWithWordVectorComparison {
-    WordVector compare_with_this;
-    DotProductWithWordVectorComparison(WordVector word): compare_with_this(word) {}
-    // if the vectors are normalized, dot product is == cosine similarity
-    bool operator()(WordVector left, WordVector right) {
-        WordVecFloat left_accumulator = 0;
-        WordVecFloat right_accumulator = 0;
-        for (size_t i = 0; i < compare_with_this.vector.size(); ++i) {
-            left_accumulator += compare_with_this.vector[i]*left.vector[i];
-            right_accumulator += compare_with_this.vector[i]*right.vector[i];
-        }
-        return left_accumulator > right_accumulator;
-    }
-};
+PmatchTransducerContainer * make_capture_tag(std::string tag)
+{ return epsilon_to_symbol_container("@PMATCH_CAPTURE_" + tag + "@"); }
 
-struct CosineSimilarityWithWordVectorComparison {
-    WordVector compare_with_this;
-    CosineSimilarityWithWordVectorComparison(WordVector word): compare_with_this(word) {}
-    bool operator()(WordVector left, WordVector right) {
-        WordVecFloat left_accumulator = 0.0;
-        WordVecFloat right_accumulator = 0.0;
-        for (size_t i = 0; i < compare_with_this.vector.size(); ++i) {
-            left_accumulator += compare_with_this.vector[i]*left.vector[i];
-            right_accumulator += compare_with_this.vector[i]*right.vector[i];
-        }
-        left_accumulator /= left.norm;
-        right_accumulator /= right.norm;
-        return left_accumulator > right_accumulator;
-    }
-};
+PmatchTransducerContainer * make_captured_tag(std::string tag)
+{ return epsilon_to_symbol_container("@PMATCH_CAPTURED_" + tag + "@"); }
 
-std::vector<WordVecFloat> get_projected_vector(std::vector<WordVecFloat> vec,
-                                               std::vector<WordVecFloat> plane_vec,
-                                               WordVecFloat translation_term)
+// Get the n best candidates in the original space using an insertion sort
+std::vector<std::pair<WordVector, WordVecFloat> > get_top_n(size_t n,
+                                                            std::vector<WordVector> & vecs,
+                                                            WordVector & comparison_point)
 {
-    return pointwise_plus(vec,
-                          pointwise_multiplication(
-                              (((translation_term - dot_product(vec, plane_vec)) / square_sum(plane_vec))
-                               * vector_similarity_projection_factor),
-                              plane_vec));
+    std::vector<std::pair<WordVector, WordVecFloat> > retval;
+    for (std::vector<WordVector>::const_iterator it = vecs.begin();
+         it != vecs.end(); ++it) {
+        WordVecFloat cosdist = cosine_distance(*it, comparison_point);
+        for (size_t i = 0; i <= retval.size(); ++i) {
+            if (i == retval.size()) {
+                // We made it to the top
+                retval.push_back(std::pair<WordVector, WordVecFloat>(
+                                     WordVector(*it), cosdist));
+                break;
+            } else {
+                // Walking the list
+                if (cosdist >= retval[i].second) {
+                    if (i == 0 && retval.size() == n) {
+                        break;
+                    }
+                    retval.insert(retval.begin() + i, std::pair<WordVector, WordVecFloat>(
+                                      WordVector(*it), cosdist));
+                    break;
+                } else {
+                    continue;
+                }
+            }
+        }
+        if (retval.size() > n) {
+            retval.erase(retval.begin());
+        }
+    }
+    return retval;    
 }
 
-struct CosineSimilarityProjectedToPlaneComparison {
-    std::vector<WordVecFloat> plane_vec;
-    std::vector<WordVecFloat> comparison_point;
-    WordVecFloat translation_term;
-    WordVecFloat plane_vec_square_sum;
-    bool negative;
-    CosineSimilarityProjectedToPlaneComparison(
-        std::vector<WordVecFloat> plane_vec_,
-        std::vector<WordVecFloat> comparison_point_,
-        WordVecFloat translation_term_,
-        bool negative_):
-        plane_vec(plane_vec_),
-            comparison_point(comparison_point_),
-            translation_term(translation_term_),
-            negative(negative_)
-        {
-            plane_vec_square_sum = square_sum(plane_vec_);
-        }
-    bool operator()(WordVector left, WordVector right) {
+// Get the n best candidates in the transformed space using an insertion sort
+std::vector<std::pair<WordVector, WordVecFloat> > get_top_n_transformed(
+    size_t n,
+    const std::vector<WordVector> & vecs,
+    std::vector<WordVecFloat> plane_vec,
+    std::vector<WordVecFloat> comparison_point,
+    WordVecFloat translation_term,
+    bool negative)
+{
+    std::vector<std::pair<WordVector, WordVecFloat> > retval;
+    WordVecFloat plane_vec_square_sum = square_sum(plane_vec);
+    WordVecFloat comparison_point_norm = norm(comparison_point);
+    for (std::vector<WordVector>::const_iterator it = vecs.begin();
+         it != vecs.end(); ++it) {
+        WordVector transformed_vec(*it);
+
         /*
          * First, given a plane "plane_vec = translation term" and a point,
          * find the multiple of plane_vec which produces a vector going
          * from point to the nearest point in the plane.
          */
-        WordVecFloat left_scaler = (translation_term - dot_product(left.vector, plane_vec)) / plane_vec_square_sum;
-        WordVecFloat right_scaler = (translation_term - dot_product(right.vector, plane_vec)) / plane_vec_square_sum;
-        left_scaler *= vector_similarity_projection_factor;
-        right_scaler *= vector_similarity_projection_factor;
-        std::vector<WordVecFloat> new_left;
-        std::vector<WordVecFloat> new_right;
-        if (negative) {
-            new_left = pointwise_minus(left.vector, pointwise_multiplication(left_scaler, plane_vec));
-            new_right = pointwise_minus(right.vector, pointwise_multiplication(right_scaler, plane_vec));
+
+        WordVecFloat transformed_vec_scaler =
+            (translation_term - dot_product(transformed_vec.vector, plane_vec))
+            / plane_vec_square_sum;
+        transformed_vec_scaler *= vector_similarity_projection_factor;
+        if(negative) {
+            transformed_vec.vector =
+                pointwise_minus(transformed_vec.vector,
+                                pointwise_multiplication(transformed_vec_scaler, plane_vec));
         } else {
-            new_left = pointwise_plus(left.vector, pointwise_multiplication(left_scaler, plane_vec));
-            new_right = pointwise_plus(right.vector, pointwise_multiplication(right_scaler, plane_vec));
+            transformed_vec.vector =
+                pointwise_plus(transformed_vec.vector,
+                               pointwise_multiplication(transformed_vec_scaler, plane_vec));
         }
-        // Then calculate cosine similarity
-        WordVecFloat left_accumulator = 0.0;
-        WordVecFloat right_accumulator = 0.0;
-        for (size_t i = 0; i < comparison_point.size(); ++i) {
-            left_accumulator += comparison_point[i]*new_left[i];
-            right_accumulator += comparison_point[i]*new_right[i];
+        transformed_vec.norm = norm(transformed_vec.vector);
+        WordVecFloat cosdist = 1 - dot_product(transformed_vec.vector, comparison_point)
+            / (transformed_vec.norm * comparison_point_norm);
+        for (size_t i = 0; i <= retval.size(); ++i) {
+            if (i == retval.size()) {
+                // We made it to the top
+                retval.push_back(std::pair<WordVector, WordVecFloat>(transformed_vec,
+                                                                     cosdist));
+                break;
+            } else {
+                // Walking the list
+                if (cosdist >= retval[i].second) {
+                    if (i == 0 && retval.size() == n) {
+                        break;
+                    }
+                    retval.insert(retval.begin() + i,
+                                  std::pair<WordVector, WordVecFloat>(transformed_vec, cosdist));
+                    break;
+                } else {
+                    continue;
+                }
+            }
         }
-        left_accumulator /= norm(new_left);
-        right_accumulator /= norm(new_right);
-        return left_accumulator > right_accumulator;
+        if (retval.size() > n) {
+            retval.erase(retval.begin());
+        }
     }
-};
+    return retval;    
+}
 
 template<typename T> std::vector<T> pointwise_minus(std::vector<T> l,
                                                     std::vector<T> r)
@@ -464,21 +480,50 @@ WordVecFloat cosine_distance(WordVector left, WordVector right)
     // a slightly negative distance, so make sure to return at least 0.0
     WordVecFloat retval = 1.0 - dot_product(left.vector, right.vector) /
         (left.norm * right.norm);
-    if (retval < 0.0) {
-        return 0.0;       
-    }
-    return retval;
+    return std::max(static_cast<WordVecFloat>(0.0), retval);
 }
 
 WordVecFloat cosine_distance(std::vector<WordVecFloat> left, std::vector<WordVecFloat> right)
 {
     WordVecFloat retval = 1.0 - dot_product(left, right) / (norm(left) * norm(right));
-    if (retval < 0.0) {
-        return 0.0;       
-    }
-    return retval;
+    return std::max(static_cast<WordVecFloat>(0.0), retval);
 }
 
+// Single-word Like()
+PmatchObject * compile_like_arc(std::string word,
+                                unsigned int nwords)
+{
+    WordVector this_word;
+    for (std::vector<WordVector>::iterator it = word_vectors.begin();
+         it != word_vectors.end(); ++it) {
+        if (word == it->word) {
+            this_word = *it;
+            break;
+        }
+    }
+    if (this_word.word == "") {
+        // got no matches
+        PmatchString * word_o = new PmatchString(word);
+        word_o->multichar = true;
+        pmatchwarning("no matches for argument to Like() operation");
+        return word_o;
+    }
+
+    std::vector<std::pair<WordVector, WordVecFloat> > top_n = get_top_n(nwords, word_vectors, this_word);
+
+    HfstTokenizer tok;
+    HfstTransducer * retval = new HfstTransducer(format);
+    for (size_t i = 0; i < top_n.size(); ++i) {
+        HfstTransducer tmp(top_n[i].first.word, tok, format);
+        if (include_cosine_distances) {
+            tmp.set_final_weights(top_n[i].second);
+        }
+        retval->disjunct(tmp);
+    }
+    return new PmatchTransducerContainer(retval);
+}
+
+// the general case
 PmatchObject * compile_like_arc(std::string word1, std::string word2,
                                 unsigned int nwords, bool is_negative)
 {
@@ -505,21 +550,21 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
 
     if (this_word1.word == "" || this_word2.word == "") {
         // just one match
+        pmatchwarning("only one match for arguments to Like() operation, using nearest neighbours");
         WordVector this_word = (this_word1.word == "" ? this_word2 : this_word1);
-        CosineSimilarityWithWordVectorComparison comparison_object(this_word);
-        std::sort(word_vectors.begin(), word_vectors.end(), comparison_object);
+        std::vector<std::pair<WordVector, WordVecFloat> > top_n = get_top_n(nwords, word_vectors, this_word);
         HfstTokenizer tok;
         HfstTransducer * retval = new HfstTransducer(format);
-        for (size_t i = 0; i < word_vectors.size() && i <= nwords; ++i) {
-            HfstTransducer tmp(word_vectors[i].word, tok, format);
-            tmp.set_final_weights(cosine_distance(word_vectors[i], this_word));
+        for (size_t i = 0; i < top_n.size(); ++i) {
+            HfstTransducer tmp(top_n[i].first.word, tok, format);
+            if (include_cosine_distances) {
+                tmp.set_final_weights(top_n[i].second);
+            }
             retval->disjunct(tmp);
         }
-        pmatchwarning("only one match for arguments to Like() operation, using nearest neighbours");
         return new PmatchTransducerContainer(retval);
     }
 
-    // the general case
     if(variables["vector-similarity-projection-factor"] != "1.0") {
         vector_similarity_projection_factor =
             strtod(variables["vector-similarity-projection-factor"].c_str(), NULL);
@@ -556,28 +601,28 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
                                               static_cast<WordVecFloat>(0.5), B_minus_A));
     }
     
-    CosineSimilarityProjectedToPlaneComparison comparison_object(
-        B_minus_A, comparison_point, hyperplane_translation_term, is_negative);
-    std::sort(word_vectors.begin(), word_vectors.end(), comparison_object);
-
+    std::vector<std::pair<WordVector, WordVecFloat> > top_n = get_top_n_transformed(nwords,
+                                                                                    word_vectors,
+                                                                                    B_minus_A,
+                                                                                    comparison_point,
+                                                                                    hyperplane_translation_term,
+                                                                                    is_negative);
     HfstTokenizer tok;
     HfstTransducer * retval = new HfstTransducer(format);
-    for (size_t i = 0; i < word_vectors.size() && i <= nwords; ++i) {
-        HfstTransducer tmp(word_vectors[i].word, tok, format);
-        std::vector<WordVecFloat> projected_i = get_projected_vector(
-            word_vectors[i].vector, B_minus_A, hyperplane_translation_term);
+    for (size_t i = 0; i < top_n.size() && i <= nwords; ++i) {
+        HfstTransducer tmp(top_n[i].first.word, tok, format);
         if (include_cosine_distances) {
-            tmp.set_final_weights(cosine_distance(projected_i, comparison_point));
+            tmp.set_final_weights(top_n[i].second);
         }
         retval->disjunct(tmp);
-        if (include_cosine_distances) {
-            for (size_t j = i + 1; j < word_vectors.size() && j <= nwords; ++j) {
-                HfstTransducer tmp2(word_vectors[i].word + "_cos_" + word_vectors[j].word, tok, format);
-                tmp2.set_final_weights(cosine_distance(projected_i,
-                                                       get_projected_vector(word_vectors[j].vector, B_minus_A, hyperplane_translation_term)));
-                retval->disjunct(tmp2);
-            }
-        }
+        // if (include_cosine_distances) {
+        //     for (size_t j = i + 1; j < word_vectors.size() && j <= nwords; ++j) {
+        //         HfstTransducer tmp2(word_vectors[i].word + "_cos_" + word_vectors[j].word, tok, format);
+        //         tmp2.set_final_weights(cosine_distance(projected_i,
+        //                                                get_projected_vector(word_vectors[j].vector, B_minus_A, hyperplane_translation_term)));
+        //         retval->disjunct(tmp2);
+        //     }
+        // }
     }
     return new PmatchTransducerContainer(retval);
 }
@@ -585,18 +630,27 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
 PmatchTransducerContainer * make_counter(std::string name)
 { return epsilon_to_symbol_container("@PMATCH_COUNTER_" + name + "@"); }
 
+hfst::StringSet get_non_special_alphabet(HfstTransducer * t)
+{
+    hfst::StringSet retval;
+    hfst::StringSet const & alphabet = t->get_alphabet();
+    for (hfst::StringSet::const_iterator it = alphabet.begin();
+         it != alphabet.end(); ++it) {
+        if (hfst_ol::PmatchAlphabet::is_printable(*it)) {
+            retval.insert(*it);
+        }
+    }
+    return retval;
+}
+
 HfstTransducer * make_list(HfstTransducer * t, ImplementationType f)
 {
     std::string arc = "@L.";
-    hfst::StringSet alphabet = t->get_alphabet();
+    hfst::StringSet alphabet = get_non_special_alphabet(t);
     for (hfst::StringSet::const_iterator it = alphabet.begin();
          it != alphabet.end(); ++it) {
-        if (!hfst_ol::PmatchAlphabet::is_special(*it) &&
-            *it != hfst::internal_epsilon && *it != hfst::internal_unknown &&
-            *it != hfst::internal_identity && *it != hfst::internal_default) {
-            arc.append(*it);
-            arc.append("_");
-        }
+        arc.append(*it);
+        arc.append("_");
     }
     arc.append("@");
     return new HfstTransducer(arc, f);
@@ -605,15 +659,11 @@ HfstTransducer * make_list(HfstTransducer * t, ImplementationType f)
 HfstTransducer * make_exc_list(HfstTransducer * t, ImplementationType f)
 {
     std::string arc = "@X.";
-    hfst::StringSet alphabet = t->get_alphabet();
+    hfst::StringSet alphabet = get_non_special_alphabet(t);
     for (hfst::StringSet::const_iterator it = alphabet.begin();
          it != alphabet.end(); ++it) {
-        if (!hfst_ol::PmatchAlphabet::is_special(*it) &&
-            *it != hfst::internal_epsilon && *it != hfst::internal_unknown &&
-            *it != hfst::internal_identity && *it != hfst::internal_default) {
-            arc.append(*it);
-            arc.append("_");
-        }
+        arc.append(*it);
+        arc.append("_");
     }
     arc.append("@");
     return new HfstTransducer(arc, f);
@@ -623,14 +673,10 @@ HfstTransducer * make_sigma(HfstTransducer * t)
 {
     HfstTransducer * retval =
         new HfstTransducer(format);
-    hfst::StringSet alphabet = t->get_alphabet();
+    hfst::StringSet alphabet = get_non_special_alphabet(t);
     for (hfst::StringSet::const_iterator it = alphabet.begin();
          it != alphabet.end(); ++it) {
-        if (!hfst_ol::PmatchAlphabet::is_special(*it) &&
-            *it != hfst::internal_epsilon && *it != hfst::internal_unknown &&
-            *it != hfst::internal_identity && *it != hfst::internal_default) {
             retval->disjunct(HfstTransducer(*it, format));
-        }
     }
     return retval;
 }
@@ -1013,9 +1059,17 @@ void init_globals(void)
     unsatisfied_insertions.clear();
     used_definitions.clear();
     function_names.clear();
+    capture_names.clear();
     zero_minimization_guard();
     need_delimiters = false;
     pmatchnerrs = 0;
+}
+
+string expand_includes(const string & script)
+{
+    return string(script);
+    
+//     string filepath = hfst::pmatch::path_from_filename($1);
 }
 
 std::map<std::string, HfstTransducer*>
@@ -1026,7 +1080,8 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
 {
     // lock here?
     init_globals();
-    data = strdup(pmatch.c_str());
+    string expanded_script = expand_includes(pmatch);
+    data = strdup(expanded_script.c_str());
     startptr = data;
     len = strlen(data);
     verbose = be_verbose;
@@ -1848,7 +1903,11 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
     } else if (op == TermComplement) {
         HfstTransducer* any = new HfstTransducer(hfst::internal_identity,
                                                  hfst::pmatch::format);
-        any->subtract(*retval);
+        hfst::StringSet alphabet = get_non_special_alphabet(retval);
+        for (hfst::StringSet::iterator it = alphabet.begin(); it != alphabet.end(); ++it) {
+            HfstTransducer symbol(*it, hfst::pmatch::format);
+            any->subtract(symbol);
+        }
         delete retval;
         retval = any;
     } else if (op == Cap) {

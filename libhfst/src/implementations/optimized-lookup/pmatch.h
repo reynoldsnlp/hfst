@@ -64,6 +64,8 @@ namespace hfst_ol {
         RtnVector rtns;
         SymbolNumberVector special_symbols;
         std::map<SymbolNumber, std::string> end_tag_map;
+        std::map<SymbolNumber, std::string> capture_tag_map;
+        std::map<SymbolNumber, std::string> captured_tag_map;
         RtnNameMap rtn_names;
 // For each symbol, either NO_SYMBOL for "no corresponding list" or an index into symbol_lists
         SymbolNumberVector symbol2lists;
@@ -79,6 +81,8 @@ namespace hfst_ol {
         SymbolNumberVector guards;
         std::vector<bool> printable_vector;
         bool is_end_tag(const SymbolNumber symbol) const;
+        bool is_capture_tag(const SymbolNumber symbol) const;
+        bool is_captured_tag(const SymbolNumber symbol) const;
         bool is_input_mark(const SymbolNumber symbol) const;
         bool is_guard(const SymbolNumber symbol) const;
         bool is_counter(const SymbolNumber symbol) const;
@@ -93,6 +97,8 @@ namespace hfst_ol {
         ~PmatchAlphabet(void);
         virtual void add_symbol(const std::string & symbol);
         static bool is_end_tag(const std::string & symbol);
+        static bool is_capture_tag(const std::string & symbol);
+        static bool is_captured_tag(const std::string & symbol);
         static bool is_insertion(const std::string & symbol);
         static bool is_guard(const std::string & symbol);
         static bool is_list(const std::string & symbol);
@@ -146,6 +152,7 @@ namespace hfst_ol {
         DoubleTape result;
         LocationVectorVector locations;
         WeightedDoubleTapeVector tape_locations;
+        std::vector<std::pair<unsigned int, unsigned int> > captures;
         std::vector<char> possible_first_symbols;
         bool verbose;
         
@@ -206,9 +213,11 @@ namespace hfst_ol {
                                     double time_cutoff = 0.0);
         void note_analysis(unsigned int input_pos, unsigned int tape_pos);
         void grab_location(unsigned int input_pos, unsigned int tape_pos);
+        SymbolNumberVector get_longest_matching_capture(SymbolNumber key, unsigned int input_pos);
         std::string get_profiling_info(void);
         std::string get_pattern_count_info(void);
         bool has_queued_input(unsigned int input_pos);
+        bool vector_matches_input(unsigned int pos, SymbolNumberVector & vec);
         bool not_possible_first_symbol(SymbolNumber sym)
         {
             if (possible_first_symbols.size() == 0) {
