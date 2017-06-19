@@ -20,8 +20,8 @@ all located on a directory listed on system PATH. On linux and OS X,
 readline and getline must be available.
 
 The setup script has been tested on linux with gcc 5.4.0, swig 3.0.12 and
-python 3.4 and on windows with swig 3.0.5 and msvc 10.0 (with python 3.3.
-and 3.4) and msvc 14.0 (with python 3.5 and 3.6).
+python 3.5 and on windows with swig 3.0.5 and msvc 10.0 (with python 3.4)
+and msvc 14.0 (with python 3.5 and 3.6).
 
 """
 
@@ -85,7 +85,10 @@ ext_swig_opts = ["-c++", "-I" + swig_include_dir, "-Wall"]
 # for python3.3 and python3.4 on windows, add SDK include directory
 if platform == "win32" and version_info[0] == 3 and (version_info[1] == 3 or version_info[1] == 4):
     ext_swig_opts.extend(["-IC:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Include"])
-
+# By default, we have a pre-swig-generated wrapper
+ext_source = ["libhfst_wrap.cpp"]
+if hfst_specific_option('--generate-wrapper'):
+    ext_source = ["libhfst.i"]
 
 # ----- LINKER ARGUMENTS -----
 
@@ -323,7 +326,7 @@ if include_foma_backend:
 
 libhfst_module = Extension('_libhfst',
                            language = "c++",
-                           sources = ["libhfst.i"] + libhfst_source_files,
+                           sources = ext_source + libhfst_source_files,
                            swig_opts = ext_swig_opts,
                            include_dirs = ext_include_dirs,
                            define_macros = ext_define_macros,
@@ -332,7 +335,7 @@ libhfst_module = Extension('_libhfst',
                            )
 
 setup(name = 'hfst',
-      version = '3.12.2.3_beta',
+      version = '3.12.2.4_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',

@@ -20,9 +20,10 @@ that work both on 32- and 64-bit environments. OS X must be 10.6 or higher.
 
 For Linux, we offer only the source code on PyPI. It is also possible to install hfst
 using Debian binary packages. This is the recommended way if the environment supports Debian.
-Compiling hfst from source requires at least: swig (tested with version 3.0.5)
-and a C++ compiler (tested with gcc 5.4.0), both located on system PATH; setuptools package
-for python (tested with version 28.8.0); readline and getline libraries for C++ compiler.
+Compiling hfst from source requires a C++ compiler (tested with gcc 5.4.0),
+readline and getline libraries for C++ compiler and setuptools package for python
+(tested with version 28.8.0). Swig is no longer needed as pre-generated files are
+included in source distribution.
 
 Installation via PyPI
 #####################
