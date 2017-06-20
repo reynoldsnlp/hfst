@@ -115,11 +115,17 @@ void match_and_print(hfst_ol::PmatchContainer & container,
 #else
         hfst::hfst_fprintf_console(stdout, "%s", container.match(input_text, time_cutoff).c_str());
 #endif
+        outstream << std::endl;
+        if (blankline_separated) {
+            outstream << std::endl;
+        }
     } else {
         hfst_ol::LocationVectorVector locations = container.locate(input_text, time_cutoff);
+        bool printed_something = false;
         for(hfst_ol::LocationVectorVector::const_iterator it = locations.begin();
             it != locations.end(); ++it) {
             if (it->at(0).output.compare("@_NONMATCHING_@") != 0) {
+                printed_something = true;
 #ifndef _MSC_VER
                 outstream << it->at(0).start << "|" << it->at(0).length << "|"
                           << it->at(0).output << "|" << it->at(0).tag << std::endl;
@@ -128,8 +134,10 @@ void match_and_print(hfst_ol::PmatchContainer & container,
 #endif
             }
         }
+        if (printed_something) {
+            outstream << std::endl;
+        }
     }
-    outstream << std::endl;
 }
 
 
@@ -158,7 +166,6 @@ int process_input(hfst_ol::PmatchContainer & container,
             match_and_print(container, outstream, input_text);
         } else if (line[0] == '\n') {
             match_and_print(container, outstream, input_text);
-            outstream << std::endl;
             input_text.clear();
         } else {
             input_text.append(line);
