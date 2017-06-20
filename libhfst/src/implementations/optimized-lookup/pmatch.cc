@@ -852,6 +852,9 @@ void PmatchContainer::process(const std::string & input_str)
     ++line_number;
     result.clear();
     locations.clear();
+    old_captures.clear();
+    best_captures.clear();
+    captures.clear();
     DoubleTape nonmatching_locations;
     while (has_queued_input(input_pos)) {
         best_result.clear();
@@ -897,6 +900,7 @@ void PmatchContainer::process(const std::string & input_str)
                 copy_to_result(best_result);
             }
             input_pos = best_input_pos;
+            old_captures.insert(old_captures.end(), best_captures.begin(), best_captures.end());
         }
         if (!candidate_found() || input_pos == old_input_pos) {
             // If no input was consumed, we move one position up
@@ -1050,7 +1054,7 @@ std::string PmatchAlphabet::stringify(const DoubleTape & str)
             }
             unsigned int pos;
             if (start_tag_pos.size() == 0) {
-                std::cerr << "Warning: end tag without start tag\n";
+                std::cerr << "pmatch: warning: end tag without start tag\n";
                 pos = 0;
             } else {
                 pos = start_tag_pos.top();
@@ -1142,13 +1146,15 @@ bool PmatchContainer::has_queued_input(unsigned int input_pos)
     return input_pos < input.size() && (input_pos + 1 != 0);
 }
 
-bool PmatchContainer::vector_matches_input(unsigned int pos, SymbolNumberVector & vec)
+bool PmatchContainer::input_matches_at(unsigned int pos,
+                                       SymbolNumberVector::iterator begin,
+                                       SymbolNumberVector::iterator end)
 {
-    if (pos + vec.size() > input.size()) {
+    if (pos + (end - begin) > input.size()) {
         return false;
     }
-    for (size_t i = 0; i < vec.size(); ++i) {
-        if (input[pos + i] != vec[i]) {
+    for (size_t i = 0; begin + i != end; ++i) {
+        if (input[pos + i] != *(begin + i)) {
             return false;
         }
     }
@@ -1623,6 +1629,7 @@ void PmatchContainer::note_analysis(unsigned int input_pos, unsigned int tape_po
         (input_pos == best_input_pos &&
          best_weight > running_weight)) {
         best_result = tape.extract_slice(0, tape_pos);
+        best_captures = captures;
         best_input_pos = input_pos;
         best_weight = running_weight;
     } else if (verbose &&
@@ -1644,26 +1651,40 @@ void PmatchContainer::grab_location(unsigned int input_pos, unsigned int tape_po
             return;
         } else if (input_pos > best_input_pos) {
             // The old locations are worse
+            best_captures.clear();
             tape_locations.clear();
         }
     }
     best_input_pos = input_pos;
+    best_captures = captures;
     WeightedDoubleTape rv(tape.extract_slice(0, tape_pos), running_weight);
     tape_locations.push_back(rv);
 }
 
-SymbolNumberVector PmatchContainer::get_longest_matching_capture(
+std::pair<SymbolNumberVector::iterator,
+          SymbolNumberVector::iterator> PmatchContainer::get_longest_matching_capture(
     SymbolNumber key, unsigned int input_pos)
 {
-    SymbolNumberVector longest_so_far;
+    std::pair<SymbolNumberVector::iterator, SymbolNumberVector::iterator> longest_so_far(input.begin(), input.begin());
     for (std::vector<std::pair<unsigned int, unsigned int> >::iterator it =
              captures.begin(); it != captures.end(); ++it) {
-        SymbolNumberVector slice(input.begin() + it->first, input.begin() + it->second);
-        if (vector_matches_input(input_pos, slice)) {
-            if (slice.size() <= longest_so_far.size()) {
+        if (input_matches_at(input_pos, input.begin() + it->first, input.begin() + it->second)) {
+            if ((it->second - it->first) <= longest_so_far.second - longest_so_far.first) {
                 continue;
             } else {
-                longest_so_far = slice;
+                longest_so_far.first = input.begin() + it->first;
+                longest_so_far.second = input.begin() + it->second;
+            }
+        }
+    }
+    for (std::vector<std::pair<unsigned int, unsigned int> >::iterator it =
+             old_captures.begin(); it != old_captures.end(); ++it) {
+        if (input_matches_at(input_pos, input.begin() + it->first, input.begin() + it->second)) {
+            if ((it->second - it->first) <= longest_so_far.second - longest_so_far.first) {
+                continue;
+            } else {
+                longest_so_far.first = input.begin() + it->first;
+                longest_so_far.second = input.begin() + it->second;
             }
         }
     }
@@ -1697,16 +1718,18 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                     } else if (output == alphabet.get_special(exit)) {
                         container->entry_stack.pop();
                     } else if (alphabet.is_capture_tag(output)) {
-                        // if it's a capture tag, do the capture
+                        // if it's a capture tag, remember where we were
                         container->captures.push_back(
                             std::pair<unsigned int, unsigned int>(container->entry_stack.back(), input_pos));
                     } else if (alphabet.is_captured_tag(output)) {
                         // if it's a captured tag, try each previously
                         // captured sequence
-                        SymbolNumberVector cap = container->get_longest_matching_capture(output, input_pos);
-                        if (cap.size() != 0) {
+                        std::pair<SymbolNumberVector::iterator, SymbolNumberVector::iterator> cap =
+                            container->get_longest_matching_capture(output, input_pos);
+                        if (cap.second - cap.first != 0) {
                             container->tape.write(tape_pos, cap);
-                            get_analyses(input_pos + cap.size(), tape_pos + cap.size(), target);
+                            get_analyses(input_pos + (cap.second - cap.first),
+                                         tape_pos + (cap.second - cap.first), target);
                         }
                         ++i;
                         container->set_weight(old_weight);

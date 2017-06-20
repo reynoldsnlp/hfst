@@ -153,6 +153,8 @@ namespace hfst_ol {
         LocationVectorVector locations;
         WeightedDoubleTapeVector tape_locations;
         std::vector<std::pair<unsigned int, unsigned int> > captures;
+        std::vector<std::pair<unsigned int, unsigned int> > best_captures;
+        std::vector<std::pair<unsigned int, unsigned int> > old_captures;
         std::vector<char> possible_first_symbols;
         bool verbose;
         
@@ -213,11 +215,15 @@ namespace hfst_ol {
                                     double time_cutoff = 0.0);
         void note_analysis(unsigned int input_pos, unsigned int tape_pos);
         void grab_location(unsigned int input_pos, unsigned int tape_pos);
-        SymbolNumberVector get_longest_matching_capture(SymbolNumber key, unsigned int input_pos);
+        std::pair<SymbolNumberVector::iterator,
+                  SymbolNumberVector::iterator>
+        get_longest_matching_capture(SymbolNumber key, unsigned int input_pos);
         std::string get_profiling_info(void);
         std::string get_pattern_count_info(void);
         bool has_queued_input(unsigned int input_pos);
-        bool vector_matches_input(unsigned int pos, SymbolNumberVector & vec);
+        bool input_matches_at(unsigned int pos,
+                              SymbolNumberVector::iterator begin,
+                              SymbolNumberVector::iterator end);
         bool not_possible_first_symbol(SymbolNumber sym)
         {
             if (possible_first_symbols.size() == 0) {
