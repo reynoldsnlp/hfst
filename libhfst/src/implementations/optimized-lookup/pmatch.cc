@@ -1914,6 +1914,7 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
     
     SymbolNumber input;
     if (!container->has_queued_input(input_pos)) {
+        container->unrecurse();
         return;
     } else {
         input = container->input[input_pos];
