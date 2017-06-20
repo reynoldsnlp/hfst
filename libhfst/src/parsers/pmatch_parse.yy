@@ -378,12 +378,12 @@ EXPRESSION12 WEIGHT { $$ = $1; $$->weight += $2; } |
 LEFT_BRACKET EXPRESSION2 RIGHT_BRACKET TAG_LEFT SYMBOL RIGHT_PARENTHESIS {
     $$ = new PmatchUnaryOperation(AddDelimiters,
                                   new PmatchBinaryOperation(Concatenate, $2,
-                                                            new PmatchString($5)));
+                                                            hfst::pmatch::make_end_tag($5)));
     free($5); } |
 LEFT_BRACKET EXPRESSION2 RIGHT_BRACKET TAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
     $$ = new PmatchUnaryOperation(AddDelimiters,
                                   new PmatchBinaryOperation(Concatenate, $2,
-                                                            new PmatchString($5)));
+                                                            hfst::pmatch::make_end_tag($5)));
     free($5); };
 
 EXPRESSION13:
@@ -510,8 +510,8 @@ CONTEXT_CONDITION {
     $$ = $1;
     // We will wrap the current definition with entry and exit guards
     hfst::pmatch::need_delimiters = true;
-    // Switch off the automatic separator-seeking context condition
-    hfst::pmatch::variables["need-separators"] = "off";
+    // Should we switch off the automatic separator-seeking context condition now?
+//    hfst::pmatch::variables["need-separators"] = "off";
 } |
 SYMBOL {
     std::string sym($1);
