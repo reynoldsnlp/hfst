@@ -142,7 +142,6 @@ namespace hfst_ol {
         SymbolNumber orig_symbol_count;
         SymbolNumber symbol_count;
         PmatchTransducer * toplevel;
-        size_t io_size;
         SymbolNumberVector input;
         // This tracks the ENTRY and EXIT tags
         PositionStack entry_stack;

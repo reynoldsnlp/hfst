@@ -855,6 +855,7 @@ void PmatchContainer::process(const std::string & input_str)
     old_captures.clear();
     best_captures.clear();
     captures.clear();
+    reset_recursion();
     DoubleTape nonmatching_locations;
     while (has_queued_input(input_pos)) {
         best_result.clear();
