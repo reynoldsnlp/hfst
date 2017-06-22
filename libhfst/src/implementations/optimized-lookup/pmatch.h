@@ -130,7 +130,7 @@ namespace hfst_ol {
 
     struct RtnStackFrame
     {
-        std::string caller;
+        PmatchTransducer * caller;
         TransitionTableIndex caller_index;
     };
 
@@ -206,7 +206,6 @@ namespace hfst_ol {
         bool has_unsatisfied_rtns(void) const;
         std::string get_unsatisfied_rtn_name(void) const;
         void add_rtn(Transducer * rtn, const std::string & name);
-        PmatchTransducer * get_rtn(const std::string & name);
         void process(const std::string & input);
         std::string match(const std::string & input,
                           double time_cutoff = 0.0);
@@ -263,7 +262,7 @@ namespace hfst_ol {
                 }
                 --stack_depth;
             }
-        void push_rtn_call(unsigned int return_index, std::string caller);
+        void push_rtn_call(unsigned int return_index, PmatchTransducer * caller);
         RtnStackFrame rtn_stack_top(void);
         void rtn_stack_pop(void);
         unsigned int get_stack_depth(void) { return stack_depth; }
@@ -456,7 +455,8 @@ namespace hfst_ol {
         { return  i < TRANSITION_TARGET_TABLE_START; }
 
         void match(unsigned int input_pos, unsigned int tape_pos);
-        void rtn_call(unsigned int input_pos, unsigned int tape_pos, std::string caller, TransitionTableIndex caller_index);
+        void rtn_call(unsigned int input_pos, unsigned int tape_pos,
+                      PmatchTransducer * caller, TransitionTableIndex caller_index);
         void rtn_return(unsigned int input_pos, unsigned int tape_pos);
         void handle_final_state(unsigned int input_pos, unsigned int tape_pos);
         void collect_possible_first_symbols(void);

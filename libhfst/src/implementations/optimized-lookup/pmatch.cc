@@ -567,15 +567,6 @@ void PmatchContainer::add_rtn(Transducer * rtn, const std::string & name)
     }
 }
 
-PmatchTransducer * PmatchContainer::get_rtn(const std::string & name)
-{
-    if (name == "TOP") {
-        return toplevel;
-    } else {
-        return alphabet.get_rtn(name);
-    }
-}
-
 PmatchContainer::PmatchContainer(void)
 {
     // Not used, but apparently needed by swig to construct these
@@ -764,7 +755,7 @@ std::map<std::string, std::string> PmatchContainer::parse_hfst3_header(std::istr
     }
 }
 
-void PmatchContainer::push_rtn_call(unsigned int return_index, std::string caller)
+void PmatchContainer::push_rtn_call(unsigned int return_index, PmatchTransducer * caller)
 {
     RtnStackFrame new_top;
     new_top.caller = caller;
@@ -1566,7 +1557,7 @@ void PmatchTransducer::match(unsigned int input_tape_pos,
 
 void PmatchTransducer::rtn_call(unsigned int input_tape_pos,
                                 unsigned int tape_pos,
-                                std::string caller,
+                                PmatchTransducer * caller,
                                 TransitionTableIndex caller_index)
 {
     container->increase_stack_depth();
@@ -1606,8 +1597,8 @@ void PmatchTransducer::handle_final_state(unsigned int input_pos,
 {
     if (container->get_stack_depth() > 0) {
         // We're not the toplevel, return to caller
-        PmatchTransducer * rtn_target = container->get_rtn(
-            container->rtn_stack.at(container->get_stack_depth() - 1).caller);
+        PmatchTransducer * rtn_target =  container->
+            rtn_stack.at(container->get_stack_depth() - 1).caller;
         rtn_target->rtn_return(input_pos, tape_pos);
     } else if (container->is_in_locate_mode()) {
         container->grab_location(input_pos, tape_pos);
@@ -1760,7 +1751,7 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
         } else if (alphabet.is_flag_diacritic(input)) {
             take_flag(input, input_pos, tape_pos, i);
         } else if (alphabet.has_rtn(input)) {
-            alphabet.get_rtn(input)->rtn_call(input_pos, tape_pos, name, target);
+            alphabet.get_rtn(input)->rtn_call(input_pos, tape_pos, this, target);
         } else { // it's not epsilon and it's not a flag or Ins, so nothing to do
             container->set_weight(old_weight);
             return;
