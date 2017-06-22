@@ -769,17 +769,17 @@ void PmatchContainer::push_rtn_call(unsigned int return_index, std::string calle
     RtnStackFrame new_top;
     new_top.caller = caller;
     new_top.caller_index = return_index;
-    rtn_stack.push(new_top);
+    rtn_stack.push_back(new_top);
 }
 
 RtnStackFrame PmatchContainer::rtn_stack_top(void)
 {
-    return rtn_stack.top();
+    return rtn_stack.back();
 }
 
 void PmatchContainer::rtn_stack_pop(void)
 {
-    rtn_stack.pop();
+    rtn_stack.pop_back();
 }
 
 void PmatchAlphabet::add_rtn(PmatchTransducer * rtn, std::string const & name)
@@ -1564,19 +1564,13 @@ void PmatchTransducer::match(unsigned int input_tape_pos,
     get_analyses(input_tape_pos, tape_pos, 0);
 }
 
-void PmatchTransducer::rtn_enter(unsigned int input_tape_pos,
-                                 unsigned int tape_pos,
-                                 std::string caller,
-                                 TransitionTableIndex caller_index)
+void PmatchTransducer::rtn_call(unsigned int input_tape_pos,
+                                unsigned int tape_pos,
+                                std::string caller,
+                                TransitionTableIndex caller_index)
 {
+    container->increase_stack_depth();
     LocalVariables new_top(local_stack.top());
-    TransitionTableIndex entry_index;
-    if (caller_index == NO_TABLE_INDEX) {
-        // we're returning from an rtn end state
-        entry_index = container->rtn_stack_top().caller_index;
-    } else {
-        entry_index = 0;
-    }
     new_top.flag_state = alphabet.get_fd_table();
     new_top.tape_step = 1;
     new_top.context = none;
@@ -1584,28 +1578,26 @@ void PmatchTransducer::rtn_enter(unsigned int input_tape_pos,
     new_top.default_symbol_trap = false;
     local_stack.push(new_top);
     container->push_rtn_call(caller_index, caller);
-    get_analyses(input_tape_pos, tape_pos, entry_index);
+    get_analyses(input_tape_pos, tape_pos, 0);
     local_stack.pop();
     container->rtn_stack_pop();
-}
-    
-
-void PmatchTransducer::rtn_call(unsigned int input_tape_pos,
-                                unsigned int tape_pos,
-                                std::string caller,
-                                TransitionTableIndex caller_index)
-{
-    container->increase_stack_depth();
-    rtn_enter(input_tape_pos, tape_pos, caller, caller_index);
     container->decrease_stack_depth();
 }
 
 void PmatchTransducer::rtn_return(unsigned int input_tape_pos,
-                                  unsigned int tape_pos,
-                                  std::string caller)
+                                  unsigned int tape_pos)
 {
+    LocalVariables new_top(local_stack.top());
+    TransitionTableIndex entry_index = container->rtn_stack.at(container->get_stack_depth() - 1).caller_index;
+    new_top.flag_state = alphabet.get_fd_table();
+    new_top.tape_step = 1;
+    new_top.context = none;
+    new_top.context_placeholder = 0;
+    new_top.default_symbol_trap = false;
+    local_stack.push(new_top);
     container->decrease_stack_depth();
-    rtn_enter(input_tape_pos, tape_pos, caller, NO_TABLE_INDEX);
+    get_analyses(input_tape_pos, tape_pos, entry_index);
+    local_stack.pop();
     container->increase_stack_depth();
 }
 
@@ -1614,9 +1606,9 @@ void PmatchTransducer::handle_final_state(unsigned int input_pos,
 {
     if (container->get_stack_depth() > 0) {
         // We're not the toplevel, return to caller
-        PmatchTransducer * rtn_target =
-            container->get_rtn(container->rtn_stack_top().caller);
-        rtn_target->rtn_return(input_pos, tape_pos, name);
+        PmatchTransducer * rtn_target = container->get_rtn(
+            container->rtn_stack.at(container->get_stack_depth() - 1).caller);
+        rtn_target->rtn_return(input_pos, tape_pos);
     } else if (container->is_in_locate_mode()) {
         container->grab_location(input_pos, tape_pos);
     } else {

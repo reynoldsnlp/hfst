@@ -26,7 +26,7 @@ namespace hfst_ol {
     struct WeightedDoubleTape;
     struct RtnStackFrame;
 
-    typedef std::stack<RtnStackFrame> RtnCallStack;
+    typedef std::vector<RtnStackFrame> RtnCallStack;
     typedef std::vector<PmatchTransducer *> RtnVector;
     typedef std::map<std::string, SymbolNumber> RtnNameMap;
     typedef std::vector<Location> LocationVector;
@@ -456,9 +456,8 @@ namespace hfst_ol {
         { return  i < TRANSITION_TARGET_TABLE_START; }
 
         void match(unsigned int input_pos, unsigned int tape_pos);
-        void rtn_enter(unsigned int input_pos, unsigned int tape_pos, std::string caller, TransitionTableIndex caller_index);
         void rtn_call(unsigned int input_pos, unsigned int tape_pos, std::string caller, TransitionTableIndex caller_index);
-        void rtn_return(unsigned int input_pos, unsigned int tape_pos, std::string caller);
+        void rtn_return(unsigned int input_pos, unsigned int tape_pos);
         void handle_final_state(unsigned int input_pos, unsigned int tape_pos);
         void collect_possible_first_symbols(void);
 
