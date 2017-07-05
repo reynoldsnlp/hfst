@@ -64,8 +64,10 @@ namespace hfst_ol {
         RtnVector rtns;
         SymbolNumberVector special_symbols;
         std::map<SymbolNumber, std::string> end_tag_map;
-        std::map<SymbolNumber, std::string> capture_tag_map;
-        std::map<SymbolNumber, std::string> captured_tag_map;
+        std::map<std::string, SymbolNumber> capture_tag_map;
+        std::map<std::string, SymbolNumber> captured_tag_map;
+        SymbolNumberVector capture2captured;
+        SymbolNumberVector captured2capture;
         RtnNameMap rtn_names;
 // For each symbol, either NO_SYMBOL for "no corresponding list" or an index into symbol_lists
         SymbolNumberVector symbol2lists;
@@ -134,6 +136,13 @@ namespace hfst_ol {
         TransitionTableIndex caller_index;
     };
 
+    struct Capture
+    {
+        unsigned int begin;
+        unsigned int end;
+        SymbolNumber name;
+    };
+
     class PmatchContainer
     {
     protected:
@@ -151,9 +160,9 @@ namespace hfst_ol {
         DoubleTape result;
         LocationVectorVector locations;
         WeightedDoubleTapeVector tape_locations;
-        std::vector<std::pair<unsigned int, unsigned int> > captures;
-        std::vector<std::pair<unsigned int, unsigned int> > best_captures;
-        std::vector<std::pair<unsigned int, unsigned int> > old_captures;
+        std::vector<Capture> captures;
+        std::vector<Capture> best_captures;
+        std::vector<Capture> old_captures;
         std::vector<char> possible_first_symbols;
         bool verbose;
         

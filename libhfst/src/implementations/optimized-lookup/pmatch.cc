@@ -22,6 +22,8 @@ PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
 {
     symbol2lists = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     list2symbols = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
+    capture2captured = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
+    captured2capture = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     rtns = RtnVector(orig_symbol_count, NULL);
     // We initialize the vector of which symbols have a printable representation
     // with false, then flip those that actually do to true
@@ -44,6 +46,8 @@ PmatchAlphabet::PmatchAlphabet(TransducerAlphabet const & a,
     container(cont) {
     symbol2lists = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     list2symbols = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
+    capture2captured = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
+    captured2capture = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     rtns = RtnVector(orig_symbol_count, NULL);
     // We initialize the vector of which symbols have a printable representation
     // with false, then flip those that actually do to true
@@ -67,6 +71,8 @@ void PmatchAlphabet::add_symbol(const std::string & symbol)
 {
     symbol2lists.push_back(NO_SYMBOL_NUMBER);
     list2symbols.push_back(NO_SYMBOL_NUMBER);
+    capture2captured.push_back(NO_SYMBOL_NUMBER);
+    captured2capture.push_back(NO_SYMBOL_NUMBER);
     rtns.push_back(NULL);
     printable_vector.push_back(true);
     if (exclusionary_lists.size() != 0) {
@@ -127,13 +133,23 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
             sizeof("@PMATCH_ENDTAG_") - 1,
             str.size() - (sizeof("@PMATCH_ENDTAG_@") - 1));
     } else if (is_capture_tag(str)) {
-        capture_tag_map[symbol_number] = str.substr(
-            sizeof("@PMATCH_CAPTURE_") - 1,
-            str.size() - (sizeof("@PMATCH_CAPTURE_@") - 1));
+        std::string name_of_capture =
+            str.substr(sizeof("@PMATCH_CAPTURE_") - 1,
+                       str.size() - (sizeof("@PMATCH_CAPTURE_@") - 1));
+        capture_tag_map[name_of_capture] = symbol_number;
+        if (captured_tag_map.count(name_of_capture) != 0) {
+            capture2captured[symbol_number] = captured_tag_map[name_of_capture];
+            captured2capture[captured_tag_map[name_of_capture]] = symbol_number;
+        }
     } else if (is_captured_tag(str)) {
-        captured_tag_map[symbol_number] = str.substr(
-            sizeof("@PMATCH_CAPTURED_") - 1,
-            str.size() - (sizeof("@PMATCH_CAPTURED_@") - 1));
+        std::string name_of_captured =
+            str.substr(sizeof("@PMATCH_CAPTURED_") - 1,
+                       str.size() - (sizeof("@PMATCH_CAPTURED_@") - 1));
+        captured_tag_map[name_of_captured] = symbol_number;
+        if (capture_tag_map.count(name_of_captured) != 0) {
+            captured2capture[symbol_number] = capture_tag_map[name_of_captured];
+            capture2captured[capture_tag_map[name_of_captured]] = symbol_number;
+        }
     } else if (is_insertion(str)) {
         rtn_names[name_from_insertion(str)] = symbol_number;
     } else if (is_guard(str)) {
@@ -591,7 +607,7 @@ bool PmatchAlphabet::is_capture_tag(const std::string & symbol)
 
 bool PmatchAlphabet::is_capture_tag(const SymbolNumber symbol) const
 {
-    return capture_tag_map.count(symbol) == 1;
+    return capture2captured[symbol] != NO_SYMBOL_NUMBER;
 }
 
 bool PmatchAlphabet::is_captured_tag(const std::string & symbol)
@@ -602,7 +618,7 @@ bool PmatchAlphabet::is_captured_tag(const std::string & symbol)
 
 bool PmatchAlphabet::is_captured_tag(const SymbolNumber symbol) const
 {
-    return captured_tag_map.count(symbol) == 1;
+    return captured2capture[symbol] != NO_SYMBOL_NUMBER;
 }
 
 bool PmatchAlphabet::is_insertion(const std::string & symbol)
@@ -1650,25 +1666,25 @@ std::pair<SymbolNumberVector::iterator,
     SymbolNumber key, unsigned int input_pos)
 {
     std::pair<SymbolNumberVector::iterator, SymbolNumberVector::iterator> longest_so_far(input.begin(), input.begin());
-    for (std::vector<std::pair<unsigned int, unsigned int> >::iterator it =
+    for (std::vector<Capture>::iterator it =
              captures.begin(); it != captures.end(); ++it) {
-        if (input_matches_at(input_pos, input.begin() + it->first, input.begin() + it->second)) {
-            if ((it->second - it->first) <= longest_so_far.second - longest_so_far.first) {
+        if (key == it->name && input_matches_at(input_pos, input.begin() + it->begin, input.begin() + it->end)) {
+            if ((it->end - it->begin) <= longest_so_far.second - longest_so_far.first) {
                 continue;
             } else {
-                longest_so_far.first = input.begin() + it->first;
-                longest_so_far.second = input.begin() + it->second;
+                longest_so_far.first = input.begin() + it->begin;
+                longest_so_far.second = input.begin() + it->end;
             }
         }
     }
-    for (std::vector<std::pair<unsigned int, unsigned int> >::iterator it =
+    for (std::vector<Capture>::iterator it =
              old_captures.begin(); it != old_captures.end(); ++it) {
-        if (input_matches_at(input_pos, input.begin() + it->first, input.begin() + it->second)) {
-            if ((it->second - it->first) <= longest_so_far.second - longest_so_far.first) {
+        if (key == it->name && input_matches_at(input_pos, input.begin() + it->begin, input.begin() + it->end)) {
+            if ((it->end - it->begin) <= longest_so_far.second - longest_so_far.first) {
                 continue;
             } else {
-                longest_so_far.first = input.begin() + it->first;
-                longest_so_far.second = input.begin() + it->second;
+                longest_so_far.first = input.begin() + it->begin;
+                longest_so_far.second = input.begin() + it->end;
             }
         }
     }
@@ -1703,13 +1719,16 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                         container->entry_stack.pop();
                     } else if (alphabet.is_capture_tag(output)) {
                         // if it's a capture tag, remember where we were
-                        container->captures.push_back(
-                            std::pair<unsigned int, unsigned int>(container->entry_stack.back(), input_pos));
+                        Capture capture;
+                        capture.begin = container->entry_stack.back();
+                        capture.end = input_pos;
+                        capture.name = output;
+                        container->captures.push_back(capture);
                     } else if (alphabet.is_captured_tag(output)) {
                         // if it's a captured tag, try each previously
                         // captured sequence
                         std::pair<SymbolNumberVector::iterator, SymbolNumberVector::iterator> cap =
-                            container->get_longest_matching_capture(output, input_pos);
+                            container->get_longest_matching_capture(alphabet.captured2capture[output], input_pos);
                         if (cap.second - cap.first != 0) {
                             container->tape.write(tape_pos, cap);
                             get_analyses(input_pos + (cap.second - cap.first),
