@@ -308,7 +308,7 @@ void TransducerHeader::skip_hfst3_header(FILE * f)
         if (type_field != std::string::npos) {
             if (header_tail.find("HFST_OL") != type_field + 5 &&
                 header_tail.find("HFST_OLW") != type_field + 5) {
-                delete headervalue;
+                delete[] headervalue;
                 throw HeaderParsingException();
             }
         }
@@ -526,10 +526,10 @@ void runTransducer (genericTransducer T)
             {
 #ifdef WINDOWS
           if (!pipe_output)
-              hfst_fprintf_console(stdout, "%s\t+?\n\n", str);
+              hfst_fprintf_console(stdout, "%s\t%s\t+?\n\n", str, str);
           else
 #endif
-              std::cout << str << "\t+?" << std::endl << std::endl;
+              std::cout << str << "\t" << str << "\t+?" << std::endl << std::endl;
 
 #ifdef WINDOWS
           if (!pipe_output)
@@ -1090,10 +1090,10 @@ void Transducer::printAnalyses(std::string prepend)
         {
 #ifdef WINDOWS
           if (!pipe_output)
-            hfst_fprintf_console(stdout, "%s\t+?\n\n", prepend.c_str());
+            hfst_fprintf_console(stdout, "%s\t%s\t+?\n\n", prepend.c_str(), prepend.c_str());
           else
 #endif
-          std::cout << prepend << "\t+?" << std::endl << std::endl;
+          std::cout << prepend << "\t" << prepend << "\t+?" << std::endl << std::endl;
 
 #ifdef WINDOWS
           if (!pipe_output)
@@ -1146,10 +1146,10 @@ void TransducerUniq::printAnalyses(std::string prepend)
 
 #ifdef WINDOWS
       if (!pipe_output)
-        hfst_fprintf_console(stdout, "%s\t+?\n\n", prepend.c_str());
+        hfst_fprintf_console(stdout, "%s\t%s\t+?\n\n", prepend.c_str(), prepend.c_str());
       else
 #endif
-        std::cout << prepend << "\t+?" << std::endl << std::endl;
+        std::cout << prepend << "\t" << prepend << "\t+?" << std::endl << std::endl;
 
 #ifdef WINDOWS
       if (!pipe_output)
@@ -1199,10 +1199,10 @@ void TransducerFdUniq::printAnalyses(std::string prepend)
     {
 #ifdef WINDOWS
   if (!pipe_output)
-    hfst_fprintf_console(stdout, "%s\t+?\n\n", prepend.c_str());
+    hfst_fprintf_console(stdout, "%s\t%s\t+?\n\n", prepend.c_str(), prepend.c_str());
   else
 #endif
-      std::cout << prepend << "\t+?" << std::endl << std::endl;
+      std::cout << prepend << "\t" << prepend << "\t+?" << std::endl << std::endl;
 
 #ifdef WINDOWS
   if (!pipe_output)
@@ -1636,10 +1636,10 @@ void TransducerW::printAnalyses(std::string prepend)
     {
 #ifdef WINDOWS
       if (!pipe_output)
-        hfst_fprintf_console(stdout, "%s\t+?\n\n", prepend.c_str());
+        hfst_fprintf_console(stdout, "%s\t%s\t+?\n\n", prepend.c_str(), prepend.c_str());
       else
 #endif
-          std::cout << prepend << "\t+?" << std::endl << std::endl;
+          std::cout << prepend << "\t" << prepend << "\t+?" << std::endl << std::endl;
 
 #ifdef WINDOWS
       if (!pipe_output)
@@ -1715,10 +1715,10 @@ void TransducerWUniq::printAnalyses(std::string prepend)
     {
 #ifdef WINDOWS
       if (!pipe_output)
-        hfst_fprintf_console(stdout, "%s\t+?\n", prepend.c_str());
+        hfst_fprintf_console(stdout, "%s\t%s\t+?\n", prepend.c_str(), prepend.c_str());
       else
 #endif
-        std::cout << prepend << "\t+?" << std::endl;
+        std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
 
 #ifdef WINDOWS
       if (!pipe_output)
@@ -1797,10 +1797,10 @@ void TransducerWFdUniq::printAnalyses(std::string prepend)
     {
 #ifdef WINDOWS
       if (!pipe_output)
-        hfst_fprintf_console(stdout, "%s\t+?", prepend);
+        hfst_fprintf_console(stdout, "%s\t%s\t+?", prepend, prepend);
       else
 #endif
-        std::cout << prepend << "\t+?" << std::endl;
+        std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
 
 #ifdef WINDOWS
       if (!pipe_output)
