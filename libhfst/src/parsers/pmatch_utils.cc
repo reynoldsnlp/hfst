@@ -703,8 +703,6 @@ PmatchTransducerContainer * make_nrc_exit(void)
 { return epsilon_to_symbol_container(NRC_EXIT_SYMBOL); }
 PmatchTransducerContainer * make_nlc_exit(void)
 { return epsilon_to_symbol_container(NLC_EXIT_SYMBOL); }
-PmatchTransducerContainer * make_passthrough(void)
-{ return epsilon_to_symbol_container(PASSTHROUGH_SYMBOL); }
 
 char * get_delimited(const char *s, char delim_left, char delim_right)
 {
@@ -2034,7 +2032,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
             retval->reverse();
             PmatchTransducerContainer * tmp = make_minimization_guard();
             HfstTransducer * head = tmp->evaluate(); delete tmp;
-            HfstTransducer passthrough(hfst::internal_epsilon, PASSTHROUGH_SYMBOL, format);
+            HfstTransducer passthrough(PASSTHROUGH_SYMBOL, format);
             HfstTransducer nlc_entry(hfst::internal_epsilon, NLC_ENTRY_SYMBOL, format);
             HfstTransducer nlc_exit(hfst::internal_epsilon, NLC_EXIT_SYMBOL, format);
             nlc_entry.concatenate(*retval);
@@ -2057,7 +2055,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
         if (!parent_is_context) {
             PmatchTransducerContainer * tmp = make_minimization_guard();
             HfstTransducer * head = tmp->evaluate(); delete tmp;
-            HfstTransducer passthrough(hfst::internal_epsilon, PASSTHROUGH_SYMBOL, format);
+            HfstTransducer passthrough(PASSTHROUGH_SYMBOL, format);
             HfstTransducer nlc_entry(hfst::internal_epsilon, NLC_ENTRY_SYMBOL, format);
             HfstTransducer nlc_exit(hfst::internal_epsilon, NLC_EXIT_SYMBOL, format);
             nlc_entry.concatenate(*retval);

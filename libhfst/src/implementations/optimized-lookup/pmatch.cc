@@ -1750,13 +1750,13 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                     }
                 } else {
                     check_context(input_pos, tape_pos, i);
-                    exit_context();
                 }
             } else {
                 // We *are* checking context and may be done
                 if (try_exiting_context(output)) {
                     // We've successfully completed a context check
                     get_analyses(local_stack.top().context_placeholder, tape_pos, target);
+                    local_stack.pop();
                 } else {
                     if (local_stack.top().negative_context_success == true) {
                         // We've succeeded in a negative context, just back out
@@ -1795,16 +1795,19 @@ void PmatchTransducer::check_context(unsigned int input_pos,
     }
     get_analyses(input_pos, tape_pos, transition_table[i].get_target());
 
+
     // In case we have a negative context, we check to see if the context matched.
     // If it didn't, we schedule a passthrough arc after we've processed epsilons.
-    // We also manually reset the context information.
+    bool schedule_passthrough = false;
     if(local_stack.top().context == NLC || local_stack.top().context == NRC) {
-        local_stack.top().context = none;
-        local_stack.top().tape_step = 1;
         if (local_stack.top().negative_context_success == false) {
-            exit_context();
-            local_stack.top().pending_passthrough = true;
+            schedule_passthrough = true;
         }
+    }
+// Pop the local stack that got pushed by entering the context
+    local_stack.pop();
+    if (schedule_passthrough) {
+        local_stack.top().pending_passthrough = true;
     }
 }
 
@@ -1921,7 +1924,7 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
     } else {
         input = container->input[input_pos];
     }
-    
+
     if (alphabet.symbol2lists[input] != NO_SYMBOL_NUMBER) {
 // At least one symbol list could allow this symbol
         for(SymbolNumberVector::const_iterator it =
@@ -1951,33 +1954,30 @@ bool PmatchTransducer::checking_context(void) const
 
 bool PmatchTransducer::try_entering_context(SymbolNumber symbol)
 {
+    LocalVariables new_top;
     if (symbol == alphabet.get_special(LC_entry)) {
-        local_stack.top().context = LC;
-        local_stack.top().tape_step = -1;
-        local_stack.top().max_context_length_remaining =
-            container->max_context_length;
-        return true;
+        new_top = local_stack.top();
+        new_top.context = LC;
+        new_top.tape_step = -1;
     } else if (symbol == alphabet.get_special(RC_entry)) {
-        local_stack.top().context = RC;
-        local_stack.top().tape_step = 1;
-        local_stack.top().max_context_length_remaining =
-            container->max_context_length;
-        return true;
+        new_top = local_stack.top();
+        new_top.context = RC;
+        new_top.tape_step = 1;
     } else if (symbol == alphabet.get_special(NLC_entry)) {
-        local_stack.top().context = NLC;
-        local_stack.top().tape_step = -1;
-        local_stack.top().max_context_length_remaining =
-            container->max_context_length;
-        return true;
+        new_top = local_stack.top();
+        new_top.context = NLC;
+        new_top.tape_step = -1;
     } else if (symbol == alphabet.get_special(NRC_entry)) {
-        local_stack.top().context = NRC;
-        local_stack.top().tape_step = 1;
-        local_stack.top().max_context_length_remaining =
-            container->max_context_length;
-        return true;
+        new_top = local_stack.top();
+        new_top.context = NRC;
+        new_top.tape_step = 1;
     } else {
         return false;
     }
+    new_top.max_context_length_remaining =
+        container->max_context_length;
+    local_stack.push(new_top);
+    return true;
 }
 
 bool PmatchTransducer::try_exiting_context(SymbolNumber symbol)
@@ -2014,9 +2014,11 @@ bool PmatchTransducer::try_exiting_context(SymbolNumber symbol)
 
 void PmatchTransducer::exit_context(void)
 {
-    local_stack.top().context = none;
-    local_stack.top().negative_context_success = false;
-    local_stack.top().tape_step = 1;
+    LocalVariables new_top(local_stack.top());
+    new_top.context = none;
+    new_top.negative_context_success = false;
+    new_top.tape_step = 1;
+    local_stack.push(new_top);
 }
 
 }
