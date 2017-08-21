@@ -91,7 +91,7 @@ check_compile_run \
 test_begin "RC() with no character between the recognized string and context"
 
 check_compile_run 'RC() separating space' \
-    'Define TOP {a} RC({b}) EndTag(AB);' 'aba b' '<AB>a</AB>ba b'
+    'set need-separators off Define TOP {a} RC({b}) EndTag(AB);' 'aba b' '<AB>a</AB>ba b'
 
 
 # Bug (reported 2013-05-30): Ins() with a name containing "name" does
@@ -112,7 +112,7 @@ Define TOP [ Ins(@1@) ] ;' \
 test_begin "Different tag in different contexts"
 
 check_compile_run '' \
-    'Define TOP {a} [[RC({b}) EndTag(AB)] | [RC({c}) EndTag(AC)]];' \
+    'set need-separators off Define TOP {a} [[RC({b}) EndTag(AB)] | [RC({c}) EndTag(AC)]];' \
     'ab ac' '<AB>a</AB>b <AC>a</AC>c'
 
 
@@ -210,7 +210,7 @@ check_compile_run \
 test_begin "A context as an affix of another"
 
 check_compile_run \
-    --codetempl 'Define T1 [ {c} @1@ EndTag(A) ];
+    --codetempl 'set need-separators off Define T1 [ {c} @1@ EndTag(A) ];
 Define T2 [ {d} LC({b}) EndTag(A) ];
 Define TOP [ T1 | T2 ];' \
     --templargs 'Same context (LC)' 'LC({b})' \
