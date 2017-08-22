@@ -435,6 +435,7 @@ int parse_options(int argc, char** argv)
             settings.print_weights = true;
             settings.print_all = true;
             settings.dedupe = true;
+            settings.verbose = false;
             if(settings.max_weight_classes == std::numeric_limits<int>::max()) {
                 settings.max_weight_classes = 2;
             }
