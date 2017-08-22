@@ -2056,12 +2056,12 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
             PmatchTransducerContainer * tmp = make_minimization_guard();
             HfstTransducer * head = tmp->evaluate(); delete tmp;
             HfstTransducer passthrough(PASSTHROUGH_SYMBOL, format);
-            HfstTransducer nlc_entry(hfst::internal_epsilon, NLC_ENTRY_SYMBOL, format);
-            HfstTransducer nlc_exit(hfst::internal_epsilon, NLC_EXIT_SYMBOL, format);
-            nlc_entry.concatenate(*retval);
-            nlc_entry.concatenate(nlc_exit);
-            nlc_entry.disjunct(passthrough);
-            head->concatenate(nlc_entry);
+            HfstTransducer nrc_entry(hfst::internal_epsilon, NRC_ENTRY_SYMBOL, format);
+            HfstTransducer nrc_exit(hfst::internal_epsilon, NRC_EXIT_SYMBOL, format);
+            nrc_entry.concatenate(*retval);
+            nrc_entry.concatenate(nrc_exit);
+            nrc_entry.disjunct(passthrough);
+            head->concatenate(nrc_entry);
             delete retval;
             retval = head;
             }
