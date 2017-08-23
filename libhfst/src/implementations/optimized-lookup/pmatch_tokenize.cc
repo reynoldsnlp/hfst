@@ -145,11 +145,44 @@ const LocationVector keep_n_best_weight(LocationVector const & locations, const 
 }
 
 /**
+ * Return the size in bytes of the first complete UTF-8 codepoint in c,
+ * or 0 if invalid.
+ */
+size_t u8_first_codepoint_size(const unsigned char* c) {
+    if (*c <= 127) {
+        return 1;
+    }
+    else if ( (*c & (128 + 64 + 32 + 16)) == (128 + 64 + 32 + 16) ) {
+        return 4;
+    }
+    else if ( (*c & (128 + 64 + 32 )) == (128 + 64 + 32) ) {
+        return 3;
+    }
+    else if ( (*c & (128 + 64 )) == (128 + 64)) {
+        return 2;
+    }
+    else {
+        return 0;
+    }
+}
+
+/**
+ * We define tags (non-lemmas) as being exactly the Multichar_symbols.
+ * Since non-Multichar_symbols may still be multi*byte*, we check that
+ * the symbol is strictly longer than the size of the first
+ * possibly-multi-byte codepoint.
+ */
+bool is_cg_tag(const string & str) {
+    // Note: invalid codepoints are also treated as tags;  ¯\_(ツ)_/¯
+    return str.size() > u8_first_codepoint_size((const unsigned char*)str.c_str());
+}
+/**
  * Return empty string if it wasn't a tag, otherwise the tag without the initial/final +
  */
 const string as_cg_tag(const string & str) {
     size_t len = str.size();
-    if(len > 1) {
+    if(is_cg_tag(str)) {
+        // TODO: Remove this whole function and just use is_cg_tag as soon as Giellatekno's FST's do the "+"-removal themselves
         if (str.at(0) == '+') {
             return str.substr(1);
         }
