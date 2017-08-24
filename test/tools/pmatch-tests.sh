@@ -1036,3 +1036,15 @@ check_compile_run \
     --inout 'Multiple matches' \
     'k c a c b c ka c ak c kak c aa c bb c ab c ba c aba c bab c kakb c' \
     'k c <AB>a c</AB> <AB>b c</AB> <AB>ka c</AB> <AB>ak c</AB> <AB>kak c</AB> <AB>aa c</AB> <AB>bb c</AB> <AB>ab c</AB> <AB>ba c</AB> <AB>aba c</AB> <AB>bab c</AB> <AB>kakb c</AB>'
+
+test_begin "Lst()"
+
+check_compile_run \
+    --code 'Match runs of characters in {a, b, c}' 'set need-separators off regex Lst({abc})+ EndTag(A);' \
+    --inout '' 'aa bb aabqbcc xyaz' '<A>aa</A> <A>bb</A> <A>aab</A>q<A>bcc</A> xy<A>a</A>z'
+
+test_begin "Exc()"
+
+check_compile_run \
+    --code 'Match runs of characters not in {a, b, c}' 'set need-separators off regex Exc({abc})+ EndTag(A);' \
+    --inout '' 'aa bb aabqbcc xyaz' 'aa<A> </A>bb<A> </A>aab<A>q</A>bcc<A> xy</A>a<A>z</A>'
