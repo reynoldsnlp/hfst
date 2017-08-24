@@ -114,7 +114,7 @@ print_usage()
 
 
 
-hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer & dictionary)
+hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer * dictionary)
 {
     HfstTransducer * word_boundary = hfst::pmatch::PmatchUtilityTransducers::
         make_latin1_whitespace_acceptor(default_format);
@@ -145,10 +145,10 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer & dictionary)
     left_context->concatenate(*left_context_exit);
     right_context->concatenate(*right_context_exit);
     delete left_context_exit; delete right_context_exit;
-    std::string dict_name = dictionary.get_name();
+    std::string dict_name = dictionary->get_name();
     if (dict_name == "") {
         dict_name = "unknown_pmatch_tokenized_dict";
-        dictionary.set_name(dict_name);
+        dictionary->set_name(dict_name);
     }
     HfstTransducer dict_ins_arc(hfst::pmatch::get_Ins_transition(dict_name.c_str()), default_format);
     // We now make the center of the tokenizer
@@ -162,9 +162,9 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer & dictionary)
     tokenizer->set_name("TOP");
     tokenizer->minimize();
     // Convert the dictionary to olw if it wasn't already
-    dictionary.convert(hfst::HFST_OLW_TYPE);
+    dictionary->convert(hfst::HFST_OLW_TYPE);
     // Get the alphabets
-    std::set<std::string> dict_syms = dictionary.get_alphabet();
+    std::set<std::string> dict_syms = dictionary->get_alphabet();
     std::set<std::string> tokenizer_syms = tokenizer->get_alphabet();
     std::vector<std::string> tokenizer_minus_dict;
     // What to add to the dictionary
@@ -173,7 +173,7 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer & dictionary)
                         std::inserter(tokenizer_minus_dict, tokenizer_minus_dict.begin()));
     for (std::vector<std::string>::const_iterator it = tokenizer_minus_dict.begin();
          it != tokenizer_minus_dict.end(); ++it) {
-        dictionary.insert_to_alphabet(*it);
+        dictionary->insert_to_alphabet(*it);
     }
     hfst::HfstBasicTransducer * tokenizer_basic = hfst::implementations::ConversionFunctions::
         hfst_transducer_to_hfst_basic_transducer(*tokenizer);
@@ -181,11 +181,11 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer & dictionary)
         hfst_basic_transducer_to_hfst_ol(tokenizer_basic,
                                          true, // weighted
                                          "", // no special options
-                                         &dictionary); // harmonize with the dictionary
+                                         dictionary); // harmonize with the dictionary
     delete tokenizer_basic;
     hfst_ol::PmatchContainer retval(tokenizer_ol);
     hfst_ol::Transducer * dict_backend = hfst::implementations::ConversionFunctions::
-        hfst_transducer_to_hfst_ol(&dictionary);
+        hfst_transducer_to_hfst_ol(dictionary);
     retval.add_rtn(dict_backend, dict_name);
     delete tokenizer_ol;
     return retval;
@@ -501,27 +501,42 @@ int main(int argc, char ** argv)
         return EXIT_FAILURE;
     }
     try {
-        hfst::HfstInputStream is(tokenizer_filename);
-        HfstTransducer dictionary(is);
-        if (first_transducer_is_called_TOP(dictionary)) {
+        // To decide whether we're working with something produced by a
+        // pmatch ruleset, we want to know whether the first transducer
+        // is named TOP. To do this, rather than load the whole thing
+        // into a HfstTransducer, we read just the header variables
+        // with a function in the hfst_ol namespace. This is not really the
+        // place for such a function, so perhaps it should be reimplemented
+        // as a static member of HfstTransducer in the future, TODO.
+        std::map<std::string, std::string> first_header_attributes;
+        try {
+            first_header_attributes = hfst_ol::PmatchContainer::parse_hfst3_header(instream);
             instream.seekg(0);
             instream.clear();
-            hfst_ol::PmatchContainer container(instream);
+        } catch(TransducerHeaderException & e) {
+            std::cerr << tokenizer_filename <<
+                " doesn't look like a HFST archive. Exiting.\n"
+                "Exception thrown:\n" << e.what() << std::endl;
+            return 1;
+        }
+        if (first_header_attributes.count("name") == 0 ||
+            first_header_attributes["name"] != "TOP") {
+            hfst::HfstInputStream is(tokenizer_filename);
+            HfstTransducer * dictionary = new HfstTransducer(is);
+            instream.close();
+            hfst_ol::PmatchContainer container = make_naive_tokenizer(dictionary);
+            delete dictionary;
             container.set_verbose(verbose);
             container.set_single_codepoint_tokenization(!tokenize_multichar);
             return process_input(container, std::cout);
         } else {
-            instream.close();
-            hfst_ol::PmatchContainer container = make_naive_tokenizer(dictionary);
+            hfst_ol::PmatchContainer container(instream);
             container.set_verbose(verbose);
             container.set_single_codepoint_tokenization(!tokenize_multichar);
             return process_input(container, std::cout);
         }
     } catch(HfstException & e) {
-        std::cerr << "The archive in " << tokenizer_filename <<
-            " doesn't look right.\nDid you make it with hfst-pmatch2fst"
-            " or make sure it's in weighted optimized-lookup format?\n"
-            "Exception thrown:\n" << e.what() << std::endl;
+        std::cerr << "Exception thrown:\n" << e.what() << std::endl;
         return 1;
     }
 
