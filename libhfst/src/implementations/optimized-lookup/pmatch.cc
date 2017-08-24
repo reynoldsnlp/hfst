@@ -650,7 +650,8 @@ bool PmatchAlphabet::is_special(const std::string & symbol)
 //        || symbol == "@_UNKNOWN_SYMBOL_@" || symbol == "@_IDENTITY_SYMBOL_@"
         return true;
     } else {
-        return symbol.find("@PMATCH") == 0 && symbol.at(symbol.size() - 1) == '@';
+        return (symbol.find("@PMATCH") == 0 || symbol.find("@L") == 0 || symbol.find("@X") == 0)
+            && symbol.at(symbol.size() - 1) == '@';
     }
 }
 
