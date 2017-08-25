@@ -1586,6 +1586,7 @@ HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t, Side side, bo
         continuation2.repeat_star();
         cap.concatenate(continuation2);
         retval->compose(cap);
+        retval->output_project();
     }
     retval->minimize();
     return retval;
