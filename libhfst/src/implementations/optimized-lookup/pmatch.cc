@@ -638,7 +638,7 @@ bool PmatchAlphabet::is_counter(const std::string & symbol)
 
 bool PmatchAlphabet::is_list(const std::string & symbol)
 {
-    return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("@") == symbol.size() - 1;
+    return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("_@") == symbol.size() - 2;
 }
 
 bool PmatchAlphabet::is_special(const std::string & symbol)
@@ -650,8 +650,8 @@ bool PmatchAlphabet::is_special(const std::string & symbol)
 //        || symbol == "@_UNKNOWN_SYMBOL_@" || symbol == "@_IDENTITY_SYMBOL_@"
         return true;
     } else {
-        return (symbol.find("@PMATCH") == 0 || symbol.find("@L") == 0 || symbol.find("@X") == 0)
-            && symbol.at(symbol.size() - 1) == '@';
+        return (symbol.find("@PMATCH") == 0 && symbol.at(symbol.size() - 1) == '@')
+            || is_list(symbol);
     }
 }
 
