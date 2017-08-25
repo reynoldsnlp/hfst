@@ -2,12 +2,12 @@
 	
 
 "<dog>"
-	"dog"+N
+	"dog" N
 
 "<be dog>"
-	be+Vdog+N
-	bedog+V
+	be Vdog N
+	bedog V
 
 "<catdog>"
-	cat+N+Cmp#dog+N
+	cat N Cmp#dog N
 
