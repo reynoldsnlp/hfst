@@ -188,7 +188,6 @@ void print_cg_subreading(size_t const & indent,
 {
     outstream << string(indent, '\t');
     bool in_lemma = false;
-    bool want_spc = false;
     for(hfst::StringVector::const_iterator it = out_beg;
         it != out_end; ++it) {
         if(it->compare("@PMATCH_BACKTRACK@") == 0) {
@@ -196,28 +195,18 @@ void print_cg_subreading(size_t const & indent,
         }
         bool is_tag = is_cg_tag(*it);
         if(in_lemma) {
-            if(!is_tag) {
-                outstream << (*it);
-            }
-            else {
+            if(is_tag) {
                 in_lemma = false;
-                outstream << "\" " << (*it);
-                want_spc = true;
+                outstream << "\"";
             }
         }
         else {
-            if(want_spc) {
-                outstream << " ";
-            }
             if(!is_tag) {
                 in_lemma = true;
-                outstream << "\"" << (*it);
-            }
-            else {
-                outstream << (*it);
-                want_spc = true;
+                outstream << "\"";
             }
         }
+        outstream << (*it);
     }
     if(in_lemma) {
         outstream << "\"";
