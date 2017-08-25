@@ -176,22 +176,6 @@ bool is_cg_tag(const string & str) {
     // Note: invalid codepoints are also treated as tags;  ¯\_(ツ)_/¯
     return str.size() > u8_first_codepoint_size((const unsigned char*)str.c_str());
 }
-/**
- * Return empty string if it wasn't a tag, otherwise the tag without the initial/final +
- */
-const string as_cg_tag(const string & str) {
-    size_t len = str.size();
-    if(is_cg_tag(str)) {
-        // TODO: Remove this whole function and just use is_cg_tag as soon as Giellatekno's FST's do the "+"-removal themselves
-        if (str.at(0) == '+') {
-            return str.substr(1);
-        }
-        else if(str.at(len - 1) == '+') {
-            return str.substr(0, len - 1);
-        }
-    }
-    return "";
-}
 
 void print_cg_subreading(size_t const & indent,
                          hfst::StringVector::const_iterator & out_beg,
@@ -210,14 +194,14 @@ void print_cg_subreading(size_t const & indent,
         if(it->compare("@PMATCH_BACKTRACK@") == 0) {
             continue;
         }
-        const string & tag = as_cg_tag(*it);
+        bool is_tag = is_cg_tag(*it);
         if(in_lemma) {
-            if(tag.empty()) {
+            if(!is_tag) {
                 outstream << (*it);
             }
             else {
                 in_lemma = false;
-                outstream << "\" " << tag;
+                outstream << "\" " << (*it);
                 want_spc = true;
             }
         }
@@ -225,12 +209,12 @@ void print_cg_subreading(size_t const & indent,
             if(want_spc) {
                 outstream << " ";
             }
-            if(tag.empty()) {
+            if(!is_tag) {
                 in_lemma = true;
                 outstream << "\"" << (*it);
             }
             else {
-                outstream << tag;
+                outstream << (*it);
                 want_spc = true;
             }
         }
