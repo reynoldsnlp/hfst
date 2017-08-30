@@ -16,7 +16,7 @@ namespace hfst_ol {
 PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
                                SymbolNumber symbol_count,
                                PmatchContainer * cont):
-    TransducerAlphabet(inputstream, symbol_count, false),
+    TransducerAlphabet(inputstream, symbol_count, true),
     special_symbols(SPECIALSYMBOL_NR_ITEMS, NO_SYMBOL_NUMBER), // SpecialSymbols enum
     container(cont)
 {
@@ -28,12 +28,30 @@ PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
     // We initialize the vector of which symbols have a printable representation
     // with false, then flip those that actually do to true
     printable_vector = std::vector<bool>(orig_symbol_count, false);
+    global_flags = std::vector<bool>(orig_symbol_count, false);
     for (SymbolNumber i = 1; i < symbol_table.size(); ++i) {
         if (is_special(symbol_table[i])) {
             add_special_symbol(symbol_table[i], i);
         } else {
             if (!is_flag_diacritic(i)) {
                 printable_vector[i] = true;
+            } else {
+                if (is_global_flag(symbol_table[i])) {
+                    global_flags[i] = true;
+                    std::string s = symbol_table[i];
+                    // redefine it as a non-global flag, removing the PMATCH_GLOBAL_ part
+                    std::string feature =  hfst::FdOperation::get_feature(symbol_table[i])
+                        .substr(14, std::string::npos);
+                    std::string value = hfst::FdOperation::get_value(symbol_table[i]);
+                    std::string new_diacritic = s.substr(0, 3) + feature + (value == "" ? "" : "." + value) + "@";
+                    fd_table.define_diacritic(i, new_diacritic);
+                    // finally go over all other known flag diacritics with the non-globalized feature and
+                    // mark them global too
+                    SymbolNumberVector globals = fd_table.get_symbols_with_feature(feature);
+                    for (SymbolNumberVector::iterator it = globals.begin(); it != globals.end(); ++it) {
+                        global_flags[*it] = true;
+                    }
+                }
             }
         }
     }
@@ -353,6 +371,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
     TransducerHeader header(inputstream);
     alphabet = PmatchAlphabet(inputstream, header.symbol_count(), this);
     orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
+    global_flag_state = alphabet.get_fd_table();
     encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
     toplevel = new hfst_ol::PmatchTransducer(
         inputstream,
@@ -400,6 +419,7 @@ PmatchContainer::PmatchContainer(Transducer * t):
     //TransducerHeader header = t->get_header();
     alphabet = PmatchAlphabet(t->get_alphabet(), this);
     orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
+    global_flag_state = alphabet.get_fd_table();
     line_number = 0;
     encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
     TransducerTable<TransitionW> transitions = t->copy_transitionw_table();
@@ -446,6 +466,7 @@ PmatchContainer::PmatchContainer(std::vector<HfstTransducer> transducers):
         TransducerHeader header(backend->get_header());
         alphabet = PmatchAlphabet(backend->get_alphabet(), this);
         orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
+        global_flag_state = alphabet.get_fd_table();
         encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
         TransducerTable<TransitionW> transitions = backend->copy_transitionw_table();
         TransducerTable<TransitionWIndex> indices = backend->copy_windex_table();
@@ -518,6 +539,7 @@ PmatchContainer::PmatchContainer(std::vector<HfstTransducer> transducers):
         // this will be the alphabet of the entire container
         alphabet = PmatchAlphabet(harmonized_tmp->get_alphabet(), this);
         orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
+        global_flag_state = alphabet.get_fd_table();
         encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
         TransducerTable<TransitionW> transitions = harmonized_tmp->copy_transitionw_table();
         TransducerTable<TransitionWIndex> indices = harmonized_tmp->copy_windex_table();
@@ -639,6 +661,17 @@ bool PmatchAlphabet::is_counter(const std::string & symbol)
 bool PmatchAlphabet::is_list(const std::string & symbol)
 {
     return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("_@") == symbol.size() - 2;
+}
+
+bool PmatchAlphabet::is_global_flag(const std::string & symbol)
+{
+    return (symbol.find("@P.") == 0 || symbol.find("@C.") == 0) && symbol.find("PMATCH_GLOBAL_") == 3 &&
+        symbol.rfind("@") == symbol.size() - 1;
+}
+
+bool PmatchAlphabet::is_global_flag(SymbolNumber symbol)
+{
+    return global_flags[symbol];
 }
 
 bool PmatchAlphabet::is_special(const std::string & symbol)
@@ -1817,6 +1850,14 @@ void PmatchTransducer::take_flag(SymbolNumber input,
                                  unsigned int tape_pos,
                                  TransitionTableIndex i)
 {
+    std::vector<short> old_global_values;
+    if (alphabet.is_global_flag(input)) {
+        (old_global_values = container->global_flag_state.get_values());
+        if (((container->global_flag_state).apply_operation
+             (*(alphabet.get_operation(input)))) == false) {
+            return;
+        }
+    }
     std::vector<short> old_values(local_stack.top().flag_state.get_values());
     if (local_stack.top().flag_state.apply_operation(
             *(alphabet.get_operation(input)))) {
@@ -1824,6 +1865,9 @@ void PmatchTransducer::take_flag(SymbolNumber input,
         // generally we shouldn't care to write flags
 //                container->tape.write(tape_pos, input, output);
         get_analyses(input_pos, tape_pos, transition_table[i].get_target());
+    }
+    if (alphabet.is_global_flag(input)) {
+        (container->global_flag_state).assign_values(old_global_values);
     }
     local_stack.top().flag_state.assign_values(old_values);
 }

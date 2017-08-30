@@ -131,6 +131,8 @@ PmatchTransducerContainer * epsilon_to_symbol_container(std::string s);
 PmatchTransducerContainer * make_end_tag(std::string tag);
 PmatchTransducerContainer * make_capture_tag(std::string tag);
 PmatchTransducerContainer * make_captured_tag(std::string tag);
+PmatchObject * make_with_tag_entry(std::string key, std::string value);
+PmatchObject * make_with_tag_exit(std::string key);
 
 std::vector<std::pair<WordVector, WordVecFloat> > get_top_n(
     size_t n,

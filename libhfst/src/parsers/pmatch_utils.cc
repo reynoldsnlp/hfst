@@ -319,6 +319,16 @@ PmatchTransducerContainer * make_capture_tag(std::string tag)
 PmatchTransducerContainer * make_captured_tag(std::string tag)
 { return epsilon_to_symbol_container("@PMATCH_CAPTURED_" + tag + "@"); }
 
+PmatchObject * make_with_tag_entry(std::string key, std::string value)
+{
+    return new PmatchString("@P.PMATCH_GLOBAL_" + key + "." + value + "@");
+}
+
+PmatchObject * make_with_tag_exit(std::string key)
+{
+    return new PmatchString("@C.PMATCH_GLOBAL_" + key + "@");
+}
+
 // Get the n best candidates in the original space using an insertion sort
 std::vector<std::pair<WordVector, WordVecFloat> > get_top_n(size_t n,
                                                             std::vector<WordVector> & vecs,

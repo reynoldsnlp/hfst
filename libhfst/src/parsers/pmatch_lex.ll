@@ -91,6 +91,8 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 "OR(" { return OR_LEFT; }
 "AND(" { return AND_LEFT; }
 ".t(" { return TAG_LEFT; }
+".tag(" { return TAG_LEFT; }
+".with(" { return WITH_LEFT; }
 "Lst(" { return LST_LEFT; }
 "Exc(" { return EXC_LEFT; }
 "Like(" { return LIKE_LEFT; }
@@ -287,6 +289,8 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
     free(label);
     return SYMBOL_WITH_LEFT_PAREN;
 }
+
+"=" { return EQUALS; }
 
 "[." { return LEFT_BRACKET_DOTTED; }
 ".]" { return RIGHT_BRACKET_DOTTED; }

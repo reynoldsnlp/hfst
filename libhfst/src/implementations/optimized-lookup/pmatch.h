@@ -81,6 +81,7 @@ namespace hfst_ol {
         std::vector<SymbolNumberVector> symbol_list_members;
         std::vector<unsigned long> counters;
         SymbolNumberVector guards;
+        std::vector<bool> global_flags;
         std::vector<bool> printable_vector;
         bool is_end_tag(const SymbolNumber symbol) const;
         bool is_capture_tag(const SymbolNumber symbol) const;
@@ -88,6 +89,7 @@ namespace hfst_ol {
         bool is_input_mark(const SymbolNumber symbol) const;
         bool is_guard(const SymbolNumber symbol) const;
         bool is_counter(const SymbolNumber symbol) const;
+        bool is_global_flag(const SymbolNumber symbol) const;
         std::string end_tag(const SymbolNumber symbol);
         std::string start_tag(const SymbolNumber symbol);
         PmatchContainer * container;
@@ -107,9 +109,11 @@ namespace hfst_ol {
         static bool is_counter(const std::string & symbol);
         static bool is_special(const std::string & symbol);
         static bool is_printable(const std::string & symbol);
+        static bool is_global_flag(const std::string & symbol);
         static std::string name_from_insertion(
             const std::string & symbol);
         bool is_printable(SymbolNumber symbol);
+        bool is_global_flag(SymbolNumber symbol);
         void add_special_symbol(const std::string & str, SymbolNumber symbol_number);
         void process_symbol_list(std::string str, SymbolNumber sym);
         void process_counter(std::string str, SymbolNumber sym);
@@ -164,6 +168,8 @@ namespace hfst_ol {
         std::vector<Capture> best_captures;
         std::vector<Capture> old_captures;
         std::vector<char> possible_first_symbols;
+        // The flag state for global flags
+        hfst::FdState<SymbolNumber> global_flag_state;
         bool verbose;
         
         bool count_patterns;
