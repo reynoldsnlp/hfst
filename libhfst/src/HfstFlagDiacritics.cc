@@ -17,6 +17,9 @@ namespace hfst {
   (FdOperator op, FdFeature feat, FdValue val, const std::string& str):
     op(op), feature(feat), value(val), name(str) {}
 
+  // Required for operator[]()
+  FdOperation::FdOperation(void): op(Pop), feature(0), value(0), name("") {}
+
   FdOperator FdOperation::Operator(void) const { return op; }
   FdFeature FdOperation::Feature(void) const { return feature; }
   FdValue FdOperation::Value(void) const { return value; }

@@ -40,6 +40,9 @@ private:
 public:
     HFSTDLL FdOperation
       (FdOperator op, FdFeature feat, FdValue val, const std::string& str);
+
+    // Required for operator[]()
+    HFSTDLL FdOperation(void);
     
     HFSTDLL FdOperator Operator(void) const;
     HFSTDLL FdFeature Feature(void) const;
@@ -116,17 +119,32 @@ public:
                 FdValue next = hfst::size_t_to_ushort(value_map.size()+1);
                 value_map[val] = next;
             }
-      
-            operations.insert
-              (std::pair<T,FdOperation>
-               (symbol,
-                FdOperation(op, feature_map[feat], value_map[val], str)));
-            symbol_map.insert(std::pair<std::string,T>(str, symbol));
+
+            FdOperation operation(op, feature_map[feat], value_map[val], str);
+            operations[symbol] = operation;
+            symbol_map[str] = symbol;
         }
     
     FdFeature num_features() const { return (hfst::FdFeature)feature_map.size(); }
+
     bool is_diacritic(T symbol) const
         { return operations.find(symbol) != operations.end(); }
+
+    std::vector<T> get_symbols_with_feature(const std::string& feature) const
+        {
+            std::vector<T> retval;
+            if (feature_map.count(feature) == 0) {
+                return retval;
+            }
+            FdFeature feature_code = feature_map.at(feature);
+            for (typename std::map<T, FdOperation>::const_iterator it = operations.begin();
+                 it != operations.end(); ++it) {
+                if ((it->second).Feature() == feature_code) {
+                    retval.push_back(it->first);
+                }
+            }
+            return retval;
+        }
       
     const FdOperation* get_operation(T symbol) const
         {
