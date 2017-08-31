@@ -44,6 +44,33 @@ using std::pair;
 #  include <getopt.h>
 #endif
 
+#ifdef HAVE_READLINE
+#include <unistd.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
+/* Read a string, and point buffer to it. */
+void libreadline_getline(char ** buffer)
+{
+  /* If the buffer has already been allocated,
+     return the memory to the free pool. */
+  if (*buffer)
+    {
+        free (*buffer);
+        *buffer = (char *)NULL;
+    }
+
+  /* Get a line from the user. */
+  *buffer = readline("");
+
+  /* If the line has any text in it,
+     save it on the history. */
+  if (*buffer && **buffer)
+    add_history (*buffer);
+}
+
+#endif
+
 #include <math.h>
 #include <errno.h>
 
@@ -148,20 +175,44 @@ int process_input(hfst_ol::PmatchContainer & container,
     char * line = NULL;
     size_t len = 0;
     while (true) {
-
 #ifndef _MSC_VER
-      if (!(hfst_getline(&line, &len, stdin) > 0))
-        break;
+#ifdef HAVE_READLINE
+        if (isatty(STDIN_FILENO)) {
+            libreadline_getline(&line);
+            if (!line)
+                break;
+        } else {
+            if (!(hfst_getline(&line, &len, stdin) > 0))
+                break;
+        }
 #else
-      std::string linestr("");
-      size_t bufsize = 1000;
-      if (! hfst::get_line_from_console(linestr, bufsize, true /* keep newlines */))
-        break;
-      line = strdup(linestr.c_str());
+        if (!(hfst_getline(&line, &len, stdin) > 0))
+            break;
+#endif
+#else
+        std::string linestr("");
+        size_t bufsize = 1000;
+        if (! hfst::get_line_from_console(linestr, bufsize, true /* keep newlines */))
+            break;
+        line = strdup(linestr.c_str());
 #endif
       
         if (!blankline_separated) {
             // newline separated
+#ifndef _MSC_VER
+#ifdef HAVE_READLINE
+            input_text = line;
+            match_and_print(container, outstream, input_text);
+        } else if (line[0] == '\0' || line[0] == '\n') {
+            match_and_print(container, outstream, input_text);
+            input_text.clear();
+        } else {
+            input_text.append(line);
+            if (isatty(STDIN_FILENO)) {
+                input_text.push_back('\n');
+            }
+        }
+#else
             input_text = line;
             match_and_print(container, outstream, input_text);
         } else if (line[0] == '\n') {
@@ -170,6 +221,18 @@ int process_input(hfst_ol::PmatchContainer & container,
         } else {
             input_text.append(line);
         }
+#endif
+#else
+            input_text = line;
+            match_and_print(container, outstream, input_text);
+        } else if (line[0] == '\n') {
+            match_and_print(container, outstream, input_text);
+            input_text.clear();
+        } else {
+            input_text.append(line);
+        }
+#endif
+
         free(line);
         line = NULL;
     }
@@ -320,6 +383,11 @@ int main(int argc, char ** argv)
     if (retval != EXIT_CONTINUE) {
         return retval;
     }
+#ifdef HAVE_READLINE
+    // Disable tab completion
+    rl_bind_key('\t', rl_insert);
+#endif
+
     std::ifstream instream(inputfilename,
                            std::ifstream::binary);
     if (!instream.good()) {
