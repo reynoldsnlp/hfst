@@ -90,6 +90,7 @@ namespace implementations
   public:
     LogWeightInputStream(void);
     LogWeightInputStream(const std::string &filename);
+    LogWeightInputStream(std::istream &is);
     void close(void);
     bool is_eof(void) const;
     bool is_bad(void) const;

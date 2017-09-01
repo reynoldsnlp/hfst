@@ -247,6 +247,16 @@ For documentation on the HFST binary transducer format, see
     */
     HFSTDLL HfstInputStream(const std::string &filename);
 
+    /** \brief Open a stream to istream \a is for reading binary
+        transducers.
+
+        @throws StreamNotReadableException
+        @throws NotTransducerStreamException
+        @throws EndOfStreamException
+        @throws TransducerHeaderException
+    */
+    HFSTDLL HfstInputStream(std::istream &is);
+
     /** \brief Destructor. */
     HFSTDLL ~HfstInputStream(void);
 

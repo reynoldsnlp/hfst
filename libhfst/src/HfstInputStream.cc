@@ -1090,6 +1090,70 @@ namespace hfst
       }
   }
   
+  HfstInputStream::HfstInputStream(std::istream &is):
+    bytes_to_skip(0), filename(std::string()), has_hfst_header(false),
+    hfst_version_2_weighted_transducer(false)
+  {
+    input_stream = &is;
+    if (stream_eof()) {
+      HFST_THROW(EndOfStreamException);
+    }
+    type = stream_fst_type();
+
+    if ( ! HfstTransducer::is_lean_implementation_type_available(type)) {
+      throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
+    }
+
+    switch (type)
+      {
+#if HAVE_SFST || HAVE_LEAN_SFST
+      case SFST_TYPE:
+        HFST_THROW_MESSAGE(FunctionNotImplementedException, "Hfst::InputStream(std::istream) of SFST_TYPE");
+        // implementation.sfst = new hfst::implementations::SfstInputStream(is);
+        break;
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OPENFST_TYPE:
+        implementation.tropical_ofst = new hfst::implementations::TropicalWeightInputStream(is);
+        break;
+#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+      case LOG_OPENFST_TYPE:
+        implementation.log_ofst = new hfst::implementations::LogWeightInputStream(is);
+        break;
+#endif
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+        HFST_THROW_MESSAGE(FunctionNotImplementedException, "Hfst::InputStream(std::istream) of FOMA_TYPE");
+        // implementation.foma = new hfst::implementations::FomaInputStream(is);
+        break;
+#endif
+#if HAVE_XFSM
+      case XFSM_TYPE:
+        HFST_THROW_MESSAGE(FunctionNotImplementedException, "Hfst::InputStream(std::istream) of XFSM_TYPE");
+        // implementation.xfsm = new hfst::implementations::XfsmInputStream(is);
+        break;
+#endif
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+        HFST_THROW_MESSAGE(FunctionNotImplementedException, "Hfst::InputStream(std::istream) of MY_TRANSDUCER_LIBRARY_TYPE");
+        // implementation.my_transducer_library = new hfst::implementations::MyTransducerLibraryInputStream(is);
+        break;
+#endif
+      case HFST_OL_TYPE:
+          implementation.hfst_ol = new hfst::implementations::HfstOlInputStream(is, false);
+        break;
+      case HFST_OLW_TYPE:
+          implementation.hfst_ol = new hfst::implementations::HfstOlInputStream(is, true);
+        break;
+      default:
+        debug_error("#10b");
+
+        HFST_THROW_MESSAGE(NotTransducerStreamException,
+                           "transducer type not recognised");
+      }
+  }
+
   HfstInputStream::~HfstInputStream(void)
   {
     switch (type)

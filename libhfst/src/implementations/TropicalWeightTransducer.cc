@@ -233,6 +233,10 @@ namespace hfst {
       input_stream(i_stream)
   {}
 
+  TropicalWeightInputStream::TropicalWeightInputStream(std::istream &is):
+    input_stream(is)
+  {}
+
   char TropicalWeightInputStream::stream_get() {
     return (char) input_stream.get(); }
 
