@@ -42,6 +42,7 @@ namespace hfst { namespace implementations
   public:
     HfstOlInputStream(bool weighted);
     HfstOlInputStream(const std::string &filename, bool weighted);
+    HfstOlInputStream(std::istream &is, bool weighted);
     void open(void);
     void close(void);
     bool is_open(void) const;

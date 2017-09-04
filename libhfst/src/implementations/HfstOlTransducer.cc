@@ -22,7 +22,12 @@ namespace hfst { namespace implementations
     i_stream(filename.c_str(), std::ios::in | std::ios::binary),
     input_stream(i_stream),weighted(weighted)
   {}
-  
+
+  HfstOlInputStream::HfstOlInputStream
+  (std::istream &is, bool weighted):
+    input_stream(is),weighted(weighted)
+  {}
+
   /* Skip the identifier string "HFST_OL_TYPE" or "HFST_OLW_TYPE" */
   void HfstOlInputStream::skip_identifier_version_3_0(void)
   { input_stream.ignore((weighted?14:13)); }

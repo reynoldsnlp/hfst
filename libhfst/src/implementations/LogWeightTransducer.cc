@@ -35,6 +35,10 @@ namespace hfst { namespace implementations
     input_stream(i_stream)
   {}
 
+  LogWeightInputStream::LogWeightInputStream(std::istream &is):
+    input_stream(is)
+  {}
+
   char LogWeightInputStream::stream_get() {
     return (char) input_stream.get(); }
 
