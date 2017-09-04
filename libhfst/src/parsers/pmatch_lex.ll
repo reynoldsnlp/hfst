@@ -142,6 +142,10 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
     pmatchlval.label = strcpy((char *) malloc(strlen("max-recursion") + 1), "max-recursion");
     return VARIABLE_NAME;
 }
+"xerox-composition" {
+    pmatchlval.label = strcpy((char *) malloc(strlen("xerox-composition") + 1), "xerox-composition");
+    return VARIABLE_NAME;
+}
 
 "vector-similarity-projection-factor" {
     pmatchlval.label = strcpy((char *) malloc(strlen("vector-similarity-projection-factor") + 1), "vector-similarity-projection-factor");

@@ -1060,6 +1060,7 @@ void init_globals(void)
     variables["max-context-length"] = "254";
     variables["max-recursion"] =  "5000";
     variables["need-separators"] = "on";
+    variables["xerox-composition"] = "on";
     variables["vector-similarity-projection-factor"] = "1.0";
     call_stack.clear();
     def_insed_expressions.clear();

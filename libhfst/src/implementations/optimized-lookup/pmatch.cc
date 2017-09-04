@@ -368,6 +368,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
         }
     }
     set_properties(properties);
+    hfst::set_xerox_composition(xerox_composition);
     TransducerHeader header(inputstream);
     alphabet = PmatchAlphabet(inputstream, header.symbol_count(), this);
     orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
@@ -1471,6 +1472,7 @@ void PmatchContainer::set_properties(void)
     max_context_length = 254;
     max_recursion = 5000;
     need_separators = true;
+    xerox_composition = true;
 }
 
 void PmatchContainer::set_properties(std::map<std::string, std::string> & properties)
@@ -1528,6 +1530,12 @@ void PmatchContainer::set_properties(std::map<std::string, std::string> & proper
                 need_separators = true;
             } else if (it->second == "off") {
                 need_separators = false;
+            }
+        } else if (it->first == "xerox-composition") {
+            if (it->second == "off") {
+                xerox_composition = false;
+            } else if (it->second == "on") {
+                xerox_composition = true;
             }
         }
     }

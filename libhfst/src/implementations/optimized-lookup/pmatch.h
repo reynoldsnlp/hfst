@@ -180,6 +180,7 @@ namespace hfst_ol {
         size_t max_context_length;
         size_t max_recursion;
         bool need_separators;
+        bool xerox_composition;
 
         unsigned long line_number;
         std::map<std::string, size_t> pattern_counts;
