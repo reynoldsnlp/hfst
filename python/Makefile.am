@@ -9,9 +9,9 @@
 
 SUBDIRS = test
 EXTRA_DIST = libhfst.i docstrings.i README setup.py \
-hfst_extensions.cc hfst_file_extensions.cc hfst_lexc_extensions.cc hfst_sfst_extensions.cc \
-hfst_lookup_extensions.cc hfst_pmatch_extensions.cc hfst_prolog_extensions.cc \
-hfst_regex_extensions.cc hfst_rules_extensions.cc hfst_xfst_extensions.cc \
+hfst_extensions.cpp hfst_file_extensions.cpp hfst_lexc_extensions.cpp hfst_sfst_extensions.cpp \
+hfst_lookup_extensions.cpp hfst_pmatch_extensions.cpp hfst_prolog_extensions.cpp \
+hfst_regex_extensions.cpp hfst_rules_extensions.cpp hfst_xfst_extensions.cpp \
 hfst/__init__.py hfst/exceptions/__init__.py hfst/sfst_rules/__init__.py \
 hfst/xerox_rules/__init__.py
 
