@@ -21,6 +21,9 @@ expected-results/EsperantoNounsAndAdjectives.prolog \
 expected-results/MonishAnalysis.prolog \
 expected-results/EinsteinsPuzzle.prolog \
 expected-results/EsperantoNounsAndAdjectivesWithTags.prolog \
+expected-results/FinnishNumerals.prolog \
+expected-results/FinnishProsody.prolog \
+expected-results/Palindromes.prolog \
 expected-results/MonishGuesserAnalyzer.prolog \
 hfst-scripts/BetterColaMachine.hfst.script \
 hfst-scripts/BrazilianPortuguese1.hfst.script \
