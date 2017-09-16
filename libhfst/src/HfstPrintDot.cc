@@ -51,6 +51,30 @@ namespace hfst {
 #endif
 
 void
+trim_to_valid_utf8(char* inp)
+  {
+    size_t len = strlen(inp);
+    for (int i=1;i<4&&(len-i>0);i++)
+      {
+        if (i < 2 && ((inp[len-i] & 0xc0) == 0xc0))
+          {
+            inp[len-i] = '\0';
+            return;
+          }
+        else if (i < 3 && ((inp[len-i] & 0xe0) == 0xe0))
+          {
+            inp[len-i] = '\0';
+            return;
+          }
+        else if (i < 4 && ((inp[len-i] & 0xf0) == 0xf0))
+          {
+            inp[len-i] = '\0';
+            return;
+          }
+      }
+  }
+
+void
 print_dot(FILE* out, HfstTransducer& t)
   {
     //fprintf(out, "// This graph generated with hfst-fst2txt\n");
@@ -232,6 +256,7 @@ print_dot(FILE* out, HfstTransducer& t)
                       } // if old label empty
                   } // if weighted
               } // if id pair
+            trim_to_valid_utf8(l);
             string sl(l);
             replace_all(sl, "\"", "\\\"");
             target_labels[arc->get_target_state()] = sl;
@@ -430,6 +455,7 @@ print_dot(std::ostream & out, HfstTransducer& t)
                       } // if old label empty
                   } // if weighted
               } // if id pair
+            trim_to_valid_utf8(l);
             string sl(l);
             replace_all(sl, "\"", "\\\"");
             target_labels[arc->get_target_state()] = sl;
