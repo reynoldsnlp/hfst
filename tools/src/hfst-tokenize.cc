@@ -82,7 +82,8 @@ print_usage()
     fprintf(message_out,
             "  -n, --newline            Newline as input separator (default is blank line)\n"
             "  -a, --print-all          Print nonmatching text\n"
-            "  -w, --print-weight       Print weights\n"
+            "  -w, --print-weight       Print weights (overrides earlier -W option)\n"
+            "  -W, --no-weights         Don't print weights (default; overrides earlier -w, or -w implied by -g, options)\n"
             "  -m, --tokenize-multichar Tokenize multicharacter symbols\n"
             "                           (by default only one utf-8 character is tokenized at a time\n"
             "                           regardless of what is present in the alphabet)\n"
@@ -96,9 +97,9 @@ print_usage()
             "  -x, --xerox              Xerox output\n"
             "  -c, --cg                 Constraint Grammar output\n"
             "  -S, --superblanks        Ignore contents of unescaped [] (cf. apertium-destxt); flush on NUL\n"
-            "  -g, --giella-cg          CG format used in Giella infrastructe (implies -l2,\n"
+            "  -g, --giella-cg          CG format used in Giella infrastructure (implies -w and -l2,\n"
             "                           treats @PMATCH_INPUT_MARK@ as subreading separator,\n"
-            "                           expects tags to start or end with +, flush on NUL)\n"
+            "                           expects tags to be Multichar_symbols, flush on NUL)\n"
             "  -C  --conllu             CoNLL-U format\n"
             "  -f, --finnpos            FinnPos output\n");
     fprintf(message_out,
@@ -341,6 +342,7 @@ int parse_options(int argc, char** argv)
                 {"keep-newline", no_argument, 0, 'k'},
                 {"print-all", no_argument, 0, 'a'},
                 {"print-weights", no_argument, 0, 'w'},
+                {"no-weights", no_argument, 0, 'W'},
                 {"tokenize-multichar", no_argument, 0, 'm'},
                 {"beam", required_argument, 0, 'b'},
                 {"time-cutoff", required_argument, 0, 't'},
@@ -358,7 +360,7 @@ int parse_options(int argc, char** argv)
                 {0,0,0,0}
             };
         int option_index = 0;
-        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmub:t:l:zixcSgCf",
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawWmub:t:l:zixcSgCf",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -381,6 +383,9 @@ int parse_options(int argc, char** argv)
             break;
         case 'w':
             settings.print_weights = true;
+            break;
+        case 'W':
+            settings.print_weights = false;
             break;
         case 'm':
             tokenize_multichar = true;
