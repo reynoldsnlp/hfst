@@ -47,7 +47,7 @@ CLASSES:
 
 """
 
-__version__ = "3.12.2.0"
+__version__ = "3.13.0.0"
 
 import hfst.exceptions
 import hfst.sfst_rules

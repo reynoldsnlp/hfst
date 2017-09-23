@@ -5,6 +5,70 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.13.0
+----------------------------
+
+* Numerous improvements to pmatching and tokenization:
+
+  * [].with(X = Y) feature in pmatch This provides support in the pmatch2fst compiler to define "global flags".
+
+  * Add a variable "xerox-composition", default to "on".
+
+  * Consider list symbols (@L..." and "@X...") to be special.
+
+  * Fix runtime handling of contexts and compilation of negative contexts.
+
+  * Make Like() and Unlike() much faster by not sorting the whole vocabulary and only calculating each comparison key once.
+
+  * Keep track of weights along context checking paths and unify weight handling.
+
+  * In blankline-separated mode, keep blanklines in output too.
+
+  * Round weight to zero decimals, non-sci.
+
+  * Make hfst-tokenise usable as a lib; include simple string-to-string function.
+
+  * Use libreadline in hfst-pmatch when available.
+
+  * Cleanup remainder of the pmatch test suite, all the tests now pass.
+
+* Python interface:
+
+  * Support reading several twolc files.
+
+  * Add functions 'compose' and 'cross_product' that take a list of transducers.
+
+  * Allow empty string as input for hfst.fst and hfst.fsa and interpret it as epsilon.
+
+  * Perform fsmbook tests also via python API.
+
+  * Add option --local-hfst to setup.py.
+
+  * Include pre-swig-generated wrappers to pypi source distribution.
+
+* Compilation:
+
+  * Use by default c++11 unordered_map and unordered_set, unless otherwise specified.
+
+  * Add an option --without-c++11 (defaults to 'no') to compile hfst without c++11 support.
+
+  * Require libc++ and osx version >= 10.7 with clang.
+
+* New functions and options:
+
+  * Add function HfstBasicTransducer::remove_final_weight.
+
+  * Add function HfstTransducer::negate() for automata.
+
+  * Add option --restricted-mode (-R) to hfst-xfst.
+
+  * Flag diacritics: support getting a list of operations involved with a particular feature.
+
+  * Allow creating HfstInputStream's from std::istream's.
+
+* Fix issues #341 and #353, make workarounds for issue #358.
+
+
 Noteworthy changes in 3.12.2
 ----------------------------
 
@@ -765,3 +829,4 @@ Noteworthy changes in release 2.1
 ---------------------------------
 
 * hfst-twolc and hfst-compose-intersect understand # like xerox originals
+
