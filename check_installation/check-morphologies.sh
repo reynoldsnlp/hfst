@@ -33,7 +33,7 @@ fi
 
 
 extension=.sh
-languages="english finnish french german italian omorfi swedish turkish"
+languages="english french german italian omorfi finnish swedish turkish"
 directions="analyze generate"
 format=xerox
 morph_folder=morphology_tests
@@ -85,10 +85,13 @@ do
 	# test that the program handles a non-word
         rm -f input
         echo "foo" > input
-        if (! $prog_full_path $format input 2>1 > /dev/null); then
-	    printf "%-32s%s\n" $prog "FAIL: program cannot handle input 'foo' (given as first argument)"
-            exit_prog
-        fi
+	# finnish tool accepts input only from standard input
+	if ! [ "$lang" = "finnish" ]; then
+            if (! $prog_full_path $format input 2>1 > /dev/null); then
+		printf "%-32s%s\n" $prog "FAIL: program cannot handle input 'foo' (given as first argument)"
+		exit_prog
+            fi
+	fi
 
 	if (! cat input | $prog_full_path $format 2>1 > /dev/null); then
 	    printf "%-32s%s\n" $prog "FAIL: program cannot handle input 'foo' (given via standard input)"
@@ -96,13 +99,16 @@ do
 	fi
 
 	# test that the program handles a real word
-	if (! $prog_full_path $format $morph_folder/$lang-$dir.input > tmp); then
-	    printf "%-32s%s\n" $prog "FAIL: program cannot handle valid input (given as first argument)"
-            exit_prog
-	fi
-	if (! diff tmp $morph_folder/$lang-$dir.output); then
-	    printf "%-32s%s\n" $prog "FAIL: wrong result for input (given as first argument)"
-            exit_prog
+	# finnish tool accepts input only from standard input
+	if ! [ "$lang" = "finnish" ]; then
+	    if (! $prog_full_path $format $morph_folder/$lang-$dir.input > tmp); then
+		printf "%-32s%s\n" $prog "FAIL: program cannot handle valid input (given as first argument)"
+		exit_prog
+	    fi
+	    if (! diff tmp $morph_folder/$lang-$dir.output); then
+		printf "%-32s%s\n" $prog "FAIL: wrong result for input (given as first argument)"
+		exit_prog
+	    fi
 	fi
 
 	if (! cat $morph_folder/$lang-$dir.input | $prog_full_path $format > tmp); then
