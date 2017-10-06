@@ -65,7 +65,6 @@ using namespace hfst_ol_tokenize;
 static bool superblanks = false; // Input is apertium-style superblanks (overrides blankline_separated)
 static bool blankline_separated = true; // Input is separated by blank lines (as opposed to single newlines)
 static bool keep_newlines = false;
-static bool tokenize_multichar = false;
 static int token_number = 1;
 std::string tokenizer_filename;
 static hfst::ImplementationType default_format = hfst::TROPICAL_OPENFST_TYPE;
@@ -97,7 +96,7 @@ print_usage()
             "  -x, --xerox              Xerox output\n"
             "  -c, --cg                 Constraint Grammar output\n"
             "  -S, --superblanks        Ignore contents of unescaped [] (cf. apertium-destxt); flush on NUL\n"
-            "  -g, --giella-cg          CG format used in Giella infrastructure (implies -w and -l2,\n"
+            "  -g, --giella-cg          CG format used in Giella infrastructure (implies -w, -m and -l2,\n"
             "                           treats @PMATCH_INPUT_MARK@ as subreading separator,\n"
             "                           expects tags to be Multichar_symbols, flush on NUL)\n"
             "  -C  --conllu             CoNLL-U format\n"
@@ -388,7 +387,7 @@ int parse_options(int argc, char** argv)
             settings.print_weights = false;
             break;
         case 'm':
-            tokenize_multichar = true;
+            settings.tokenize_multichar = true;
             break;
         case 't':
             settings.time_cutoff = atof(optarg);
@@ -437,6 +436,7 @@ int parse_options(int argc, char** argv)
             break;
         case 'g':
             settings.output_format = giellacg;
+            settings.tokenize_multichar = true;
             settings.print_weights = true;
             settings.print_all = true;
             settings.dedupe = true;
@@ -532,12 +532,12 @@ int main(int argc, char ** argv)
             hfst_ol::PmatchContainer container = make_naive_tokenizer(dictionary);
             delete dictionary;
             container.set_verbose(verbose);
-            container.set_single_codepoint_tokenization(!tokenize_multichar);
+            container.set_single_codepoint_tokenization(!settings.tokenize_multichar);
             return process_input(container, std::cout);
         } else {
             hfst_ol::PmatchContainer container(instream);
             container.set_verbose(verbose);
-            container.set_single_codepoint_tokenization(!tokenize_multichar);
+            container.set_single_codepoint_tokenization(!settings.tokenize_multichar);
             return process_input(container, std::cout);
         }
     } catch(HfstException & e) {
