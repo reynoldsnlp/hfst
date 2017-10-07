@@ -96,7 +96,7 @@ print_usage()
             "  -x, --xerox              Xerox output\n"
             "  -c, --cg                 Constraint Grammar output\n"
             "  -S, --superblanks        Ignore contents of unescaped [] (cf. apertium-destxt); flush on NUL\n"
-            "  -g, --giella-cg          CG format used in Giella infrastructure (implies -w, -m and -l2,\n"
+            "  -g, --giella-cg          CG format used in Giella infrastructure (implies -w and -l2,\n"
             "                           treats @PMATCH_INPUT_MARK@ as subreading separator,\n"
             "                           expects tags to be Multichar_symbols, flush on NUL)\n"
             "  -C  --conllu             CoNLL-U format\n"
@@ -436,7 +436,6 @@ int parse_options(int argc, char** argv)
             break;
         case 'g':
             settings.output_format = giellacg;
-            settings.tokenize_multichar = true;
             settings.print_weights = true;
             settings.print_all = true;
             settings.dedupe = true;
