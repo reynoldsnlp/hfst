@@ -239,7 +239,7 @@ for type in types:
     tr.remove_optimization()
     assert(tr.compare(tr_))
 
-#  def lookup_fd(self, lookup_path, **kvargs):
+#  def lookup_fd(self, lookup_path, **kwargs):
 #      max_weight = None
 #      infinite_cutoff = -1 # Is this right?
 #      output='dict' # 'dict' (default), 'text', 'raw'

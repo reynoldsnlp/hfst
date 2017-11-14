@@ -527,7 +527,7 @@ public:
       attstr = fsm.get_att_string(write_weights)
       f.write(attstr)
 
-  def lookup(self, input, **kvargs):
+  def lookup(self, input, **kwargs):
       """
       Lookup string *input*.
 
@@ -535,7 +535,7 @@ public:
       ----------
       * `input` :
           The input. A string or a pre-tokenized tuple of symbols (i.e. a tuple of strings).
-      * `kvargs` :
+      * `kwargs` :
           Possible parameters and their default values are: obey_flags=True,
           max_number=-1, time_cutoff=0.0, output='tuple'
       * `obey_flags` :
@@ -560,7 +560,7 @@ public:
       time_cutoff=0.0
       output='tuple' # 'tuple' (default), 'text', 'raw'
 
-      for k,v in kvargs.items():
+      for k,v in kwargs.items():
           if k == 'obey_flags':
              if v == 'True':
                 pass
@@ -614,13 +614,13 @@ public:
       else:
          return retval
 
-  def extract_longest_paths(self, **kvargs):
+  def extract_longest_paths(self, **kwargs):
       """
       Extract longest paths of the transducer.
 
       Parameters
       ----------
-      * `kvargs` :
+      * `kwargs` :
           Possible parameters and their default values are: obey_flags=True,
           output='dict'
       * `obey_flags` :
@@ -632,7 +632,7 @@ public:
       obey_flags=True
       output='dict' # 'dict' (default), 'text', 'raw'
 
-      for k,v in kvargs.items():
+      for k,v in kwargs.items():
           if k == 'obey_flags':
              if v == 'True':
                 pass
@@ -663,13 +663,13 @@ public:
       else:
          return retval
 
-  def extract_shortest_paths(self, **kvargs):
+  def extract_shortest_paths(self, **kwargs):
       """
       Extract shortest paths of the transducer.
 
       Parameters
       ----------
-      * `kvargs` :
+      * `kwargs` :
           Possible parameters and their default values are: obey_flags=True.
       * `output` :
           Possible values are 'dict', 'text' and 'raw', 'dict' being the default.
@@ -677,7 +677,7 @@ public:
       """
       output='dict' # 'dict' (default), 'text', 'raw'
 
-      for k,v in kvargs.items():
+      for k,v in kwargs.items():
           if k == 'output':
              if v == 'text':
                 output == 'text'
@@ -700,14 +700,14 @@ public:
       else:
          return retval
 
-  def extract_paths(self, **kvargs):
+  def extract_paths(self, **kwargs):
       """
 
       Extract paths that are recognized by the transducer.
 
       Parameters
       ----------
-      * `kvargs` :
+      * `kwargs` :
           Arguments recognized are filter_flags, max_cycles, max_number, obey_flags,
           output, random.
       * `filter_flags` :
@@ -781,7 +781,7 @@ public:
       random=False
       output='dict' # 'dict' (default), 'text', 'raw'
 
-      for k,v in kvargs.items():
+      for k,v in kwargs.items():
           if k == 'obey_flags' :
              if v == 'True':
                 pass
@@ -843,7 +843,7 @@ public:
       else:
          return retval
 
-  def substitute(self, s, S=None, **kvargs):
+  def substitute(self, s, S=None, **kwargs):
       """
       Substitute symbols or transitions in the transducer.
 
@@ -855,7 +855,7 @@ public:
       * `S` :
           The symbol, transition, a tuple of transitions or a transducer
           (hfst.HfstTransducer) that substitutes *s*.
-      * `kvargs` :
+      * `kwargs` :
           Arguments recognized are 'input' and 'output', their values can be False or
           True, True being the default. These arguments are valid only if *s* and *S*
           are strings, else they are ignored.
@@ -905,7 +905,7 @@ public:
          if _is_string(S):
             input=True
             output=True
-            for k,v in kvargs.items():
+            for k,v in kwargs.items():
                 if k == 'input':
                    if v == False:
                       input=False
@@ -953,14 +953,14 @@ HfstOutputStream() { return new hfst::HfstOutputStream(hfst::get_default_fst_typ
 
 %pythoncode %{
 
-def __init__(self, **kvargs):
+def __init__(self, **kwargs):
     """
     Open a stream for writing binary transducers. Note: hfst.HfstTransducer.write_to_file
     is probably the easiest way to write a single binary transducer to a file.
 
     Parameters
     ----------
-    * `kvargs` :
+    * `kwargs` :
         Arguments recognized are filename, hfst_format, type.
     * `filename` :
         The name of the file where transducers are written. If the file exists, it
@@ -995,7 +995,7 @@ def __init__(self, **kvargs):
     filename = ""
     hfst_format = True
     type = _libhfst.get_default_fst_type()
-    for k,v in kvargs.items():
+    for k,v in kwargs.items():
         if k == 'filename':
            filename = v
         if k == 'hfst_format':
@@ -1255,7 +1255,7 @@ class HfstBasicTransducer {
       attstr = self.get_att_string(write_weights)
       f.write(attstr)
 
-  def lookup(self, lookup_path, **kvargs):
+  def lookup(self, lookup_path, **kwargs):
       """
       Lookup tokenized input *input* in the transducer.
 
@@ -1263,7 +1263,7 @@ class HfstBasicTransducer {
       ----------
       * `str` :
           A list/tuple of strings to look up.
-      * `kvargs` :
+      * `kwargs` :
           infinite_cutoff=-1, max_weight=None, obey_flags=False
       * `max_epsilon_loops` :
           How many times epsilon input loops are followed. Defaults to -1, i.e. infinitely.
@@ -1277,7 +1277,7 @@ class HfstBasicTransducer {
       obey_flags = False
       output='dict' # 'dict' (default), 'text', 'raw'
 
-      for k,v in kvargs.items():
+      for k,v in kwargs.items():
           if k == 'max_weight' :
              max_weight=v
           elif k == 'max_epsilon_loops' :
@@ -1306,7 +1306,7 @@ class HfstBasicTransducer {
       else:
          return retval
 
-  def substitute(self, s, S=None, **kvargs):
+  def substitute(self, s, S=None, **kwargs):
       """
 
       Substitute symbols or transitions in the transducer.
@@ -1319,7 +1319,7 @@ class HfstBasicTransducer {
       * `S` :
           The symbol, transition, a tuple of transitions or a transducer
           (hfst.HfstBasicTransducer) that substitutes *s*.
-      * `kvargs` :
+      * `kwargs` :
           Arguments recognized are 'input' and 'output', their values can be False or
           True, True being the default. These arguments are valid only if *s* and *S*
           are strings, else they are ignored.
@@ -1394,7 +1394,7 @@ class HfstBasicTransducer {
          if _is_string(S):
             input=True
             output=True
-            for k,v in kvargs.items():
+            for k,v in kwargs.items():
                 if k == 'input':
                    if v == False:
                       input=False
