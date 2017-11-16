@@ -27,6 +27,7 @@ namespace hfst_ol {
     struct RtnStackFrame;
 
     typedef std::vector<RtnStackFrame> RtnCallStack;
+    typedef std::vector<RtnCallStack> RtnCallStacks;
     typedef std::vector<PmatchTransducer *> RtnVector;
     typedef std::map<std::string, SymbolNumber> RtnNameMap;
     typedef std::vector<Location> LocationVector;
@@ -158,7 +159,7 @@ namespace hfst_ol {
         SymbolNumberVector input;
         // This tracks the ENTRY and EXIT tags
         PositionStack entry_stack;
-        RtnCallStack rtn_stack;
+        RtnCallStacks rtn_stacks;
         DoubleTape tape;
         DoubleTape best_result;
         DoubleTape result;
@@ -197,6 +198,7 @@ namespace hfst_ol {
         bool limit_reached;
         // The global running weight
         Weight running_weight;
+        Weight weight_limit;
         // This is the depth of the stack from the point of view of the
         // container. When it's 0, we're in the toplevel, even if the
         // stack of variables is bigger due to having passed through a RTN.
@@ -224,9 +226,11 @@ namespace hfst_ol {
         void add_rtn(Transducer * rtn, const std::string & name);
         void process(const std::string & input);
         std::string match(const std::string & input,
-                          double time_cutoff = 0.0);
+                          double time_cutoff = 0.0,
+                          Weight weight_cutoff = 0.0);
         LocationVectorVector locate(const std::string & input,
-                                    double time_cutoff = 0.0);
+                                    double time_cutoff = 0.0,
+                                    Weight weight_cutoff = 0.0);
         void note_analysis(unsigned int input_pos, unsigned int tape_pos);
         void grab_location(unsigned int input_pos, unsigned int tape_pos);
         std::pair<SymbolNumberVector::iterator,
@@ -280,6 +284,7 @@ namespace hfst_ol {
             }
         void push_rtn_call(unsigned int return_index, PmatchTransducer * caller);
         RtnStackFrame rtn_stack_top(void);
+        PmatchTransducer * get_latest_rtn_caller(void);
         void rtn_stack_pop(void);
         unsigned int get_stack_depth(void) { return stack_depth; }
         bool candidate_found(void)

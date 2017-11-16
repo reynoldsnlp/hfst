@@ -12,7 +12,6 @@
 using hfst::HfstTransducer;
 
 namespace hfst_ol {
-
 PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
                                SymbolNumber symbol_count,
                                PmatchContainer * cont):
@@ -811,17 +810,26 @@ void PmatchContainer::push_rtn_call(unsigned int return_index, PmatchTransducer 
     RtnStackFrame new_top;
     new_top.caller = caller;
     new_top.caller_index = return_index;
-    rtn_stack.push_back(new_top);
+    if (rtn_stacks.size() <= stack_depth) {
+        rtn_stacks.push_back(RtnCallStack(1, new_top));
+    } else {
+        rtn_stacks[stack_depth].push_back(new_top);
+    }
 }
 
 RtnStackFrame PmatchContainer::rtn_stack_top(void)
 {
-    return rtn_stack.back();
+    return rtn_stacks[stack_depth].back();
+}
+
+PmatchTransducer * PmatchContainer::get_latest_rtn_caller(void)
+{
+    return rtn_stacks[stack_depth - 1].back().caller;
 }
 
 void PmatchContainer::rtn_stack_pop(void)
 {
-    rtn_stack.pop_back();
+    rtn_stacks[stack_depth].pop_back();
 }
 
 void PmatchAlphabet::add_rtn(PmatchTransducer * rtn, std::string const & name)
@@ -966,7 +974,8 @@ void PmatchContainer::process(const std::string & input_str)
 }
 
 std::string PmatchContainer::match(const std::string & input,
-                                   double time_cutoff)
+                                   double time_cutoff,
+                                   Weight weight_cutoff)
 {
     max_time = time_cutoff;
     if (max_time > 0.0) {
@@ -980,7 +989,8 @@ std::string PmatchContainer::match(const std::string & input,
 }
 
 LocationVectorVector PmatchContainer::locate(const std::string & input,
-                                             double time_cutoff)
+                                             double time_cutoff,
+                                             Weight weight_cutoff)
 {
     max_time = time_cutoff;
     if (max_time > 0.0) {
@@ -1618,6 +1628,7 @@ void PmatchTransducer::rtn_call(unsigned int input_tape_pos,
                                 PmatchTransducer * caller,
                                 TransitionTableIndex caller_index)
 {
+    container->push_rtn_call(caller_index, caller);
     container->increase_stack_depth();
     LocalVariables new_top(local_stack.top());
     new_top.flag_state = alphabet.get_fd_table();
@@ -1626,25 +1637,24 @@ void PmatchTransducer::rtn_call(unsigned int input_tape_pos,
     new_top.context_placeholder = 0;
     new_top.default_symbol_trap = false;
     local_stack.push(new_top);
-    container->push_rtn_call(caller_index, caller);
     get_analyses(input_tape_pos, tape_pos, 0);
     local_stack.pop();
-    container->rtn_stack_pop();
     container->decrease_stack_depth();
+    container->rtn_stack_pop();
 }
 
 void PmatchTransducer::rtn_return(unsigned int input_tape_pos,
                                   unsigned int tape_pos)
 {
     LocalVariables new_top(local_stack.top());
-    TransitionTableIndex entry_index = container->rtn_stack.at(container->get_stack_depth() - 1).caller_index;
+    container->decrease_stack_depth();
+    TransitionTableIndex entry_index = container->rtn_stack_top().caller_index;
     new_top.flag_state = alphabet.get_fd_table();
     new_top.tape_step = 1;
     new_top.context = none;
     new_top.context_placeholder = 0;
     new_top.default_symbol_trap = false;
     local_stack.push(new_top);
-    container->decrease_stack_depth();
     get_analyses(input_tape_pos, tape_pos, entry_index);
     local_stack.pop();
     container->increase_stack_depth();
@@ -1655,8 +1665,7 @@ void PmatchTransducer::handle_final_state(unsigned int input_pos,
 {
     if (container->get_stack_depth() > 0) {
         // We're not the toplevel, return to caller
-        PmatchTransducer * rtn_target =  container->
-            rtn_stack.at(container->get_stack_depth() - 1).caller;
+        PmatchTransducer * rtn_target = container->get_latest_rtn_caller();
         rtn_target->rtn_return(input_pos, tape_pos);
     } else if (container->is_in_locate_mode()) {
         container->grab_location(input_pos, tape_pos);
