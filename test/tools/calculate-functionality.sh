@@ -1,8 +1,14 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
+TOOL=
 
-if ! test -x $TOOLDIR/hfst-calculate; then
-    exit 0;
+if [ "$1" = '--python' ]; then
+    TOOL="python3 ./hfst-calculate.py"
+else
+    TOOL=$TOOLDIR/hfst-calculate
+    if ! test -x $TOOL; then
+	exit 0;
+    fi
 fi
 
 for i in "" .sfst .ofst .foma; do
@@ -27,7 +33,7 @@ for i in "" .sfst .ofst .foma; do
             FFLAG=;;
     esac
     if test -f 4toINFcats$i ; then
-        if ! echo "catcatcat(cat)+" | $TOOLDIR/hfst-calculate $FFLAG > test ; then
+        if ! echo "catcatcat(cat)+" | $TOOL $FFLAG > test ; then
             exit 1
         fi
         if ! $TOOLDIR/hfst-compare -s 4toINFcats$i test  ; then
@@ -36,7 +42,7 @@ for i in "" .sfst .ofst .foma; do
         rm test
     fi
     if test -f cat2dog$i ; then
-        if ! echo "{cat}:{dog}" | $TOOLDIR/hfst-calculate $FFLAG > test ; then
+        if ! echo "{cat}:{dog}" | $TOOL $FFLAG > test ; then
             exit 1
         fi
         if ! $TOOLDIR/hfst-compare -s cat2dog$i test  ; then
