@@ -3,6 +3,7 @@ TOOLDIR=../../tools/src
 TOOL=
 
 if [ "$1" = '--python' ]; then
+    exit 1 # not yet implemented
     TOOL="python3 ./hfst-compose-intersect.py"
 else
     TOOL=$TOOLDIR/hfst-compose-intersect

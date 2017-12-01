@@ -3,7 +3,7 @@ TOOLDIR=../../tools/src
 TOOL=
 
 if [ "$1" = '--python' ]; then
-    TOOL="python3 ./hfst-calculate.py"
+    TOOL="python3 ./hfst-conjunct.py"
 else
     TOOL=$TOOLDIR/hfst-conjunct
     if ! test -x $TOOL; then
