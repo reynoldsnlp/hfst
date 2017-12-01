@@ -1,5 +1,16 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
+TOOL=
+
+if [ "$1" = '--python' ]; then
+    TOOL="python3 ./hfst-shuffle.py"
+else
+    TOOL=$TOOLDIR/hfst-shuffle
+    if ! test -x $TOOL; then
+	exit 0;
+    fi
+fi
+
 if ! [ -x $TOOLDIR/hfst-shuffle ]; then
     exit 0;
 fi
@@ -9,7 +20,7 @@ for i in .sfst .ofst .foma; do
 	continue;
     fi
 
-    if ! $TOOLDIR/hfst-shuffle ab$i bc$i > TMP; then
+    if ! $TOOL ab$i bc$i > TMP; then
 	rm TMP;
 	exit 1;
     else
@@ -18,7 +29,7 @@ for i in .sfst .ofst .foma; do
 	    exit 1;
 	fi
     fi
-    if ! $TOOLDIR/hfst-shuffle id$i id$i > TMP; then
+    if ! $TOOL id$i id$i > TMP; then
 	rm TMP;
 	exit 1;
     else
@@ -27,7 +38,7 @@ for i in .sfst .ofst .foma; do
 	    exit 1;
 	fi
     fi
-    if ! $TOOLDIR/hfst-shuffle aid$i idb$i > TMP; then
+    if ! $TOOL aid$i idb$i > TMP; then
 	rm TMP;
 	exit 1;
     else
@@ -36,7 +47,7 @@ for i in .sfst .ofst .foma; do
 	    exit 1;
 	fi
     fi
-    if $TOOLDIR/hfst-shuffle a2b$i ab$i > /dev/null 2>&1; then
+    if $TOOL a2b$i ab$i > /dev/null 2>&1; then
 	rm TMP;
 	exit 1;
     fi
