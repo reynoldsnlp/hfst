@@ -1,6 +1,17 @@
 #!/bin/sh
-
 TOOLDIR=../../tools/src
+TOOL=
+
+if [ "$1" = '--python' ]; then
+    TOOL="python3 ./hfst-lexc.py"
+else
+    TOOL=$TOOLDIR/hfst-lexc
+    if ! test -x $TOOL ; then
+	echo "missing hfst-lexc, assuming configured off, skipping"
+	exit 73
+    fi
+fi
+
 LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc 
           basic.empty-sides.lexc basic.escapes.lexc 
           basic.infostrings.lexc basic.initial-lexicon-empty.lexc 
@@ -40,12 +51,6 @@ if test "$srcdir" = ""; then
     srcdir="./"
 fi
 
-
-if ! test -x $TOOLDIR/hfst-lexc ; then
-    echo "missing hfst-lexc, assuming configured off, skipping"
-    exit 73
-fi
-
 for i in .sfst .ofst .foma ; do
     FFLAG=
     FNAME=
@@ -71,7 +76,7 @@ for i in .sfst .ofst .foma ; do
     fi
 
     if test -f cat$i ; then
-        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/cat.lexc -o test 2> /dev/null; then
+        if ! $TOOL $FFLAG $srcdir/cat.lexc -o test 2> /dev/null; then
             echo lexc $FFLAG cat.lexc failed with $?
             exit 1
         fi
@@ -84,7 +89,7 @@ for i in .sfst .ofst .foma ; do
     for f in $LEXCTESTS $LEXCWARN ; do
         
         #check non-flag result
-        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/$f -o test 2> /dev/null; then
+        if ! $TOOL $FFLAG $srcdir/$f -o test 2> /dev/null; then
             echo lexc $FFLAG $f failed with $?
             exit 1
         fi
@@ -116,7 +121,7 @@ for i in .sfst .ofst .foma ; do
         RESULT="$f.flag.result.prolog"
  
 
-        if ! $TOOLDIR/hfst-lexc -F $FFLAG $srcdir/$f -o test 2> /dev/null; then
+        if ! $TOOL -F $FFLAG $srcdir/$f -o test 2> /dev/null; then
             echo lexc2fst -F $FFLAG $f failed with $?
             exit 1
         fi
@@ -136,13 +141,13 @@ for i in .sfst .ofst .foma ; do
     done
 
     for f in $LEXCWARN ; do
-        if $TOOLDIR/hfst-lexc --Werror $FFLAG $srcdir/$f -o test 2> /dev/null; then
+        if $TOOL --Werror $FFLAG $srcdir/$f -o test 2> /dev/null; then
             echo lexc $FFLAG $f passed although --Werror was used
             exit 1
         fi        
     done
 
-    if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/basic.multi-file-1.lexc \
+    if ! $TOOL $FFLAG $srcdir/basic.multi-file-1.lexc \
         $srcdir/basic.multi-file-2.lexc \
         $srcdir/basic.multi-file-3.lexc -o test 2> /dev/null; then
         echo lexc2fst $FFLAG basic.multi-file-{1,2,3}.lexc failed with $?

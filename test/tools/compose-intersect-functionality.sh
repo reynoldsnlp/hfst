@@ -1,6 +1,15 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
-TOOLDIR=../../tools/src
+TOOL=
+
+if [ "$1" = '--python' ]; then
+    TOOL="python3 ./hfst-compose-intersect.py"
+else
+    TOOL=$TOOLDIR/hfst-compose-intersect
+    if ! test -x $TOOL; then
+	exit 0;
+    fi
+fi
 
 for i in "" .sfst .ofst .foma; do
     FFLAG=
@@ -24,7 +33,7 @@ for i in "" .sfst .ofst .foma; do
         if ! echo "([catdog]|d:D|c:C)*" | $TOOLDIR/hfst-calculate $FFLAG >> rules ; then
             exit 1
         fi
-        if ! $TOOLDIR/hfst-compose-intersect -1 lexicon -2 rules > test ; then
+        if ! $TOOL -1 lexicon -2 rules > test ; then
             exit 1
         fi
         if ! echo "cat|dog|{cat}:{Cat}|{dog}:{Dog}" | $TOOLDIR/hfst-calculate $FFLAG > test2 ; then

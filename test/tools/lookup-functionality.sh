@@ -1,6 +1,17 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
-if ! $TOOLDIR/hfst-lookup -s cat.hfst < $srcdir/cat.strings > test.lookups ; then
+TOOL=
+
+if [ "$1" = '--python' ]; then
+    TOOL="python3 ./hfst-lookup.py"
+else
+    TOOL=$TOOLDIR/hfst-lookup
+    if ! test -x $TOOL; then
+	exit 0;
+    fi
+fi
+
+if ! $TOOL -s cat.hfst < $srcdir/cat.strings > test.lookups ; then
     exit 1
 fi
 
@@ -11,7 +22,7 @@ for i in "" .sfst .ofst .foma; do
 if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
     if test -f abid$i ; then
 
-	if ! echo "aa" | $TOOLDIR/hfst-lookup -s abid$i \
+	if ! echo "aa" | $TOOL -s abid$i \
 	    > test.lookups; 
 	then
 	    exit 1
@@ -21,7 +32,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 	    exit 1
 	fi
 	
-	if ! echo "ab" | $TOOLDIR/hfst-lookup -s abid$i \
+	if ! echo "ab" | $TOOL -s abid$i \
 	    > test.lookups; 
 	then
 	    exit 1
@@ -31,7 +42,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 	    exit 1
 	fi
 	
-	if ! echo "ac" | $TOOLDIR/hfst-lookup -s abid$i \
+	if ! echo "ac" | $TOOL -s abid$i \
 	    > test.lookups; 
 	then
 	    exit 1
@@ -45,7 +56,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 
     if test -f infinitely_ambiguous$i ; then
 	
-	if ! echo "ad" | $TOOLDIR/hfst-lookup infinitely_ambiguous$i \
+	if ! echo "ad" | $TOOL infinitely_ambiguous$i \
 	    2> warnings > test.lookups;
 	then
 	    exit 1
@@ -56,7 +67,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 	    exit 1;
 	fi
 
-	if ! echo "b" | $TOOLDIR/hfst-lookup infinitely_ambiguous$i \
+	if ! echo "b" | $TOOL infinitely_ambiguous$i \
 	    2> warnings > test.lookups;
 	then
 	    exit 1
@@ -71,7 +82,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 
     if test -f infinitely_ambiguous_with_flags$i ; then
 
-	if ! echo "a" | $TOOLDIR/hfst-lookup infinitely_ambiguous_with_flags$i \
+	if ! echo "a" | $TOOL infinitely_ambiguous_with_flags$i \
 	    2> warnings > test.lookups;
 	then
 	    exit 1
@@ -82,7 +93,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 	    exit 1;
 	fi
 
-	if ! echo "b" | $TOOLDIR/hfst-lookup infinitely_ambiguous_with_flags$i \
+	if ! echo "b" | $TOOL infinitely_ambiguous_with_flags$i \
 	    2> warnings > test.lookups;
 	then
 	    exit 1
