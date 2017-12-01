@@ -1,5 +1,16 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
+TOOL=
+
+if [ "$1" = '--python' ]; then
+    TOOL="python3 ./hfst-prune-alphabet.py"
+else
+    TOOL=$TOOLDIR/hfst-prune-alphabet
+    if ! test -x $TOOL; then
+	exit 0;
+    fi
+fi
+
 for i in  .hfst .sfst .ofst .foma; do
 
 if (([ ".hfst" = "$i" ]) || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
@@ -8,7 +19,7 @@ if (([ ".hfst" = "$i" ]) || $TOOLDIR/hfst-format --list-formats | grep $i > /dev
 
 	# Prunable alphabet
 	for arg in --safe -S --force -f ""; do 
-            if ! $TOOLDIR/hfst-minimize prunable_alphabet$i | $TOOLDIR/hfst-prune-alphabet $arg > test ; then
+            if ! $TOOLDIR/hfst-minimize prunable_alphabet$i | $TOOL $arg > test ; then
 		exit 1
 	    fi
 	    if ! $TOOLDIR/hfst-summarize --verbose test 2> /dev/null | grep --after-context 1 "sigma symbols missing from transducer" | tail -1 > tmp; then
@@ -23,7 +34,7 @@ if (([ ".hfst" = "$i" ]) || $TOOLDIR/hfst-format --list-formats | grep $i > /dev
 	for number in 1 2; do
 	    # safe pruning
 	    for arg in --safe -S ""; do
-		if ! $TOOLDIR/hfst-minimize non_prunable_alphabet_$number$i | $TOOLDIR/hfst-prune-alphabet $arg > test ; then
+		if ! $TOOLDIR/hfst-minimize non_prunable_alphabet_$number$i | $TOOL $arg > test ; then
 		    exit 1
 		fi
 		if ! $TOOLDIR/hfst-summarize --verbose test 2> /dev/null | grep --after-context 1 "sigma symbols missing from transducer" | tail -1 > tmp; then
@@ -35,7 +46,7 @@ if (([ ".hfst" = "$i" ]) || $TOOLDIR/hfst-format --list-formats | grep $i > /dev
 	    done
 	    # forced pruning
 	    for arg in --force -f; do
-		if ! $TOOLDIR/hfst-minimize non_prunable_alphabet_$number$i | $TOOLDIR/hfst-prune-alphabet $arg > test ; then
+		if ! $TOOLDIR/hfst-minimize non_prunable_alphabet_$number$i | $TOOL $arg > test ; then
 		    exit 1
 		fi
 		if ! $TOOLDIR/hfst-summarize --verbose test 2> /dev/null | grep --after-context 1 "sigma symbols missing from transducer" | tail -1 > tmp; then
