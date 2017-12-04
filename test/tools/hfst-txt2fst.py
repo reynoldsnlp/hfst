@@ -34,12 +34,14 @@ if inputfilename != None:
     istr = open(inputfilename, 'r')
 else:
     istr = stdin
-ostr = hfst.HfstOutputStream()
+ostr = hfst.HfstOutputStream(type=impl)
 
 att = hfst.AttReader(istr, epsilonstr)
 
 for tr in att:
-    ostr.write(tr)
+    TR = hfst.HfstTransducer(tr) # TODO: why doesn't (tr, impl) work?
+    TR.convert(impl)
+    ostr.write(TR)
     ostr.flush()
 
 if inputfilename != None:

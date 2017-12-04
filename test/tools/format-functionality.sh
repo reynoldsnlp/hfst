@@ -20,39 +20,57 @@ echo '0 1 a b
 1' > TMP;
 
 if $FORMAT_TOOL --test-format sfst; then
-    if echo TMP | $TXT_TOOL -f sfst > test ; then
+    if cat TMP | $TXT_TOOL -f sfst > test ; then
 	if ! $FORMAT_TOOL test > TMP1 ; then
 	    exit 1
 	fi
 	echo "Transducers in test are of type SFST (1.4 compatible)" > TMP2
-	if ! diff TMP1 TMP2 ; then
-	    exit 1
+	if ! diff TMP1 TMP2 2> /dev/null > /dev/null; then
+	    if [ "$1" = '--python' ]; then
+		if ! (grep 'SFST_TYPE' TMP1 2> /dev/null > /dev/null); then
+		    exit 1
+		fi
+	    else
+		exit 1
+	    fi
 	fi
     fi
 fi
 
 if $FORMAT_TOOL --test-format openfst-tropical; then
-    if echo TMP | $TXT_TOOL -f openfst-tropical \
+    if cat TMP | $TXT_TOOL -f openfst-tropical \
 	> test ; then
 	if ! $FORMAT_TOOL test > TMP1 ; then
 	    exit 1
 	fi
 	echo "Transducers in test are of type OpenFST, std arc,"\
              "tropical semiring" > TMP2
-	if ! diff TMP1 TMP2 ; then
-	    exit 1
+	if ! diff TMP1 TMP2 2> /dev/null > /dev/null; then
+	    if [ "$1" = '--python' ]; then
+		if ! (grep 'TROPICAL_OPENFST_TYPE' TMP1 2> /dev/null > /dev/null); then
+		    exit 1
+		fi		
+	    else
+		exit 1
+	    fi
 	fi
     fi
 fi
 
 if $FORMAT_TOOL --test-format foma; then
-    if echo TMP | $TXT_TOOL -f foma > test ; then
+    if cat TMP | $TXT_TOOL -f foma > test ; then
 	if ! $FORMAT_TOOL test > TMP1 ; then
 	    exit 1
 	fi
 	echo "Transducers in test are of type foma" > TMP2
-	if ! diff TMP1 TMP2 ; then
-	    exit 1
+	if ! diff TMP1 TMP2 2> /dev/null > /dev/null; then
+	    if [ "$1" = '--python' ]; then
+		if ! (grep 'FOMA_TYPE' TMP1 2> /dev/null > /dev/null); then
+		    exit 1
+		fi		
+	    else
+		exit 1
+	    fi
 	fi
     fi
 fi
