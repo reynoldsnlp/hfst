@@ -2,19 +2,21 @@
 TOOLDIR=../../tools/src
 CALCULATE_TOOL=
 FORMAT_TOOL=
+COMPARE_TOO=
 
 if [ "$1" = '--python' ]; then
     CALCULATE_TOOL="python3 ./hfst-calculate.py"
     FORMAT_TOOL="python3 ./hfst-format.py"
+    COMPARE_TOOL="python3 ./hfst-compare.py"
 else
     CALCULATE_TOOL=$TOOLDIR/hfst-calculate
     FORMAT_TOOL=$TOOLDIR/hfst-format
-    if ! test -x $CALCULATE_TOOL; then
-	exit 0;
-    fi
-    if ! test -x $FORMAT_TOOL; then
-	exit 0;
-    fi
+    COMPARE_TOOL=$TOOLDIR/hfst-compare
+    for tool in $CALCULATE_TOOL $FORMAT_TOOL $COMPARE_TOOL; do
+	if ! test -x $tool; then
+	    exit 0;
+	fi
+    done
 fi
 
 for i in "" .sfst .ofst .foma; do
@@ -42,7 +44,7 @@ for i in "" .sfst .ofst .foma; do
         if ! echo "catcatcat(cat)+" | $CALCULATE_TOOL $FFLAG > test ; then
             exit 1
         fi
-        if ! $TOOLDIR/hfst-compare -s 4toINFcats$i test  ; then
+        if ! $COMPARE_TOOL -s 4toINFcats$i test  ; then
             exit 1
         fi
         rm test
@@ -51,7 +53,7 @@ for i in "" .sfst .ofst .foma; do
         if ! echo "{cat}:{dog}" | $CALCULATE_TOOL $FFLAG > test ; then
             exit 1
         fi
-        if ! $TOOLDIR/hfst-compare -s cat2dog$i test  ; then
+        if ! $COMPARE_TOOL -s cat2dog$i test  ; then
             exit 1
         fi
         rm test

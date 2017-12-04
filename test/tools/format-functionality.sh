@@ -1,22 +1,27 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
-TOOL=
+FORMAT_TOOL=
+TXT_TOOL=
 
 if [ "$1" = '--python' ]; then
-    TOOL="python3 ./hfst-format.py"
+    FORMAT_TOOL="python3 ./hfst-format.py"
+    TXT_TOOL="python3 ./hfst-txt2fst.py"
 else
-    TOOL=$TOOLDIR/hfst-format
-    if ! test -x $TOOL; then
-	exit 0;
-    fi
+    FORMAT_TOOL=$TOOLDIR/hfst-format
+    TXT_TOOL=$TOOLDIR/hfst-txt2fst
+    for tool in $FORMAT_TOOL $TXT_TOOL; do
+	if ! test -x $tool; then
+	    exit 0;
+	fi
+    done
 fi
 
 echo '0 1 a b
 1' > TMP;
 
-if $TOOL --test-format sfst; then
-    if echo TMP | $TOOLDIR/hfst-txt2fst -f sfst > test ; then
-	if ! $TOOL test > TMP1 ; then
+if $FORMAT_TOOL --test-format sfst; then
+    if echo TMP | $TXT_TOOL -f sfst > test ; then
+	if ! $FORMAT_TOOL test > TMP1 ; then
 	    exit 1
 	fi
 	echo "Transducers in test are of type SFST (1.4 compatible)" > TMP2
@@ -26,10 +31,10 @@ if $TOOL --test-format sfst; then
     fi
 fi
 
-if $TOOL --test-format openfst-tropical; then
-    if echo TMP | $TOOLDIR/hfst-txt2fst -f openfst-tropical \
+if $FORMAT_TOOL --test-format openfst-tropical; then
+    if echo TMP | $TXT_TOOL -f openfst-tropical \
 	> test ; then
-	if ! $TOOL test > TMP1 ; then
+	if ! $FORMAT_TOOL test > TMP1 ; then
 	    exit 1
 	fi
 	echo "Transducers in test are of type OpenFST, std arc,"\
@@ -40,9 +45,9 @@ if $TOOL --test-format openfst-tropical; then
     fi
 fi
 
-if $TOOL --test-format foma; then
-    if echo TMP | $TOOLDIR/hfst-txt2fst -f foma > test ; then
-	if ! $TOOL test > TMP1 ; then
+if $FORMAT_TOOL --test-format foma; then
+    if echo TMP | $TXT_TOOL -f foma > test ; then
+	if ! $FORMAT_TOOL test > TMP1 ; then
 	    exit 1
 	fi
 	echo "Transducers in test are of type foma" > TMP2
