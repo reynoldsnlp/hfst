@@ -633,7 +633,7 @@ namespace hfst
                         ImplementationType type) {
 
     std::string filestr("");
-    if (NULL != folder) {
+    if (NULL != folder && strcmp(folder, "") != 0) {
       filestr.append(folder);
       filestr.append("/"); // FIX: WINDOWS
     }
