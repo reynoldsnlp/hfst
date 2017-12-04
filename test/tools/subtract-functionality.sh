@@ -1,23 +1,31 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
 TOOL=
+FORMAT_TOOL=
+COMPARE_TOOL=
 
 if [ "$1" = '--python' ]; then
     TOOL="python3 ./hfst-subtract.py"
+    FORMAT_TOOL="python3 ./hfst-format.py"
+    COMPARE_TOOL="python3 ./hfst-compare.py"
 else
     TOOL=$TOOLDIR/hfst-subtract
-    if ! test -x $TOOL; then
-	exit 0;
-    fi
+    FORMAT_TOOL=$TOOLDIR/hfst-format
+    COMPARE_TOOL=$TOOLDIR/hfst-compare
+    for tool in $TOOL $FORMAT_TOOL $COMPARE_TOOL; do
+	if ! test -x $tool; then
+	    exit 0;
+	fi
+    done
 fi
 
 for i in "" .sfst .ofst .foma; do
-    if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
+    if ((test -z "$i") || $FORMAT_TOOL --list-formats | grep $i > /dev/null); then
         if test -f cat_or_dog$i -a -f dog$i -a -f cat$i ; then
             if ! $TOOL cat_or_dog$i dog$i > test ; then
                 exit 1
             fi
-            if ! $TOOLDIR/hfst-compare -s test cat$i  ; then
+            if ! $COMPARE_TOOL -s test cat$i  ; then
                 exit 1
             fi
             rm test;
@@ -29,7 +37,7 @@ for i in "" .sfst .ofst .foma; do
 	    if ! $TOOL empty$i empty$i > test ; then
 	        exit 1
 	    fi
-	    if ! $TOOLDIR/hfst-compare -s test empty$i ; then
+	    if ! $COMPARE_TOOL -s test empty$i ; then
 	        exit 1
 	    fi
 #    else
@@ -41,7 +49,7 @@ for i in "" .sfst .ofst .foma; do
 	    if ! $TOOL -1 unk_or_id_star$i -2 a2b$i > test ; then
 	        exit 1
 	    fi
-	    if ! $TOOLDIR/hfst-compare -s test a2b_complement$i ; then
+	    if ! $COMPARE_TOOL -s test a2b_complement$i ; then
 	        echo "FAIL: Complement test" $i
 	        exit 1
 	    fi
@@ -52,7 +60,7 @@ for i in "" .sfst .ofst .foma; do
 	    if ! $TOOL -1 unk_or_id_star$i -2 a2b_input > test ; then
 	        exit 1
 	    fi
-	    if ! $TOOLDIR/hfst-compare -s test a2b_input_projection_complement$i ; then
+	    if ! $COMPARE_TOOL -s test a2b_input_projection_complement$i ; then
 	        echo "FAIL: Complement test, input projection" $i ;
 	        exit 1
 	    fi
@@ -70,13 +78,13 @@ if test -f cat2dog_0.3.ofst -a -f cat2dog_0.5.ofst ; then
     if ! $TOOL -1 cat2dog_0.3.ofst -2 cat2dog_0.5.ofst > test ; then
 	exit 1;
     fi
-    if ! $TOOLDIR/hfst-compare -s empty.ofst test ; then
+    if ! $COMPARE_TOOL -s empty.ofst test ; then
 	exit 1;
     fi
     if ! $TOOL -2 cat2dog_0.3.ofst -1 cat2dog_0.5.ofst > test ; then
 	exit 1;
     fi
-    if ! $TOOLDIR/hfst-compare -s empty.ofst test ; then
+    if ! $COMPARE_TOOL -s empty.ofst test ; then
 	exit 1;
     fi
     rm test;
