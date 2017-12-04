@@ -23,7 +23,7 @@ if ((test -z "$i") || $FORMAT_TOOL --list-formats | grep $i > /dev/null); then
             echo turning cat$i to strings failed
             exit 1
         fi
-        if ! diff test.strings cat.strings > /dev/null 2>&1 ; then
+        if ! diff test.strings cat.strings; then # > /dev/null 2>&1 ; then
             echo cat$i strings differ from expected
             exit 1
         fi
