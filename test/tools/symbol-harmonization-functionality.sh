@@ -2,7 +2,7 @@
 
 TOOLDIR=../../tools/src/
 FORMAT_TOOL=$TOOLDIR/hfst-format
-COMPARE_TOOOL=$TOOLDIR/hfst-compare
+COMPARE_TOOL=$TOOLDIR/hfst-compare
 
 for ext in .sfst .ofst .foma; do
 

@@ -2,14 +2,17 @@
 TOOLDIR=../../tools/src
 TOOL=
 FORMAT_TOOL=
+COMPARE_TOOL=
 
 if [ "$1" = '--python' ]; then
     TOOL="python3 ./hfst-head.py"
     FORMAT_TOOL="python3 ./hfst-format.py"
+    COMPARE_TOOL="python3 ./hfst-compare.py"
 else
     TOOL=$TOOLDIR/hfst-head
     FORMAT_TOOL=$TOOLDIR/hfst-format
-    for tool in $TOOL $FORMAT_TOOL; do
+    COMPARE_TOOL=$TOOLDIR/hfst-compare
+    for tool in $TOOL $FORMAT_TOOL $COMPARE_TOOL; do
 	if ! test -x $tool; then
 	    exit 0;
 	fi
