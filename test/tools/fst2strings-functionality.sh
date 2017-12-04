@@ -1,18 +1,23 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
 TOOL=
+FORMAT_TOOL=
 
 if [ "$1" = '--python' ]; then
     TOOL="python3 ./hfst-fst2strings.py"
+    FORMAT_TOOL="python3 ./hfst-format.py"
 else
     TOOL=$TOOLDIR/hfst-fst2strings
-    if ! test -x $TOOL; then
-	exit 0;
-    fi
+    FORMAT_TOOL=$TOOLDIR/hfst-format
+    for tool in $TOOL $FORMAT_TOOL; do
+	if ! test -x $tool; then
+	    exit 0;
+	fi
+    done
 fi
 
 for i in "" .sfst .ofst .foma; do
-if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
+if ((test -z "$i") || $FORMAT_TOOL --list-formats | grep $i > /dev/null); then
     if test -f cat$i ; then
         if ! $TOOL cat$i > test.strings ; then
             echo turning cat$i to strings failed
@@ -66,7 +71,7 @@ fi
 done
 
 for i in "" .sfst .ofst .foma; do
-if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
+if ((test -z "$i") || $FORMAT_TOOL --list-formats | grep $i > /dev/null); then
     # Test the empty transducer
     if test -f empty$i ; then
 	if ! $TOOL -r 20 empty$i > /dev/null ; then

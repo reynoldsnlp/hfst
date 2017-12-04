@@ -1,17 +1,20 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
-if ! $TOOLDIR/hfst-flookup -R -s cat.hfst < $srcdir/cat.strings > test.lookups ; then
+FORMAT_TOOL=$TOOLDIR/hfst-format
+FLOOKUP_TOOL=$TOOLDIR/hfst-flookup
+
+if ! $FLOOKUP_TOOL -R -s cat.hfst < $srcdir/cat.strings > test.lookups ; then
     exit 1
 fi
 
-$TOOLDIR/hfst-format -l > TMP;
+$FORMAT_TOOL -l > TMP;
 
 # test what strings the transducer [a:b (ID:ID)*] recognizes
 for i in "" .sfst .ofst .foma; do
-if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
+if ((test -z "$i") || $FORMAT_TOOL --list-formats | grep $i > /dev/null); then
     if test -f abid$i ; then
 
-	if ! echo "aa" | $TOOLDIR/hfst-flookup -R -s abid$i \
+	if ! echo "aa" | $FLOOKUP_TOOL -R -s abid$i \
 	    > test.lookups; 
 	then
 	    exit 1
@@ -21,7 +24,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 	    exit 1
 	fi
 	
-	if ! echo "ab" | $TOOLDIR/hfst-flookup -R -s abid$i \
+	if ! echo "ab" | $FLOOKUP_TOOL -R -s abid$i \
 	    > test.lookups; 
 	then
 	    exit 1
@@ -31,7 +34,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 	    exit 1
 	fi
 	
-	if ! echo "ac" | $TOOLDIR/hfst-flookup -R -s abid$i \
+	if ! echo "ac" | $FLOOKUP_TOOL -R -s abid$i \
 	    > test.lookups; 
 	then
 	    exit 1
@@ -41,7 +44,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 	    exit 1
 	fi
 
-        if ! echo "aa" | $TOOLDIR/hfst-flookup -s abid$i \
+        if ! echo "aa" | $FLOOKUP_TOOL -s abid$i \
             > test.lookups;
         then
             exit 1
@@ -51,7 +54,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 	    exit 1
         fi
         
-        if ! echo "bc" | $TOOLDIR/hfst-flookup -s abid$i \
+        if ! echo "bc" | $FLOOKUP_TOOL -s abid$i \
 	    > test.lookups; 
         then
 	    exit 1
@@ -64,7 +67,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 
     if test -f infinitely_ambiguous$i ; then
 	
-	if ! echo "ad" | $TOOLDIR/hfst-flookup -R infinitely_ambiguous$i \
+	if ! echo "ad" | $FLOOKUP_TOOL -R infinitely_ambiguous$i \
 	    2> warnings > test.lookups;
 	then
 	    exit 1
@@ -75,7 +78,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 	    exit 1;
 	fi
 
-	if ! echo "b" | $TOOLDIR/hfst-flookup -R infinitely_ambiguous$i \
+	if ! echo "b" | $FLOOKUP_TOOL -R infinitely_ambiguous$i \
 	    2> warnings > test.lookups;
 	then
 	    exit 1
@@ -90,7 +93,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 
     if test -f infinitely_ambiguous_with_flags$i ; then
 
-	if ! echo "a" | $TOOLDIR/hfst-flookup -R infinitely_ambiguous_with_flags$i \
+	if ! echo "a" | $FLOOKUP_TOOL -R infinitely_ambiguous_with_flags$i \
 	    2> warnings > test.lookups;
 	then
 	    exit 1
@@ -101,7 +104,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
 	    exit 1;
 	fi
 
-	if ! echo "b" | $TOOLDIR/hfst-flookup -R infinitely_ambiguous_with_flags$i \
+	if ! echo "b" | $FLOOKUP_TOOL -R infinitely_ambiguous_with_flags$i \
 	    2> warnings > test.lookups;
 	then
 	    exit 1

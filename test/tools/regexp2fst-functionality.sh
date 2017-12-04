@@ -1,14 +1,19 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
 TOOL=
+FORMAT_TOOL=
 
 if [ "$1" = '--python' ]; then
     TOOL="python3 ./hfst-regexp2fst.py"
+    FORMAT_TOOL="python3 ./hfst-format.py"
 else
     TOOL=$TOOLDIR/hfst-regexp2fst
-    if ! test -x $TOOL; then
-	exit 0;
-    fi
+    FORMAT_TOOL=$TOOLDIR/hfst-format
+    for tool in $TOOL $FORMAT_TOOL; do
+	if ! test -x $tool; then
+	    exit 0;
+	fi
+    done
 fi
 
 if [ "$srcdir" = "" ] ; then
@@ -17,7 +22,7 @@ fi
 
 for i in sfst openfst-tropical foma; do
     
-    if ! ($TOOLDIR/hfst-format --list-formats | grep $i > /dev/null) ; then
+    if ! ($FORMAT_TOOL --list-formats | grep $i > /dev/null) ; then
 	continue;
     fi
     

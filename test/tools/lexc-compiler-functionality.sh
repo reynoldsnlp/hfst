@@ -1,11 +1,17 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
 TOOL=
+FORMAT_TOOL=
+COMPARE_TOOL=
 
 if [ "$1" = '--python' ]; then
     TOOL="python3 ./hfst-lexc.py"
+    FORMAT_TOOL="python3 ./hfst-format.py"
+    COMPARE_TOOL="python3 ./hfst-compare.py"
 else
     TOOL=$TOOLDIR/hfst-lexc
+    FORMAT_TOOL=$TOOLDIR/hfst-format
+    COMPARE_TOOL=$TOOLDIR/hfst-compare
     if ! test -x $TOOL ; then
 	echo "missing hfst-lexc, assuming configured off, skipping"
 	exit 73
@@ -71,7 +77,7 @@ for i in .sfst .ofst .foma ; do
     
     #echo "---- $FNAME --------"
 
-    if ! ($TOOLDIR/hfst-format --test-format $FNAME ) ; then
+    if ! ($FORMAT_TOOL --test-format $FNAME ) ; then
         continue;
     fi
 
@@ -80,7 +86,7 @@ for i in .sfst .ofst .foma ; do
             echo lexc $FFLAG cat.lexc failed with $?
             exit 1
         fi
-        if ! $TOOLDIR/hfst-compare -e -s cat$i test ; then
+        if ! $COMPARE_TOOL -e -s cat$i test ; then
         echo "results differ: " "cat"$i" test"
             exit 1
         fi
@@ -109,7 +115,7 @@ for i in .sfst .ofst .foma ; do
         $TOOLDIR/hfst-txt2fst --prolog $FFLAG -i $RESULT -o $RESULT.tmp
            
          #echo "comparing file: $f"
-         if ! $TOOLDIR/hfst-compare -e -s $RESULT.tmp test ; then
+         if ! $COMPARE_TOOL -e -s $RESULT.tmp test ; then
              echo "results differ: $f"
              exit 1
          fi
@@ -129,7 +135,7 @@ for i in .sfst .ofst .foma ; do
         $TOOLDIR/hfst-txt2fst --prolog $FFLAG -i $RESULT -o $RESULT.tmp
            
          #echo "comparing flag file: $f"
-         if ! $TOOLDIR/hfst-compare -e -s $RESULT.tmp test ; then
+         if ! $COMPARE_TOOL -e -s $RESULT.tmp test ; then
              echo "flag results differ: $f: "$RESULT".tmp != test"
              exit 1
          fi
@@ -153,7 +159,7 @@ for i in .sfst .ofst .foma ; do
         echo lexc2fst $FFLAG basic.multi-file-{1,2,3}.lexc failed with $?
         exit 1
     fi
-    if ! $TOOLDIR/hfst-compare -e -s walk_or_dog$i test ; then
+    if ! $COMPARE_TOOL -e -s walk_or_dog$i test ; then
         exit 1
     fi
 done

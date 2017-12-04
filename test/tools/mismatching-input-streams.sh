@@ -1,5 +1,6 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
+FORMAT_TOOL=$TOOLDIR/hfst-format
 
 TOOLS="hfst-disjunct hfst-concatenate hfst-conjunct hfst-subtract hfst-compose hfst-shuffle"
 # TODO: hfst-compose-intersect, hfst-substitute, hfst-xfst?
@@ -16,8 +17,8 @@ do
             if (test "$type1" != "$type2"); then
                 if (ls $TOOLDIR/$tool > /dev/null 2> /dev/null); then
                     # echo "$tool"
-                    if ($TOOLDIR/hfst-format --list-formats | grep $type1 > /dev/null); then
-                        if ($TOOLDIR/hfst-format --list-formats | grep $type2 > /dev/null); then
+                    if ($FORMAT_TOOL --list-formats | grep $type1 > /dev/null); then
+                        if ($FORMAT_TOOL --list-formats | grep $type2 > /dev/null); then
                             # (1) two transducers
                             if test -f cat.$type1 -a -f dog.$type2; then
                                 # echo "  $type1, $type2"

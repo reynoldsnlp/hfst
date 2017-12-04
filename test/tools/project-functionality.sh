@@ -1,29 +1,37 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
 TOOL=
+COMPARE_TOOL=
+FORMAT_TOOL=
 
 if [ "$1" = '--python' ]; then
     TOOL="python3 ./hfst-project.py"
+    COMPARE_TOOL="python3 ./hfst-compare.py"
+    FORMAT_TOOL="python3 ./hfst-format.py"
 else
     TOOL=$TOOLDIR/hfst-project
-    if ! test -x $TOOL; then
-	exit 0;
-    fi
+    COMPARE_TOOL=$TOOLDIR/hfst-compare
+    FORMAT_TOOL=$TOOLDIR/hfst-format
+    for tool in $TOOL $COMPARE_TOOL $FORMAT_TOOL; do
+	if ! test -x $tool; then
+	    exit 0;
+	fi
+    done
 fi
 
 for i in  .hfst .sfst .ofst .foma; do
-    if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
+    if ((test -z "$i") || $FORMAT_TOOL --list-formats | grep $i > /dev/null); then
         if test -f cat2dog$i -a -f cat$i -a -f dog$i ; then
             if ! $TOOL -p input cat2dog$i > test ; then
                 exit 1
             fi
-            if ! $TOOLDIR/hfst-compare -s test cat$i  ; then
+            if ! $COMPARE_TOOL -s test cat$i  ; then
                 exit 1
             fi
             if ! $TOOL -p output cat2dog$i > test ; then
                 exit 1
             fi
-            if ! $TOOLDIR/hfst-compare -s test dog$i  ; then
+            if ! $COMPARE_TOOL -s test dog$i  ; then
                 exit 1
             fi
             rm test;

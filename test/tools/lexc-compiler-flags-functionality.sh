@@ -4,6 +4,7 @@
 # exit 77
 
 TOOLDIR=../../tools/src
+COMPARE_TOOL=$TOOLDIR/hfst-compare
 LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc 
           basic.empty-sides.lexc basic.escapes.lexc 
           basic.infostrings.lexc basic.initial-lexicon-empty.lexc 
@@ -58,7 +59,7 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
         hfst-fst2fst $FFLAG $ORIGINAL -o $ORIGINAL.tmp
         
      echo "comparing eliminated file: $f"
-     if ! $TOOLDIR/hfst-compare -e -s $ORIGINAL.tmp $FLAGGED.noflags.foma.tmp ; then
+     if ! $COMPARE_TOOL -e -s $ORIGINAL.tmp $FLAGGED.noflags.foma.tmp ; then
          echo "results differ: $f"
          exit 1
      fi

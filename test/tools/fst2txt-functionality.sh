@@ -1,14 +1,19 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
 TOOL=
+FORMAT_TOOL=
 
 if [ "$1" = '--python' ]; then
     TOOL="python3 ./hfst-fst2txt.py"
+    FORMAT_TOOL="python3 ./hfst-format.py"
 else
     TOOL=$TOOLDIR/hfst-fst2txt
-    if ! test -x $TOOL; then
-	exit 0;
-    fi
+    FORMAT_TOOL=$TOOLDIR/hfst-format
+    for tool in $TOOL $FORMAT_TOOL; do
+	if ! test -x $tool; then
+	    exit 0;
+	fi
+    done
 fi
 
 if [ "$srcdir" = "" ]; then
@@ -21,7 +26,7 @@ cat $srcdir/cat.txt | tr -d '\r' > TMP;
 mv TMP $srcdir/cat.txt;
 
 for i in "" .sfst .ofst .foma; do
-if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
+if ((test -z "$i") || $FORMAT_TOOL --list-formats | grep $i > /dev/null); then
     if test -f cat$i ; then
         if ! $TOOL -D < cat$i > test.txt 2> /dev/null ; then
             exit 1

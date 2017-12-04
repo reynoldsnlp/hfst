@@ -1,19 +1,24 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
 TOOL=
+FORMAT_TOOL=
 
 if [ "$1" = '--python' ]; then
     TOOL="python3 ./hfst-prune-alphabet.py"
+    FORMAT_TOOL="python3 ./hfst-format.py"
 else
     TOOL=$TOOLDIR/hfst-prune-alphabet
-    if ! test -x $TOOL; then
-	exit 0;
-    fi
+    FORMAT_TOOL=$TOOLDIR/hfst-format
+    for tool in $TOOL $FORMAT_TOOL; do
+	if ! test -x $tool; then
+	    exit 0;
+	fi
+    done
 fi
 
 for i in  .hfst .sfst .ofst .foma; do
 
-if (([ ".hfst" = "$i" ]) || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
+if (([ ".hfst" = "$i" ]) || $FORMAT_TOOL --list-formats | grep $i > /dev/null); then
 
     if test -f prunable_alphabet$i -a non_prunable_alphabet_1$i -a non_prunable_alphabet_2$i; then
 
