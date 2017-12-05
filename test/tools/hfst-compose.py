@@ -6,7 +6,7 @@ if len(argv) != 3:
 istr1 = hfst.HfstInputStream(argv[1])
 istr2 = hfst.HfstInputStream(argv[2])
 if (istr1.get_type() != istr2.get_type()):
-    raise RuntimeError('Error: transdcuer types differ in ' + argv[1] + ' and ' + argv[2])
+    raise RuntimeError('Error: transducer types differ in ' + argv[1] + ' and ' + argv[2])
 ostr = hfst.HfstOutputStream(type=istr1.get_type())
 
 while((not istr1.is_eof()) and (not istr2.is_eof())):
