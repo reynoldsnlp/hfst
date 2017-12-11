@@ -2,6 +2,7 @@ import hfst
 from sys import argv, stdin
 epsilonstr=hfst.EPSILON
 inputfilename=None
+prolog=False
 impl=hfst.ImplementationType.TROPICAL_OPENFST_TYPE
 skip_next = False
 for i in range(1, len(argv)):
@@ -26,8 +27,10 @@ for i in range(1, len(argv)):
     elif arg == '-i':
         skip_next= True
         inputfilename = argv[i+1]
+    elif arg == '--prolog':
+        prolog=True
     else:
-        raise RuntimeError('argument not recognized: ' + arg)
+        inputfilename = arg
 
 istr = None
 if inputfilename != None:
@@ -36,9 +39,13 @@ else:
     istr = stdin
 ostr = hfst.HfstOutputStream(type=impl)
 
-att = hfst.AttReader(istr, epsilonstr)
+reader = None
+if prolog:
+    reader = hfst.PrologReader(istr)
+else:
+    reader = hfst.AttReader(istr, epsilonstr)
 
-for tr in att:
+for tr in reader:
     TR = hfst.HfstTransducer(tr) # TODO: why doesn't (tr, impl) work?
     TR.convert(impl)
     ostr.write(TR)
