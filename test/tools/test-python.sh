@@ -4,7 +4,7 @@ export srcdir=`pwd`
 
 for tool in calculate compare compose concatenate conjunct determinize \
 	    disjunct format fst2strings head invert minimize \
-	    project prune-alphabet remove-epsilons repeat reverse \
+	    project prune-alphabet push-weights remove-epsilons repeat reverse \
 	    shuffle split subtract tail txt2fst;
 do
     printf "%-20s" $tool"..."
@@ -25,7 +25,7 @@ done
 
 # todo: not yet implemented:
 # compose-intersect flookup fst2txt lexc-compiler-flags lexc-compiler
-# lexc-wrapper lookup optimized-lookup pmatch proc push-weights
+# lexc-wrapper lookup optimized-lookup pmatch proc
 # reweight strings2fst substitute
 # summarize symbol-harmonization tokenize-backtrack
 # tokenize-flushing tokenize
