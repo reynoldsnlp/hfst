@@ -14,7 +14,7 @@ else
     COMPARE_TOOL=$TOOLDIR/hfst-compare
     for tool in $DISJUNCT_TOOL $FORMAT_TOOL $COMPARE_TOOL; do
 	if ! test -x $tool; then
-	    exit 0;
+	    exit 77;
 	fi
     done
 fi

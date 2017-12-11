@@ -14,7 +14,7 @@ else
     for tool in $COMPARE_TOOL $FORMAT_TOOL $REGEXP_TOOL $FSTTOOL;
     do
 	if ! test -x $tool; then
-	    exit 0;
+	    exit 77;
 	fi
     done
 fi

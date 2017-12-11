@@ -11,7 +11,7 @@ else
     TXT_TOOL=$TOOLDIR/hfst-txt2fst
     for tool in $FORMAT_TOOL $TXT_TOOL; do
 	if ! test -x $tool; then
-	    exit 0;
+	    exit 77;
 	fi
     done
 fi

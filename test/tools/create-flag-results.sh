@@ -5,7 +5,7 @@
 
 # not yet implemented
 if [ "$1" = "--python" ]; then
-   exit 1
+   exit 77
 fi
 
 TOOLDIR=../../tools/src

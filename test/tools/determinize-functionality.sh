@@ -14,7 +14,7 @@ else
     FORMAT_TOOL=$TOOLDIR/hfst-format
     for tool in $DET_TOOL $COMPARE_TOOL $FORMAT_TOOL; do
 	if ! test -x $tool; then
-	    exit 0;
+	    exit 77;
 	fi
     done
 fi

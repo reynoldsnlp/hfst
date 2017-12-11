@@ -11,7 +11,7 @@ else
     COMPARE_TOOL=$TOOLDIR/hfst-compare
     for tool in $TOOL $COMPARE_TOOL; do
 	if ! test -x $tool; then
-	    exit 0;
+	    exit 77;
 	fi
     done
 fi

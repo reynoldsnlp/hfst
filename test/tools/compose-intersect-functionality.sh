@@ -5,7 +5,7 @@ CALCULATE_TOOL=
 COMPARE_TOOL=
 
 if [ "$1" = '--python' ]; then
-    exit 1 # not yet implemented
+    exit 77 # not yet implemented
     CI_TOOL="python3 ./hfst-compose-intersect.py"
     CALCULATE_TOOL="python3 ./hfst-calculate.py"
     COMPARE_TOOL="python3 ./hfst-compare.py"
@@ -16,7 +16,7 @@ else
     for tool in $CI_TOOL $CALCULATE_TOOL $COMPARE_TOOL;
     do	
 	if ! test -x $tool; then
-	    exit 0;
+	    exit 77;
 	fi
     done
 fi

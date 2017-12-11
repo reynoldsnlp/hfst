@@ -1,4 +1,7 @@
 #!/bin/sh
+if [ "$1" = "--python" ]; then
+    exit 77
+fi
 
 TOOLDIR=../../tools/src/
 FORMAT_TOOL=$TOOLDIR/hfst-format

@@ -1,4 +1,8 @@
 #!/bin/sh
+if [ "$1" = "--python" ]; then
+    exit 77
+fi
+
 TOOLDIR=../../tools/src
 COMPARE_TOOL=$TOOLDIR/hfst-compare
 if [ -x $COMPARE_TOOL ] ; then

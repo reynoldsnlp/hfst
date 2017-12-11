@@ -15,7 +15,7 @@ else
     for tool in $COMPOSE_TOOL $COMPARE_TOOL $FORMAT_TOOL;
     do
 	if ! test -x $tool; then
-	    exit 0;
+	    exit 77;
 	fi
     done
 fi

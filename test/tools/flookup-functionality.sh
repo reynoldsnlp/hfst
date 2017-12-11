@@ -3,6 +3,12 @@ TOOLDIR=../../tools/src
 FORMAT_TOOL=$TOOLDIR/hfst-format
 FLOOKUP_TOOL=$TOOLDIR/hfst-flookup
 
+if [ "$1" = "--python" ]; then
+    exit 77 # not yet implemented
+    FORMAT_TOOL="python3 ./hfst-format.py"
+    FLOOKUP_TOOL="python3 ./hfst-flookup.py"
+fi
+
 if ! $FLOOKUP_TOOL -R -s cat.hfst < $srcdir/cat.strings > test.lookups ; then
     exit 1
 fi

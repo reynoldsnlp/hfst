@@ -14,7 +14,7 @@ else
     COMPARE_TOOL=$TOOLDIR/hfst-compare
     for tool in $TOOL $FORMAT_TOOL $COMPARE_TOOL; do
 	if ! test -x $tool; then
-	    exit 0;
+	    exit 77;
 	fi
     done
 fi
@@ -50,11 +50,13 @@ if ((test -z "$i") || $FORMAT_TOOL --list-formats | grep $i > /dev/null); then
 fi
 done
 
-$TOOL -C -f openfst-tropical -i negative_epsilon_cycles.txt > /dev/null 2> test;
-if ! test `grep 'warning' test | wc -l` = '2'; then
-    exit 1
-fi
-$TOOL -C -f openfst-tropical -i no_negative_epsilon_cycles.txt > /dev/null 2> test;
-if ! test `grep 'warning' test | wc -l` = '0'; then
-    exit 1
+if [ "$1" != '--python' ]; then
+    $TOOL -C -f openfst-tropical -i negative_epsilon_cycles.txt > /dev/null 2> test;
+    if ! test `grep 'warning' test | wc -l` = '2'; then
+	exit 1
+    fi
+    $TOOL -C -f openfst-tropical -i no_negative_epsilon_cycles.txt > /dev/null 2> test;
+    if ! test `grep 'warning' test | wc -l` = '0'; then
+	exit 1
+    fi
 fi
