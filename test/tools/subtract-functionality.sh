@@ -3,16 +3,19 @@ TOOLDIR=../../tools/src
 TOOL=
 FORMAT_TOOL=
 COMPARE_TOOL=
+PROJECT_TOOL=
 
 if [ "$1" = '--python' ]; then
     TOOL="python3 ./hfst-subtract.py"
     FORMAT_TOOL="python3 ./hfst-format.py"
     COMPARE_TOOL="python3 ./hfst-compare.py"
+    PROJECT_TOOL="python3 ./hfst-project.py"
 else
     TOOL=$TOOLDIR/hfst-subtract
     FORMAT_TOOL=$TOOLDIR/hfst-format
     COMPARE_TOOL=$TOOLDIR/hfst-compare
-    for tool in $TOOL $FORMAT_TOOL $COMPARE_TOOL; do
+    PROJECT_TOOL=$TOOLDIR/hfst-project
+    for tool in $TOOL $FORMAT_TOOL $COMPARE_TOOL $PROJECT_TOOL; do
 	if ! test -x $tool; then
 	    exit 77;
 	fi
@@ -54,7 +57,7 @@ for i in "" .sfst .ofst .foma; do
 	        exit 1
 	    fi
 	# the input projection
-	    if ! $TOOLDIR/hfst-project -p input a2b$i > a2b_input ; then
+	    if ! $PROJECT_TOOL -p input a2b$i > a2b_input ; then
 	        exit 1
 	    fi
 	    if ! $TOOL -1 unk_or_id_star$i -2 a2b_input > test ; then

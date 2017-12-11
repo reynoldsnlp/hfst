@@ -12,7 +12,7 @@ for arg in argv[1:]:
         level = arg
     else:
         ifile = arg
-
+        
 istr = hfst.HfstInputStream(ifile)
 ostr = hfst.HfstOutputStream(type=istr.get_type())
 
