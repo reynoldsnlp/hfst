@@ -25,41 +25,34 @@ for i in sfst openfst-tropical foma; do
     if ! ($FORMAT_TOOL --list-formats | grep $i > /dev/null) ; then
 	continue;
     fi
-    
-    if ! $TOOL -f $i $srcdir/cats_and_dogs.xre > test ; then
+
+    # Newline-separated
+    if ! $TOOL -f $i $srcdir/cats_and_dogs.xre > test.fst ; then
         exit 1
     fi
-    
-    rm test;
-    if ! $TOOL -S -f $i $srcdir/cats_and_dogs_semicolon.xre > test ; then
-        exit 1
-    fi
-    
-    rm test;
     if ! $TOOL -f $i $srcdir/at_file_quote.$i.xre > test.fst ; then
         exit 1
-    fi
-    
+    fi    
     if ! $TOOL -f $i $srcdir/not-contains-a.xre > test.fst ; then
         exit 1
     fi
-    
-    if ! $TOOL -S -f $i $srcdir/not-contains-a-comment-emptyline.xre > test.fst ; then
-        exit 1
-    fi
-    
     if ! $TOOL -f $i $srcdir/parallel-left-arrow.xre > test.fst ; then
         exit 1
     fi
-    
+
+    # Space-separated
+    if ! $TOOL -S -f $i $srcdir/cats_and_dogs_semicolon.xre > test ; then
+        exit 1
+    fi
+    if ! $TOOL -S -f $i $srcdir/not-contains-a-comment-emptyline.xre > test.fst ; then
+        exit 1
+    fi
     if ! $TOOL -S -f $i $srcdir/parallel-left-arrow-multicom-emptyline.xre > test.fst ; then
         exit 1
     fi
-
     if ! $TOOL -S -f $i $srcdir/left-arrow-with-semicolon-comment.xre > test.fst ; then
         exit 1
     fi
-
     if ! $TOOL -S -f $i $srcdir/left-arrow-with-semicolon-many-comments.xre > test.fst ; then
         exit 1
     fi

@@ -5,6 +5,7 @@ skip_next = False
 harmonize=True
 semicolons=False
 infile=stdin
+transducers_written=0
 
 for i in range(1, len(argv)):
     if skip_next:
@@ -33,20 +34,41 @@ ostr = hfst.HfstOutputStream(type=impl)
 comp = hfst.XreCompiler(impl)
 comp.set_harmonization(harmonize)
 if (semicolons):
-    data = infile.read().rstrip() # todo: trailing whitespace should be taken care of by compile function
-    chars_read = [0]
-    while(chars_read[0] < len(data)):
-        stderr.write("compiling data: '" + data[chars_read[0]:] + "'\n")
-        tr = comp.compile(data, chars_read)
+    data = infile.read()
+    i=0
+    while(i < len(data)):
+        chars_read = [0]  # HFST 4.0: should compile return a tuple of transducer and int instead?
+        tr = comp.compile(data[i:], chars_read)
+        i = i + chars_read[0]
         if tr != None:
             ostr.write(tr)
+            transducers_written = transducers_written + 1
+        else:
+            if comp.contained_only_comments(): # HFST 4.0: should return a str 'only comments' instead?
+                pass
+            else:
+                import sys
+                sys.exit(1)
+                raise RuntimeError('error in regexp compilation')
 else:
     for line in infile:
-        stderr.write(line)
         tr = comp.compile(line)
         if tr != None:
             ostr.write(tr)
+            transducers_written = transducers_written + 1
+        else:
+            if comp.contained_only_comments(): # HFST 4.0: should return a str 'only comments' instead?
+                pass
+            else:
+                import sys
+                sys.exit(1)
+                raise RuntimeError('error in regexp compilation')
 
 ostr.close()
 if infile != stdin:
     infile.close()
+
+if transducers_written == 0:
+    import sys
+    sys.exit(1)
+    raise RuntimeError('no transducer was written')

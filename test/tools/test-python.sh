@@ -4,8 +4,8 @@ export srcdir=`pwd`
 
 for tool in calculate compare compose concatenate conjunct determinize \
 	    disjunct format fst2strings head invert minimize \
-	    project prune-alphabet push-weights remove-epsilons repeat reverse \
-	    shuffle split subtract tail txt2fst;
+	    project prune-alphabet push-weights regexp2fst remove-epsilons \
+	    repeat reverse shuffle split subtract tail txt2fst;
 do
     printf "%-20s" $tool"..."
     ./$tool-functionality.sh --python
@@ -20,8 +20,7 @@ do
 done
 
 
-# todo: fix these:
-# pmatch2fst, regexp2fst
+# todo: fix pmatch2fst
 
 # todo: not yet implemented:
 # compose-intersect flookup fst2txt lexc-compiler-flags lexc-compiler
