@@ -4,6 +4,7 @@ in1=None
 in2=None
 silent=False
 harmonize=True
+eliminate_flags=False
 retval=0
 from sys import argv
 if len(argv) < 3:
@@ -13,6 +14,8 @@ for arg in argv[1:]:
         silent = True
     elif arg == '-H' or arg == '--do-not-harmonize':
         harmonize = False
+    elif arg == '-e' or arg == '--eliminate-flags':
+        eliminate_flags=True
     else:
         if in1 == None:
             in1 = arg
@@ -27,6 +30,9 @@ if (istr1.get_type() != istr2.get_type()):
 while((not istr1.is_eof()) and (not istr2.is_eof())):
     tr1 = istr1.read()
     tr2 = istr2.read()
+    if eliminate_flags:
+        tr1.eliminate_flags()
+        tr2.eliminate_flags()
     if (tr1.compare(tr2, harmonize)):
         if not silent:
             print(tr1.get_name() + ' == ' + tr2.get_name())

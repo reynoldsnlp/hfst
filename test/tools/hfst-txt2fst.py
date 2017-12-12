@@ -2,6 +2,7 @@ import hfst
 from sys import argv, stdin
 epsilonstr=hfst.EPSILON
 inputfilename=None
+outputfilename=None
 prolog=False
 impl=hfst.ImplementationType.TROPICAL_OPENFST_TYPE
 skip_next = False
@@ -27,17 +28,29 @@ for i in range(1, len(argv)):
     elif arg == '-i':
         skip_next= True
         inputfilename = argv[i+1]
+    elif arg == '-o':
+        skip_next= True
+        outputfilename = argv[i+1]
     elif arg == '--prolog':
         prolog=True
-    else:
+    elif inputfilename == None:
         inputfilename = arg
+    elif outputfilename == None:
+        outputfilename = arg
+    else:
+        raise RuntimeError('Unknown option: ' + arg)
+
 
 istr = None
 if inputfilename != None:
     istr = open(inputfilename, 'r')
 else:
     istr = stdin
-ostr = hfst.HfstOutputStream(type=impl)
+ostr = None
+if outputfilename != None:
+    ostr = hfst.HfstOutputStream(filename=outputfilename, type=impl)
+else:
+    ostr = hfst.HfstOutputStream(type=impl)
 
 reader = None
 if prolog:

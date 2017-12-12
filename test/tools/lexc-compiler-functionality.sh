@@ -3,19 +3,25 @@ TOOLDIR=../../tools/src
 TOOL=
 FORMAT_TOOL=
 COMPARE_TOOL=
+TXT2FST=
 
 if [ "$1" = '--python' ]; then
     TOOL="python3 ./hfst-lexc.py"
     FORMAT_TOOL="python3 ./hfst-format.py"
     COMPARE_TOOL="python3 ./hfst-compare.py"
+    TXT2FST="python3 ./hfst-txt2fst.py"
 else
     TOOL=$TOOLDIR/hfst-lexc
     FORMAT_TOOL=$TOOLDIR/hfst-format
     COMPARE_TOOL=$TOOLDIR/hfst-compare
-    if ! test -x $TOOL ; then
-	echo "missing hfst-lexc, assuming configured off, skipping"
-	exit 73
-    fi
+    TXT2FST=$TOOLDIR/hfst-txt2fst
+    for tool in $TOOL $FORMAT_TOOL $COMPARE_TOOL $TXT2FST;
+    do
+	if ! test -x $tool ; then
+	    echo "missing hfst-lexc, assuming configured off, skipping"
+	    exit 77
+	fi
+    done
 fi
 
 LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc 
@@ -40,6 +46,7 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           xre.star-plus-optional.lexc
           no-newline-before-sublexicon.lexc xre.any-variations.lexc"
 
+          # basic.lowercase-lexicon-end.lexc fails with -F with python
           # xre.any-variations.lexc # - hfst works file, foma's eliminate_flags removes valid paths (hfst-compare -e)
           # basic.end.lexc -hfst doesn't parse till end
           # xre.any-variations.lexc -foma ?:? problem
@@ -112,7 +119,7 @@ for i in .sfst .ofst .foma ; do
      #   mv test.foma $RESULT
      #   rm tmp-foma-script
      
-        $TOOLDIR/hfst-txt2fst --prolog $FFLAG -i $RESULT -o $RESULT.tmp
+        $TXT2FST --prolog $FFLAG -i $RESULT -o $RESULT.tmp
            
          #echo "comparing file: $f"
          if ! $COMPARE_TOOL -e -s $RESULT.tmp test ; then
@@ -128,11 +135,11 @@ for i in .sfst .ofst .foma ; do
  
 
         if ! $TOOL -F $FFLAG $srcdir/$f -o test 2> /dev/null; then
-            echo lexc2fst -F $FFLAG $f failed with $?
+            echo hfst-lexc -F $FFLAG $f failed with $?
             exit 1
         fi
         
-        $TOOLDIR/hfst-txt2fst --prolog $FFLAG -i $RESULT -o $RESULT.tmp
+        $TXT2FST --prolog $FFLAG -i $RESULT -o $RESULT.tmp
            
          #echo "comparing flag file: $f"
          if ! $COMPARE_TOOL -e -s $RESULT.tmp test ; then
@@ -156,7 +163,7 @@ for i in .sfst .ofst .foma ; do
     if ! $TOOL $FFLAG $srcdir/basic.multi-file-1.lexc \
         $srcdir/basic.multi-file-2.lexc \
         $srcdir/basic.multi-file-3.lexc -o test 2> /dev/null; then
-        echo lexc2fst $FFLAG basic.multi-file-{1,2,3}.lexc failed with $?
+        echo hfst-lexc $FFLAG basic.multi-file-{1,2,3}.lexc failed with $?
         exit 1
     fi
     if ! $COMPARE_TOOL -e -s walk_or_dog$i test ; then
@@ -164,4 +171,4 @@ for i in .sfst .ofst .foma ; do
     fi
 done
 
-exit 77
+#exit 77

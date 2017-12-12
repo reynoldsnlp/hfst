@@ -19,11 +19,21 @@ do
     fi
 done
 
-# todo: not yet implemented:
-# flookup lexc-compiler-flags lexc-compiler
-# lexc-wrapper lookup optimized-lookup proc
-# reweight strings2fst substitute
-# summarize symbol-harmonization tokenize-backtrack
-# tokenize-flushing tokenize
+# one problem with python: lexc-compiler: basic.lowercase-lexicon-end.lexc
+
+# flookup 
+# lookup
+# optimized-lookup
+# proc
+# reweight
+# strings2fst
+# substitute
+# summarize
+# symbol-harmonization
+# tokenize-backtrack
+# tokenize-flushing
+# tokenize
 
 # fst2fst-functionality doesn't exist
+# lexc-wrapper not supported any more
+# lexc-compiler-flags not carried out even with c++
