@@ -3,7 +3,7 @@
 export srcdir=`pwd`
 
 for tool in calculate compare compose concatenate conjunct determinize \
-	    disjunct format fst2strings head invert minimize \
+	    disjunct format fst2strings head invert minimize pmatch2fst pmatch \
 	    project prune-alphabet push-weights regexp2fst remove-epsilons \
 	    repeat reverse shuffle split subtract tail txt2fst;
 do
@@ -18,9 +18,6 @@ do
 	printf '%s\n' 'fail'
     fi
 done
-
-
-# todo: fix pmatch2fst
 
 # todo: not yet implemented:
 # compose-intersect flookup fst2txt lexc-compiler-flags lexc-compiler

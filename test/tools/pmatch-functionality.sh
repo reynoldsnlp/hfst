@@ -7,7 +7,7 @@ if [ "$1" = '--python' ]; then
 else
     TOOL=$TOOLDIR/hfst-pmatch
     if ! test -x $TOOL; then
-	exit 0;
+	exit 77;
     fi
 fi
 
@@ -30,14 +30,16 @@ if ! echo "cat" | $TOOL pmatch_endtag.pmatch > test.pmatch;
     
 rm test.pmatch test.lookups
 
-# Jyrki's suite
-if ! $srcdir/pmatch-tests.sh --log none; then
-    if [ -e $srcdir/pmatch-tests.sh.* ]; then
-        rm $srcdir/pmatch-tests.sh.*
+if [ "$1" != '--python' ]; then
+    # Jyrki's suite
+    if ! $srcdir/pmatch-tests.sh --log none; then
+	if [ -e $srcdir/pmatch-tests.sh.* ]; then
+            rm $srcdir/pmatch-tests.sh.*
+	fi
+	exit 1
     fi
-    exit 1
-fi
-
-if [ -e $srcdir/pmatch-tests.sh.* ]; then
-    rm $srcdir/pmatch-tests.sh.*
+    
+    if [ -e $srcdir/pmatch-tests.sh.* ]; then
+	rm $srcdir/pmatch-tests.sh.*
+    fi
 fi

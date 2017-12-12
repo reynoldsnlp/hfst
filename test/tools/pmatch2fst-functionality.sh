@@ -1,59 +1,65 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
-TOOL=
+PMATCH2FST=
+PMATCH=
 
 if [ "$1" = '--python' ]; then
-    TOOL="python3 ./hfst-pmatch2fst.py"
+    PMATCH2FST="python3 ./hfst-pmatch2fst.py"
+    PMATCH="python3 ./hfst-pmatch.py"
 else
-    TOOL=$TOOLDIR/hfst-pmatch2fst
-    if ! test -x $TOOL; then
-	exit 0;
-    fi
+    PMATCH2FST=$TOOLDIR/hfst-pmatch2fst
+    PMATCH=$TOOLDIR/hfst-pmatch
+    for tool in $TOOL $PMATCH2FST;
+    do
+	if ! test -x $tool; then
+	    exit 77;
+	fi
+    done
 fi
 
 if [ "$srcdir" = "" ] ; then
     srcdir=. ;
 fi
 
-if ! $TOOL $srcdir/pmatch_blanks.txt > test.pmatch ; then
+if ! $PMATCH2FST $srcdir/pmatch_blanks.txt > test.pmatch ; then
     exit 1
 fi
 # Test with any old string
-if ! $TOOLDIR/hfst-pmatch --newline test.pmatch < $srcdir/cat.strings > pmatch.out ; then
+if ! $PMATCH --newline test.pmatch < $srcdir/cat.strings > pmatch.out ; then
     exit 1
 fi
 
-echo 'set need-separators off regex [\Whitespace]+ EndTag(Q);' | $TOOL > test.pmatch
+echo 'set need-separators off regex [\Whitespace]+ EndTag(Q);' | $PMATCH2FST > test.pmatch
 
-echo 'a b  c' | $TOOLDIR/hfst-pmatch --newline test.pmatch > pmatch.out
+echo 'a b  c' | $PMATCH --newline test.pmatch > pmatch.out
 if ! echo '<Q>a</Q> <Q>b</Q>  <Q>c</Q>' | diff pmatch.out - > /dev/null ; then
     exit 1
 fi
 
-echo 'set need-separators off regex "\x22" EndTag(Q);' | $TOOL > test.pmatch
+echo 'set need-separators off regex "\x22" EndTag(Q);' | $PMATCH2FST > test.pmatch
 
-echo 'a "b"  c' | $TOOLDIR/hfst-pmatch --newline test.pmatch > pmatch.out
+echo 'a "b"  c' | $PMATCH --newline test.pmatch > pmatch.out
 if ! echo 'a <Q>"</Q>b<Q>"</Q>  c' | diff pmatch.out - > /dev/null ; then
     exit 1
 fi
 
-echo 'set need-separators off regex "\"" EndTag(Q);' | $TOOL > test.pmatch
+echo 'set need-separators off regex "\"" EndTag(Q);' | $PMATCH2FST > test.pmatch
 
-echo 'a "b"  c' | $TOOLDIR/hfst-pmatch --newline test.pmatch > pmatch.out
+echo 'a "b"  c' | $PMATCH --newline test.pmatch > pmatch.out
 if ! echo 'a <Q>"</Q>b<Q>"</Q>  c' | diff pmatch.out - > /dev/null ; then
     exit 1
 fi
 
-echo 'set need-separators off regex {"} EndTag(Q);' | $TOOL > test.pmatch
+echo 'set need-separators off regex {"} EndTag(Q);' | $PMATCH2FST > test.pmatch
 
-echo 'a "b"  c' | $TOOLDIR/hfst-pmatch --newline test.pmatch > pmatch.out
+echo 'a "b"  c' | $PMATCH --newline test.pmatch > pmatch.out
 if ! echo 'a <Q>"</Q>b<Q>"</Q>  c' | diff pmatch.out - > /dev/null ; then
     exit 1
 fi
 
-echo 'set need-separators off regex %" EndTag(Q);' | $TOOL > test.pmatch
+echo 'set need-separators off regex %" EndTag(Q);' | $PMATCH2FST > test.pmatch
 
-echo 'a "b"  c' | $TOOLDIR/hfst-pmatch --newline test.pmatch > pmatch.out
+echo 'a "b"  c' | $PMATCH --newline test.pmatch > pmatch.out
 if ! echo 'a <Q>"</Q>b<Q>"</Q>  c' | diff pmatch.out - > /dev/null ; then
     exit 1
 fi
