@@ -34,20 +34,22 @@ if ((test -z "$i") || $FORMAT_TOOL --list-formats | grep $i > /dev/null); then
         if ! diff test.txt $srcdir/cat.txt > /dev/null 2>&1 ; then
             exit 1
         fi
-        if ! $TOOL -f dot < cat$i > test.txt 2> /dev/null ; then
+	if ! $TOOL -f prolog < cat$i > test.txt 2> /dev/null ; then
             exit 1
         fi
-        if which dot > /dev/null 2>&1 ; then
-            if ! dot test.txt > /dev/null 2>&1 ; then
-                exit 1
+	if [ "$1" != '--python' ]; then
+            if ! $TOOL -f dot < cat$i > test.txt 2> /dev/null ; then
+		exit 1
             fi
-        fi
-        if ! $TOOL -f pckimmo < cat$i > test.txt 2> /dev/null ; then
-            exit 1
-        fi
-        if ! $TOOL -f prolog < cat$i > test.txt 2> /dev/null ; then
-            exit 1
-        fi
+            if which dot > /dev/null 2>&1 ; then
+		if ! dot test.txt > /dev/null 2>&1 ; then
+                    exit 1
+		fi
+            fi
+            if ! $TOOL -f pckimmo < cat$i > test.txt 2> /dev/null ; then
+		exit 1
+            fi
+	fi
         rm test.txt
     fi
 fi
