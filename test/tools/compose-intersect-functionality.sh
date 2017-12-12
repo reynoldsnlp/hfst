@@ -5,7 +5,6 @@ CALCULATE_TOOL=
 COMPARE_TOOL=
 
 if [ "$1" = '--python' ]; then
-    exit 77 # not yet implemented
     CI_TOOL="python3 ./hfst-compose-intersect.py"
     CALCULATE_TOOL="python3 ./hfst-calculate.py"
     COMPARE_TOOL="python3 ./hfst-compare.py"
