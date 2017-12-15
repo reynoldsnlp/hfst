@@ -94,6 +94,7 @@ namespace std {
 %template(HfstTransducerPair) pair<hfst::HfstTransducer, hfst::HfstTransducer>;
 %template(HfstTransducerPairVector) vector<pair<hfst::HfstTransducer, hfst::HfstTransducer> >;
 %template(HfstRuleVector) vector<hfst::xeroxRules::Rule>;
+%template(FooBarBaz) pair<hfst::HfstTransducer*,unsigned int>;
 }
 
 
@@ -434,19 +435,19 @@ public:
       return results;
     }
 
-    HfstOneLevelPaths _lookup_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
+    HfstOneLevelPaths _lookup_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(TransducerIsCyclicException, FunctionNotImplementedException)
     {
       return hfst::lookup_vector($self, false /*fd*/, s, limit, time_cutoff);
     }
-    HfstOneLevelPaths _lookup_fd_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
+    HfstOneLevelPaths _lookup_fd_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(TransducerIsCyclicException, FunctionNotImplementedException)
     {
       return hfst::lookup_vector($self, true /*fd*/, s, limit, time_cutoff);
     }
-    HfstOneLevelPaths _lookup_fd_string(const std::string& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
+    HfstOneLevelPaths _lookup_fd_string(const std::string& s, int limit = -1, double time_cutoff = 0.0) const throw(TransducerIsCyclicException, FunctionNotImplementedException)
     {
       return hfst::lookup_string($self, true /*fd*/, s, limit, time_cutoff);
     }
-    HfstOneLevelPaths _lookup_string(const std::string & s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
+    HfstOneLevelPaths _lookup_string(const std::string & s, int limit = -1, double time_cutoff = 0.0) const throw(TransducerIsCyclicException, FunctionNotImplementedException)
     {
       return hfst::lookup_string($self, false /*fd*/, s, limit, time_cutoff);
     }
@@ -562,13 +563,13 @@ public:
 
       for k,v in kwargs.items():
           if k == 'obey_flags':
-             if v == 'True':
+             if v == True:
                 pass
-             elif v == 'False':
+             elif v == False:
                 obey_flags=False
              else:
                 print('Warning: ignoring argument %s as it has value %s.' % (k, v))
-                print("Possible values are 'True' and 'False'.")
+                print("Possible values are True and False.")
           elif k == 'output':
              if v == 'text':
                 output='text'
@@ -634,13 +635,13 @@ public:
 
       for k,v in kwargs.items():
           if k == 'obey_flags':
-             if v == 'True':
+             if v == True:
                 pass
-             elif v == 'False':
+             elif v == False:
                 obey_flags=False
              else:
                 print('Warning: ignoring argument %s as it has value %s.' % (k, v))
-                print("Possible values are 'True' and 'False'.")
+                print("Possible values are True and False.")
           elif k == 'output':
              if v == 'text':
                 output == 'text'
@@ -783,33 +784,33 @@ public:
 
       for k,v in kwargs.items():
           if k == 'obey_flags' :
-             if v == 'True':
+             if v == True:
                 pass
-             elif v == 'False':
+             elif v == False:
                 obey_flags=False
              else:
                 print('Warning: ignoring argument %s as it has value %s.' % (k, v))
-                print("Possible values are 'True' and 'False'.")
+                print("Possible values are True and False.")
           elif k == 'filter_flags' :
-             if v == 'True':
+             if v == True:
                 pass
-             elif v == 'False':
+             elif v == False:
                 filter_flags=False
              else:
                 print('Warning: ignoring argument %s as it has value %s.' % (k, v))
-                print("Possible values are 'True' and 'False'.")
+                print("Possible values are True and False.")
           elif k == 'max_cycles' :
              max_cycles=v
           elif k == 'max_number' :
              max_number=v
           elif k == 'random' :
-             if v == 'False':
+             if v == False:
                 pass
-             elif v == 'True':
+             elif v == True:
                 random=True
              else:
                 print('Warning: ignoring argument %s as it has value %s.' % (k, v))
-                print("Possible values are 'True' and 'False'.")
+                print("Possible values are True and False.")
           elif k == 'output':
              if v == 'text':
                 output = 'text'
@@ -1135,7 +1136,7 @@ class HfstBasicTransducer {
     void disjunct(const StringPairVector &spv, float weight) { self->disjunct(spv, weight); }
     void harmonize(HfstBasicTransducer &another) { self->harmonize(another); }
 
-  HfstTwoLevelPaths _lookup(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight, bool obey_flags)
+  HfstTwoLevelPaths _lookup(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight, bool obey_flags) throw(TransducerIsCyclicException)
   {
     hfst::HfstTwoLevelPaths results;
     $self->lookup(lookup_path, results, infinite_cutoff, max_weight, obey_flags);
@@ -1466,9 +1467,12 @@ class XreCompiler
   bool is_function_definition(const std::string& name);
   void undefine(const std::string& name);
   HfstTransducer* compile(const std::string& xre);
+  //HfstTransducer* compile_first(const std::string& xre, unsigned int & chars_read);
   void set_verbosity(bool verbose);
   bool getOutputToConsole();
   void set_expand_definitions(bool expand); // TODO: should this be set automatically to True?
+  void set_harmonization(bool harmonize);
+  bool contained_only_comments();
 
   // *** Some wrappers *** //
 %extend{
@@ -1485,6 +1489,12 @@ class XreCompiler
   void setOutputToConsole(bool value)
   {
     (void)self->setOutputToConsole(value);
+  }
+  std::pair<hfst::HfstTransducer*,unsigned int> compile_first(const std::string & xre)
+  {
+    unsigned int c=0;
+    hfst::HfstTransducer * result = self->compile_first(xre, c);
+    return std::pair<hfst::HfstTransducer*, unsigned int>(result, c);
   }
 }
 
