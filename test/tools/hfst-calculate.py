@@ -22,7 +22,7 @@ for i in range(1, len(argv)):
         raise RuntimeError('argument not recognized: ' + arg)
 
 hfst.set_default_fst_type(impl)
-result = hfst.compile_sfst_file('<stdin>')
+result = hfst.compile_sfst_file("")
 result.convert(impl)
 ostr = hfst.HfstOutputStream(type=hfst.get_default_fst_type())
 ostr.write(result)
