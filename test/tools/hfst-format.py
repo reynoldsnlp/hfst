@@ -4,7 +4,7 @@ test_format=None
 infile=None
 from sys import argv
 for arg in argv[1:]:
-    if arg == '--list-formats':
+    if arg == '-l' or arg == '--list-formats':
         list_formats=True
     elif arg == '--test-format':
         test_format='<next>'

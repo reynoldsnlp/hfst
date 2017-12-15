@@ -37,9 +37,9 @@ if (semicolons):
     data = infile.read()
     i=0
     while(i < len(data)):
-        chars_read = [0]  # HFST 4.0: should compile return a tuple of transducer and int instead?
-        tr = comp.compile(data[i:], chars_read)
-        i = i + chars_read[0]
+        tr_and_chars_read = comp.compile_first(data[i:]) # HFST 4.0: document this
+        tr = tr_and_chars_read[0]
+        i = i + tr_and_chars_read[1]
         if tr != None:
             ostr.write(tr)
             transducers_written = transducers_written + 1

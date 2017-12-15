@@ -21,9 +21,9 @@ done
 
 # one problem with python: lexc-compiler: basic.lowercase-lexicon-end.lexc
 
-# flookup
-# lookup
-# optimized-lookup
+# flookup: is this needed?
+# lookup: HFST 4.0: rewrite lookup and path extraction...
+# optimized-lookup: --""--
 # proc
 # reweight
 # summarize
