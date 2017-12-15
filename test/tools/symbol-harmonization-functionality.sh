@@ -156,7 +156,6 @@ for ext in .sfst .ofst .foma; do
     fi
     rm -f conjunction
 
-
     # disjunction
     echo "[?]" | $REGEXP_TOOL ${FFLAG} > tmp1;
     echo "[a:b]" | $REGEXP_TOOL ${FFLAG} > tmp2;
@@ -204,7 +203,6 @@ for ext in .sfst .ofst .foma; do
     fi
     rm -f subtraction
 
-
     ## substitution
     echo "\`[[a:b ?] , c , d ]" | $REGEXP_TOOL ${FFLAG} > tmp1;
     echo "[a:b ?]" | $REGEXP_TOOL ${FFLAG} > tmp2;
@@ -241,7 +239,6 @@ for ext in .sfst .ofst .foma; do
 	exit 1;
     fi
 
-
     ## freely insert aka ignore
     echo "[?] / a" | $REGEXP_TOOL ${FFLAG} > tmp1;
     echo "[a* [?|a] a*]" | $REGEXP_TOOL -H ${FFLAG} > tmp2;
@@ -264,7 +261,6 @@ for ext in .sfst .ofst .foma; do
 	exit 1;
     fi
 
-
     ## some cases
     echo "a:?" | $REGEXP_TOOL ${FFLAG} > tmp1;
     echo "a:?|a" | $REGEXP_TOOL ${FFLAG} > tmp3;
@@ -280,12 +276,11 @@ for ext in .sfst .ofst .foma; do
 	exit 1;
     fi
 
-
     ## test that special symbols @_.*_@ are never harmonized
     echo "@_foo_@" | $STRINGS2FST_TOOL -S ${FFLAG} > tmp1;
     echo "[?:?]" | $REGEXP_TOOL ${FFLAG} > tmp2;
     # using command line binary tools
-    for tool in $COMPOSE_TOOL $CONCATENATE_TOOL $CONJUNCT_TOOL $DISJUNCT_TOOL $SUBTRACT_TOOL
+    for tool in "$COMPOSE_TOOL" "$CONCATENATE_TOOL" "$CONJUNCT_TOOL" "$DISJUNCT_TOOL" "$SUBTRACT_TOOL"
     do
 	$tool tmp1 tmp2 | $FST2TXT_TOOL | tr '\t' ' ' > result
 	if (grep "@_foo_@ @_UNKNOWN_SYMBOL_@" result > /dev/null); then
@@ -311,7 +306,6 @@ for ext in .sfst .ofst .foma; do
 	    exit 1;
 	fi
     done
-
 
     ## test special symbols in replace rules
 

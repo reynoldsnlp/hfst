@@ -1,4 +1,5 @@
 import hfst
+harmonize=True
 explicit_ifile1=None
 explicit_ifile2=None
 arg1=None
@@ -7,7 +8,9 @@ from sys import argv
 if len(argv) < 2 or len(argv) > 5:
     raise RuntimeError('Usage: hfst-concatenate.py INFILE1 INFILE2')
 for arg in argv[1:]:
-    if arg == '-1':
+    if arg == '-H' or arg == '--do-not-harmonize':
+        harmonize=False
+    elif arg == '-1':
         explicit_ifile1 = '<next>'
     elif arg == '-2':
         explicit_ifile2 = '<next>'
@@ -61,7 +64,7 @@ ostr = hfst.HfstOutputStream(type=istr1.get_type())
 while((not istr1.is_eof()) and (not istr2.is_eof())):
     tr1 = istr1.read()
     tr2 = istr2.read()
-    tr1.concatenate(tr2)
+    tr1.concatenate(tr2, harmonize)
     tr1.write(ostr)
     ostr.flush()
 
