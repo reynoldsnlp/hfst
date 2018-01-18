@@ -25,7 +25,7 @@ script:
     - echo "${CCACHE_ARGS[@]:-}"
     - ./configure --enable-xfst --enable-proc --without-foma --enable-lexc --enable-all-tools --enable-silent-rules "${CCACHE_ARGS[@]:-}"
     - if [[ $CXX = g++ ]]; then make -j2; else make -j; fi
-    - make check
+    - make check VERBOSE=1
 
 # g++ with -j runs out of memory on travis, thus -j2
 
