@@ -500,7 +500,7 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
        strcmp(c,serial_ranges[i][1]) <= 0)
     {
       int c_int = utf8_str_to_int(c);
-      if((c_int-utf8_str_to_int(serial_ranges[i][0]))%2 == 0) // uppercase
+      if((c_int-utf8_str_to_int(serial_ranges[i][0]))%2 != 0) // uppercase
       {
         case_res = 1;
         return utf8_int_to_str(c_int+1);

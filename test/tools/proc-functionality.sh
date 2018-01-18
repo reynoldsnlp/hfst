@@ -155,6 +155,20 @@ if ! diff test.strings $srcdir/proc-cat-NUL.strings ; then
     exit 1
 fi
 
+# Serial unicode ranges check (should really be tested for all --with-unicode-handler configurations):
+printf 'ž:ž <n>' |hfst-strings2fst -S|hfst-fst2fst -O -i - >proc-serial-unicode.hfstol
+if ! echo 'ž Ž'|$TOOL proc-serial-unicode.hfstol | tr -d '\r' > test.strings ; then
+    echo serial unicode fail:
+    cat test.strings
+    exit 1
+fi
+if ! diff test.strings $srcdir/proc-serial-unicode.strings ; then
+    echo serial unicode diffs
+    exit 1
+fi
+rm proc-serial-unicode.hfstol
+
+
 
 # compounding / space handling checks
 if ! $TOOL compounds.hfstol < $srcdir/proc-compounds.strings | tr -d '\r' > test.strings ; then
