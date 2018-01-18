@@ -156,7 +156,7 @@ if ! diff test.strings $srcdir/proc-cat-NUL.strings ; then
 fi
 
 # Serial unicode ranges check (should really be tested for all --with-unicode-handler configurations):
-printf 'ž:ž <n>' |hfst-strings2fst -S|hfst-fst2fst -O -i - >proc-serial-unicode.hfstol
+printf 'ž:ž <n>' | $TOOLDIR/hfst-strings2fst -S | $TOOLDIR/hfst-fst2fst -O -i - >proc-serial-unicode.hfstol
 if ! echo 'ž Ž'|$TOOL proc-serial-unicode.hfstol | tr -d '\r' > test.strings ; then
     echo serial unicode fail:
     cat test.strings
