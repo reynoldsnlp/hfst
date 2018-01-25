@@ -156,8 +156,17 @@ if ! diff test.strings $srcdir/proc-cat-NUL.strings ; then
 fi
 
 # Serial unicode ranges check (should really be tested for all --with-unicode-handler configurations):
-printf 'ž:ž <n>' | $TOOLDIR/hfst-strings2fst -S | $TOOLDIR/hfst-fst2fst -O -i - >proc-serial-unicode.hfstol
-if ! echo 'ž Ž'|$TOOL proc-serial-unicode.hfstol | tr -d '\r' > test.strings ; then
+# TODO: [ıŀŉĸ] need exceptions in alphabet.cc
+perl -CS -e 'for(my $c=0x0100; $c < 0x017F; $c++){ my $l=chr $c; if($c != 0x0131 && $c != 0x0138 && $c != 0x0140 && $c != 0x149 && $l =~ m/\p{Lower}/){ print $l.":".$l." <n>\n"; }}' \
+    | $TOOLDIR/hfst-strings2fst -j -S \
+    | $TOOLDIR/hfst-minimize          \
+    | $TOOLDIR/hfst-fst2fst -O -i -   \
+    > proc-serial-unicode.hfstol
+if ! $TOOLDIR/hfst-fst2txt proc-serial-unicode.hfstol                  \
+        | cut -f3                                                      \
+        | perl -CS -ne 'next if /@|^$/;chomp;printf $_." ".uc $_."\n"' \
+        | $TOOL proc-serial-unicode.hfstol                             \
+        | tr -d '\r' > test.strings ; then
     echo serial unicode fail:
     cat test.strings
     exit 1
