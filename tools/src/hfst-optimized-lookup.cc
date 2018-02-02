@@ -1545,6 +1545,12 @@ void TransducerW::find_transitions(SymbolNumber input,
     {
       return;
     }
+
+  // Endless loop protection
+  if (output_symbol > &output_string.back()) {
+    return;
+  }
+
   while (transitions[i]->get_input() != NO_SYMBOL_NUMBER)
     {
 
@@ -1597,7 +1603,7 @@ void TransducerW::note_analysis(SymbolNumber * whole_output_string)
 {
   std::string str = "";
   for (SymbolNumber * num = whole_output_string;
-       *num != NO_SYMBOL_NUMBER;
+       num <= &output_string.back() && *num != NO_SYMBOL_NUMBER;
        ++num)
     {
       str.append(symbol_table[*num]);
@@ -1895,6 +1901,12 @@ void TransducerW::get_analyses(SymbolNumber * input_symbol,
           return;
       }
   }
+
+  // Endless loop protection
+  if (output_symbol > &output_string.back()) {
+    return;
+  }
+
   if (i >= TRANSITION_TARGET_TABLE_START )
     {
       i -= TRANSITION_TARGET_TABLE_START;
