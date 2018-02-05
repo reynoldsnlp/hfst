@@ -57,14 +57,11 @@ HfstOneLevelPaths lookup_vector(const hfst::HfstTransducer * tr, bool fd, const 
       else
         { return *(tr->lookup(s, limit, time_cutoff)); }
     }
-  hfst::HfstTransducer input(s, tr->get_type());
-  input.compose(*(tr));
-  input.minimize();
+
   hfst::HfstTwoLevelPaths result;
-  if (fd)
-    { input.extract_paths_fd(result, limit, -1); }
-  else
-    { input.extract_paths(result, limit, -1); }
+  hfst::HfstBasicTransducer fsm(*tr);
+  (void)time_cutoff;
+  fsm.lookup(s, result, NULL, NULL, limit, fd);
   return hfst::extract_output_side(result);
 }
 
@@ -81,14 +78,12 @@ HfstOneLevelPaths lookup_string(const hfst::HfstTransducer * tr, bool fd, const 
   hfst::HfstTokenizer tok;
   for (hfst::StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
     { tok.add_multichar_symbol(*it); }
-  hfst::HfstTransducer input(s, tok, tr->get_type());
-  input.compose(*(tr));
-  input.minimize();
+
+  StringVector sv = tok.tokenize_one_level(s);
   hfst::HfstTwoLevelPaths result;
-  if (fd)
-    { input.extract_paths_fd(result, limit, -1); }
-  else
-    { input.extract_paths(result, limit, -1); }
+  hfst::HfstBasicTransducer fsm(*tr);
+  (void)time_cutoff;
+  fsm.lookup(sv, result, NULL, NULL, limit, fd);
   return hfst::extract_output_side(result);
 }
 

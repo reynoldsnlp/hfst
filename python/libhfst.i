@@ -48,6 +48,7 @@
 #include "implementations/optimized-lookup/pmatch.h"
 #include "parsers/TwolcCompiler.h"
 namespace hfst { typedef std::vector<hfst::xeroxRules::Rule> HfstRuleVector; }
+namespace hfst { typedef std::pair<hfst::HfstTransducer*,unsigned int> HfstTransducerUIntPair; }
 
 // Most of C++ extension code is located in separate files.
 #include "hfst_regex_extensions.cpp"
@@ -94,7 +95,7 @@ namespace std {
 %template(HfstTransducerPair) pair<hfst::HfstTransducer, hfst::HfstTransducer>;
 %template(HfstTransducerPairVector) vector<pair<hfst::HfstTransducer, hfst::HfstTransducer> >;
 %template(HfstRuleVector) vector<hfst::xeroxRules::Rule>;
-%template(FooBarBaz) pair<hfst::HfstTransducer*,unsigned int>;
+%template(HfstTransducerUIntPair) pair<hfst::HfstTransducer*,unsigned int>;
 }
 
 
@@ -165,6 +166,7 @@ typedef std::vector<hfst::HfstTransducer> HfstTransducerVector;
 typedef std::pair<hfst::HfstTransducer, hfst::HfstTransducer> HfstTransducerPair;
 typedef std::vector<std::pair<hfst::HfstTransducer, hfst::HfstTransducer> > HfstTransducerPairVector;
 typedef std::vector<hfst::xeroxRules::Rule> HfstRuleVector;
+typedef std::pair<hfst::HfstTransducer*,unsigned int> HfstTransducerUIntPair;
 
 // *** Some enumerations *** //
 
@@ -1139,7 +1141,7 @@ class HfstBasicTransducer {
   HfstTwoLevelPaths _lookup(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight, bool obey_flags) throw(TransducerIsCyclicException)
   {
     hfst::HfstTwoLevelPaths results;
-    $self->lookup(lookup_path, results, infinite_cutoff, max_weight, obey_flags);
+    $self->lookup(lookup_path, results, infinite_cutoff, max_weight, -1, obey_flags);
     return results;
   }
 
@@ -1490,7 +1492,7 @@ class XreCompiler
   {
     (void)self->setOutputToConsole(value);
   }
-  std::pair<hfst::HfstTransducer*,unsigned int> compile_first(const std::string & xre)
+  HfstTransducerUIntPair compile_first(const std::string & xre)
   {
     unsigned int c=0;
     hfst::HfstTransducer * result = self->compile_first(xre, c);

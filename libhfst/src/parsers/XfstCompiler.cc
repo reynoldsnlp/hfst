@@ -704,11 +704,11 @@ namespace xfst {
         HfstTwoLevelPaths results;
 
         if (variables_["maximum-weight"] == "OFF")
-          t->lookup(lookup_path, results, &cutoff, NULL, (variables_["obey-flags"] == "ON"));
+          t->lookup(lookup_path, results, &cutoff, NULL, -1 /*max_number*/, (variables_["obey-flags"] == "ON"));
         else
           {
             float max_weight = string_to_float(variables_["maximum-weight"]);
-            t->lookup(lookup_path, results, &cutoff, &max_weight, (variables_["obey-flags"] == "ON"));
+            t->lookup(lookup_path, results, &cutoff, &max_weight, -1 /*max_number*/, (variables_["obey-flags"] == "ON"));
           }
 
         bool printed = false; // if anything was printed

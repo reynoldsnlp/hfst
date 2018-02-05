@@ -3616,6 +3616,7 @@
             HfstEpsilonHandler Eh,
             size_t max_epsilon_cycles,
             float * max_weight /*= NULL*/,
+	    int max_number /*=-1*/,
             StringVector * flag_diacritic_path /*= NULL*/)
          {
            // Check whether the number of input epsilon cycles is exceeded
@@ -3626,6 +3627,10 @@
            if (max_weight != NULL && path_so_far.first > *max_weight) {
              return;
            }
+	   // Check whether the maximum number of results is exceeded
+	   if (max_number >= 0 && (size_t)max_number <= results.size()) {
+	     return;
+	   }
            
            // If we are at the end of lookup_path,
            if (lookup_index == lookup_path.size())
@@ -3692,7 +3697,7 @@
                    
                    // call lookup for the target state of the transition
                    lookup(lookup_path, results, it->get_target_state(),
-                             lookup_index, path_so_far, alphabet, *Ehp, max_epsilon_cycles, max_weight, flag_diacritic_path);
+			  lookup_index, path_so_far, alphabet, *Ehp, max_epsilon_cycles, max_weight, max_number, flag_diacritic_path);
                    
                    // return to the original values of path_so_far
                    // and lookup_index
@@ -3716,6 +3721,7 @@
             HfstTwoLevelPaths &results,
             size_t * max_epsilon_cycles /*= NULL*/,
             float * max_weight /*= NULL*/,
+	    int max_number /*= -1*/,
             bool obey_flags /*= false*/)
          {
            HfstState state = 0;
@@ -3728,13 +3734,13 @@
              {
                HfstEpsilonHandler Eh(*max_epsilon_cycles);
                lookup(lookup_path, results, state, lookup_index, path_so_far,
-                      alphabet, Eh, *max_epsilon_cycles, max_weight, flag_diacritic_path);
+                      alphabet, Eh, *max_epsilon_cycles, max_weight, max_number, flag_diacritic_path);
              }
            else
              {
                HfstEpsilonHandler Eh(100000);
                lookup(lookup_path, results, state, lookup_index, path_so_far,
-                      alphabet, Eh, 100000, max_weight, flag_diacritic_path);
+                      alphabet, Eh, 100000, max_weight, max_number, flag_diacritic_path);
              }
            
            if (flag_diacritic_path != NULL)
