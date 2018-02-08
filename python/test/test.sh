@@ -64,22 +64,25 @@ do
     fi
 done
 
-for format in sfst openfst foma;
+for testfile in test_streams test_streams_all;
 do
-    if ( $PYTHON test_streams_1.py $format $PYTHONPATH | $PYTHON test_streams_2.py $format $PYTHONPATH | $PYTHON test_streams_3.py $format $PYTHONPATH ); then
-	if ! [ "$VERBOSITY" = "silent" ]; then
-            echo "test_streams[1|2|3].py with "$format" format passed"
+    for format in sfst openfst foma;
+    do
+	if ( $PYTHON ${testfile}_1.py $format $PYTHONPATH | $PYTHON ${testfile}_2.py $format $PYTHONPATH | $PYTHON ${testfile}_3.py $format $PYTHONPATH ); then
+	    if ! [ "$VERBOSITY" = "silent" ]; then
+		echo ${testfile}"_[1|2|3].py with "$format" format passed"
+	    fi
+	elif [ "$?" = "77" ]; then
+	    if ! [ "$VERBOSITY" = "silent" ]; then
+		echo ${testfile}"_[1|2|3].py with "$format" format skipped"
+	    fi
+	else
+	    if ! [ "$VERBOSITY" = "silent" ]; then
+		echo ${testfile}"_[1|2|3].py with "$format" format failed"
+	    fi
+            exit 1
 	fi
-    elif [ "$?" = "77" ]; then
-	if ! [ "$VERBOSITY" = "silent" ]; then
-            echo "test_streams[1|2|3].py with "$format" format skipped"
-	fi
-    else
-	if ! [ "$VERBOSITY" = "silent" ]; then
-            echo "test_streams[1|2|3].py with "$format" format failed"
-	fi
-        exit 1
-    fi
+    done
 done
 
 rm foo

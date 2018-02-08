@@ -21,7 +21,6 @@ if hfst.HfstTransducer.is_implementation_type_available(hfst.ImplementationType.
     types.append(hfst.ImplementationType.TROPICAL_OPENFST_TYPE)
 if hfst.HfstTransducer.is_implementation_type_available(hfst.ImplementationType.FOMA_TYPE):
     types.append(hfst.ImplementationType.FOMA_TYPE)
-    print('HERE!!!')
 
 for type in types:
 

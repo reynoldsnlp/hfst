@@ -948,13 +948,31 @@ public:
 ~HfstOutputStream(void);
 HfstOutputStream &flush();
 void close(void);
+hfst::HfstOutputStream & redirect(hfst::HfstTransducer &) throw(StreamIsClosedException);
 
 %extend {
 
-void write(hfst::HfstTransducer transducer) throw(StreamIsClosedException) { $self->redirect(transducer); }
 HfstOutputStream() { return new hfst::HfstOutputStream(hfst::get_default_fst_type()); }
 
 %pythoncode %{
+
+def write(self, tr):
+    """
+    Write one or more transducers to stream.
+
+    Parameters
+    ----------
+    * `tr` :
+        An HfstTransducer or an iterable object of several HfstTransducers.
+    """
+    if isinstance(tr, HfstTransducer):
+        self.redirect(tr)
+    else:
+        for t in tr:
+            if isinstance(t, HfstTransducer):
+                self.redirect(t)
+            else:
+                raise RuntimeError('Cannot write objects that are not instances of HfstTransducer')
 
 def __init__(self, **kwargs):
     """
@@ -1000,15 +1018,15 @@ def __init__(self, **kwargs):
     type = _libhfst.get_default_fst_type()
     for k,v in kwargs.items():
         if k == 'filename':
-           filename = v
+            filename = v
         if k == 'hfst_format':
-           hfst_format = v
+            hfst_format = v
         if k == 'type':
-           type = v
+            type = v
     if filename == "":
-       self.this = _libhfst.create_hfst_output_stream("", type, hfst_format)
+        self.this = _libhfst.create_hfst_output_stream("", type, hfst_format)
     else:
-       self.this = _libhfst.create_hfst_output_stream(filename, type, hfst_format)
+        self.this = _libhfst.create_hfst_output_stream(filename, type, hfst_format)
 %}
 
 }
@@ -1034,6 +1052,15 @@ public:
 hfst::HfstTransducer * read() throw (EndOfStreamException) { return new hfst::HfstTransducer(*($self)); }
 
 %pythoncode %{
+
+def read_all(self):
+    """
+    Read all transducers from stream and return them in a list.
+    """
+    retval = []
+    while(not self.is_eof()):
+        retval.append(self.read())
+    return retval
 
 def __iter__(self):
     """
