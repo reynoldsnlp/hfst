@@ -191,6 +191,19 @@ if ! diff test.strings $srcdir/proc-compounds-out.strings ; then
 fi
 rm test.strings
 
+# escaping
+if ! $TOOL escaping.hfstol < $srcdir/proc-escaping.strings | tr -d '\r' > test.strings ; then
+    echo escaping fail
+    cat test.strings
+    exit 1
+fi
+if ! diff test.strings $srcdir/proc-escaping-out.strings ; then
+    echo escaping diffs
+    exit 1
+fi
+rm test.strings
+
+
 ## skip new test introduced in version 3014...
 exit 0
 

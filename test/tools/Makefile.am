@@ -190,7 +190,7 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   a_or_id.hfst id_star_a_b_c.hfst pmatch_endtag.pmatch
 OL_CHECKS=cat2dog.hfstol cat2dog.genhfstol cat_weight_final.hfstol cat_weight_ambig.hfstol \
 			proc-caps.hfstol proc-caps.genhfstol \
-			compounds.hfstol compounds2.hfstol
+			escaping.hfstol compounds.hfstol compounds2.hfstol
 if WANT_SFST
 SFST_CHECKS=0to3cats.sfst 2to4cats.sfst 4cats.sfst\
 			4toINFcats.sfst cat2cat_or_CAT_uppercased.sfst \
@@ -269,7 +269,7 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt cat_weight_ambig.txt
 		 a2b.txt a2b_complement.txt a2b_input_projection_complement.txt \
 		 walk_or_dog.txt ab.txt bc.txt id.txt aid.txt idb.txt \
 		 ab_shuffle_bc.txt id_shuffle_id.txt aid_shuffle_idb.txt \
-		 compounds.txt compounds2.txt \
+		 escaping.txt compounds.txt compounds2.txt \
 		 id_shuffle_id.txt aid_shuffle_idb.txt \
 		 prunable_alphabet.txt non_prunable_alphabet_1.txt non_prunable_alphabet_2.txt id.txt unk2unk_or_id.txt \
 		 a2a_or_a2b_or_a2unk.txt a2b_or_b2b_or_unk2b.txt a_or_id.txt id_star_a_b_c.txt \
