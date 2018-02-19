@@ -20,8 +20,8 @@ hfst-invert ${1}.hfst | $fst2fstcommand > \
     hfst-${1}-installable/${2}-generation.hfst.ol
 $fst2fstcommand ${1}.hfst > \
     hfst-${1}-installable/${2}-analysis.hfst.ol
-sed s/LANGCODE/${2}/g < analyze.sh > hfst-${1}-installable/${1}-analyze
-sed s/LANGCODE/${2}/g < generate.sh > hfst-${1}-installable/${1}-generate
+sed s/LANGCODE/${2}/g < analyze.sh > hfst-${1}-installable/${1}-analyze-words
+sed s/LANGCODE/${2}/g < generate.sh > hfst-${1}-installable/${1}-generate-words
 sed -e s/LANGNAME/${1}/g -e s/LANGCODE/${2}/g < Makefile-skeleton > \
     hfst-${1}-installable/Makefile
 
