@@ -14,6 +14,6 @@ if [ "$1" == "--help" ] ; then
     exit 0
 fi
 
-hfst-tokenize $trdir/LANGCODE-analysis.hfst.ol |
+hfst-tokenize $trdir/LANGCODE-tokenize.pmatch |
     hfst-lookup -p -b 25 $trdir/LANGCODE-analysis.hfst.ol |
     cut -f1,2
