@@ -130,7 +130,7 @@ namespace xfst {
     variable_explanations_["random-seed"] = "<EXPLANATION MISSING>";
     variable_explanations_["recode-cp1252"] = "<NOT SUPPORTED>";
     variable_explanations_["recursive-define"] = "<EXPLANATION MISSING>";
-    variable_explanations_["retokenize"] = "<EXPLANATION MISSING>";
+    variable_explanations_["retokenize"] = "retokenize regular expressions in 'compile-replace'";
     variable_explanations_["show-flags"] = "show flag diacritics when printing";
     variable_explanations_["sort-arcs"] = "<NOT IMPLEMENTED>";
     variable_explanations_["use-timer"] = "<NOT IMPLEMENTED>";
@@ -200,7 +200,7 @@ namespace xfst {
         variables_["random-seed"] = "ON";
         variables_["recode-cp1252"] = "NEVER";
         variables_["recursive-define"] = "OFF";
-        variables_["retokenize"] = "OFF";
+        variables_["retokenize"] = "ON";
         variables_["show-flags"] = "OFF";
         variables_["sort-arcs"] = "MAYBE";
         variables_["use-timer"] = "OFF";
@@ -267,7 +267,7 @@ namespace xfst {
         variables_["random-seed"] = "ON";
         variables_["recode-cp1252"] = "NEVER";
         variables_["recursive-define"] = "OFF";
-        variables_["retokenize"] = "OFF";
+        variables_["retokenize"] = "ON";
         variables_["show-flags"] = "OFF";
         variables_["sort-arcs"] = "MAYBE";
         variables_["use-timer"] = "OFF";
@@ -5141,7 +5141,7 @@ namespace xfst {
     return retval;
     }*/
 
-  static std::string to_regexp(const hfst::StringPairVector & path, bool input_side)
+  static std::string to_regexp(const hfst::StringPairVector & path, bool input_side, bool retokenize)
   {
     std::string pathstr("[");
     for (hfst::StringPairVector::const_iterator it = path.begin(); it != path.end(); it++)
@@ -5151,7 +5151,13 @@ namespace xfst {
         if (symbol != "^]" && symbol != "^[")
           {
             if (symbol != hfst::internal_epsilon)
-              pathstr.append(symbol); //.append(" ");
+	      {
+		pathstr.append(symbol);
+		if (!retokenize)
+		  {
+		    pathstr.append(" ");
+		  }
+	      }
           }
       }
     pathstr.append("]");
@@ -5212,7 +5218,7 @@ namespace xfst {
                   {
                     HfstState end_state = rit->first;
 
-                   std::string regexp = to_regexp(rit->second, (level == UPPER_LEVEL));
+		   std::string regexp = to_regexp(rit->second, (level == UPPER_LEVEL), (variables_["retokenize"] == "ON"));
                    std::string literal_regexp = to_literal_regexp(rit->second, (level != UPPER_LEVEL));
 
                    std::string cross_product_regexp = "[ ";
