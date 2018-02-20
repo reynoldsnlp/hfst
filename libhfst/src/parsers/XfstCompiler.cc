@@ -5159,6 +5159,15 @@ namespace xfst {
 		  }
 	      }
           }
+	else
+	  {
+	    // For better alignment
+	    pathstr.append("\"@EPSILON_MARKER@\"");
+	    if (!retokenize)
+	      {
+		pathstr.append(" ");
+	      }
+	  }
       }
     pathstr.append("]");
     if (pathstr == "[]")
@@ -5216,7 +5225,7 @@ namespace xfst {
                 for (HfstReplacements::const_iterator rit = replacements.begin();
                      rit != replacements.end(); rit++)
                   {
-                    HfstState end_state = rit->first;
+                   HfstState end_state = rit->first;
 
 		   std::string regexp = to_regexp(rit->second, (level == UPPER_LEVEL), (variables_["retokenize"] == "ON"));
                    std::string literal_regexp = to_literal_regexp(rit->second, (level != UPPER_LEVEL));
@@ -5260,6 +5269,7 @@ namespace xfst {
       cr->optimize();
 
       result->subtract(*cr).optimize();
+      result->substitute("@EPSILON_MARKER@", "@_EPSILON_SYMBOL_@");
       delete cr;
       stack_.pop();
       delete tmp;
