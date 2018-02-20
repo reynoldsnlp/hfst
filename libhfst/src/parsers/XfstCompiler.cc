@@ -680,7 +680,7 @@ namespace xfst {
     XfstCompiler::lookup(char* line, HfstBasicTransducer * t)
       {
         char* token = strstrip(line);
-        StringSet alpha = t->get_alphabet();
+        StringSet alpha = t->get_input_symbols();
         HfstTokenizer tok;
         for (StringSet::const_iterator it = alpha.begin();
              it != alpha.end(); it++)
