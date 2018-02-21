@@ -1134,6 +1134,8 @@ class HfstBasicTransducer {
     std::set<std::string> symbols_used();
     void prune_alphabet(bool force=true);
     const std::set<std::string> &get_alphabet() const;
+    StringSet get_input_symbols() const;
+    StringSet get_output_symbols() const;
     StringPairSet get_transition_pairs() const;
     HfstState add_state(void);
     HfstState add_state(HfstState s);
