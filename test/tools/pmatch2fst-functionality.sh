@@ -36,7 +36,8 @@ if ! echo '<Q>a</Q> <Q>b</Q>  <Q>c</Q>' | diff pmatch.out - > /dev/null ; then
     exit 1
 fi
 
-echo 'set need-separators off regex "\x22" EndTag(Q);' | $PMATCH2FST > test.pmatch
+# printf to workaround a weird bug with \x22 when bash is called as /bin/sh on macos:
+printf '%s\n' 'set need-separators off regex "\x22" EndTag(Q);' | $PMATCH2FST > test.pmatch
 
 echo 'a "b"  c' | $PMATCH --newline test.pmatch > pmatch.out
 if ! echo 'a <Q>"</Q>b<Q>"</Q>  c' | diff pmatch.out - > /dev/null ; then
