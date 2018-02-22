@@ -299,6 +299,10 @@
        HFSTDLL const HfstAlphabet &get_alphabet() const;
        
        HFSTDLL StringPairSet get_transition_pairs() const;
+
+       HFSTDLL StringSet get_input_symbols() const;
+
+       HFSTDLL StringSet get_output_symbols() const;
        
        // ----------------------------------------------------------------
        // --- Adding states and transitions and iterating through them ---
