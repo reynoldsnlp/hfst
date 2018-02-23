@@ -22,14 +22,13 @@ define internal_punct "'" | "-" | "." | "*"+;
 define unknown_word_char [[\Whitespace] - Punct ] - punct_trailing;
 define unknown_token [unknown_word_char+ (internal_punct unknown_word_char+)]+ ;
 define boundary Whitespace | .#. ;
-define optcap_omorfi OptCap(omorfi, U);
 
 define omorfi_with_trailing_punctuation
-  LC(boundary) Ins(optcap_omorfi) RC([punct_trailing | punct_sentbound]);
+  LC(boundary) Ins(omorfi) RC([punct_trailing | punct_sentbound]);
 define omorfi_with_preceding_punctuation
-  LC(punct_preceding) Ins(optcap_omorfi) RC(boundary);
+  LC(punct_preceding) Ins(omorfi) RC(boundary);
 define omorfi_between_punctuation
-  LC(punct_preceding) Ins(optcap_omorfi) RC([punct_trailing | punct_sentbound]);
+  LC(punct_preceding) Ins(omorfi) RC([punct_trailing | punct_sentbound]);
 define trailing_punct NLC(boundary) punct_trailing RC(boundary);
 define preceding_punct LC(boundary) punct_preceding NRC(boundary);
 define sentbound NLC(boundary) punct_sentbound+ RC(boundary);
@@ -49,12 +48,13 @@ define inch_sign {"} | {”};
 define numerical numerical_exp | numerical_range | percentage_maybe_change;
 define url (({http}) ("s") {://}) ({www.}) [[Alpha | Num]+ (".")]+ "." [Alpha]^{1,10} (":" Num+) ("/" [\Whitespace]+);
 define email [\Whitespace]+ "@" [\Whitespace]+ "." Alpha+;
+define xml_tag "<" ("/") [\[">"|"\n"]]+ ">";
 define typographic_paragraph_separator "*"+ | "-"+ | "=+";
 define any_nonwhitespace_utf8_char ? - Whitespace;
 
 define TOP
   ! First the case with a plain omorfi token, possibly with trailing dash
-  [ define( LC(boundary) Ins(optcap_omorfi) (token_trailing_parts) RC(boundary) ) ] |
+  [ define( LC(boundary) Ins(omorfi) (token_trailing_parts) RC(boundary) ) ] |
   ! word.
   [ omorfi_with_trailing_punctuation ] |
   ! -word
@@ -65,6 +65,7 @@ define TOP
   ! The trailing punctuation
   [ trailing_punct ] |
   [ preceding_punct ] |
+  [ xml_tag ] |
   ! This will insert a newline and should be less preferred than dotted
   ! punctuations coming from omorfi
   [ sentbound EndTag("Boundary=Sentence")]::100 |
