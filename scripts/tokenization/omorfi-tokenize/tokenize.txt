@@ -20,7 +20,7 @@ define date_with_time date " " time;
 define token_preceding_parts define(LC(.#. | "\n") hyphen) | "@" | "." | "#";
 define numerical_expr (minus) [[Num+] | [Num^{1,3} [(","|"."|" ") Num^3]*]] (["."|","] Num+);
 define scientific_num (minus) [Num+] (["." | ","] Num+) ("e" Num+);
-define numerical_ord Num+ ".";
+define numerical_ord Num+ "." NRC(boundary UppercaseAlpha);
 define numerical_range numerical_expr [(" ") dash (" ")] numerical_expr;
 define date_range [ date | [ Num Num "." ] ] (" ") dash (" ") date;
 define percentage_maybe_change (["+" | minus]) numerical_expr ("%");
@@ -45,7 +45,7 @@ define omorfi_suffixes [[("-") LowercaseAlpha+]+ .o. omorfi] .o. ["[POSITION=SUF
 define internal_punct "'" | "-" | "." | "*"+;
 define unknown_word_char [\[Whitespace | Punct | em_dash | punct_trailing]];
 define unknown_token [unknown_word_char+ (internal_punct unknown_word_char+)]+ ;
-define boundary Whitespace | .#. ;
+define boundary Whitespace+ | .#. ;
 
 define omorfi_with_trailing_punctuation
   LC(boundary) Ins(omorfi) RC([punct_trailing | punct_sentbound]);
