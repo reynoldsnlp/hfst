@@ -6,8 +6,12 @@ set need-separators off
 ! wordforms in OmorFi, and the latter a list of missing proper names that
 ! probably don't belong in a dictionary.
 
-define punct_trailing "\"" | "'" | "," | ")" | "]" | "}" | "’" | "”" | "–" | ":" | ";" | "»" | ">" | "”";
-define punct_preceding "\"" | "'" | "<" | "(" | "[" | "{" | "’" | "”" | "-" | "–" | "»" | ">" | "“";
+! We use directed unicode quotation marks in both directions because people
+! don't use them correctly in the wild
+define punct_trailing_or_preceding "\"" | "'" | "’" | "”" | "“" | "„" | "″"; 
+define punct_trailing punct_trailing_or_preceding | "," | ")" | "]" | "}" | "–" | ":" | ";" | "»" | ">" ;
+define punct_preceding punct_trailing_or_preceding | "<" | "(" | "[" | "{" | "-" | "–" | "»" | ">" ;
+
 define punct_sentbound "." | "?" | "!";
 define dash "-" | "–";
 define hyphen "-" | "‐";
@@ -42,7 +46,7 @@ define disallowed_omorfi_analyses "[SUBCAT=DECIMAL]" | "[UPOS=NUM]";
 define omorfi [@bin"omorfi.hfst" .o. [[\disallowed_omorfi_analyses]+] ] | @txt"omorfi_additions.txt" ;
 define proper_name @txt"proper_names.txt";
 define omorfi_suffixes [[("-") LowercaseAlpha+]+ .o. omorfi] .o. ["[POSITION=SUFFIX]" ?+];
-define internal_punct "'" | "-" | "." | "*"+;
+define internal_punct "'" | "’" | "-" | "." | "*"+;
 define unknown_word_char [\[Whitespace | Punct | em_dash | punct_trailing]];
 define unknown_token [unknown_word_char+ (internal_punct unknown_word_char+)]+ ;
 define boundary Whitespace+ | .#. ;
@@ -87,5 +91,5 @@ define TOP
   [ token_trailing_parts ]::600 | ! lone trailing part
   [ Punct ]::700 |
   [ typographic_paragraph_separator ]::800 |
-  [ any_nonwhitespace_utf8_char ]::900
+  [ [Alpha | Num]+ | any_nonwhitespace_utf8_char ]::900
 ;
