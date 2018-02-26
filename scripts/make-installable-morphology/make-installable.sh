@@ -3,7 +3,7 @@
 function print_help()
 {
     echo
-    echo 'make-installable.sh langname langcode [--dir dirname] [-w | --weighted] [--capcase] [--punct]'
+    echo 'make-installable.sh langname langcode [--dir dirname] [--unweighted] [--capcase] [--punct]'
     echo
     echo 'Expects to have an analyzing morphology in the directory'
     echo 'hfst-[langname] under the name "langname.hfst", where'
@@ -11,10 +11,10 @@ function print_help()
     echo 'should be under the working directory, or you can specify its full'
     echo 'name and path with --dir, eg. for French,'
     echo
-    echo './make-installable.sh french fr --dir /path/to/french [-w | --weighted] [--capcase] [--punct]'
+    echo './make-installable.sh french fr --dir /path/to/french [--unweighted] [--capcase] [--punct]'
     echo
     echo 'fr is the language code'
-    echo '-w or --weighted controls whether the analyzer will be weighted'
+    echo '--unweighted controls whether the analyzer will be weighted'
     echo '--capcase controls whether to compose in a casing handler'
     echo '--punct controls whether to include a punctuation handler'
 }
@@ -30,7 +30,7 @@ shift 2
 
 dir=hfst-${langname}-installable
 
-fst2fstcommand="hfst-fst2fst -O"
+fst2fstcommand="hfst-fst2fst -w"
 capcase="false"
 punct="false"
 
@@ -40,8 +40,8 @@ while test -n "$1"; do
 	    print_help
 	    exit 1
 	    ;;
-	-w|--weighted)
-	    fst2fstcommand="hfst-fst2fst -w"
+	--unweighted)
+	    fst2fstcommand="hfst-fst2fst -O"
 	    ;;
 	--capcase)
 	    capcase="true"
