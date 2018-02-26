@@ -17,6 +17,13 @@ you should use --capcase
 2) Does the morphology know about punctuation like .,!? If not, consider using
 --punct
 
-Notes about existing transducers:
+Notes about args for existing transducers:
 
 French: --capcase --punct
+Italian: --capcase
+Finnish: [none, but consider using tokenizer from
+  scripts/tokenization/omorfi-tokenize]
+Turkish: --punct --capcase
+Swedish: --punct --capcase
+German: [none]
+English: --capcase
