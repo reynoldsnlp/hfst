@@ -46,6 +46,7 @@
 #include "implementations/HfstBasicTransition.h"
 #include "implementations/HfstBasicTransducer.h"
 #include "implementations/optimized-lookup/pmatch.h"
+#include "implementations/optimized-lookup/pmatch_tokenize.h"
 #include "parsers/TwolcCompiler.h"
 namespace hfst { typedef std::vector<hfst::xeroxRules::Rule> HfstRuleVector; }
 namespace hfst { typedef std::pair<hfst::HfstTransducer*,unsigned int> HfstTransducerUIntPair; }
@@ -56,6 +57,7 @@ namespace hfst { typedef std::pair<hfst::HfstTransducer*,unsigned int> HfstTrans
 #include "hfst_lexc_extensions.cpp"
 #include "hfst_xfst_extensions.cpp"
 #include "hfst_pmatch_extensions.cpp"
+#include "hfst_pmatch_tokenize_extensions.cpp"
 #include "hfst_sfst_extensions.cpp"
 #include "hfst_lookup_extensions.cpp"
 #include "hfst_rules_extensions.cpp"
@@ -1134,6 +1136,8 @@ class HfstBasicTransducer {
     std::set<std::string> symbols_used();
     void prune_alphabet(bool force=true);
     const std::set<std::string> &get_alphabet() const;
+    StringSet get_input_symbols() const;
+    StringSet get_output_symbols() const;
     StringPairSet get_transition_pairs() const;
     HfstState add_state(void);
     HfstState add_state(HfstState s);
@@ -1661,7 +1665,12 @@ namespace hfst_ol {
 
 }; // class PmatchContainer
 } // namespace hfst_ol
- 
+
+namespace hfst {
+  std::string pmatch_tokenize(hfst_ol::PmatchContainer & container,
+			      const std::string & input_text);
+}
+
 %pythoncode %{
 
 class ImplementationType:

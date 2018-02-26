@@ -35,7 +35,10 @@ for type in [hfst.ImplementationType.SFST_TYPE, hfst.ImplementationType.TROPICAL
         except IOError as e:
             pass
 
-        # (4) try to compile meaningless and invalid expressions
+        # (4) use pmatch_tokenize
+        assert hfst.pmatch_tokenize(cont, "Je marche seul dans l'avenue des Ternes.").rstrip() == "avenue des Ternes"
+
+        # (5) try to compile meaningless and invalid expressions
         # skip these tests, it seems that PmatchCompiler should be reseted after
         # compilation that fails...
         continue

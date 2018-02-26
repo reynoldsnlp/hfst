@@ -418,6 +418,11 @@ enum PmatchEvalType {
     Transducer
 };
 
+enum PmatchObjectType {
+    Unspecified,
+    String
+};
+
 struct PmatchObject {
     std::string name; // optional, given if the object appears as a definition
     double weight;
@@ -425,6 +430,7 @@ struct PmatchObject {
     clock_t my_timer;
     HfstTransducer * cache;
     bool parent_is_context;
+    PmatchObjectType object_type;
     PmatchObject(void);
     void start_timing(void)
         {
@@ -445,6 +451,10 @@ struct PmatchObject {
         {
             return name != "" && call_stack.size() == 0;
         }
+
+    virtual bool is_unweighted_disjunction_of_strings(void)
+        { return false; }
+    virtual void collect_strings_into(StringVector & strings) { return; }
     
     virtual HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer) = 0;
     virtual HfstTransducer * evaluate(std::vector<PmatchObject *> args);
@@ -466,11 +476,14 @@ struct PmatchString: public PmatchObject {
     std::string string;
     bool multichar;
     PmatchString(std::string str, bool is_multichar = false):
-        string(str), multichar(is_multichar) {}
+        string(str), multichar(is_multichar) { object_type = String; }
     HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
     std::string as_string(void) { return string; }
     StringPair as_string_pair(void)
         { return StringPair(string, string); }
+    bool is_unweighted_disjunction_of_strings(void)
+        { return weight == 0.0 && (multichar || (string.size() < 2)); }
+    void collect_strings_into(StringVector & strings);
 };
 
 struct PmatchQuestionMark: public PmatchObject {
@@ -604,6 +617,8 @@ struct PmatchBinaryOperation: public PmatchObject{
         op(_op), left(_left), right(_right) {}
     HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
     StringPair as_string_pair(void);
+    bool is_unweighted_disjunction_of_strings(void);
+    void collect_strings_into(StringVector & strings);
     void mark_context_children(void)
         {
             parent_is_context = true;

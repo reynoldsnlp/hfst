@@ -1674,6 +1674,7 @@ PmatchObject::PmatchObject(void)
     line_defined = pmatchlineno;
     cache = (HfstTransducer*) (NULL);
     parent_is_context = false;
+    object_type = Unspecified;
 }
 
 HfstTransducer * PmatchObject::evaluate(std::vector<PmatchObject *> args)
@@ -1698,6 +1699,17 @@ HfstTransducer * PmatchObject::evaluate(std::vector<PmatchObject *> args)
         errstring << "Object " << name << " on line " << pmatchlineno << " has no argument handling";
         throw std::invalid_argument(errstring.str());
     }
+}
+
+void PmatchString::collect_strings_into(StringVector & strings)
+{
+    strings.push_back(string);
+}
+
+void PmatchBinaryOperation::collect_strings_into(StringVector & strings)
+{
+    left->collect_strings_into(strings);
+    right->collect_strings_into(strings);
 }
 
 HfstTransducer * PmatchSymbol::evaluate(PmatchEvalType eval_type)
@@ -2098,6 +2110,34 @@ HfstTransducer * PmatchBinaryOperation::evaluate(PmatchEvalType eval_type)
     }
     start_timing();
     HfstTransducer * retval = NULL;
+
+    // Special optimization cases
+    if (op == Disjunct) {
+        if (left->is_unweighted_disjunction_of_strings() &&
+            right->is_unweighted_disjunction_of_strings()) {
+            StringVector strings;
+            left->collect_strings_into(strings);
+            right->collect_strings_into(strings);
+            HfstTokenizer tok;
+            retval = new HfstTransducer(format);
+            for (StringVector::iterator it = strings.begin(); it != strings.end(); ++it) {
+                StringPairVector spv = tok.tokenize(*it);
+                retval->disjunct(spv);
+            }
+            retval->set_final_weights(hfst::double_to_float(weight), true);
+            if (cache == NULL && should_use_cache() == true) {
+                cache = retval;
+                // No minimization because we did it the clever way!
+                print_size_info(cache);
+                report_time();
+                return new HfstTransducer(*cache);
+            }
+            report_time();
+            return retval;
+        }
+    }
+
+    // General cases
     HfstTransducer * lhs = left->evaluate();
     HfstTransducer * rhs = right->evaluate();
     if (op == Concatenate) {
@@ -2191,6 +2231,15 @@ StringPair PmatchBinaryOperation::as_string_pair(void)
     }
     return StringPair("", "");
 }
+
+bool PmatchBinaryOperation::is_unweighted_disjunction_of_strings(void)
+{
+    return weight == 0.0 && 
+        op == Disjunct &&
+        left->is_unweighted_disjunction_of_strings() &&
+        right->is_unweighted_disjunction_of_strings();
+}
+
 
 HfstTransducer * PmatchTernaryOperation::evaluate(PmatchEvalType eval_type)
 {
