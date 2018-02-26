@@ -99,6 +99,6 @@ rest=${langname:1}
 sed -e s/Langname/$firstletter$rest/g -e s/LANGNAME/${langname}/g < README-skeleton > \
     ${target_dir}/README
 
-sed -e s/LANG/${langname}.hfst/g < tokenizer-skeleton > ${langcode}-tokenizer.txt
+sed -e s/LANG/${langname}_tmp.hfst/g < tokenizer-skeleton > ${langcode}-tokenizer.txt
 hfst-pmatch2fst ${langcode}-tokenizer.txt > ${target_dir}/${langcode}-tokenize.pmatch
 rm -f ${langcode}-tokenizer.txt ${langname}_tmp.hfst
