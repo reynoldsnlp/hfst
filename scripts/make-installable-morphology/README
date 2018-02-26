@@ -19,11 +19,11 @@ you should use --capcase
 
 Notes about args for existing transducers:
 
-French: --capcase --punct
-Italian: --capcase
+French: --capcase --punct --unweighted
+Italian: --capcase --unweighted
 Finnish: [none, but consider using tokenizer from
   scripts/tokenization/omorfi-tokenize]
-Turkish: --punct --capcase
-Swedish: --punct --capcase
-German: [none]
+Turkish: --punct --capcase --unweighted
+Swedish: --punct --capcase --unweighted
+German: --unweighted
 English: --capcase
