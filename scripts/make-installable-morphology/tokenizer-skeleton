@@ -1,0 +1,7 @@
+set need-separators off
+
+define morfo @bin"LANG";
+define word_boundary Whitespace | .#. | Punct;
+define others Exc(word_boundary);
+define boundary_separated_token LC(word_boundary) morfo RC(word_boundary);
+define TOP boundary_separated_token | [[others+]:10000];
