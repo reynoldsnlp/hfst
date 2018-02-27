@@ -71,13 +71,15 @@ set -x
 mkdir -p $target_dir
 
 hfst-fst2fst -t ${dir}/${langname}.hfst > ${langname}_tmp.hfst
+echo '0' | hfst-txt2fst | hfst-disjunct -1 - -2 ${langname}_tmp.hfst > ${langname}_with_empty_string.hfst
+mv ${langname}_with_empty_string.hfst ${langname}_tmp.hfst
 
 if [ "$punct" == "true" ]; then
     hfst-strings2fst -j punct.txt | hfst-disjunct -1 - -2 ${langname}_tmp.hfst > ${langname}_with_punct.hfst
     mv ${langname}_with_punct.hfst ${langname}_tmp.hfst
 fi
 
-hfst-invert ${langname}_tmp.hfst | $fst2fstcommand > \
+hfst-invert ${langname}_tmp.hfst | hfst-minimize | $fst2fstcommand > \
     ${target_dir}/${langcode}-generation.hfst.ol
 
 if [ "$capcase" == "true" ]; then
@@ -85,7 +87,7 @@ if [ "$capcase" == "true" ]; then
     mv ${langname}_capcase.hfst ${langname}_tmp.hfst
 fi
 
-$fst2fstcommand ${langname}_tmp.hfst > \
+hfst-minimize ${langname}_tmp.hfst | $fst2fstcommand  > \
     ${target_dir}/${langcode}-analysis.hfst.ol
 
 sed s/LANGCODE/${langcode}/g < analyze.sh > ${target_dir}/${langname}-analyze-words
