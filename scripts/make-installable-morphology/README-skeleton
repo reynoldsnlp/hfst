@@ -16,5 +16,5 @@ hfst-tokenize and hfst-lookup.
 Report bugs to <hfst-bugs@helsinki.fi> or directly to our bug tracker at:
 <https://github.com/hfst/hfst/issues>
 
-General help using HFST software: 
-<https://kitwiki.csc.fi/twiki/bin/view/KitWiki//HfstHome>
+General help using HFST software:
+<https://github.com/hfst/hfst/wiki>
