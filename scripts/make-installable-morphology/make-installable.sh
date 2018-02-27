@@ -1,36 +1,104 @@
 #!/bin/bash
 
-if [ -e hfst-${1}-installable ] ; then
-    echo "Target directory already exists"; exit 1
-fi
+function print_help()
+{
+    echo
+    echo 'make-installable.sh langname langcode [--dir dirname] [--unweighted] [--capcase] [--punct]'
+    echo
+    echo 'Expects to have an analyzing morphology in the directory'
+    echo 'hfst-[langname] under the name "langname.hfst", where'
+    echo '"langname" is the name of the language in question. hfst-[langname]'
+    echo 'should be under the working directory, or you can specify its full'
+    echo 'name and path with --dir, eg. for French,'
+    echo
+    echo './make-installable.sh french fr --dir /path/to/french [--unweighted] [--capcase] [--punct]'
+    echo
+    echo 'fr is the language code'
+    echo '--unweighted controls whether the analyzer will be weighted'
+    echo '--capcase controls whether to compose in a casing handler'
+    echo '--punct controls whether to include a punctuation handler'
+}
+
 if [ $# -lt 2 ] ; then
-    echo "usage: $0 langname langcode [w] [smallcaser]"
-    exit 1
-elif [ $# -lt 3 ] ; then
-    fst2fstcommand="hfst-fst2fst -O"
-elif [ "$3" = "w" ] ; then
-    fst2fstcommand="hfst-fst2fst -w"
-else
-    echo "Didn't understand argument $3"
+    print_help
     exit 1
 fi
+
+langname=$1
+langcode=$2
+shift 2
+
+dir=hfst-${langname}-installable
+
+fst2fstcommand="hfst-fst2fst -w"
+capcase="false"
+punct="false"
+
+while test -n "$1"; do
+    case "$1" in
+	-h|--help)
+	    print_help
+	    exit 1
+	    ;;
+	--unweighted)
+	    fst2fstcommand="hfst-fst2fst -O"
+	    ;;
+	--capcase)
+	    capcase="true"
+	    ;;
+	--punct)
+	    punct="true"
+	    ;;
+	--dir)
+	    if [ -z "$2" ]; then
+		print_help
+		exit 1
+	    fi
+	    dir=$2
+	    shift
+	    ;;
+	*)
+	    print_help
+	    exit 1
+    esac
+    shift
+done
+
+target_dir=${dir}/hfst-${langname}-installable
+
 set -x
-mkdir hfst-${1}-installable
-hfst-invert ${1}.hfst | $fst2fstcommand > \
-    hfst-${1}-installable/${2}-generation.hfst.ol
-$fst2fstcommand ${1}.hfst > \
-    hfst-${1}-installable/${2}-analysis.hfst.ol
-sed s/LANGCODE/${2}/g < analyze.sh > hfst-${1}-installable/${1}-analyze-words
-sed s/LANGCODE/${2}/g < generate.sh > hfst-${1}-installable/${1}-generate-words
-sed -e s/LANGNAME/${1}/g -e s/LANGCODE/${2}/g < Makefile-skeleton > \
-    hfst-${1}-installable/Makefile
 
-typeset -u firstletter=${1:0:1}
-rest=${1:1}
+mkdir -p $target_dir
 
-sed -e s/Langname/$firstletter$rest/g -e s/LANGNAME/${1}/g < README-skeleton > \
-    hfst-${1}-installable/README
+hfst-fst2fst -t ${dir}/${langname}.hfst > ${langname}_tmp.hfst
 
-sed -e s/LANG/${1}.hfst/g < tokenizer-skeleton > ${2}-tokenizer.txt
-hfst-pmatch2fst ${2}-tokenizer.txt > hfst-${1}-installable/${2}-tokenize.pmatch
-rm ${2}-tokenizer.txt
+if [ "$punct" == "true" ]; then
+    hfst-strings2fst -j punct.txt | hfst-disjunct -1 - -2 ${langname}_tmp.hfst > ${langname}_with_punct.hfst
+    mv ${langname}_with_punct.hfst ${langname}_tmp.hfst
+fi
+
+hfst-invert ${langname}_tmp.hfst | $fst2fstcommand > \
+    ${target_dir}/${langcode}-generation.hfst.ol
+
+if [ "$capcase" == "true" ]; then
+    hfst-pmatch2fst <<< 'set need-separators off regex (OptDownCase(?, L)) ?*;' | hfst-fst2fst -t | hfst-compose -1 - -2 ${langname}_tmp.hfst > ${langname}_capcase.hfst
+    mv ${langname}_capcase.hfst ${langname}_tmp.hfst
+fi
+
+$fst2fstcommand ${langname}_tmp.hfst > \
+    ${target_dir}/${langcode}-analysis.hfst.ol
+
+sed s/LANGCODE/${langcode}/g < analyze.sh > ${target_dir}/${langname}-analyze-words
+sed s/LANGCODE/${langcode}/g < generate.sh > ${target_dir}/${langname}-generate-words
+sed -e s/LANGNAME/${langname}/g -e s/LANGCODE/${langcode}/g < Makefile-skeleton > \
+    ${target_dir}/Makefile
+
+typeset -u firstletter=${langname:0:1}
+rest=${langname:1}
+
+sed -e s/Langname/$firstletter$rest/g -e s/LANGNAME/${langname}/g < README-skeleton > \
+    ${target_dir}/README
+
+sed -e s/LANG/${langname}_tmp.hfst/g < tokenizer-skeleton > ${langcode}-tokenizer.txt
+hfst-pmatch2fst ${langcode}-tokenizer.txt > ${target_dir}/${langcode}-tokenize.pmatch
+rm -f ${langcode}-tokenizer.txt ${langname}_tmp.hfst
