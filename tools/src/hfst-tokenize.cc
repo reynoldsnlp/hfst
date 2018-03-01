@@ -86,7 +86,7 @@ print_usage()
             "  -m, --tokenize-multichar Tokenize multicharacter symbols\n"
             "                           (by default only one utf-8 character is tokenized at a time\n"
             "                           regardless of what is present in the alphabet)\n"
-            "  -b, --beam=B             Output only analyses whose weight is within B from\n"
+            "  -b, --beam=B             Output only analyses whose weight is within B from best result\n"
             "  -tS, --time-cutoff=S     Limit search after having used S seconds per input\n"
             "  -lN, --weight-classes=N  Output no more than N best weight classes\n"
             "                           (where analyses with equal weight constitute a class\n"
