@@ -95,6 +95,7 @@ static int max_recursion = -1;
 static int max_context = -1;
 
 static double time_cutoff = 0.0;
+static hfst_ol::Weight weight_cutoff = hfst_ol::INFINITE_WEIGHT;
 static bool profile = false;
 
 void
@@ -115,6 +116,7 @@ print_usage()
             "      --no-mark-patterns  Don't tag matched patterns\n"
             "      --max-context       Upper limit to context length allowed\n"
             "      --max-recursion     Upper limit for recursion\n"
+            "      --weight-cutoff=W   Upper limit for allowed weight\n"
             "  -t, --time-cutoff=S     Limit search after having used S seconds per input\n"
             "  -p  --profile           Produce profiling data\n");
     fprintf(message_out,
@@ -138,16 +140,16 @@ void match_and_print(hfst_ol::PmatchContainer & container,
     }
     if (!container.is_in_locate_mode()) {
 #ifndef _MSC_VER
-        outstream << container.match(input_text, time_cutoff);
+        outstream << container.match(input_text, time_cutoff, weight_cutoff);
 #else
-        hfst::hfst_fprintf_console(stdout, "%s", container.match(input_text, time_cutoff).c_str());
+        hfst::hfst_fprintf_console(stdout, "%s", container.match(input_text, time_cutoff, weight_cutoff).c_str());
 #endif
         outstream << std::endl;
         if (blankline_separated) {
             outstream << std::endl;
         }
     } else {
-        hfst_ol::LocationVectorVector locations = container.locate(input_text, time_cutoff);
+        hfst_ol::LocationVectorVector locations = container.locate(input_text, time_cutoff, weight_cutoff);
         bool printed_something = false;
         for(hfst_ol::LocationVectorVector::const_iterator it = locations.begin();
             it != locations.end(); ++it) {
@@ -268,12 +270,13 @@ int parse_options(int argc, char** argv)
                 {"no-mark-patterns", no_argument, 0, 'm'},
                 {"max-context", required_argument, 0, 'b'},
                 {"max-recursion", required_argument, 0, 'r'},
+                {"weight-cutoff", required_argument, 0, 'w'},
                 {"time-cutoff", required_argument, 0, 't'},
                 {"profile", no_argument, 0, 'p'},
                 {0,0,0,0}
             };
         int option_index = 0;
-        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT HFST_GETOPT_UNARY_SHORT "nxlcdmq:r:t:p",
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT HFST_GETOPT_UNARY_SHORT "nxlcdmb:r:w:t:p",
                             long_options, &option_index);
         if (-1 == c)
         {
@@ -319,6 +322,13 @@ int parse_options(int argc, char** argv)
                 return EXIT_FAILURE;
             }
             break;
+        case 'w':
+            weight_cutoff = atof(optarg);
+            if (weight_cutoff < 0.0)
+            {
+                std::cerr << "Invalid argument for --weight-cutoff\n";
+                return EXIT_FAILURE;
+            }
         case 't':
             time_cutoff = atof(optarg);
             if (time_cutoff < 0.0)

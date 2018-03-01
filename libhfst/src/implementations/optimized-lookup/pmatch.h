@@ -196,6 +196,8 @@ namespace hfst_ol {
         unsigned long call_counter;
         // A flag to set for when time has been overstepped
         bool limit_reached;
+        // Weight cutoff
+        Weight max_weight;
         // The global running weight
         Weight running_weight;
         Weight weight_limit;
@@ -227,10 +229,10 @@ namespace hfst_ol {
         void process(const std::string & input);
         std::string match(const std::string & input,
                           double time_cutoff = 0.0,
-                          Weight weight_cutoff = 0.0);
+                          Weight weight_cutoff = INFINITE_WEIGHT);
         LocationVectorVector locate(const std::string & input,
                                     double time_cutoff = 0.0,
-                                    Weight weight_cutoff = 0.0);
+                                    Weight weight_cutoff = INFINITE_WEIGHT);
         void note_analysis(unsigned int input_pos, unsigned int tape_pos);
         void grab_location(unsigned int input_pos, unsigned int tape_pos);
         std::pair<SymbolNumberVector::iterator,

@@ -978,6 +978,7 @@ std::string PmatchContainer::match(const std::string & input,
                                    Weight weight_cutoff)
 {
     max_time = time_cutoff;
+    max_weight = weight_cutoff;
     if (max_time > 0.0) {
         start_clock = clock();
         call_counter = 0;
@@ -993,6 +994,7 @@ LocationVectorVector PmatchContainer::locate(const std::string & input,
                                              Weight weight_cutoff)
 {
     max_time = time_cutoff;
+    max_weight = weight_cutoff;
     if (max_time > 0.0) {
         start_clock = clock();
         call_counter = 0;
@@ -1945,6 +1947,7 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
                                     unsigned int tape_pos,
                                     TransitionTableIndex i)
 {
+    if (container->get_weight() > container->max_weight) { return; }
     if (container->max_time > 0.0) {
         ++container->call_counter;
         // Have we spent too much time?
