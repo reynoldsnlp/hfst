@@ -56,5 +56,5 @@ define TOP
   [ define( LC([boundary | Punct]) unknown_token RC([boundary | Punct]) ) ]::500 |
   [ Punct ]::700 |
   [ typographic_paragraph_separator ]::800 |
-  [ NRC(morfo) [[Alpha | Num]+ | any_nonwhitespace_utf8_char ]]::900
+  [ NRC(Ins(morfo)) [[Alpha | Num]+ | any_nonwhitespace_utf8_char ]]::900
 ;
