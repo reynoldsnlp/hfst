@@ -1651,11 +1651,6 @@ void PmatchTransducer::rtn_return(unsigned int input_tape_pos,
     LocalVariables new_top(local_stack.top());
     container->decrease_stack_depth();
     TransitionTableIndex entry_index = container->rtn_stack_top().caller_index;
-    new_top.flag_state = alphabet.get_fd_table();
-    new_top.tape_step = 1;
-    new_top.context = none;
-    new_top.context_placeholder = 0;
-    new_top.default_symbol_trap = false;
     local_stack.push(new_top);
     get_analyses(input_tape_pos, tape_pos, entry_index);
     local_stack.pop();
