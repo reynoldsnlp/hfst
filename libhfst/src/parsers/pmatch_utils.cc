@@ -1301,33 +1301,61 @@ std::string path_from_filename(char * filename)
 
 void read_vec(std::string filename)
 {
+    bool binary_format = false;
+    if (filename.rfind(".bin") == filename.size() - 4) {
+        binary_format = true;
+    }
     if (word_vectors.size() != 0) {
         word_vectors.clear();
         std::cerr << "pmatch: vector model file " << filename
                   << " overrides earlier one\n";
     }
+    char separator = ' ';
     std::ifstream infile;
     std::string line;
-    size_t linenumber = 0;
-    char separator = '\t';
+    size_t lexicon_size;
+    size_t dimension;
     infile.open(filename.c_str());
     if(!infile.good()) {
         std::cerr << "pmatch: could not open vector file " << filename <<
             " for reading\n";
         return;
+    }
+    std::getline(infile, line);
+    std::stringstream ss(line);
+    ss >> lexicon_size;
+    ss.ignore(1);
+    ss >> dimension;
+    size_t words_read = 0;
+    if (binary_format) {
+        size_t vector_data_size = sizeof(float) * dimension;
+        char * vector_data = new char[vector_data_size];
+        while (infile.good() && words_read <= lexicon_size) {
+            // The actual number of vectors is 1 more than lexicon_size
+            // due to <s>
+            std::getline(infile, line, separator);
+            infile.read(vector_data, vector_data_size);
+            infile.ignore(1);
+            WordVector wv;
+            wv.word = line;
+            wv.vector.assign((float*) vector_data, (float*) (vector_data + vector_data_size));
+            wv.norm = norm(wv.vector);
+            word_vectors.push_back(wv);
+            ++words_read;
+        }
+        delete vector_data;
     } else {
-        while(infile.good()) {
+        while(infile.good() && words_read <= lexicon_size) {
             std::getline(infile, line);
-            ++linenumber;
-            if (linenumber == 1) { continue; } // first line is metadata
             if (line.empty()) { continue; }
+            ++words_read;
             size_t pos = line.find(separator);
             if (pos == std::string::npos) {
-                separator = ' ';
+                separator = '\t';
                 pos = line.find(separator);
                 if (pos == std::string::npos) {
                     std::cerr << "pmatch warning: vector file " << filename <<
-                        " doesn't appear to be tab- or space-separated\n  (reading line " << linenumber << ")\n";
+                        " doesn't appear to be tab- or space-separated\n  (reading line " << words_read + 1 << ")\n";
                     break;
                 }
             }
@@ -1346,14 +1374,15 @@ void read_vec(std::string filename)
             if (line.back() != separator) {
 #endif
 #if defined _MSC_VER && 1200 <= _MSC_VER
-	      components.push_back((float)strtod(line.substr(pos + 1).c_str(), NULL));
-#else
-	      components.push_back(strtof(line.substr(pos + 1).c_str(), NULL));
-#endif
+                components.push_back((float)strtod(line.substr(pos + 1).ctr(), NULL));
             }
+#else
+                components.push_back(strtof(line.substr(pos + 1).c_str(), NULL));
+            }
+#endif
             if (word_vectors.size() != 0 && word_vectors[0].vector.size() != components.size()) {
                 std::cerr << "pmatch warning: vector file " << filename <<
-                    " appears malformed\n  (reading line " << linenumber << ")\n";
+                    " appears malformed\n  (reading line " << words_read + 1 << ")\n";
                 continue;
             }
             WordVector wv;
