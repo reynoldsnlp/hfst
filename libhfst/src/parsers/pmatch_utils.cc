@@ -1339,6 +1339,10 @@ void read_vec(std::string filename)
             infile.ignore(1);
             WordVector wv;
             wv.word = line;
+            // This will not compile is WordVectorFloat is not float,
+            // in which case a conversion needs to happen, but
+            // we can reasonably expect it to be a float for the
+            // foreseeable future
             wv.vector.assign((float*) vector_data, (float*) (vector_data + vector_data_size));
             wv.norm = norm(wv.vector);
             word_vectors.push_back(wv);
