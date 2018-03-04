@@ -1326,6 +1326,7 @@ void read_vec(std::string filename)
     ss >> lexicon_size;
     ss.ignore(1);
     ss >> dimension;
+    word_vectors.reserve(lexicon_size + 1);
     size_t words_read = 0;
     if (binary_format) {
         size_t vector_data_size = sizeof(float) * dimension;
