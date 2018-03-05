@@ -171,6 +171,8 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
         rtn_names[name_from_insertion(str)] = symbol_number;
     } else if (is_guard(str)) {
         guards.push_back(symbol_number);
+    } else if (is_underscored_list(str)) {
+        process_underscored_symbol_list(str, symbol_number);
     } else if (is_list(str)) {
         process_symbol_list(str, symbol_number);
     } else if (is_counter(str)) {
@@ -182,7 +184,7 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
     }
 }
 
-void PmatchAlphabet::process_symbol_list(std::string str, SymbolNumber sym)
+void PmatchAlphabet::process_underscored_symbol_list(const std::string & str, SymbolNumber sym)
 {
     SymbolNumberVector list_symbols;
     StringSymbolMap ss = build_string_symbol_map();
@@ -247,6 +249,48 @@ void PmatchAlphabet::process_symbol_list(std::string str, SymbolNumber sym)
     }
 }
 
+void PmatchAlphabet::process_symbol_list(const std::string & str, SymbolNumber sym)
+{
+    bool polarity = str[1] == 'L';
+    size_t begin = strlen("@L.");
+    size_t stop = str.size() - begin - strlen("@");
+
+    SymbolNumberVector list_symbols = container->symbol_vector_from_symbols(str.substr(begin, stop));
+
+    // Process the symbols we found
+    for (SymbolNumberVector::const_iterator it = list_symbols.begin();
+         it != list_symbols.end(); ++it) {
+        if (polarity == true) {
+            if (symbol2lists[*it] == NO_SYMBOL_NUMBER) {
+              symbol2lists[*it] = hfst::size_t_to_ushort(symbol_lists.size());
+                symbol_lists.push_back(SymbolNumberVector(1, sym));
+            } else {
+                symbol_lists[symbol2lists[*it]].push_back(sym);
+            }
+        }
+    }
+    list2symbols[sym] = hfst::size_t_to_ushort(symbol_list_members.size());
+    if (polarity == false) {
+        SymbolNumberVector excl_symbols;
+        exclusionary_lists.push_back(sym);
+        for (SymbolNumber candidate_for_list = 1; candidate_for_list < symbol_table.size(); ++candidate_for_list) {
+            if (is_printable(symbol_table[candidate_for_list]) &&
+                find(list_symbols.begin(), list_symbols.end(), candidate_for_list) == list_symbols.end()) {
+                excl_symbols.push_back(candidate_for_list);
+                if (symbol2lists[candidate_for_list] == NO_SYMBOL_NUMBER) {
+                  symbol2lists[candidate_for_list] = hfst::size_t_to_ushort(symbol_lists.size());
+                    symbol_lists.push_back(SymbolNumberVector(1, sym));
+                } else {
+                    symbol_lists[symbol2lists[sym]].push_back(sym);
+                }
+            }
+        }
+        symbol_list_members.push_back(excl_symbols);
+    } else {
+        symbol_list_members.push_back(list_symbols);
+    }
+}
+
 SymbolNumberVector PmatchAlphabet::get_specials(void) const
 {
     SymbolNumberVector v;
@@ -272,68 +316,6 @@ void PmatchAlphabet::count(SymbolNumber sym)
 {
     if (is_counter(sym)) {
         counters[sym]++;
-    }
-}
-
-void PmatchContainer::collect_first_symbols(void)
-{
-    // Fetch the first symbols from any
-    // first-position rtn arcs in TOP. If they are potential epsilon loops,
-    // clear out the set.
-    toplevel->collect_possible_first_symbols();
-
-    SymbolNumber max_input_sym = 0;
-    std::set<SymbolNumber> & possible_firsts = toplevel->possible_first_symbols;
-    for (std::set<SymbolNumber>::iterator it = possible_firsts.begin();
-         it != possible_firsts.end(); ++it) {
-        if (*it > max_input_sym) { max_input_sym = *it; }
-        if (alphabet.has_rtn(*it)) {
-            if (alphabet.get_rtn(*it) == toplevel) {
-                possible_firsts.clear();
-                break;
-            }
-            alphabet.get_rtn(*it)->collect_possible_first_symbols();
-            std::set<SymbolNumber> rtn_firsts =
-                alphabet.get_rtn(*it)->possible_first_symbols;
-            for (RtnNameMap::const_iterator it = alphabet.rtn_names.begin();
-                 it != alphabet.rtn_names.end(); ++it) {
-                if (rtn_firsts.count(it->second) == 1) {
-                    // For now we are very conservative:
-                    // if we can go through two levels of rtns
-                    // without any input, we just assume the full
-                    // input set is possible
-                    possible_firsts.clear();
-                }
-            }
-            if (rtn_firsts.empty() || possible_firsts.empty()) {
-                possible_firsts.clear();
-                break;
-            } else {
-                for (std::set<SymbolNumber>::
-                         const_iterator rtn_it = rtn_firsts.begin();
-                     rtn_it != rtn_firsts.end(); ++rtn_it) {
-                    if (*rtn_it > max_input_sym) { max_input_sym = *rtn_it ;}
-                    possible_firsts.insert(*rtn_it);
-                }
-            }
-        }
-    }
-    for (RtnNameMap::const_iterator it = alphabet.rtn_names.begin();
-         it != alphabet.rtn_names.end(); ++it) {
-        possible_firsts.erase(it->second);
-    }
-    if (!possible_firsts.empty() &&
-        alphabet.get_special(boundary) != NO_SYMBOL_NUMBER) {
-        possible_firsts.insert(alphabet.get_special(boundary));
-    }
-    if (!possible_firsts.empty()) {
-        for (int i = 0; i <= max_input_sym; ++i) {
-            if (possible_firsts.count(i) == 1) {
-                possible_first_symbols.push_back(1);
-            } else {
-                possible_first_symbols.push_back(0);
-            }
-        }
     }
 }
 
@@ -373,6 +355,11 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
     orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
     global_flag_state = alphabet.get_fd_table();
     encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
+
+    if (properties.count("initial_symbols") == 1) {
+        collect_first_symbols(properties["initial_symbols"]);
+    }
+    
     toplevel = new hfst_ol::PmatchTransducer(
         inputstream,
         header.index_table_size(),
@@ -403,7 +390,6 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
             delete rtn;
         }
     }
-    collect_first_symbols();
 }
 
 PmatchContainer::PmatchContainer(Transducer * t):
@@ -430,7 +416,6 @@ PmatchContainer::PmatchContainer(Transducer * t):
         alphabet,
         "TOP",
         this);
-    collect_first_symbols();
 }
 
 // This constructor handles all the awkward optimized-lookup specific
@@ -585,7 +570,6 @@ PmatchContainer::PmatchContainer(std::vector<HfstTransducer> transducers):
             }
         }
     }
-    collect_first_symbols();
 }
 
 void PmatchContainer::add_rtn(Transducer * rtn, const std::string & name)
@@ -659,6 +643,11 @@ bool PmatchAlphabet::is_counter(const std::string & symbol)
 }
 
 bool PmatchAlphabet::is_list(const std::string & symbol)
+{
+    return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("@") == symbol.size() - 1;
+}
+
+bool PmatchAlphabet::is_underscored_list(const std::string & symbol)
 {
     return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("_@") == symbol.size() - 2;
 }
@@ -1287,193 +1276,6 @@ PmatchTransducer::PmatchTransducer(std::vector<TransitionW> transition_vector,
     local_stack.push(local_variables);
 }
 
-// Precompute which symbols may be at the start of a match.
-// For now we ignore default arcs, as does the rest of pmatch.
-void PmatchTransducer::collect_possible_first_symbols(void)
-{
-    SymbolNumberVector input_symbols;
-    SymbolNumberVector special_symbol_v = alphabet.get_specials();
-    std::set<SymbolNumber> special_symbols(special_symbol_v.begin(),
-                                           special_symbol_v.end());
-    SymbolTable table = alphabet.get_symbol_table();
-    SymbolNumber symbol_count = hfst::size_t_to_uint(table.size());
-    for (SymbolNumber i = 1; i < symbol_count; ++i) {
-        if (!alphabet.is_like_epsilon(i) &&
-            !alphabet.is_end_tag(i) &&
-            special_symbols.count(i) == 0 &&
-            i != alphabet.get_unknown_symbol() &&
-            i != alphabet.get_identity_symbol() &&
-            i != alphabet.get_default_symbol())
-        {
-            input_symbols.push_back(i);
-        }
-    }
-    // always include unknown and identity (once) but not default
-    if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
-        input_symbols.push_back(alphabet.get_unknown_symbol());
-    }
-    if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
-        input_symbols.push_back(alphabet.get_identity_symbol());
-    }
-    std::set<TransitionTableIndex> seen_indices;
-    try {
-        collect_first(0, input_symbols, seen_indices);
-    } catch (bool e) {
-        // If the end state can be reached without any input
-        // or we have initial wildcards
-        if (e == true) {
-            possible_first_symbols.clear();
-        }
-    }
-
-}
-
-void PmatchTransducer::collect_first_epsilon(TransitionTableIndex i,
-                                             SymbolNumberVector const& input_symbols,
-                                             std::set<TransitionTableIndex> & seen_indices)
-{
-    while(true) {
-        SymbolNumber output = transition_table[i].get_output_symbol();
-        if (transition_table[i].get_input_symbol() == 0) {
-            if (!checking_context()) {
-                if (!try_entering_context(output)) {
-                    collect_first(transition_table[i].get_target(), input_symbols, seen_indices);
-                    ++i;
-                } else {
-                    // We're going to fake through a context
-                    collect_first(transition_table[i].get_target(), input_symbols, seen_indices);
-                    ++i;
-                }
-            } else {
-                // We *are* checking context and may be done
-                if (try_exiting_context(output)) {
-                    collect_first(transition_table[i].get_target(), input_symbols, seen_indices);
-                    ++i;
-                } else {
-                    // Don't touch output when checking context
-                    collect_first(transition_table[i].get_target(), input_symbols, seen_indices);
-                    ++i;
-                }
-            }
-        } else if (alphabet.is_flag_diacritic(
-                       transition_table[i].get_input_symbol())) {
-            collect_first(transition_table[i].get_target(), input_symbols, seen_indices);
-            ++i;
-        } else if (alphabet.has_rtn(transition_table[i].get_input_symbol())) {
-            possible_first_symbols.insert(transition_table[i].get_input_symbol());
-            // collect the inputs from this later
-            ++i;
-        } else { // it's not epsilon and it's not a flag or Ins, so nothing to do
-            return;
-        }
-    }
-
-}
-
-void PmatchTransducer::collect_first_epsilon_index(TransitionTableIndex i,
-                                                   SymbolNumberVector const& input_symbols,
-                                                   std::set<TransitionTableIndex> & seen_indices)
-{
-    if (index_table[i].get_input_symbol() == 0) {
-        collect_first_epsilon(
-            index_table[i].get_target() - TRANSITION_TARGET_TABLE_START,
-            input_symbols, seen_indices);
-    }
-}
-
-void PmatchTransducer::collect_first_transition(TransitionTableIndex i,
-                                                SymbolNumberVector const& input_symbols,
-                                                std::set<TransitionTableIndex> & seen_indices)
-{
-    for (SymbolNumberVector::const_iterator it = input_symbols.begin();
-         it != input_symbols.end(); ++it) {
-        if (transition_table[i].get_input_symbol() == *it) {
-            if (!checking_context()) {
-                // if this is unknown or identity, game over
-                if (*it == alphabet.get_identity_symbol() ||
-                    *it == alphabet.get_unknown_symbol()) {
-                    container->reset_recursion();
-                    throw true;
-                }
-                if (alphabet.list2symbols[*it] != NO_SYMBOL_NUMBER) {
-                    // If this is a list, collect everything in the list
-                    // if it's an exclusionary list, give up
-                    if (std::find(alphabet.exclusionary_lists.begin(),
-                                  alphabet.exclusionary_lists.end(),
-                                  *it)
-                        != alphabet.exclusionary_lists.end()) {
-                        container->reset_recursion();
-                        throw true;
-                    }
-                    for (SymbolNumberVector::const_iterator sym_it =
-                            alphabet.symbol_list_members[alphabet.list2symbols[*it]].begin();
-                        sym_it != alphabet.symbol_list_members[alphabet.list2symbols[*it]].end(); ++sym_it) {
-                        possible_first_symbols.insert(*sym_it);
-                    }
-                } else {
-                    possible_first_symbols.insert(*it);
-                }
-            } else {
-                // faking through a context check
-                collect_first(transition_table[i].get_target(),
-                              input_symbols, seen_indices);
-            }
-        }
-    }
-}
-
-void PmatchTransducer::collect_first_index(TransitionTableIndex i,
-                                           SymbolNumberVector const& input_symbols,
-                                           std::set<TransitionTableIndex> & seen_indices)
-{
-    for (SymbolNumberVector::const_iterator it = input_symbols.begin();
-         it != input_symbols.end(); ++it) {
-        if (index_table[i+*it].get_input_symbol() == *it) {
-            collect_first_transition(index_table[i+*it].get_target() -
-                                     TRANSITION_TARGET_TABLE_START,
-                                     input_symbols, seen_indices);
-        }
-    }
-}
-
-void PmatchTransducer::collect_first(TransitionTableIndex i,
-                                     SymbolNumberVector const& input_symbols,
-                                     std::set<TransitionTableIndex> & seen_indices)
-{
-    if (!container->try_recurse()) {
-        container->reset_recursion();
-        throw true;
-    }
-    if (seen_indices.count(i) == 1) {
-        container->unrecurse();
-        return;
-    } else {
-        seen_indices.insert(i);
-    }
-    if (indexes_transition_table(i))
-    {
-        i -= TRANSITION_TARGET_TABLE_START;
-        
-        // If we can get to finality without any input,
-        // throw a bool indicating that the full input set is needed
-        if (transition_table[i].final()) {
-            container->reset_recursion();
-            throw true;
-        }
-
-        collect_first_epsilon(i+1, input_symbols, seen_indices);
-        collect_first_transition(i+1, input_symbols, seen_indices);
-        
-    } else {
-        if (index_table[i].final()) {
-            container->reset_recursion();
-            throw true;
-        }
-        collect_first_epsilon_index(i+1, input_symbols, seen_indices);
-        collect_first_index(i+1, input_symbols, seen_indices);
-    }
-}
-
 void PmatchContainer::set_properties(void)
 {
     count_patterns = false;
@@ -1551,6 +1353,27 @@ void PmatchContainer::set_properties(std::map<std::string, std::string> & proper
             }
         }
     }
+}
+
+void PmatchContainer::collect_first_symbols(const std::string & symbols_list)
+{
+    SymbolNumberVector possible_first_symbols = symbol_vector_from_symbols(symbols_list);
+    for (SymbolNumberVector::const_iterator it = possible_first_symbols.begin();
+         it != possible_first_symbols.end(); ++it) {
+        while (*it <= possible_first_symbols.size()) {
+            possible_first_symbols.push_back(false);
+        }
+        possible_first_symbols[*it] = true;
+    }
+}
+
+SymbolNumberVector PmatchContainer::symbol_vector_from_symbols(const std::string & symbols)
+{
+    initialize_input(symbols.c_str());
+    if (alphabet.get_special(boundary) != NO_SYMBOL_NUMBER) {
+        return SymbolNumberVector(input.begin() + 1, input.end() - 1);
+    }
+    return SymbolNumberVector(input);
 }
 
 void PmatchContainer::initialize_input(const char * input_s)
@@ -1648,12 +1471,9 @@ void PmatchTransducer::rtn_call(unsigned int input_tape_pos,
 void PmatchTransducer::rtn_return(unsigned int input_tape_pos,
                                   unsigned int tape_pos)
 {
-    LocalVariables new_top(local_stack.top());
     container->decrease_stack_depth();
     TransitionTableIndex entry_index = container->rtn_stack_top().caller_index;
-    local_stack.push(new_top);
     get_analyses(input_tape_pos, tape_pos, entry_index);
-    local_stack.pop();
     container->increase_stack_depth();
 }
 

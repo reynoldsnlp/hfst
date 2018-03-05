@@ -107,6 +107,7 @@ namespace hfst_ol {
         static bool is_insertion(const std::string & symbol);
         static bool is_guard(const std::string & symbol);
         static bool is_list(const std::string & symbol);
+        static bool is_underscored_list(const std::string & symbol);
         static bool is_counter(const std::string & symbol);
         static bool is_special(const std::string & symbol);
         static bool is_printable(const std::string & symbol);
@@ -116,7 +117,8 @@ namespace hfst_ol {
         bool is_printable(SymbolNumber symbol);
         bool is_global_flag(SymbolNumber symbol);
         void add_special_symbol(const std::string & str, SymbolNumber symbol_number);
-        void process_symbol_list(std::string str, SymbolNumber sym);
+        void process_underscored_symbol_list(const std::string & str, SymbolNumber sym);
+        void process_symbol_list(const std::string & str, SymbolNumber sym);
         void process_counter(std::string str, SymbolNumber sym);
         void count(SymbolNumber sym);
         void add_rtn(PmatchTransducer * rtn, std::string const & name);
@@ -168,7 +170,7 @@ namespace hfst_ol {
         std::vector<Capture> captures;
         std::vector<Capture> best_captures;
         std::vector<Capture> old_captures;
-        std::vector<char> possible_first_symbols;
+        std::vector<bool> possible_first_symbols;
         // The flag state for global flags
         hfst::FdState<SymbolNumber> global_flag_state;
         bool verbose;
@@ -209,8 +211,6 @@ namespace hfst_ol {
         unsigned int best_input_pos;
         Weight best_weight;
 
-        void collect_first_symbols(void);
-
     public:
 
         PmatchContainer(std::istream & is);
@@ -219,9 +219,10 @@ namespace hfst_ol {
         PmatchContainer(void);
         ~PmatchContainer(void);
 
-
         void set_properties(void);
         void set_properties(std::map<std::string, std::string> & properties);
+        void collect_first_symbols(const std::string & symbol_list);
+        SymbolNumberVector symbol_vector_from_symbols(const std::string & symbols);
         void initialize_input(const char * input);
         bool has_unsatisfied_rtns(void) const;
         std::string get_unsatisfied_rtn_name(void) const;
@@ -250,7 +251,7 @@ namespace hfst_ol {
                 return false;
             }
             return sym >= possible_first_symbols.size() ||
-                possible_first_symbols[sym] == 0;
+                possible_first_symbols[sym] == false;
         }
         void copy_to_result(const DoubleTape & best_result);
         void copy_to_result(SymbolNumber input, SymbolNumber output);
@@ -429,23 +430,6 @@ namespace hfst_ol {
         bool try_exiting_context(SymbolNumber symbol);
         void exit_context(void);
 
-        void collect_first_epsilon(TransitionTableIndex i,
-                                   SymbolNumberVector const& input_symbols,
-                                   std::set<TransitionTableIndex> & seen_indices);
-        void collect_first_epsilon_index(TransitionTableIndex i,
-                                         SymbolNumberVector const& input_symbols,
-                                         std::set<TransitionTableIndex> & seen_indices);
-        void collect_first_transition(TransitionTableIndex i,
-                                      SymbolNumberVector const& input_symbols,
-                                      std::set<TransitionTableIndex> & seen_indices);
-        void collect_first_index(TransitionTableIndex i,
-                                 SymbolNumberVector const& input_symbols,
-                                 std::set<TransitionTableIndex> & seen_indices);
-        void collect_first(TransitionTableIndex i,
-                           SymbolNumberVector const& input_symbols,
-                           std::set<TransitionTableIndex> & seen_indices);
-
-
     public:
         PmatchTransducer(std::istream& is,
                          TransitionTableIndex index_table_size,
@@ -459,8 +443,6 @@ namespace hfst_ol {
                          PmatchAlphabet & alphabet,
                          std::string name,
                          PmatchContainer * container);
-
-        std::set<SymbolNumber> possible_first_symbols;
 
         bool final_index(TransitionTableIndex i) const
         {
@@ -482,7 +464,6 @@ namespace hfst_ol {
                       PmatchTransducer * caller, TransitionTableIndex caller_index);
         void rtn_return(unsigned int input_pos, unsigned int tape_pos);
         void handle_final_state(unsigned int input_pos, unsigned int tape_pos);
-        void collect_possible_first_symbols(void);
 
         friend class PmatchContainer;
     };
