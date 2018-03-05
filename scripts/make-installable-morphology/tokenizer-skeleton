@@ -32,7 +32,7 @@ define typographic_paragraph_separator "*"+ | "-"+ | "=+";
 define any_nonwhitespace_utf8_char ? - Whitespace;
 define internal_punct "'" | "’" | "-" | "*"+;
 define unknown_word_char [\[Whitespace | Punct | em_dash | punct_trailing]];
-define unknown_token [unknown_word_char+ (internal_punct unknown_word_char+)]+ ;
+define unknown_token unknown_word_char+ (internal_punct) ;
 
 define trailing_punct NLC(boundary) punct_trailing RC(boundary);
 define preceding_punct LC(boundary) punct_preceding NRC(boundary);
@@ -53,7 +53,7 @@ define TOP
   [date | date_range | date_with_time | time | numerical] |
   [("<") url (">") ] | email |
   ! Unknown token
-  [ define( LC([boundary | Punct]) NRC(Ins(morfo)) unknown_token RC([boundary | Punct]) ) ]::500 |
+  [ define( LC([boundary | Punct]) unknown_token RC([boundary | Punct]) ) ]::500 |
   [ Punct ]::700 |
   [ typographic_paragraph_separator ]::800 |
   [ NRC(Ins(morfo)) [[Alpha | Num]+ | any_nonwhitespace_utf8_char ]]::900
