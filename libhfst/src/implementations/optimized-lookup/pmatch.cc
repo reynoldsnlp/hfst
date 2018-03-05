@@ -356,8 +356,8 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
     global_flag_state = alphabet.get_fd_table();
     encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
 
-    if (properties.count("initial_symbols") == 1) {
-        collect_first_symbols(properties["initial_symbols"]);
+    if (properties.count("initial-symbols") == 1) {
+        collect_first_symbols(properties["initial-symbols"]);
     }
     
     toplevel = new hfst_ol::PmatchTransducer(
@@ -1723,16 +1723,11 @@ void PmatchTransducer::take_transitions(SymbolNumber input,
             Weight old_weight = container->get_weight();
             container->increment_weight(transition_table[i].get_weight());
             if (!checking_context()) {
-                if (this_output == alphabet.get_identity_symbol() ||
-                    (this_output == alphabet.get_unknown_symbol()) ||
+                if (alphabet.is_meta_arc(this_output) ||
                     (alphabet.list2symbols[this_output] != NO_SYMBOL_NUMBER)) {
                 // we got here via a meta-arc, so look back in the
                 // input tape to find the symbol we want to write
                     this_output = container->input[input_pos];
-                }
-                if (this_input == alphabet.get_identity_symbol() ||
-                    (this_input == alphabet.get_unknown_symbol()) ||
-                    (alphabet.list2symbols[this_input] != NO_SYMBOL_NUMBER)) {
                     this_input = container->input[input_pos];
                 }
                 if (this_input == alphabet.get_special(Pmatch_passthrough)) {
@@ -1823,6 +1818,11 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
         if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
             take_transitions(alphabet.get_unknown_symbol(), input_pos, tape_pos, i+1);
         }
+    }
+    if (alphabet.get_default_symbol() != NO_SYMBOL_NUMBER &&
+        local_stack.top().default_symbol_trap) {
+        take_transitions(alphabet.get_default_symbol(),
+                         input_pos, tape_pos, i+1);
     }
     container->unrecurse();
 }
