@@ -30,7 +30,7 @@ define email [\Whitespace]+ "@" [\Whitespace]+ "." Alpha+;
 define xml_tag "<" ("/") [\[">"|"\n"]]+ ">";
 define typographic_paragraph_separator "*"+ | "-"+ | "=+";
 define any_nonwhitespace_utf8_char ? - Whitespace;
-define internal_punct "'" | "’" | "-" | "." | "*"+;
+define internal_punct "'" | "’" | "-" | "*"+;
 define unknown_word_char [\[Whitespace | Punct | em_dash | punct_trailing]];
 define unknown_token [unknown_word_char+ (internal_punct unknown_word_char+)]+ ;
 
@@ -40,10 +40,10 @@ define sentbound NLC(boundary) punct_sentbound+ RC(boundary);
 define punct_between NLC(boundary) [punct_trailing | punct_preceding] NRC(boundary);
 
 define TOP
-  [ LC(boundary) Ins(morfo) RC(boundary) ] |
-  [ LC(boundary) Ins(morfo) RC([punct_trailing | punct_sentbound]) ] |
-  [ LC(punct_preceding) Ins(morfo) RC(boundary) ] |
-  [ LC(punct_preceding) Ins(morfo) RC([punct_trailing | punct_sentbound]) ] |
+  [ LC([boundary | punct_preceding]) Ins(morfo) RC(boundary | [punct_trailing | punct_sentbound]) ] |
+! The case where the morphology contains entries ending in internal punctuation
+! and will be immediately followed by an another alpha token
+  [ LC([boundary | punct_preceding]) RC([Alpha+ internal_punct]) Ins(morfo) ] |
   [ trailing_punct ] |
   [ preceding_punct ] |
   [ xml_tag ] |
@@ -53,7 +53,7 @@ define TOP
   [date | date_range | date_with_time | time | numerical] |
   [("<") url (">") ] | email |
   ! Unknown token
-  [ define( LC([boundary | Punct]) unknown_token RC([boundary | Punct]) ) ]::500 |
+  [ define( LC([boundary | Punct]) NRC(Ins(morfo)) unknown_token RC([boundary | Punct]) ) ]::500 |
   [ Punct ]::700 |
   [ typographic_paragraph_separator ]::800 |
   [ NRC(Ins(morfo)) [[Alpha | Num]+ | any_nonwhitespace_utf8_char ]]::900
