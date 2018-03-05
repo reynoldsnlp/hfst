@@ -165,7 +165,7 @@ PmatchObject * compile_like_arc(std::string word,
 
 PmatchTransducerContainer * make_counter(std::string name);
 
-hfst::StringSet get_non_special_alphabet(HfstTransducer * t);
+StringSet get_non_special_alphabet(HfstTransducer * t);
 HfstTransducer * make_list(HfstTransducer * t,
                            ImplementationType f = format);
 HfstTransducer * make_exc_list(HfstTransducer * t,
@@ -455,7 +455,8 @@ struct PmatchObject {
     virtual bool is_unweighted_disjunction_of_strings(void)
         { return false; }
     virtual void collect_strings_into(StringVector & strings) { return; }
-    
+    virtual void collect_initial_symbols_into(StringSet & allowed, StringSet & disallowed)
+        { return; }
     virtual HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer) = 0;
     virtual HfstTransducer * evaluate(std::vector<PmatchObject *> args);
     virtual void mark_context_children(void) { parent_is_context = true; }

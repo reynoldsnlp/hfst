@@ -1190,6 +1190,21 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         hfst::pmatch::timer = clock();
         std::cerr << "compiled and harmonized in " << duration << " seconds\n";
     }
+    StringSet allowed_initial_symbols;
+    StringSet disallowed_initial_symbols;
+    definitions["TOP"]->collect_initial_symbols_into(allowed_initial_symbols,
+                                                     disallowed_initial_symbols);
+    if (allowed_initial_symbols.size() != 0 && allowed_initial_symbols.count("@UNK@") == 0) {
+        std::string initial_symbols_list;
+        for (StringSet::iterator it = allowed_initial_symbols.begin(); it != allowed_initial_symbols.end(); ++it) {
+            if (disallowed_initial_symbols.count(*it) == 0) {
+                initial_symbols_list.append(*it);
+            }
+        }
+        if (initial_symbols_list.size() != 0) {
+            variables["initial-symbols"] = initial_symbols_list;
+        }
+    }
     if (variables["need-separators"] == "on") {
         HfstTransducer not_whitespace(hfst::internal_identity, format);
         not_whitespace.subtract(*(get_utils()->latin1_whitespace_acceptor));
