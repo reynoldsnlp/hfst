@@ -2,34 +2,37 @@
 
 test_case()
 {
-    expected=$1-analyze-words.output
-    echo $2 | $1-analyze-words | cut -f 2- > tmp
-    if test -f "$expected" ; then
-	if ! diff tmp $expected > /dev/null; then
-	    echo "$1: input \"$2\" (space-separated words) differs from expected"
+    # input on one line
+    if ! echo $2 | $1-analyze-words | cut -f 2- > tmp; then
+	echo "$1: input \"$2\" (space-separated words) failed"
+    fi
+    if test -f "$3" ; then
+	if ! diff tmp $3 > /dev/null; then
+	    echo "$1: output of \"$2\" (space-separated words) differs from expected"
 	fi
     fi
-    echo $2 | perl -pe 's/ /\n/;' | $1-analyze-words | cut -f 2- > tmp
-    if test -f "$expected" ; then
-	if ! diff tmp $expected > /dev/null; then
-	    echo "$1: input \"$2\" (line-separated words) differs from expected"
+    # each word on its own line
+    if ! echo $2 | perl -pe 's/ /\n/;' | $1-analyze-words | cut -f 2- > tmp; then
+	echo "$1: input \"$2\" (line-separated words) failed"
+    fi
+    if test -f "$3" ; then
+	if ! diff tmp $3 > /dev/null; then
+	    echo "$1: output of \"$2\" (line-separated words) differs from expected"
 	fi
     fi
 }
 
 test_lang()
 {
-    test_case $1 "$2"
-    var=`echo $2 | perl -pe 's/^(.)/\l$1/g;'`
-    test_case $1 "$var"
-    var=`echo $2 | perl -pe 's/ (.)/ \u$1/g;'`
-    test_case $1 "$var"
+    test_case $1 "$2" "$1-analyze-words.output"
+    test_case $1 " "
+    test_case $1 ""
 }
 
-test_lang "english" "This is a test."
-test_lang "finnish" "Tämä on testi."
-#test_lang "french" " "
-#test_lang "german" " "
-#test_lang "italian" " "
-#test_lang "swedish" " "
-#test_lang "turkish" " "
+test_lang "english" "TODO"
+test_lang "finnish" "TODO"
+test_lang "french" "TODO"
+test_case "german" "TODO"
+test_lang "italian" "TODO"
+test_lang "swedish" "TODO"
+test_lang "turkish" "TODO"
