@@ -13,7 +13,11 @@ and
 	LANGNAME-generate-words
 	
 will perform analysis and generation by attempting to run, respectively,
-hfst-tokenize and hfst-lookup. The morphologies vary somewhat in their tagging
+hfst-tokenize and hfst-lookup. Those utilities are not included, they have
+to be present on your system. HFST is available from
+https://github.com/hfst/hfst.
+
+The morphologies vary somewhat in their tagging
 conventions. To find the right tags to give to the generation side,
 you have to either reverse-engineer them from what you see from the analysis
 side, or refer to the documentation of the morphology itself (which are
