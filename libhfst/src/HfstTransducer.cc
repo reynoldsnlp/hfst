@@ -333,6 +333,20 @@ HfstTransducer &HfstTransducer::prune_alphabet(bool force)
   return convert_to_hfst_transducer(net);;
 }
 
+StringSet HfstTransducer::get_initial_input_symbols() const
+{
+  switch(type)
+    {
+#if HAVE_OPENFST
+    case TROPICAL_OPENFST_TYPE:
+      return tropical_ofst_interface.get_initial_input_symbols
+	(implementation.tropical_ofst);
+#endif
+    default:
+      HFST_THROW_MESSAGE(FunctionNotImplementedException, "get_first_input_symbols");
+    }
+}
+
 StringSet HfstTransducer::get_first_input_symbols() const
 {
     switch(type)
