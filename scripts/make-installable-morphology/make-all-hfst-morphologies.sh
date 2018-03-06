@@ -8,7 +8,7 @@ rootpath=$1
 
 ./make-installable.sh italian it --dir ${rootpath}/hfst-italian --capcase --unweighted &
 
-./make-installable.sh finnish fi --dir ${rootpath}/hfst-finnish && cp ../tokenization/omorfi-tokenize/tokenize.pmatch ${rootpath}/hfst-finnish/hfst-finnish-installable/fi-tokenize.pmatch &
+./make-installable.sh finnish fi --dir ${rootpath}/hfst-finnish
 
 ./make-installable.sh turkish tr --dir ${rootpath}/hfst-turkish --punct --capcase --unweighted &
 
@@ -19,3 +19,5 @@ rootpath=$1
 ./make-installable.sh english en --dir ${rootpath}/hfst-english --capcase &
 
 wait
+
+cp ../tokenization/omorfi-tokenize/tokenize.pmatch ${rootpath}/hfst-finnish/hfst-finnish-installable/fi-tokenize.pmatch
