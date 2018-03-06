@@ -696,6 +696,7 @@ void match_and_print(hfst_ol::PmatchContainer & container,
     LocationVectorVector locations = container.locate(input_text, s.time_cutoff);
     if (locations.size() == 0 && s.print_all) {
         print_no_output(input_text, outstream, s);
+        return;
     }
     int token_number = 1;
     for(LocationVectorVector::const_iterator it = locations.begin();
@@ -714,7 +715,7 @@ void match_and_print(hfst_ol::PmatchContainer & container,
                               s);
         ++token_number;
     }
-    if (s.output_format == finnpos) {
+    if (s.output_format == finnpos || s.output_format == tokenize) {
         outstream << std::endl;
     }
 }
