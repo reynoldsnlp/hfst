@@ -69,6 +69,7 @@ target_dir=${dir}/hfst-${langname}-installable
 set -x
 
 mkdir -p $target_dir
+rm -rf $target_dir/*
 
 hfst-fst2fst -t ${dir}/${langname}.hfst > ${langname}_tmp.hfst
 echo '0' | hfst-txt2fst | hfst-disjunct -1 - -2 ${langname}_tmp.hfst > ${langname}_with_empty_string.hfst
