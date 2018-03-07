@@ -69,3 +69,4 @@ _:_ Punct
 ☻:☻ Punct
 ♥:♥ Punct
 ♪:♪ Punct
+...:... Punct

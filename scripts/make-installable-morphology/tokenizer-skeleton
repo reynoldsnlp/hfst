@@ -34,7 +34,7 @@ define internal_punct "'" | "’" | "-" | "*"+;
 define unknown_word_char [\[Whitespace | Punct | em_dash | punct_trailing]];
 define unknown_token unknown_word_char+ (internal_punct) ;
 
-define punct_between [punct_trailing | punct_preceding];
+define punct_between [punct_trailing | punct_preceding | punct_sentbound]+;
 
 define TOP
   [ LC([boundary | punct_preceding]) Ins(morfo) RC(boundary | [punct_trailing | punct_sentbound]) ] |
