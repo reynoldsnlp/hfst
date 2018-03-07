@@ -4,8 +4,8 @@ if [ ! -d "$trdir" ] ; then
     echo $trdir not found
     exit 1
 fi
-if [ ! -e "$trdir"/LANGCODE-analysis.hfst.ol ] ; then
-    echo "$trdir/LANGCODE-analysis.hfst.ol not found"
+if [ ! -e "$trdir"/LANGCODE-tokenize.pmatch ] ; then
+    echo "$trdir/LANGCODE-tokenize.pmatch not found"
     exit 1
 fi
 if ! command -v hfst-tokenize > /dev/null; then
