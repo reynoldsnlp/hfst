@@ -24,5 +24,3 @@ fi
 ./make-installable.sh english en --dir ${rootpath}/hfst-english --capcase &
 
 wait
-
-cp ../tokenization/omorfi-tokenize/tokenize.pmatch ${rootpath}/hfst-finnish/hfst-finnish-installable/fi-tokenize.pmatch
