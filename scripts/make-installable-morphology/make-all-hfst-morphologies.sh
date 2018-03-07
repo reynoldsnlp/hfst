@@ -4,6 +4,11 @@ set -x
 
 rootpath=$1
 
+if [ -z $rootpath ]; then
+    echo "You forgot to give the root path!"
+    exit 1
+fi
+
 ./make-installable.sh french fr --dir ${rootpath}/hfst-french --capcase --punct --unweighted &
 
 ./make-installable.sh italian it --dir ${rootpath}/hfst-italian --capcase --unweighted &
