@@ -89,20 +89,44 @@ bool location_compare(const Location& lhs, const Location& rhs) {
     else {
         return lhs.weight < rhs.weight;
     }
-};
+}
 
+bool location_compare_ignoring_weights(const Location& lhs, const Location& rhs) {
+    if(lhs.tag == rhs.tag) {
+        if(lhs.start == rhs.start){
+            if(lhs.length == rhs.length) {
+                return lhs.output < rhs.output;
+            }
+            else {
+                return lhs.length < rhs.length;
+            }
+        }
+        else {
+            return lhs.start < rhs.start;
+        }
+    }
+    else {
+        return lhs.tag < rhs.tag;
+    }
+}
 
-
-
-const LocationVector dedupe_locations(LocationVector const & locations, const TokenizeSettings& s) {
+const LocationVector dedupe_locations(LocationVector const & locations, const TokenizeSettings & s) {
     if(!s.dedupe) {
         return locations;
     }
-    std::set<Location, bool(*)(const Location& lhs, const Location& rhs)> ls(&location_compare);
-    ls.insert(locations.begin(), locations.end());
-    LocationVector uniq;
-    std::copy(ls.begin(), ls.end(), std::back_inserter(uniq));
-    return uniq;
+    if(s.print_weights || s.output_format != xerox) {
+        std::set<Location, bool(*)(const Location& lhs, const Location& rhs)> ls(&location_compare);
+        ls.insert(locations.begin(), locations.end());
+        LocationVector uniq;
+        std::copy(ls.begin(), ls.end(), std::back_inserter(uniq));
+        return uniq;
+    } else {
+        std::set<Location, bool(*)(const Location& lhs, const Location& rhs)> ls(&location_compare_ignoring_weights);
+        ls.insert(locations.begin(), locations.end());
+        LocationVector uniq;
+        std::copy(ls.begin(), ls.end(), std::back_inserter(uniq));
+        return uniq;
+    }
 }
 /**
  * Keep only the max_weight_classes best weight classes
@@ -603,7 +627,7 @@ void print_location_vector(hfst_ol::PmatchContainer & container,
             if ((s.beam < 0.0 || loc_it->weight <= best_weight + s.beam) &&
                 // We don't print "plain" tokens without any analysis
                 // except if they are the only one present
-                (locations.size() == 1 || loc_it->output.compare(loc_it->input) != 0)) {
+                (locations.size() <= 1 || loc_it->output.compare(loc_it->input) != 0)) {
                 outstream << loc_it->input << "\t" << loc_it->output;
                 if (s.print_weights) {
                     outstream << "\t" << loc_it->weight;
