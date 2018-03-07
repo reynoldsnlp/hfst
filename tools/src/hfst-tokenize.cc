@@ -346,7 +346,7 @@ int parse_options(int argc, char** argv)
                 {"beam", required_argument, 0, 'b'},
                 {"time-cutoff", required_argument, 0, 't'},
                 {"weight-classes", required_argument, 0, 'l'},
-                {"unique", required_argument, 0, 'u'},
+                {"unique", no_argument, 0, 'u'},
                 {"segment", no_argument, 0, 'z'},
 		{"space-separated", no_argument, 0, 'd'},
                 {"xerox", no_argument, 0, 'x'},
