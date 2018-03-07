@@ -34,22 +34,19 @@ define internal_punct "'" | "’" | "-" | "*"+;
 define unknown_word_char [\[Whitespace | Punct | em_dash | punct_trailing]];
 define unknown_token unknown_word_char+ (internal_punct) ;
 
-define trailing_punct NLC(boundary) punct_trailing RC(boundary);
-define preceding_punct LC(boundary) punct_preceding NRC(boundary);
-define sentbound NLC(boundary) punct_sentbound+ RC(boundary);
-define punct_between NLC(boundary) [punct_trailing | punct_preceding] NRC(boundary);
+define punct_between [punct_trailing | punct_preceding];
 
 define TOP
   [ LC([boundary | punct_preceding]) Ins(morfo) RC(boundary | [punct_trailing | punct_sentbound]) ] |
 ! The case where the morphology contains entries ending in internal punctuation
 ! and will be immediately followed by an another alpha token
   [ LC([boundary | punct_preceding]) RC([Alpha+ internal_punct]) Ins(morfo) ] |
-  [ trailing_punct ] |
-  [ preceding_punct ] |
+  [ NLC(boundary) RC(punct_trailing) Ins(morfo) RC(boundary) ] |
+  [ LC(boundary) RC(punct_preceding) Ins(morfo) NRC(boundary) ] |
   [ xml_tag ] |
   ! This will insert a newline in the token stream
-  [ sentbound EndTag("Boundary=Sentence")]::100 |
-  [ punct_between ] |
+  [ NLC(boundary) RC(punct_sentbound) Ins(morfo) RC(boundary) EndTag("Boundary=Sentence")]::100 |
+  [ NLC(boundary) RC(punct_between) Ins(morfo) NRC(boundary) ] |
   [date | date_range | date_with_time | time | numerical] |
   [("<") url (">") ] | email |
   ! Unknown token
