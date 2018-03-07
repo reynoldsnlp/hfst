@@ -19,4 +19,4 @@ if [ "$1" == "--help" ] ; then
     exit 0
 fi
 
-hfst-tokenize --xerox $trdir/LANGCODE-tokenize.pmatch
+hfst-tokenize --unique --xerox $trdir/LANGCODE-tokenize.pmatch
