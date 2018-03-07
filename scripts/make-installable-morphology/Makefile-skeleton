@@ -1,7 +1,6 @@
 langname = LANGNAME
 langcode = LANGCODE
 
-analyzer_transducer = $(langcode)-analysis.hfst.ol
 generator_transducer = $(langcode)-generation.hfst.ol
 tokenizer_transducer = $(langcode)-tokenize.pmatch
 prefix = /usr/local
@@ -12,7 +11,6 @@ generator_script = ${langname}-generate-words
 
 install:
 	install -m 0775 -d $(transducerpath)
-	install -m 0664 $(analyzer_transducer) --target-directory=$(transducerpath)
 	install -m 0664 $(generator_transducer) --target-directory=$(transducerpath)
 	install -m 0664 $(tokenizer_transducer) --target-directory=$(transducerpath)
 	sed -e s,BINPATH,$(binarypath),g -e s,TRPATH,$(transducerpath),g \
@@ -23,7 +21,6 @@ install:
 	chmod 0755 $(binarypath)/$(generator_script)
 
 uninstall:
-	rm -f $(transducerpath)/$(analyzer_transducer)
 	rm -f $(transducerpath)/$(generator_transducer)
 	rm -f $(transducerpath)/$(tokenizer_transducer)
 	rmdir --ignore-fail-on-non-empty $(transducerpath)
