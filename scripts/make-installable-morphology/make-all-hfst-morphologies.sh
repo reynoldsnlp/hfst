@@ -8,7 +8,7 @@ rootpath=$1
 
 ./make-installable.sh italian it --dir ${rootpath}/hfst-italian --capcase --unweighted &
 
-./make-installable.sh finnish fi --dir ${rootpath}/hfst-finnish
+./make-installable.sh finnish fi --dir ${rootpath}/hfst-finnish &
 
 ./make-installable.sh turkish tr --dir ${rootpath}/hfst-turkish --punct --capcase --unweighted &
 
