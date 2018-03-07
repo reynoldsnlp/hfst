@@ -8,12 +8,12 @@ if [ ! -e "$trdir"/LANGCODE-analysis.hfst.ol ] ; then
     echo "$trdir/LANGCODE-analysis.hfst.ol not found"
     exit 1
 fi
-if ! command -v hfst-tokenize 2> /dev/null; then
+if ! command -v hfst-tokenize > /dev/null; then
     echo "hfst-tokenize not found on your system"
     echo "HFST is available from https://github.com/hfst/hfst"
     exit 1
 fi
-if ! command -v hfst-lookup 2> /dev/null; then
+if ! command -v hfst-lookup > /dev/null; then
     echo "hfst-lookup not found on your system"
     echo "HFST is available from https://github.com/hfst/hfst"
     exit 1
