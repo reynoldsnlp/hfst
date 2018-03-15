@@ -91,6 +91,8 @@ bool symbol_in_global_context(std::string & sym);
 bool symbol_in_local_context(std::string & sym);
 PmatchObject * symbol_from_global_context(std::string & sym);
 PmatchObject * symbol_from_local_context(std::string & sym);
+bool string_set_has_meta_arc(StringSet & ss);
+bool is_special(const std::string & symbol);
 
 /**
  * @brief input handling function for flex that parses strings.
@@ -410,17 +412,10 @@ struct PmatchUtilityTransducers
                              bool optional = false );
 };
 
-struct PmatchObject;
-
 enum PmatchEvalType {
     InputSide,
     OutputSide,
     Transducer
-};
-
-enum PmatchObjectType {
-    Unspecified,
-    String
 };
 
 struct PmatchObject {
@@ -430,7 +425,6 @@ struct PmatchObject {
     clock_t my_timer;
     HfstTransducer * cache;
     bool parent_is_context;
-    PmatchObjectType object_type;
     PmatchObject(void);
     void start_timing(void)
         {
@@ -455,8 +449,17 @@ struct PmatchObject {
     virtual bool is_unweighted_disjunction_of_strings(void)
         { return false; }
     virtual void collect_strings_into(StringVector & strings) { return; }
-    virtual void collect_initial_symbols_into(StringSet & allowed, StringSet & disallowed)
-        { return; }
+    virtual void collect_initial_symbols_into(
+        StringSet & allowed, StringSet & disallowed);
+    virtual StringSet get_real_initial_symbols(void);
+    virtual StringSet get_real_initial_symbols_from_right(void);
+    virtual bool is_left_concatenation_with_context(void);
+    virtual bool is_context(void);
+    virtual bool is_delimiter(void);
+    virtual StringSet get_initial_symbols_from_unary_root(void);
+    virtual StringSet get_initial_RC_initial_symbols(void);
+    virtual StringSet get_initial_NRC_initial_symbols(void);
+    void expand_Ins_arcs(StringSet & ss);
     virtual HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer) = 0;
     virtual HfstTransducer * evaluate(std::vector<PmatchObject *> args);
     virtual void mark_context_children(void) { parent_is_context = true; }
@@ -477,7 +480,7 @@ struct PmatchString: public PmatchObject {
     std::string string;
     bool multichar;
     PmatchString(std::string str, bool is_multichar = false):
-        string(str), multichar(is_multichar) { object_type = String; }
+        string(str), multichar(is_multichar) { }
     HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
     std::string as_string(void) { return string; }
     StringPair as_string_pair(void)
@@ -603,6 +606,11 @@ struct PmatchUnaryOperation: public PmatchObject{
     PmatchUnaryOperation(PmatchUnaryOp _op, PmatchObject * _root):
         op(_op), root(_root) {}
     HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    StringSet get_initial_RC_initial_symbols(void);
+    StringSet get_initial_NRC_initial_symbols(void);
+    bool is_context(void);
+    bool is_delimiter(void);
+    StringSet get_initial_symbols_from_unary_root(void);
     void mark_context_children(void)
         {
             parent_is_context = true;
@@ -620,6 +628,10 @@ struct PmatchBinaryOperation: public PmatchObject{
     StringPair as_string_pair(void);
     bool is_unweighted_disjunction_of_strings(void);
     void collect_strings_into(StringVector & strings);
+    StringSet get_real_initial_symbols_from_right(void);
+    bool is_left_concatenation_with_context(void);
+    StringSet get_initial_RC_initial_symbols(void);
+    StringSet get_initial_NRC_initial_symbols(void);
     void mark_context_children(void)
         {
             parent_is_context = true;

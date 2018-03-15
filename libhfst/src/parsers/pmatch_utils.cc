@@ -171,6 +171,21 @@ PmatchObject * symbol_from_local_context(std::string & sym)
     }
 }
 
+bool string_set_has_meta_arc(StringSet & ss)
+{
+    return ss.count(hfst::internal_unknown) == 1 ||
+        ss.count(hfst::internal_identity) == 1 ||
+        ss.count(hfst::internal_default) == 1;
+}
+
+bool is_special(const std::string & symbol)
+{
+    if (symbol.size() < 3) {
+        return false;
+    }
+    return symbol.find("@") == 0 && symbol.rfind("@") == symbol.size() - 1;
+}
+
 int*
 get_n_to_k(const char* s)
 {
@@ -1190,21 +1205,54 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         hfst::pmatch::timer = clock();
         std::cerr << "compiled and harmonized in " << duration << " seconds\n";
     }
+
     StringSet allowed_initial_symbols;
     StringSet disallowed_initial_symbols;
-    definitions["TOP"]->collect_initial_symbols_into(allowed_initial_symbols,
-                                                     disallowed_initial_symbols);
-    if (allowed_initial_symbols.size() != 0 && allowed_initial_symbols.count("@UNK@") == 0) {
-        std::string initial_symbols_list;
-        for (StringSet::iterator it = allowed_initial_symbols.begin(); it != allowed_initial_symbols.end(); ++it) {
-            if (disallowed_initial_symbols.count(*it) == 0) {
-                initial_symbols_list.append(*it);
+    definitions["TOP"]->collect_initial_symbols_into(
+        allowed_initial_symbols, disallowed_initial_symbols);
+    std::string initial_symbols_list;
+    std::string disallowed_initial_symbols_list;
+    // Use this to bail out if there's something suspicious in the final lists
+    bool initial_symbols_ok = true;
+    for (StringSet::iterator it = allowed_initial_symbols.begin();
+         it != allowed_initial_symbols.end(); ++it) {
+        if (is_special(*it)) {
+            if (hfst::pmatch::verbose) {
+                std::cerr << "Not setting initial symbol list due to special symbol " << *it << std::endl;
             }
+            initial_symbols_ok = false;
         }
-        if (initial_symbols_list.size() != 0) {
-            variables["initial-symbols"] = initial_symbols_list;
-        }
+        initial_symbols_list.append(*it);
     }
+    for (StringSet::iterator it = disallowed_initial_symbols.begin();
+         it != disallowed_initial_symbols.end(); ++it) {
+        if (is_special(*it)) {
+            if (hfst::pmatch::verbose) {
+                std::cerr << "Not setting initial symbol list due to special symbol " << *it << std::endl;
+            }
+            initial_symbols_ok = false;
+        }
+        disallowed_initial_symbols_list.append(*it);
+    }
+    if (allowed_initial_symbols.size() > 200) {
+        if (hfst::pmatch::verbose) {
+            std::cerr << "Not setting initial symbol list due to excess length: " << allowed_initial_symbols.size() << std::endl;
+        }
+        initial_symbols_ok = false;
+    }
+    if (disallowed_initial_symbols.size() > 200) {
+        if (hfst::pmatch::verbose) {
+            std::cerr << "Not setting initial symbol list due to excess length: " << disallowed_initial_symbols.size() << std::endl;
+        }
+        initial_symbols_ok = false;
+    }
+    if (initial_symbols_ok && initial_symbols_list.size() != 0) {
+        variables["initial-symbols"] = initial_symbols_list;
+    }
+    if (initial_symbols_ok && disallowed_initial_symbols_list.size() != 0) {
+        variables["disallowed-initial-symbols"] = disallowed_initial_symbols_list;
+    }
+    
     if (variables["need-separators"] == "on") {
         HfstTransducer not_whitespace(hfst::internal_identity, format);
         not_whitespace.subtract(*(get_utils()->latin1_whitespace_acceptor));
@@ -1723,7 +1771,6 @@ PmatchObject::PmatchObject(void)
     line_defined = pmatchlineno;
     cache = (HfstTransducer*) (NULL);
     parent_is_context = false;
-    object_type = Unspecified;
 }
 
 HfstTransducer * PmatchObject::evaluate(std::vector<PmatchObject *> args)
@@ -1749,6 +1796,248 @@ HfstTransducer * PmatchObject::evaluate(std::vector<PmatchObject *> args)
         throw std::invalid_argument(errstring.str());
     }
 }
+
+void PmatchObject::expand_Ins_arcs(StringSet & ss)
+{
+    bool did_no_expansions = false;
+    StringSet expansions_done;
+    StringSet expanded_symbols;
+    if ((this->name).size() != 0) {
+        std::string this_name_insed = "@I.";
+        this_name_insed.append(this->name);
+        this_name_insed.append("@");
+        expansions_done.insert(this_name_insed);
+    }
+    while (!did_no_expansions) {
+        did_no_expansions = true;
+        for (StringSet::const_iterator it = ss.begin(); it != ss.end(); ++it) {
+            if (it->find("@I.") == 0 && it->rfind("@") == it->size() - 1) {
+                // it's an Ins
+                if (expansions_done.count(*it) == 0) {
+                    std::string ins_name = it->substr(3, it->size() - 3 - 1);
+                    did_no_expansions = false;
+                    expansions_done.insert(*it);
+                    if (definitions.count(ins_name) != 0) {
+                        StringSet allowed, disallowed;
+                        definitions[ins_name]->collect_initial_symbols_into(allowed, disallowed);
+                        if (allowed.size() != 0) {
+                            expanded_symbols.insert(allowed.begin(), allowed.end());
+                        } else {
+                            expanded_symbols.insert(hfst::internal_identity);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    for (StringSet::const_iterator it = expansions_done.begin();
+         it != expansions_done.end(); ++it) {
+        ss.erase(*it);
+    }
+    ss.insert(expanded_symbols.begin(), expanded_symbols.end());
+}
+
+StringSet PmatchObject::get_real_initial_symbols(void)
+{
+    if (this->is_left_concatenation_with_context()) {
+        return this->get_real_initial_symbols_from_right();
+    }
+    if (this->is_delimiter()) {
+        return this->get_initial_symbols_from_unary_root();
+    }
+    HfstTransducer * tmp = this->evaluate();
+    StringSet retval(tmp->get_initial_input_symbols());
+    delete tmp;
+    return retval;
+}
+
+StringSet PmatchObject::get_real_initial_symbols_from_right(void)
+{
+    return StringSet();
+}
+
+StringSet PmatchBinaryOperation::get_real_initial_symbols_from_right(void)
+{
+    return right->get_real_initial_symbols();
+}
+
+StringSet PmatchObject::get_initial_symbols_from_unary_root(void)
+{
+    return StringSet();
+}
+
+StringSet PmatchUnaryOperation::get_initial_symbols_from_unary_root(void)
+{
+    return root->get_real_initial_symbols();
+}
+
+bool PmatchObject::is_left_concatenation_with_context(void)
+{
+    return false;
+}
+
+bool PmatchBinaryOperation::is_left_concatenation_with_context(void)
+{
+    return op == Concatenate && left->is_context();
+}
+
+bool PmatchObject::is_context(void)
+{
+    return false;
+}
+
+bool PmatchObject::is_delimiter(void)
+{
+    return false;
+}
+
+bool PmatchUnaryOperation::is_context(void)
+{
+    return op == LC || op == NLC || op == RC || op == NRC;
+}
+
+bool PmatchUnaryOperation::is_delimiter(void)
+{
+    return op == AddDelimiters;
+}
+
+StringSet PmatchObject::get_initial_RC_initial_symbols(void)
+{
+    return StringSet();
+}
+
+StringSet PmatchObject::get_initial_NRC_initial_symbols(void)
+{
+    return StringSet();
+}
+
+StringSet PmatchBinaryOperation::get_initial_RC_initial_symbols(void)
+{
+    StringSet retval;
+    if (op == Concatenate) {
+        StringSet left_ss = left->get_initial_RC_initial_symbols();
+        StringSet right_ss;
+        if (right->is_context() || right->is_delimiter()) {
+            right_ss = right->get_initial_NRC_initial_symbols();
+        }
+        retval.insert(left_ss.begin(), left_ss.end());
+        retval.insert(right_ss.begin(), right_ss.end());
+        return retval;
+    }
+    return retval;
+}
+
+StringSet PmatchBinaryOperation::get_initial_NRC_initial_symbols(void)
+{
+    StringSet retval;
+    if (op == Concatenate) {
+        StringSet left_ss = left->get_initial_NRC_initial_symbols();
+        StringSet right_ss;
+        if (right->is_context() || right->is_delimiter()) {
+            right_ss = right->get_initial_NRC_initial_symbols();
+        }
+        retval.insert(left_ss.begin(), left_ss.end());
+        retval.insert(right_ss.begin(), right_ss.end());
+        return retval;
+    }
+    return retval;
+}
+
+StringSet PmatchUnaryOperation::get_initial_RC_initial_symbols(void)
+{
+    if (op == RC) {
+        HfstTransducer * tmp = this->root->evaluate();
+        StringSet retval(tmp->get_initial_input_symbols());
+        delete tmp;
+        return retval;
+    }
+    if (op == AddDelimiters) {
+        return root->get_initial_RC_initial_symbols();
+    }
+    return StringSet();
+}
+
+StringSet PmatchUnaryOperation::get_initial_NRC_initial_symbols(void)
+{
+    if (op == NRC) {
+        HfstTransducer * tmp = this->root->evaluate();
+        StringSet retval(tmp->get_initial_input_symbols());
+        delete tmp;
+        return retval;
+    }
+    if (op == AddDelimiters) {
+        return root->get_initial_NRC_initial_symbols();
+    }
+    return StringSet();
+}
+
+void PmatchObject::collect_initial_symbols_into(StringSet & allowed_initial_symbols,
+                                                StringSet & disallowed_initial_symbols)
+{
+    // One or neither of allowed_initial_symbols and disallowed_initial_symbols
+    // will have some symbols inserted to it.
+    
+    StringSet allowed = this->get_real_initial_symbols();
+    StringSet required = this->get_initial_RC_initial_symbols();
+    StringSet disallowed = this->get_initial_NRC_initial_symbols();
+
+    // The first input symbols collected in this way may include:
+    // - insertion arcs
+    // - unknown, identity, default
+    // - symbols after flag diacritics
+    // - symbols from contexts
+    expand_Ins_arcs(allowed);
+    expand_Ins_arcs(required);
+    expand_Ins_arcs(disallowed);
+
+    if (allowed.size() == 0) {
+        // Probably something went wrong, we'll just not make no judgement
+        return;
+    }
+    
+    if (string_set_has_meta_arc(allowed)) {
+        if (required.size() != 0 && !string_set_has_meta_arc(required)) {
+            // RC sets a constraint
+            for (StringSet::iterator it = required.begin(); it != required.end(); ++it) {
+                if (disallowed.count(*it) == 0) {
+                    allowed_initial_symbols.insert(*it);
+                }
+            }
+            return;
+        } else {
+            // Anything goes except what is disallowed
+            if (disallowed.size() == 0 || string_set_has_meta_arc(disallowed)) {
+                return;
+            } else {
+                disallowed_initial_symbols.insert(disallowed.begin(), disallowed.end());
+                return;
+            }
+        }
+    }
+
+    // Now we can assume that "allowed" is nonempty and non-meta.
+
+    if (required.size() == 0 || string_set_has_meta_arc(required)) {
+        // RC poses no constraint
+        for (StringSet::iterator it = allowed.begin(); it != allowed.end(); ++it) {
+            if (disallowed.count(*it) == 0) {
+                allowed_initial_symbols.insert(*it);
+            }
+        }
+        return;
+    }
+
+    // Now we can assume that there is a genuine RC constraint.
+
+    for (StringSet::iterator it = required.begin(); it != required.end(); ++it) {
+        std::cerr << *it << std::endl;
+        if (allowed.count(*it) == 1 && disallowed.count(*it) == 0) {
+            allowed_initial_symbols.insert(*it);
+        }
+    }
+    return;
+}
+
 
 void PmatchString::collect_strings_into(StringVector & strings)
 {
@@ -1788,7 +2077,7 @@ HfstTransducer * PmatchSymbol::evaluate(PmatchEvalType eval_type)
 }
 
 HfstTransducer * PmatchString::evaluate(PmatchEvalType eval_type) {
-    if (cache != NULL && should_use_cache()) {
+    if (cache != NULL) {
         return new HfstTransducer(*cache);
     }
     start_timing();
@@ -1874,7 +2163,7 @@ HfstTransducer * PmatchBuiltinFunction::evaluate(PmatchEvalType eval_type)
 
 HfstTransducer * PmatchNumericOperation::evaluate(PmatchEvalType eval_type)
 {
-    if (cache != NULL && should_use_cache()) {
+    if (cache != NULL) {
         return new HfstTransducer(*cache);
     }
     HfstTransducer * tmp;
@@ -1902,7 +2191,7 @@ HfstTransducer * PmatchNumericOperation::evaluate(PmatchEvalType eval_type)
 
 HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
 {
-    if (cache != NULL && should_use_cache()) {
+    if (cache != NULL) {
         return new HfstTransducer(*cache);
     }
     HfstTransducer * retval = NULL;
@@ -2154,7 +2443,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
 
 HfstTransducer * PmatchBinaryOperation::evaluate(PmatchEvalType eval_type)
 {
-    if (cache != NULL && should_use_cache()) {
+    if (cache != NULL) {
         return new HfstTransducer(*cache);
     }
     start_timing();
@@ -2292,7 +2581,7 @@ bool PmatchBinaryOperation::is_unweighted_disjunction_of_strings(void)
 
 HfstTransducer * PmatchTernaryOperation::evaluate(PmatchEvalType eval_type)
 {
-    if (cache != NULL && should_use_cache()) {
+    if (cache != NULL) {
         return new HfstTransducer(*cache);
     }
     start_timing();
@@ -2350,7 +2639,7 @@ HfstTransducer * PmatchAcceptor::evaluate(PmatchEvalType eval_type)
 
 HfstTransducer * PmatchParallelRulesContainer::evaluate(PmatchEvalType eval_type)
 {
-    if (cache != NULL && should_use_cache()) {
+    if (cache != NULL) {
         return new HfstTransducer(*cache);
     }
     start_timing();
@@ -2408,7 +2697,7 @@ std::vector<hfst::xeroxRules::Rule> PmatchParallelRulesContainer::make_mappings(
 
 HfstTransducer * PmatchReplaceRuleContainer::evaluate(PmatchEvalType eval_type)
 {
-    if (cache != NULL && should_use_cache()) {
+    if (cache != NULL) {
         return new HfstTransducer(*cache);
     }
     start_timing();
@@ -2495,7 +2784,7 @@ HfstTransducer * PmatchQuestionMark::evaluate(PmatchEvalType eval_type)
 
 HfstTransducer * PmatchRestrictionContainer::evaluate(PmatchEvalType eval_type)
 {
-    if (cache != NULL && should_use_cache()) {
+    if (cache != NULL) {
         return new HfstTransducer(*cache);
     }
     start_timing();
