@@ -1357,10 +1357,10 @@ void PmatchContainer::set_properties(std::map<std::string, std::string> & proper
 
 void PmatchContainer::collect_first_symbols(const std::string & symbols_list)
 {
-    SymbolNumberVector possible_first_symbols = symbol_vector_from_symbols(symbols_list);
-    for (SymbolNumberVector::const_iterator it = possible_first_symbols.begin();
-         it != possible_first_symbols.end(); ++it) {
-        while (*it <= possible_first_symbols.size()) {
+    SymbolNumberVector first_symbols = symbol_vector_from_symbols(symbols_list);
+    for (SymbolNumberVector::const_iterator it = first_symbols.begin();
+         it != first_symbols.end(); ++it) {
+        while (*it >= possible_first_symbols.size()) {
             possible_first_symbols.push_back(false);
         }
         possible_first_symbols[*it] = true;
