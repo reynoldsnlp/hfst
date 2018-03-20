@@ -281,6 +281,7 @@ FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-gen.strings \
 			proc-cat-out.strings proc-cat-weighted-out.strings \
 			proc-compounds-out.strings proc-compounds.strings \
 			proc-compounds2-out.strings proc-compounds2.strings \
+			proc-serial-unicode.strings proc-escaping.strings proc-escaping-out.strings \
 			utf-8.strings latin-1.strings \
 			cat2dog.strings heavycat.strings \
 			cat_weight_ambig_out.strings cat_weight_ambig_W_out.strings \
