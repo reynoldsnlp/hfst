@@ -451,8 +451,45 @@ warn.one-sided-flags.lexc.result.prolog
 
 # files needed for test programs
 EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS) $(PMATCH_TXTS) $(PMATCHSCRIPTS) script.xfst lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh \
-calculate-functionality.sh shuffle-functionality.sh $(RESULT_FILES) $(TOKENIZE_FILES)
-
+$(RESULT_FILES) $(TOKENIZE_FILES) \
+compare-functionality.sh \
+compose-functionality.sh \
+concatenate-functionality.sh \
+conjunct-functionality.sh \
+determinize-functionality.sh \
+disjunct-functionality.sh \
+format-functionality.sh \
+fst2strings-functionality.sh \
+fst2txt-functionality.sh \
+head-functionality.sh \
+invert-functionality.sh \
+lookup-functionality.sh \
+flookup-functionality.sh \
+optimized-lookup-functionality.sh \
+minimize-functionality.sh \
+pmatch2fst-functionality.sh \
+pmatch-functionality.sh \
+project-functionality.sh \
+prune-alphabet-functionality.sh \
+regexp2fst-functionality.sh \
+remove-epsilons-functionality.sh \
+repeat-functionality.sh \
+reverse-functionality.sh \
+reweight-functionality.sh \
+split-functionality.sh \
+strings2fst-functionality.sh \
+substitute-functionality.sh \
+subtract-functionality.sh \
+summarize-functionality.sh \
+symbol-harmonization-functionality.sh \
+tail-functionality.sh \
+txt2fst-functionality.sh \
+lexc-wrapper-functionality.sh \
+lexc-compiler-functionality.sh \
+calculate-functionality.sh \
+shuffle-functionality.sh \
+proc-functionality.sh \
+tokenize-functionality.sh tokenize-backtrack-functionality.sh tokenize-flushing-functionality.sh
 
 valgrind: $(CHECK_DATA)
 	$(srcdir)/valgrind.sh $(srcdir)
