@@ -7,7 +7,7 @@ if [ "$1" = '--python' ]; then
 else
     TOOL=$TOOLDIR/hfst-proc/hfst-apertium-proc
     if ! test -x $TOOL; then
-	exit 0;
+	exit 77;
     fi
 fi
 

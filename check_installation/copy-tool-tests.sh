@@ -70,6 +70,9 @@ rm pmatch-tests.sh
 rm pmatch-tester.sh
 rm pmatch-functionality.sh
 
+# python bindings are tested separately
+rm test-python.sh
+
 # The tagger tools are experimental so they are not tested
 
 cd ..
