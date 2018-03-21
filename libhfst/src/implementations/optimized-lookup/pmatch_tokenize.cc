@@ -110,11 +110,15 @@ bool location_compare_ignoring_weights(const Location& lhs, const Location& rhs)
     }
 }
 
+bool location_compare_using_only_weights(const Location& lhs, const Location& rhs) {
+    return lhs.weight < rhs.weight;
+}
+
 const LocationVector dedupe_locations(LocationVector const & locations, const TokenizeSettings & s) {
     if(!s.dedupe) {
         return locations;
     }
-    if(s.print_weights || s.output_format != xerox) {
+    if(s.print_weights) {
         std::set<Location, bool(*)(const Location& lhs, const Location& rhs)> ls(&location_compare);
         ls.insert(locations.begin(), locations.end());
         LocationVector uniq;
@@ -125,6 +129,7 @@ const LocationVector dedupe_locations(LocationVector const & locations, const To
         ls.insert(locations.begin(), locations.end());
         LocationVector uniq;
         std::copy(ls.begin(), ls.end(), std::back_inserter(uniq));
+        std::sort(uniq.begin(), uniq.end(), location_compare_using_only_weights);
         return uniq;
     }
 }
