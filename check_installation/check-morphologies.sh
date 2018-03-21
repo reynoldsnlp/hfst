@@ -88,20 +88,20 @@ do
 
 	# test that the program handles real words
 	if ! [ "$dir" = "generate" ]; then
-	    if (! cat $morph_folder/$lang-$dir-words.input | $prog_full_path $format > tmp); then
+	    if (! cat $morph_folder/$lang-$dir-words.input | $prog_full_path $format > $morph_folder/$lang-$dir-words.result); then
 		printf "%-32s%s\n" $prog "FAIL: program cannot handle valid input (given via standard input)"
 		exit 1
 	    fi
 	else
 	    # use output from analyzer as input to generator
-	    if (! cut -f 2- tmp | perl -pe 's/^\n//g;' | $prog_full_path $format > TMP && mv TMP tmp); then
+	    if (! cut -f 2- $morph_folder/$lang-analyze-words.result | perl -pe 's/^\n//g;' | $prog_full_path $format > $morph_folder/$lang-$dir-words.result); then
 		printf "%-32s%s\n" $prog "FAIL: program cannot handle valid input (given via standard input)"
 		exit 1
 	    fi
 	fi
 	# check that the result is as expected
 	if ! [ "$dir" = "generate" ]; then
-	    if (! diff tmp $morph_folder/$lang-$dir-words.output); then
+	    if (! diff $morph_folder/$lang-$dir-words.result $morph_folder/$lang-$dir-words.output); then
 		printf "%-32s%s\n" $prog "FAIL: wrong result for input (given via standard input)"
 		exit 1
 	    fi
@@ -109,7 +109,7 @@ do
 	    # just check that the generated forms contain each original form given to the analyzer
 	    for word in `cat $morph_folder/$lang-analyze-words.input | tr -d '.' | tr -d ','`;
             do
-		if ! grep --ignore-case $word tmp > /dev/null 2> /dev/null ; then
+		if ! grep --ignore-case $word $morph_folder/$lang-$dir-words.result > /dev/null 2> /dev/null ; then
 		    printf "%-32s%s\n" $prog "FAIL: correct generated form '"$word"' not found"
 		    exit 1
 		fi
@@ -120,7 +120,8 @@ do
     done
 done
 
-rm -f tmp TMP copied_morphology_script.sh
+rm -f copied_morphology_script.sh
+rm -f $morph_folder/*.result
 
 echo "-----------------"
 echo "All tests passed."
