@@ -32,8 +32,8 @@ if [ "$3" = "--hfst-tool-prefix" ]; then
 fi
 
 
-extension=.sh
-languages="english french german italian omorfi finnish swedish turkish"
+extension=
+languages="english french german italian finnish swedish turkish"
 directions="analyze generate"
 format=xerox
 morph_folder=morphology_tests
