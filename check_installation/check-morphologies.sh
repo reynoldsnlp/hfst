@@ -34,7 +34,7 @@ fi
 languages="english french german italian finnish swedish turkish"
 directions="analyze generate"
 format=xerox
-morph_folder=morphology_tests_new
+morph_folder=morphology_tests
 
 
 echo "---------------------------- "
