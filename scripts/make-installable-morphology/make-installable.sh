@@ -102,5 +102,9 @@ sed -e s/Langname/$firstletter$rest/g -e s/LANGNAME/${langname}/g < README-skele
     ${target_dir}/README
 
 sed -e s/LANG/${langname}_tmp.hfst/g < tokenizer-skeleton > ${langcode}-tokenizer.txt
+if [ -e ${langname}-tokenizer-patch.txt ]; then
+    patch ${langcode}-tokenizer.txt ${langname}-tokenizer-patch.txt
+fi
+
 hfst-pmatch2fst ${langcode}-tokenizer.txt > ${target_dir}/${langcode}-tokenize.pmatch
 rm -f ${langcode}-tokenizer.txt ${langname}_tmp.hfst
