@@ -17,8 +17,6 @@ fi
 
 echo "  Copying command line tool tests..."
 ./copy-tool-tests.sh
-# echo "  Copying tests for python bindings..."
-# ./copy-python-tests.sh
 
 if [ ! "$VERSION" = "" ]; then
     DISTDIR=check-hfst"-"$VERSION;
@@ -34,7 +32,7 @@ mkdir $DISTDIR
 for dir in tool_tests morphology_tests ospell_tests;
 do
     if [ ! -d $dir ]; then
-	echo "ERROR: directory 'tool_tests' does not exist."
+	echo "ERROR: directory '"$dir"' does not exist."
 	exit 1;
     fi
 done
@@ -42,8 +40,6 @@ done
 cp dist-README $DISTDIR/README
 cp ./check-tools.sh $DISTDIR/
 cp --parents ./tool_tests/* $DISTDIR/
-# cp ./check-python.sh $DISTDIR/
-# cp --parents ./python_tests/* $DISTDIR/
 cp ./check-morphologies.sh $DISTDIR/
 cp --parents ./morphology_tests/* $DISTDIR/
 cp ./check-ospell.sh $DISTDIR
