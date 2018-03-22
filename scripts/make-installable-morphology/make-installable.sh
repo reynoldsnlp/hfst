@@ -86,6 +86,10 @@ if [ "$capcase" == "true" ]; then
     mv ${langname}_capcase.hfst ${langname}_tmp.hfst
 fi
 
+# normalize fancy unicode apostrophes, just about all transducers need this
+echo "\"’\" (->) \"'\"" | hfst-regexp2fst | hfst-compose -1 - -2 ${langname}_tmp.hfst > ${langname}_normalized.hfst
+mv ${langname}_normalized.hfst ${langname}_tmp.hfst
+
 sed s/LANGCODE/${langcode}/g < analyze.sh > ${target_dir}/${langname}-analyze-words
 sed s/LANGCODE/${langcode}/g < generate.sh > ${target_dir}/${langname}-generate-words
 sed -e s/LANGNAME/${langname}/g -e s/LANGCODE/${langcode}/g < Makefile-skeleton > \
