@@ -462,6 +462,9 @@ namespace hfst_ol {
         void match(unsigned int input_pos, unsigned int tape_pos);
         void rtn_call(unsigned int input_pos, unsigned int tape_pos,
                       PmatchTransducer * caller, TransitionTableIndex caller_index);
+        void rtn_call_in_context(unsigned int input_pos, unsigned int tape_pos,
+                                 PmatchTransducer * caller, TransitionTableIndex caller_index,
+                                 LocalVariables locals);
         void rtn_return(unsigned int input_pos, unsigned int tape_pos);
         void handle_final_state(unsigned int input_pos, unsigned int tape_pos);
 

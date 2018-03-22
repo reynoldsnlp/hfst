@@ -1468,6 +1468,23 @@ void PmatchTransducer::rtn_call(unsigned int input_tape_pos,
     container->rtn_stack_pop();
 }
 
+void PmatchTransducer::rtn_call_in_context(unsigned int input_tape_pos,
+                                           unsigned int tape_pos,
+                                           PmatchTransducer * caller,
+                                           TransitionTableIndex caller_index,
+                                           LocalVariables locals)
+{
+    container->push_rtn_call(caller_index, caller);
+    container->increase_stack_depth();
+    LocalVariables new_top(locals);
+    new_top.flag_state = alphabet.get_fd_table();
+    local_stack.push(new_top);
+    get_analyses(input_tape_pos, tape_pos, 0);
+    local_stack.pop();
+    container->decrease_stack_depth();
+    container->rtn_stack_pop();
+}
+
 void PmatchTransducer::rtn_return(unsigned int input_tape_pos,
                                   unsigned int tape_pos)
 {
@@ -1566,82 +1583,84 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
     i = make_transition_table_index(i, 0);
     while (is_good(i)) {
         SymbolNumber input = transition_table[i].get_input_symbol();
+        if (input != 0 && !alphabet.is_flag_diacritic(input) && !alphabet.has_rtn(input)) {
+            return;
+        }
+        
         SymbolNumber output = transition_table[i].get_output_symbol();
         TransitionTableIndex target = transition_table[i].get_target();
         Weight old_weight = container->get_weight();
         container->increment_weight(transition_table[i].get_weight());
-        // We also handle paths where we're checking contexts here
-        if (input == 0) {
+
+        if (checking_context()) {
+            if (try_exiting_context(output)) {
+                // We've successfully completed a context check
+                get_analyses(local_stack.top().context_placeholder, tape_pos, target);
+                local_stack.pop();
+            } else {
+                if (local_stack.top().negative_context_success == true) {
+                    // We've succeeded in a negative context, just back out
+                    return;
+                } else if (alphabet.is_flag_diacritic(input)) {
+                    take_flag(input, input_pos, tape_pos, i);
+                } else if (alphabet.has_rtn(input)) {
+                    alphabet.get_rtn(input)->rtn_call_in_context(input_pos, tape_pos, this, target, local_stack.top());
+                } else {
+                    // Don't alter tapes when checking context
+                    get_analyses(input_pos, tape_pos, target);
+                }
+            }
+        } else if (input == 0) {
             if (container->profile_mode) {
                 alphabet.count(output);
             }
-            if (!checking_context()) {
-                if (!try_entering_context(output)) {
-                    // no context to enter, regular input epsilon
-                    container->tape.write(tape_pos, 0, output);
-                    
-                    // if it's an entry or exit arc, adjust entry stack
-                    if (output == alphabet.get_special(entry)) {
-                        container->entry_stack.push(input_pos);
-                    } else if (output == alphabet.get_special(exit)) {
-                        container->entry_stack.pop();
-                    } else if (alphabet.is_capture_tag(output)) {
-                        // if it's a capture tag, remember where we were
-                        Capture capture;
-                        capture.begin = container->entry_stack.back();
-                        capture.end = input_pos;
-                        capture.name = output;
-                        container->captures.push_back(capture);
-                    } else if (alphabet.is_captured_tag(output)) {
-                        // if it's a captured tag, try each previously
-                        // captured sequence
-                        std::pair<SymbolNumberVector::iterator, SymbolNumberVector::iterator> cap =
-                            container->get_longest_matching_capture(alphabet.captured2capture[output], input_pos);
-                        if (cap.second - cap.first != 0) {
-                            container->tape.write(tape_pos, cap);
-                            get_analyses(input_pos + (cap.second - cap.first),
-                                         tape_pos + (cap.second - cap.first), target);
-                        }
-                        ++i;
-                        container->set_weight(old_weight);
-                        continue;
+            if (!try_entering_context(output)) {
+                // no context to enter, regular input epsilon
+                container->tape.write(tape_pos, 0, output);
+                
+                // if it's an entry or exit arc, adjust entry stack
+                if (output == alphabet.get_special(entry)) {
+                    container->entry_stack.push(input_pos);
+                } else if (output == alphabet.get_special(exit)) {
+                    container->entry_stack.pop();
+                } else if (alphabet.is_capture_tag(output)) {
+                    // if it's a capture tag, remember where we were
+                    Capture capture;
+                    capture.begin = container->entry_stack.back();
+                    capture.end = input_pos;
+                    capture.name = output;
+                    container->captures.push_back(capture);
+                } else if (alphabet.is_captured_tag(output)) {
+                    // if it's a captured tag, try each previously
+                    // captured sequence
+                    std::pair<SymbolNumberVector::iterator, SymbolNumberVector::iterator> cap =
+                        container->get_longest_matching_capture(alphabet.captured2capture[output], input_pos);
+                    if (cap.second - cap.first != 0) {
+                        container->tape.write(tape_pos, cap);
+                        get_analyses(input_pos + (cap.second - cap.first),
+                                     tape_pos + (cap.second - cap.first), target);
                     }
-                    
-                    get_analyses(input_pos, tape_pos + 1, target);
-                    
-                    if (output == alphabet.get_special(entry)) {
-                        container->entry_stack.pop_back();
-                    } else if (output == alphabet.get_special(exit)) {
-                        container->entry_stack.unpop();
-                    } else if (alphabet.is_capture_tag(output)) {
-                        container->captures.pop_back();
-                    }
-                } else {
-                    check_context(input_pos, tape_pos, i);
+                    ++i;
+                    container->set_weight(old_weight);
+                    continue;
+                }
+                
+                get_analyses(input_pos, tape_pos + 1, target);
+                
+                if (output == alphabet.get_special(entry)) {
+                    container->entry_stack.pop_back();
+                } else if (output == alphabet.get_special(exit)) {
+                    container->entry_stack.unpop();
+                } else if (alphabet.is_capture_tag(output)) {
+                    container->captures.pop_back();
                 }
             } else {
-                // We *are* checking context and may be done
-                if (try_exiting_context(output)) {
-                    // We've successfully completed a context check
-                    get_analyses(local_stack.top().context_placeholder, tape_pos, target);
-                    local_stack.pop();
-                } else {
-                    if (local_stack.top().negative_context_success == true) {
-                        // We've succeeded in a negative context, just back out
-                        return;
-                    } else {
-                        // Don't alter tapes when checking context
-                        get_analyses(input_pos, tape_pos, target);
-                    }
-                }
+                check_context(input_pos, tape_pos, i);
             }
         } else if (alphabet.is_flag_diacritic(input)) {
             take_flag(input, input_pos, tape_pos, i);
         } else if (alphabet.has_rtn(input)) {
             alphabet.get_rtn(input)->rtn_call(input_pos, tape_pos, this, target);
-        } else { // it's not epsilon and it's not a flag or Ins, so nothing to do
-            container->set_weight(old_weight);
-            return;
         }
         ++i;
         container->set_weight(old_weight);
