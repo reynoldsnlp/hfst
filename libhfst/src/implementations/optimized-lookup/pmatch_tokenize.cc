@@ -619,25 +619,30 @@ void print_location_vector(hfst_ol::PmatchContainer & container,
         print_location_vector_giellacg(container, locations, outstream, s);
     } else if (s.output_format == xerox) {
         float best_weight = std::numeric_limits<float>::max();
-        if (s.beam >= 0.0) {
-            for (LocationVector::const_iterator loc_it = locations.begin();
-                 loc_it != locations.end(); ++loc_it) {
-                if (best_weight > loc_it->weight) {
-                    best_weight = loc_it->weight;
-                }
+        for (LocationVector::const_iterator loc_it = locations.begin();
+             loc_it != locations.end(); ++loc_it) {
+            if (best_weight > loc_it->weight) {
+                best_weight = loc_it->weight;
             }
         }
+        bool printed_something = false;
         for (LocationVector::const_iterator loc_it = locations.begin();
              loc_it != locations.end(); ++loc_it) {
             if ((s.beam < 0.0 || loc_it->weight <= best_weight + s.beam) &&
                 // We don't print "plain" tokens without any analysis
                 // except if they are the only one present
-                (locations.size() <= 1 || loc_it->output.compare(loc_it->input) != 0)) {
+                (loc_it->output.compare(loc_it->input) != 0 ||
+                 (loc_it + 1 == locations.end() && !printed_something))) {
                 outstream << loc_it->input << "\t" << loc_it->output;
                 if (s.print_weights) {
-                    outstream << "\t" << loc_it->weight;
+                    if (loc_it + 1 == locations.end() && !printed_something) {
+                        outstream << "\t" << best_weight;
+                    } else {
+                        outstream << "\t" << loc_it->weight;
+                    }
                 }
                 outstream << std::endl;
+                printed_something = true;
             }
         }
         if (locations.at(0).tag == "<Boundary=Sentence>") {
