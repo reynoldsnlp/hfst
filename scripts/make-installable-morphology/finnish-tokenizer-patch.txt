@@ -6,4 +6,4 @@
 > define finnish_foreign_conjugation [([[":"|"'"] Alpha^{1,3}]:"")]::10;
 > 
 43a50
->   [ LC([boundary | punct_preceding]) Ins(morfo) (finnish_foreign_conjugation (finnish_clitics)) RC(boundary | [punct_trailing | punct_sentbound]) ]:100 |
+>   [ LC([boundary | punct_preceding]) Ins(morfo) (finnish_foreign_conjugation (finnish_clitics)) RC(boundary | [punct_trailing | punct_sentbound]) ]::100 |
