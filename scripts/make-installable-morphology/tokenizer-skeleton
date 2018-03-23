@@ -40,7 +40,7 @@ define punct_between [punct_trailing | punct_preceding | punct_sentbound]+;
 
 define TOP
   [
-  [ LC([boundary | punct_preceding]) Ins(morfo) RC(boundary | [punct_trailing | punct_sentbound]) ]::100 |
+  [ LC([boundary | punct_preceding]) Ins(morfo) RC(boundary | [punct_trailing | punct_sentbound]) ] |
   ! The case where the morphology contains entries ending in internal punctuation
   ! and will be immediately followed or preceded by an another alpha token
   [ RC([Alpha+ internal_punct Alpha+]) Ins(morfo) OR(LC([boundary | punct_preceding | [Alpha+ boundary]]), RC(Alpha+ boundary)) ]::200 |
@@ -52,7 +52,7 @@ define TOP
   ! This will insert a newline in the token stream
   [ NLC(boundary) RC(punct_sentbound) Ins(morfo) RC(boundary) EndTag("Boundary=Sentence")]::1100 |
   [ NLC(boundary) RC(punct_between) Ins(morfo) NRC(boundary) ] |
-  [[ date | date_range | date_with_time | time | numerical ] ["":[" " "Num"]]]::1050 |
+  [ date | date_range | date_with_time | time | numerical ]::1050 |
   [("<") url (">") ] | email |
   ! Unknown token
   [ define( LC([boundary | punct_preceding_strict]) unknown_token RC([boundary | punct_trailing_strict | punct_sentbound]) ) ]::1500 |
