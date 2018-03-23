@@ -1,7 +1,16 @@
-40a41,42
-> define finnish_foreign_conjugation [([[":"|"'"] Alpha^{1,3}]:"")]::10;
+40a41,46
+> define ae "a" | "ä";
+> define oe "o" | "ö";
+> define finnish_clitics [["k" oe ] | ["h" ae "n"] | [ "k" [{aa}|{ää}] "n" ] |  ! only the ones occurring with open classes
+> {kin} | [ "p" ae ]]+ ("s");
+> define finnish_foreign_conjugation [([[":"|"'"] Alpha^{1,3}]:"")]:10;
 > 
-43c45
+43c49,50
 <   [ LC([boundary | punct_preceding]) Ins(morfo) RC(boundary | [punct_trailing | punct_sentbound]) ]::100 |
 ---
->   [ LC([boundary | punct_preceding]) Ins(morfo) finnish_foreign_conjugation RC(boundary | [punct_trailing | punct_sentbound]) ]::100 |
+>   [ LC([boundary | punct_preceding]) Ins(morfo) RC(boundary | [punct_trailing | punct_sentbound]) ] |
+>   [ LC([boundary | punct_preceding]) Ins(morfo) (finnish_foreign_conjugation (finnish_clitics)) RC(boundary | [punct_trailing | punct_sentbound]) ]:100 |
+55c62
+<   [[ date | date_range | date_with_time | time | numerical ] ["":[" " "Num"]]]::1050 |
+---
+>   [date | date_range | date_with_time | time | numerical]::1050 |
