@@ -1,5 +1,5 @@
 40a41,42
-> define finnish_foreign_conjugation [([[":"|"'"] Alpha^{1,3}]:"")]:10;
+> define finnish_foreign_conjugation [([[":"|"'"] Alpha^{1,3}]:"")]::10;
 > 
 43c45
 <   [ LC([boundary | punct_preceding]) Ins(morfo) RC(boundary | [punct_trailing | punct_sentbound]) ]::100 |
