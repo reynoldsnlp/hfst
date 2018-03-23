@@ -12,7 +12,7 @@
 # Information on package
 HFST_NAME=hfst
 HFST_MAJOR=3
-HFST_MINOR=12
+HFST_MINOR=14
 HFST_EXTENSION=1
 HFST_VERSION=$HFST_MAJOR.$HFST_MINOR.$HFST_EXTENSION
 
@@ -21,11 +21,11 @@ HFST_VERSION=$HFST_MAJOR.$HFST_MINOR.$HFST_EXTENSION
 # for package-config pc file
 LIBHFST_NAME=hfst
 LIBHFST_MAJOR=3
-LIBHFST_MINOR=12
+LIBHFST_MINOR=14
 LIBHFST_EXTENSION=1
 LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR.$LIBHFST_EXTENSION
 
-AC_INIT([hfst], [3.12.1], [hfst-bugs@helsinki.fi], [hfst])
+AC_INIT([hfst], [3.14.1], [hfst-bugs@helsinki.fi], [hfst])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall std-options foreign check-news])
 
@@ -37,9 +37,9 @@ AC_CONFIG_SRCDIR([libhfst/src/HfstTransducer.h])
 AC_CONFIG_HEADERS([config.h libhfst/src/hfst.hpp])
 
 AC_SUBST([LIBHFST_MAJOR],     [3])
-AC_SUBST([LIBHFST_MINOR],     [12])
+AC_SUBST([LIBHFST_MINOR],     [14])
 AC_SUBST([LIBHFST_EXTENSION], [1])
-AC_SUBST([LIBHFST_VERSION],   [3.12.1])
+AC_SUBST([LIBHFST_VERSION],   [3.14.1])
 AC_SUBST([LIBHFST_NAME],      [hfst])
 
 # long version = version vector cast in base 10000, for automatic comparisons
@@ -50,7 +50,7 @@ AC_SUBST([LIBHFST_NAME],      [hfst])
 # $LIBHFST_MINOR * 10000 + $LIBHFST_EXTENSION + "L"
 # NB! It turned out to be not portable, and can't be used!
 
-AC_DEFINE([HFST_LONGVERSION], [300120001L],
+AC_DEFINE([HFST_LONGVERSION], [300140001L],
           [Define to hfst version vector as long in base 10000])
 AC_DEFINE([HFST_REVISION], ["$Revision$"],
           [Automatically substitute to configure.ac revision])

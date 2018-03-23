@@ -5,6 +5,20 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.14.0
+----------------------------
+
+* Numerous improvements to pmatching and tokenization:
+
+  * Handle default arcs in pmatch & fix spelling of initial symbols variable
+
+  * Handle weight cutoffs inside pmatch
+
+  * Add introspecion mechanism to PmatchObjects; use for optimization
+
+* Implement variable 'retokenize' in hfst-xfst
+
+
 Noteworthy changes in 3.13.0
 ----------------------------
 
