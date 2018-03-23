@@ -1682,7 +1682,6 @@ void PmatchTransducer::check_context(unsigned int input_pos,
     }
     get_analyses(input_pos, tape_pos, transition_table[i].get_target());
 
-
     // In case we have a negative context, we check to see if the context matched.
     // If it didn't, we schedule a passthrough arc after we've processed epsilons.
     bool schedule_passthrough = false;
@@ -1691,7 +1690,7 @@ void PmatchTransducer::check_context(unsigned int input_pos,
             schedule_passthrough = true;
         }
     }
-// Pop the local stack that got pushed by entering the context
+    // Pop the local stack that got pushed by entering the context
     local_stack.pop();
     if (schedule_passthrough) {
         local_stack.top().pending_passthrough = true;
