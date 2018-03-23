@@ -52,7 +52,7 @@ define TOP
   ! This will insert a newline in the token stream
   [ NLC(boundary) RC(punct_sentbound) Ins(morfo) RC(boundary) EndTag("Boundary=Sentence")]::1100 |
   [ NLC(boundary) RC(punct_between) Ins(morfo) NRC(boundary) ] |
-  [date | date_range | date_with_time | time | numerical]::1050 |
+  [[ date | date_range | date_with_time | time | numerical ] ["":[" " "Num"]]]::1050 |
   [("<") url (">") ] | email |
   ! Unknown token
   [ define( LC([boundary | punct_preceding_strict]) unknown_token RC([boundary | punct_trailing_strict | punct_sentbound]) ) ]::1500 |
