@@ -37,12 +37,10 @@ int
 pmatcherror(const char *msg)
 {
     std::string parsedata;
-    if (strlen(hfst::pmatch::data) < 60)
-    {
+    if (strlen(hfst::pmatch::data) < 60) {
         parsedata = hfst::pmatch::data;
     }
-    else
-    {
+    else {
         parsedata = std::string(hfst::pmatch::data, 59) + "... [truncated]";
     }
     std::string errmsg = "pmatch parsing failed: ";
@@ -1124,8 +1122,6 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     }
     pmatchparse();
     free(startptr);
-    data = 0;
-    len = 0;
     std::map<std::string, hfst::HfstTransducer*> retval;
      for (std::set<std::string>::const_iterator it =
               unsatisfied_insertions.begin();
@@ -1148,6 +1144,8 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
      }
 
     if (pmatchnerrs != 0) {
+        data = 0;
+        len = 0;
         return retval;
     }
     // Our helper for harmonizing all the networks' alphabets with
@@ -1293,6 +1291,8 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         it != variables.end(); ++it) {
         retval["TOP"]->set_property(it->first, it->second);
     }
+    data = 0;
+    len = 0;
     return retval;
 }
 
@@ -2811,8 +2811,8 @@ HfstTransducer * PmatchRestrictionContainer::evaluate(PmatchEvalType eval_type)
     return retval;
 }
 
-HfstTransducer * PmatchMarkupContainer::evaluate(PmatchEvalType eval_type) { pmatcherror("Should never happen\n"); throw 1; }
-HfstTransducer * PmatchMappingPairsContainer::evaluate(PmatchEvalType eval_type) { pmatcherror("Should never happen\n"); throw 1; }
-HfstTransducer * PmatchContextsContainer::evaluate(PmatchEvalType eval_type) { pmatcherror("Should never happen\n"); throw 1; }
+HfstTransducer * PmatchMarkupContainer::evaluate(PmatchEvalType eval_type) { pmatcherror("Should never happen\n"); }
+HfstTransducer * PmatchMappingPairsContainer::evaluate(PmatchEvalType eval_type) { pmatcherror("Should never happen\n"); }
+HfstTransducer * PmatchContextsContainer::evaluate(PmatchEvalType eval_type) { pmatcherror("Should never happen\n"); }
 
 } }
