@@ -198,7 +198,7 @@ inline void process_input_0delim_print(hfst_ol::PmatchContainer & container,
                                        std::ostream & outstream,
                                        std::ostringstream& cur)
 {
-    const auto& input_text{cur.str()};
+    const std::string& input_text{cur.str()};
     if(!input_text.empty()) {
         match_and_print(container, outstream, input_text, settings);
     }
