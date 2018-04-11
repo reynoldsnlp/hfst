@@ -58,6 +58,8 @@ void print_nonmatching_sequence(std::string const & str, std::ostream & outstrea
     } else if (s.output_format == giellacg) {
         outstream << ":";
         print_escaping_newlines(str, outstream);
+    } else if (s.output_format == visl) {
+        outstream << str;
     } else if (s.output_format == conllu) {
         outstream << str;
     } else if (s.output_format == finnpos) {
@@ -616,6 +618,8 @@ void print_location_vector(hfst_ol::PmatchContainer & container,
         }
         outstream << std::endl;
     } else if (s.output_format == giellacg && locations.size() != 0) {
+        print_location_vector_giellacg(container, locations, outstream, s);
+    } else if (s.output_format == visl && locations.size() != 0) {
         print_location_vector_giellacg(container, locations, outstream, s);
     } else if (s.output_format == xerox) {
         float best_weight = std::numeric_limits<float>::max();
