@@ -98,6 +98,8 @@ namespace std {
 %template(HfstTransducerPairVector) vector<pair<hfst::HfstTransducer, hfst::HfstTransducer> >;
 %template(HfstRuleVector) vector<hfst::xeroxRules::Rule>;
 %template(HfstTransducerUIntPair) pair<hfst::HfstTransducer*,unsigned int>;
+%template(LocationVector) vector<hfst_ol::Location>;
+%template(LocationVectorVector) vector<vector<hfst_ol::Location> >;
 }
 
 
@@ -146,6 +148,32 @@ class EmptyStringException : public HfstException { public: EmptyStringException
 class SymbolNotFoundException : public HfstException { public: SymbolNotFoundException(const std::string&, const std::string&, size_t); ~SymbolNotFoundException(); std::string what() const; };
 class MetadataException : public HfstException { public: MetadataException(const std::string&, const std::string&, size_t); ~MetadataException(); std::string what() const; };
 class FlagDiacriticsAreNotIdentitiesException : public HfstException { public: FlagDiacriticsAreNotIdentitiesException(const std::string&, const std::string&, size_t); ~FlagDiacriticsAreNotIdentitiesException(); std::string what() const; };
+
+
+namespace hfst_ol
+{
+
+  struct Location
+  {
+    unsigned int start;
+    unsigned int length;
+    std::string input;
+    std::string output;
+    std::string tag;
+    float weight;
+    std::vector<size_t> input_parts; // indices in input_symbol_strings
+    std::vector<size_t> output_parts; // indices in output_symbol_strings
+    std::vector<std::string> input_symbol_strings;
+    std::vector<std::string> output_symbol_strings;
+
+    //bool operator<(Location rhs) const
+    //{ return this->weight < rhs.weight; }
+  };
+
+  typedef std::vector<hfst_ol::Location> LocationVector;
+  typedef std::vector<std::vector<hfst_ol::Location> > LocationVectorVector;
+
+}
 
 namespace hfst
 {
@@ -1650,6 +1678,20 @@ namespace hfst {
 
 // *** PmatchContainer *** //
 
+// hfst_pmatch_tokenize_extensions.cc
+namespace hfst {
+  std::string pmatch_tokenize(hfst_ol::PmatchContainer * cont,
+			      const std::string & input_text);
+			      //const hfst_ol_tokenize::TokenizeSettings & ts);
+  hfst_ol::LocationVectorVector pmatch_locate(hfst_ol::PmatchContainer * cont,
+					      const std::string & input,
+					      double time_cutoff = 0.0);
+  hfst_ol::LocationVectorVector pmatch_locate(hfst_ol::PmatchContainer * cont,
+					      const std::string & input,
+					      double time_cutoff,
+					      float weight_cutoff);
+}
+
 namespace hfst_ol {
     class PmatchContainer
     {
@@ -1663,13 +1705,31 @@ namespace hfst_ol {
         //void set_extract_tags_mode(bool b);
         void set_profile(bool b);
 
+%extend {
+	  // extension because of inf default value of weight_cutoff...
+	  hfst_ol::LocationVectorVector locate(const std::string & input,
+					       double time_cutoff = 0.0)
+	    {
+	      return hfst::pmatch_locate(self, input, time_cutoff);
+	    };
+	  hfst_ol::LocationVectorVector locate(const std::string & input,
+					       double time_cutoff,
+					       float weight_cutoff)
+	    {
+	      return hfst::pmatch_locate(self, input, time_cutoff, weight_cutoff);
+	    };
+%pythoncode %{
+
+  def tokenize(self, input, **kwargs):
+      return pmatch_tokenize(self, input)
+  def tokenize_(self, input, **kwargs):
+      return pmatch_tokenize(self, input).rstrip().split('\n')
+
+%}
+}
+
 }; // class PmatchContainer
 } // namespace hfst_ol
-
-namespace hfst {
-  std::string pmatch_tokenize(hfst_ol::PmatchContainer & container,
-			      const std::string & input_text);
-}
 
 %pythoncode %{
 
