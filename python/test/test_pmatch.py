@@ -48,7 +48,7 @@ for type in [hfst.ImplementationType.SFST_TYPE, hfst.ImplementationType.TROPICAL
         # (6) use PmatchContainer.tokenize
         tokenization = cont.tokenize("Je marche seul dans l'avenue des Ternes.")
         assert tokenization.rstrip() == "avenue des Ternes"
-        tokenization = cont.tokenize_("Je marche seul dans l'avenue des Ternes.")
+        tokenization = cont.tokenize("Je marche seul dans l'avenue des Ternes.", tokens=True)
         assert tokenization == ["avenue des Ternes"]
 
         # (7) Test Finnish tokenizer
@@ -70,7 +70,7 @@ for type in [hfst.ImplementationType.SFST_TYPE, hfst.ImplementationType.TROPICAL
 
             tokenization = cont.tokenize("Tässä on sanoja!")
             assert tokenization.rstrip() == "Tässä\non\nsanoja\n!"
-            tokenization = cont.tokenize_("Tässä on sanoja!")
+            tokenization = cont.tokenize("Tässä on sanoja!", tokens=True)
             assert tokenization == ["Tässä", "on", "sanoja", "!"]
 
         # (8) try to compile meaningless and invalid expressions

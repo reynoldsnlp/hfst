@@ -1681,8 +1681,16 @@ namespace hfst {
 // hfst_pmatch_tokenize_extensions.cc
 namespace hfst {
   std::string pmatch_tokenize(hfst_ol::PmatchContainer * cont,
-			      const std::string & input_text);
-			      //const hfst_ol_tokenize::TokenizeSettings & ts);
+			      const std::string & input_text,
+			      const std::string & output_format,
+			      int * max_weight_classes,
+			      bool dedupe,
+			      bool print_weights,
+			      bool print_all,
+			      double time_cutoff,
+			      bool verbose,
+			      float beam,
+			      bool tokenize_multichar);
   hfst_ol::LocationVectorVector pmatch_locate(hfst_ol::PmatchContainer * cont,
 					      const std::string & input,
 					      double time_cutoff = 0.0);
@@ -1719,13 +1727,50 @@ namespace hfst_ol {
 	      return hfst::pmatch_locate(self, input, time_cutoff, weight_cutoff);
 	    };
 %pythoncode %{
-
   def tokenize(self, input, **kwargs):
-      return pmatch_tokenize(self, input)
-  def tokenize_(self, input, **kwargs):
-      return pmatch_tokenize(self, input).rstrip().split('\n')
-
+      output_format='tokenize'
+      max_weight_classes=None
+      dedupe=False
+      print_weights=False
+      print_all=False
+      time_cutoff=0.0
+      verbose=True
+      beam=-1.0
+      tokenize_multichar=False
+      tokens=False
+      for k,v in kwargs.items():
+         if k == 'output_format':
+            if v == 'tokenize' or v == 'space_separated' or v == 'xerox' or v == 'cg' or v == 'finnpos' or v == 'giellacg' or v == 'conllu':
+               output_format=v
+            else:
+               print('Warning: ignoring unknown value %s for argument %s.' % (v,k))
+         elif k == 'max_weight_classes':
+            max_weight_classes=int(v)
+         elif k == 'dedupe':
+            dedupe=v
+         elif k == 'print_weights':
+            print_weights=v
+         elif k == 'print_all':
+            print_all=v
+         elif k == 'time_cutoff':
+            time_cutoff=float(v)
+         elif k == 'verbose':
+            verbose=v
+         elif k == 'beam':
+            beam=float(v)
+         elif k == 'tokenize_multichar':
+            tokenize_multichar=v
+         elif k == 'tokens':
+            tokens=v
+         else:
+            print('Warning: ignoring unknown argument %s.' % (k))
+      retval = pmatch_tokenize(self, input, output_format, max_weight_classes, dedupe, print_weights, print_all, time_cutoff, verbose, beam, tokenize_multichar)
+      if tokens:
+         return retval.rstrip().split('\n')
+      else:
+         return retval
 %}
+
 }
 
 }; // class PmatchContainer
