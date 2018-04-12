@@ -23,7 +23,8 @@ enum OutputFormat {
     cg,
     finnpos,
     giellacg,
-    conllu
+    conllu,
+    visl,
 };
 
 struct TokenizeSettings {

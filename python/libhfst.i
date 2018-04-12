@@ -98,6 +98,8 @@ namespace std {
 %template(HfstTransducerPairVector) vector<pair<hfst::HfstTransducer, hfst::HfstTransducer> >;
 %template(HfstRuleVector) vector<hfst::xeroxRules::Rule>;
 %template(HfstTransducerUIntPair) pair<hfst::HfstTransducer*,unsigned int>;
+%template(LocationVector) vector<hfst_ol::Location>;
+%template(LocationVectorVector) vector<vector<hfst_ol::Location> >;
 }
 
 
@@ -146,6 +148,32 @@ class EmptyStringException : public HfstException { public: EmptyStringException
 class SymbolNotFoundException : public HfstException { public: SymbolNotFoundException(const std::string&, const std::string&, size_t); ~SymbolNotFoundException(); std::string what() const; };
 class MetadataException : public HfstException { public: MetadataException(const std::string&, const std::string&, size_t); ~MetadataException(); std::string what() const; };
 class FlagDiacriticsAreNotIdentitiesException : public HfstException { public: FlagDiacriticsAreNotIdentitiesException(const std::string&, const std::string&, size_t); ~FlagDiacriticsAreNotIdentitiesException(); std::string what() const; };
+
+
+namespace hfst_ol
+{
+
+  struct Location
+  {
+    unsigned int start;
+    unsigned int length;
+    std::string input;
+    std::string output;
+    std::string tag;
+    float weight;
+    std::vector<size_t> input_parts; // indices in input_symbol_strings
+    std::vector<size_t> output_parts; // indices in output_symbol_strings
+    std::vector<std::string> input_symbol_strings;
+    std::vector<std::string> output_symbol_strings;
+
+    //bool operator<(Location rhs) const
+    //{ return this->weight < rhs.weight; }
+  };
+
+  typedef std::vector<hfst_ol::Location> LocationVector;
+  typedef std::vector<std::vector<hfst_ol::Location> > LocationVectorVector;
+
+}
 
 namespace hfst
 {
@@ -1650,6 +1678,28 @@ namespace hfst {
 
 // *** PmatchContainer *** //
 
+// hfst_pmatch_tokenize_extensions.cc
+namespace hfst {
+  std::string pmatch_tokenize(hfst_ol::PmatchContainer * cont,
+			      const std::string & input_text,
+			      const std::string & output_format,
+			      int * max_weight_classes,
+			      bool dedupe,
+			      bool print_weights,
+			      bool print_all,
+			      double time_cutoff,
+			      bool verbose,
+			      float beam,
+			      bool tokenize_multichar);
+  hfst_ol::LocationVectorVector pmatch_locate(hfst_ol::PmatchContainer * cont,
+					      const std::string & input,
+					      double time_cutoff = 0.0);
+  hfst_ol::LocationVectorVector pmatch_locate(hfst_ol::PmatchContainer * cont,
+					      const std::string & input,
+					      double time_cutoff,
+					      float weight_cutoff);
+}
+
 namespace hfst_ol {
     class PmatchContainer
     {
@@ -1663,13 +1713,68 @@ namespace hfst_ol {
         //void set_extract_tags_mode(bool b);
         void set_profile(bool b);
 
+%extend {
+	  // extension because of inf default value of weight_cutoff...
+	  hfst_ol::LocationVectorVector locate(const std::string & input,
+					       double time_cutoff = 0.0)
+	    {
+	      return hfst::pmatch_locate(self, input, time_cutoff);
+	    };
+	  hfst_ol::LocationVectorVector locate(const std::string & input,
+					       double time_cutoff,
+					       float weight_cutoff)
+	    {
+	      return hfst::pmatch_locate(self, input, time_cutoff, weight_cutoff);
+	    };
+%pythoncode %{
+  def tokenize(self, input, **kwargs):
+      output_format='tokenize'
+      max_weight_classes=None
+      dedupe=False
+      print_weights=False
+      print_all=False
+      time_cutoff=0.0
+      verbose=True
+      beam=-1.0
+      tokenize_multichar=False
+      tokens=False
+      for k,v in kwargs.items():
+         if k == 'output_format':
+            if v == 'tokenize' or v == 'space_separated' or v == 'xerox' or v == 'cg' or v == 'finnpos' or v == 'giellacg' or v == 'conllu':
+               output_format=v
+            else:
+               print('Warning: ignoring unknown value %s for argument %s.' % (v,k))
+         elif k == 'max_weight_classes':
+            max_weight_classes=int(v)
+         elif k == 'dedupe':
+            dedupe=v
+         elif k == 'print_weights':
+            print_weights=v
+         elif k == 'print_all':
+            print_all=v
+         elif k == 'time_cutoff':
+            time_cutoff=float(v)
+         elif k == 'verbose':
+            verbose=v
+         elif k == 'beam':
+            beam=float(v)
+         elif k == 'tokenize_multichar':
+            tokenize_multichar=v
+         elif k == 'tokens':
+            tokens=v
+         else:
+            print('Warning: ignoring unknown argument %s.' % (k))
+      retval = pmatch_tokenize(self, input, output_format, max_weight_classes, dedupe, print_weights, print_all, time_cutoff, verbose, beam, tokenize_multichar)
+      if tokens:
+         return retval.rstrip().split('\n')
+      else:
+         return retval
+%}
+
+}
+
 }; // class PmatchContainer
 } // namespace hfst_ol
-
-namespace hfst {
-  std::string pmatch_tokenize(hfst_ol::PmatchContainer & container,
-			      const std::string & input_text);
-}
 
 %pythoncode %{
 
