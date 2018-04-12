@@ -22,6 +22,7 @@
 #include "HfstExceptionDefs.h"
 
 #include "pmatch_utils.h"
+#include "xre_utils.h"
 //#include "tools/src/HfstUtf8.h"
 #include "implementations/optimized-lookup/pmatch.h"
 
@@ -2222,44 +2223,27 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
         delete retval;
         retval = complement;
     } else if (op == Containment) {
-        HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
-                                                  hfst::pmatch::format);
-        HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
-                                                   hfst::pmatch::format);
-        right->repeat_star();
-        left->repeat_star();
-        retval->repeat_star();
+        HfstTransducer any(hfst::internal_identity, hfst::pmatch::format);
+        any.repeat_star();
+        HfstTransducer * left = new HfstTransducer(any);
         left->concatenate(*retval);
-        left->concatenate(*right);
-        delete retval; delete right;
+        left->concatenate(any);
+        delete retval;
         retval = left;
     } else if (op == ContainmentOnce) {
-        HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
-                                                  hfst::pmatch::format);
-        HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
-                                                   hfst::pmatch::format);
-        left->subtract(*retval);
-        right->subtract(*retval);
-        right->repeat_star();
-        left->repeat_star();
-        left->concatenate(*retval);
-        left->concatenate(*right);
-        delete retval; delete right;
-        retval = left;
+        hfst::ImplementationType xre_orig_type = hfst::xre::format;
+        hfst::xre::format = hfst::pmatch::format;
+        HfstTransducer * new_retval = hfst::xre::contains_once(retval);
+        hfst::xre::format = xre_orig_type;
+        delete retval;
+        retval = new_retval;
     } else if (op == ContainmentOptional) {
-        HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
-                                                  hfst::pmatch::format);
-        HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
-                                                   hfst::pmatch::format);
-        left->subtract(*retval);
-        right->subtract(*retval);
-        right->repeat_star();
-        left->repeat_star();
-        retval->optionalize();
-        left->concatenate(*retval);
-        left->concatenate(*right);
-        delete retval; delete right;
-        retval = left;
+        hfst::ImplementationType xre_orig_type = hfst::xre::format;
+        hfst::xre::format = hfst::pmatch::format;
+        HfstTransducer * new_retval = hfst::xre::contains_once_optional(retval);
+        hfst::xre::format = xre_orig_type;
+        delete retval;
+        retval = new_retval;
     } else if (op == TermComplement) {
         HfstTransducer* any = new HfstTransducer(hfst::internal_identity,
                                                  hfst::pmatch::format);
