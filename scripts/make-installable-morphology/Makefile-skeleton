@@ -1,8 +1,8 @@
 langname = LANGNAME
 langcode = LANGCODE
 
-generator_transducer = $(langcode)-generation.hfst.ol
-tokenizer_transducer = $(langcode)-tokenize.pmatch
+generator_transducer = $(langname)-generation.hfst.ol
+tokenizer_transducer = $(langname)-tokenize.pmatch
 prefix = /usr/local
 transducerpath = $(prefix)/share/hfst/LANGCODE
 binarypath = $(prefix)/bin
