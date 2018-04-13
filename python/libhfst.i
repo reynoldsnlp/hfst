@@ -1680,17 +1680,17 @@ namespace hfst {
 
 // hfst_pmatch_tokenize_extensions.cc
 namespace hfst {
-  std::string pmatch_tokenize(hfst_ol::PmatchContainer * cont,
-			      const std::string & input_text,
-			      const std::string & output_format,
-			      int * max_weight_classes,
-			      bool dedupe,
-			      bool print_weights,
-			      bool print_all,
-			      double time_cutoff,
-			      bool verbose,
-			      float beam,
-			      bool tokenize_multichar);
+  std::string pmatch_get_tokenized_output(hfst_ol::PmatchContainer * cont,
+					  const std::string & input_text,
+					  const std::string & output_format,
+					  int * max_weight_classes,
+					  bool dedupe,
+					  bool print_weights,
+					  bool print_all,
+					  double time_cutoff,
+					  bool verbose,
+					  float beam,
+					  bool tokenize_multichar);
   hfst_ol::LocationVectorVector pmatch_locate(hfst_ol::PmatchContainer * cont,
 					      const std::string & input,
 					      double time_cutoff = 0.0);
@@ -1714,6 +1714,13 @@ namespace hfst_ol {
         void set_profile(bool b);
 
 %extend {
+	  PmatchContainer(const std::string & filename)
+	    {
+	      std::ifstream ifs(filename);
+	      hfst_ol::PmatchContainer * retval = new hfst_ol::PmatchContainer(ifs);
+	      ifs.close();
+	      return retval;
+	    }
 	  // extension because of inf default value of weight_cutoff...
 	  hfst_ol::LocationVectorVector locate(const std::string & input,
 					       double time_cutoff = 0.0)
@@ -1727,7 +1734,40 @@ namespace hfst_ol {
 	      return hfst::pmatch_locate(self, input, time_cutoff, weight_cutoff);
 	    };
 %pythoncode %{
-  def tokenize(self, input, **kwargs):
+  def get_tokenized_output(self, input, **kwargs):
+      """
+      Tokenize *input* and get a string representation of the tokenization
+      (essentially the same that command line tool hfst-tokenize would give).
+
+      Parameters
+      ----------
+      * `input` :
+          The input string to be tokenized.
+      * `kwargs` :
+          Possible parameters are:
+          output_format, max_weight_classes, dedupe, print_weights, print_all,
+          time_cutoff, verbose, beam, tokenize_multichar.
+      * `output_format` :
+          The format of output; possible values are 'tokenize', 'xerox', 'cg', 'finnpos',
+          'giellacg', 'conllu' and 'visl'; 'tokenize' being the default.
+      * `max_weight_classes` :
+          Maximum number of best weight classes to output
+          (where analyses with equal weight constitute a class), defaults to None i.e. no limit.
+      * `dedupe` :
+          Whether duplicate analyses are removed, defaults to False.
+      * `print_weights` :
+          Whether weights are printd, defaults to False.
+      * `print_all` :
+          Whether nonmatching text is printed, defaults to False.
+      * `time_cutoff` :
+          Maximum number of seconds used per input after limiting the search.
+      * `verbose` :
+          Whether input is processed verbosely, defaults to True.
+      * `beam` :
+          Beam within analyses must be to get printed.
+      * `tokenize_multichar` :
+          Tokenize input into multicharacter symbols present in the transducer, defaults to false.
+      """
       output_format='tokenize'
       max_weight_classes=None
       dedupe=False
@@ -1737,7 +1777,6 @@ namespace hfst_ol {
       verbose=True
       beam=-1.0
       tokenize_multichar=False
-      tokens=False
       for k,v in kwargs.items():
          if k == 'output_format':
             if v == 'tokenize' or v == 'space_separated' or v == 'xerox' or v == 'cg' or v == 'finnpos' or v == 'giellacg' or v == 'conllu':
@@ -1760,15 +1799,26 @@ namespace hfst_ol {
             beam=float(v)
          elif k == 'tokenize_multichar':
             tokenize_multichar=v
-         elif k == 'tokens':
-            tokens=v
          else:
             print('Warning: ignoring unknown argument %s.' % (k))
-      retval = pmatch_tokenize(self, input, output_format, max_weight_classes, dedupe, print_weights, print_all, time_cutoff, verbose, beam, tokenize_multichar)
-      if tokens:
-         return retval.rstrip().split('\n')
-      else:
-         return retval
+      return pmatch_get_tokenized_output(self, input, output_format, max_weight_classes, dedupe, print_weights, print_all, time_cutoff, verbose, beam, tokenize_multichar)
+
+  def tokenize(self, input):
+      """
+      Tokenize *input* and return a list of tokens i.e. strings.
+
+      Parameters
+      ----------
+      * `input` :
+          The string to be tokenized.
+      """
+      retval = []
+      locations = self.locate(input)
+      for loc in locations:
+         if loc[0].output != "@_NONMATCHING_@":
+            retval.append(loc[0].input)
+      return retval
+
 %}
 
 }

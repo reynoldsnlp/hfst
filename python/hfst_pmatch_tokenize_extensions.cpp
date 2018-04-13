@@ -1,33 +1,36 @@
 namespace hfst
 {
-  hfst_ol::LocationVectorVector pmatch_locate(hfst_ol::PmatchContainer * cont,
-					      const std::string & input,
-					      double time_cutoff = 0.0)
+  hfst_ol::LocationVectorVector pmatch_locate
+  (hfst_ol::PmatchContainer * cont,
+   const std::string & input,
+   double time_cutoff = 0.0)
   {
     return cont->locate(input, time_cutoff);
   }
 
-  hfst_ol::LocationVectorVector pmatch_locate(hfst_ol::PmatchContainer * cont,
-					      const std::string & input,
-					      double time_cutoff,
-					      float weight_cutoff)
+  hfst_ol::LocationVectorVector pmatch_locate
+  (hfst_ol::PmatchContainer * cont,
+   const std::string & input,
+   double time_cutoff,
+   float weight_cutoff)
   {
     return cont->locate(input, time_cutoff, weight_cutoff);
   }
 
   std::ostringstream pmatch_tokenize_ostringstream;
 
-  std::string pmatch_tokenize(hfst_ol::PmatchContainer * cont,
-			      const std::string & input_text,
-			      const std::string & output_format,
-			      int * max_weight_classes,
-			      bool dedupe,
-			      bool print_weights,
-			      bool print_all,
-			      double time_cutoff,
-			      bool verbose,
-			      float beam,
-			      bool tokenize_multichar)
+  std::string pmatch_get_tokenized_output
+  (hfst_ol::PmatchContainer * cont,
+   const std::string & input_text,
+   const std::string & output_format,
+   int * max_weight_classes,
+   bool dedupe,
+   bool print_weights,
+   bool print_all,
+   double time_cutoff,
+   bool verbose,
+   float beam,
+   bool tokenize_multichar)
   {
     pmatch_tokenize_ostringstream.str("");
     hfst_ol_tokenize::TokenizeSettings settings;
