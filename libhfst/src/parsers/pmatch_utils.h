@@ -539,7 +539,9 @@ enum PmatchUnaryOp {
     LC,
     NLC,
     RC,
-    NRC
+    NRC,
+    Explode,
+    Implode
 };
 
 enum PmatchBinaryOp {
@@ -559,7 +561,8 @@ enum PmatchBinaryOp {
     After,
     InsertFreely,
     IgnoreInternally,
-    Merge
+    Merge,
+    ConcatenateStrings
 };
 
 enum PmatchTernaryOp {

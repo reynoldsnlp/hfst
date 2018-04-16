@@ -2411,6 +2411,16 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
             delete retval;
             retval = head;
             }
+    } else if (op == Explode) {
+        delete retval;
+        std::string val = root->as_string();
+        HfstTokenizer tok;
+        retval = new HfstTransducer(val, tok, format);
+    } else if (op == Implode) {
+        delete retval;
+        std::string val = root->as_string();
+        HfstTokenizer tok;
+        retval = new HfstTransducer(string, tok, format);
     }
 
     retval->set_final_weights(hfst::double_to_float(weight), true);
@@ -2529,6 +2539,8 @@ HfstTransducer * PmatchBinaryOperation::evaluate(PmatchEvalType eval_type)
             pmatcherror("Error: transducers must be automata in merge operation.");
         }
         delete lhs; lhs = tmp;
+    } else if (op == ConcatenateStrings) {
+        
     }
     delete rhs;
     lhs->set_final_weights(hfst::double_to_float(weight), true);

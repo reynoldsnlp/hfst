@@ -56,7 +56,7 @@
 %start PMATCH
 %type <pmatchDefinition> DEFINITION
 %type <pmatchObject> EXPRESSION1 EXPRESSION2 EXPRESSION3 EXPRESSION4 EXPRESSION5 EXPRESSION6 EXPRESSION7 EXPRESSION8 EXPRESSION9 EXPRESSION10 EXPRESSION11 EXPRESSION12 EXPRESSION13
-%type <label> SYMBOL QUOTED_LITERAL CURLY_LITERAL SYMBOL_WITH_LEFT_PAREN CONCATENATED_STRING_LIST VARIABLE_NAME
+%type <label> SYMBOL QUOTED_LITERAL CURLY_LITERAL SYMBOL_WITH_LEFT_PAREN CONCATENATED_STRING_LIST VARIABLE_NAME STRINGLIKE
 %type <string_vector> ARGLIST
 %type <pmatchObject_vector> FUNCALL_ARGLIST
 
@@ -534,24 +534,19 @@ SYMBOL {
 
 EXPLODE: EXPLODE_LEFT CONCATENATED_STRING_LIST RIGHT_PARENTHESIS
 {
-    $$ = new PmatchString($2, true);
-    free($2);
+    $$ = new PmatchUnaryOperation(Explode, $2);
 };
 
 IMPLODE: IMPLODE_LEFT CONCATENATED_STRING_LIST RIGHT_PARENTHESIS
 {
-    $$ = new PmatchString($2);
-    free($2);
+    $$ = new PmatchUnaryOperation(Implode, $2);
 };
 
-CONCATENATED_STRING_LIST: SYMBOL
+CONCATENATED_STRING_LIST: STRINGLIKE
 { $$ = $1; } |
-SYMBOL COMMA CONCATENATED_STRING_LIST
+STRINGLIKE COMMA CONCATENATED_STRING_LIST
 {
-    $$ = static_cast<char*>(malloc(sizeof(char)*(strlen($1) + strlen($3)+1)));
-    strcpy($$, $1);
-    strcat($$, $3);
-    free($1); free($3);
+    $$ = new PmatchBinaryOperation(ConcatenateStrings, $1, $2);
 };
 
 FUNCALL: SYMBOL_WITH_LEFT_PAREN FUNCALL_ARGLIST RIGHT_PARENTHESIS
@@ -812,6 +807,10 @@ PMATCH_NEGATIVE_LEFT_CONTEXT: NLC_LEFT EXPRESSION2 RIGHT_PARENTHESIS {
     $$ = new PmatchUnaryOperation(NLC, $2);
 };
 
+STRINGLIKE: QUOTED_LITERAL { $$ = new PmatchString($1); free($1); } |
+CURLY_LITERAL { $$ = new PmatchString(std::string($1)); $$->is_multichar = true; free($1); } |
+SYMBOL { $$ = new PmatchSymbol(sym); }
+;
 
 // MAP: MAP_LEFT SYMBOL COMMA READ_TEXT RIGHT_PARENTHESIS {
 //     if (hfst::pmatch::functions.count($2) == 0) {
