@@ -3,4 +3,4 @@ morphological analysis and generation of French word forms.
 
 This is a test version.
 
-More information: [INSERT_METASHARE_URN_HERE].
+More information: http://urn.fi/urn:nbn:fi:lb-2018041704
