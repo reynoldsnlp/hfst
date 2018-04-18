@@ -1384,11 +1384,7 @@ void PmatchContainer::initialize_input(const char * input_s)
     SymbolNumber k = NO_SYMBOL_NUMBER;
     SymbolNumber boundary_sym = alphabet.get_special(boundary);
     char * single_codepoint_scratch;
-    char * single_codepoint_scratch_orig = NULL;
-    if (single_codepoint_tokenization) {
-        single_codepoint_scratch = new char[5];
-        single_codepoint_scratch_orig = single_codepoint_scratch;
-    }
+    char single_codepoint_scratch_orig[5]{};
     if (boundary_sym != NO_SYMBOL_NUMBER) {
         input.push_back(boundary_sym);
     }
@@ -1431,9 +1427,6 @@ void PmatchContainer::initialize_input(const char * input_s)
     }
     if (boundary_sym != NO_SYMBOL_NUMBER) {
         input.push_back(boundary_sym);
-    }
-    if (single_codepoint_tokenization) {
-        delete single_codepoint_scratch_orig;
     }
     return;
 }

@@ -241,6 +241,10 @@ int process_input_visl(hfst_ol::PmatchContainer& container, std::ostream& outstr
         }
     }
 
+    if (len < 0) {
+        len = 0;
+    }
+
     line.assign(buffer, buffer+len);
     trim(line);
     if (!line.empty()) {
