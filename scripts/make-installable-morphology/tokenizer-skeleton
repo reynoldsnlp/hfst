@@ -46,6 +46,7 @@ define TOP
   [ RC([Alpha+ internal_punct Alpha+]) Ins(morfo) OR(LC([boundary | punct_preceding | [Alpha+ boundary]]), RC(Alpha+ boundary)) ]::200 |
   ! The case where the next token contains internal punctuation, like "isn't"
   [ LC([boundary | punct_preceding]) Ins(morfo) AND(RC([Alpha+ internal_punct Alpha+]), RC(Ins(morfo) boundary)) ]::300 |
+  [ RC([Alpha+ internal_punct Alpha+]) Ins(morfo) RC(boundary) ]::300 |
   [ NLC(boundary) RC(punct_trailing) Ins(morfo) RC(boundary) ] |
   [ LC(boundary) RC(punct_preceding) Ins(morfo) NRC(boundary) ] |
   [ xml_tag ] |
