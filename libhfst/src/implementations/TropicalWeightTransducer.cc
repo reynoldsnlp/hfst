@@ -296,20 +296,25 @@ namespace hfst {
             symbols.insert(sym);
           }
 	else
-	  {
+        {
 	    if (visited_states.find(arc.nextstate) == visited_states.end())
-	      {
+            {
 		get_initial_input_symbols(t, arc.nextstate, visited_states, symbols);
-	      }
-	  }
+            }
+        }
       }
   }
-
+  
   StringSet TropicalWeightTransducer::get_initial_input_symbols(StdVectorFst *t)
   {
     assert(t->InputSymbols() != NULL);
     StringSet symbols;
     StateId s = t->Start();
+    if (s + 1 == 0) {
+        // This can apparently happen with empty transducers
+        // causing a segfault
+        return symbols;
+    }
     std::set<StateId> visited_states;
     get_initial_input_symbols(t, s, visited_states, symbols);
     return symbols;

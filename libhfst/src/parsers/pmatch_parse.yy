@@ -235,16 +235,11 @@ MAPPINGPAIR: EXPRESSION3 REPLACE_ARROW EXPRESSION3
 {
     $$ = new PmatchMappingPairsContainer($2, $1, $3); }
 | EXPRESSION3 REPLACE_ARROW EXPRESSION3 MARKUP_MARKER EXPRESSION3 {
-    PmatchMarkupContainer * markup = new PmatchMarkupContainer($3, $5);
-    $$ = new PmatchMappingPairsContainer($2, $1, markup); }
+    $$ = new PmatchMappingPairsContainer($2, new PmatchMarkupContainer($1, $3, $5)); }
 | EXPRESSION3 REPLACE_ARROW EXPRESSION3 MARKUP_MARKER {
-    PmatchTransducerContainer * epsilon = new PmatchTransducerContainer(
-        new HfstTransducer(hfst::internal_epsilon, format));
-    PmatchMarkupContainer * markup = new PmatchMarkupContainer($3, epsilon);
-    $$ = new PmatchMappingPairsContainer($2, $1, markup);
+    $$ = new PmatchMappingPairsContainer($2, new PmatchMarkupContainer($1, $3, new PmatchEpsilonArc));
 } | EXPRESSION3 REPLACE_ARROW MARKUP_MARKER EXPRESSION3 {
-    PmatchMarkupContainer * markup = new PmatchMarkupContainer(new PmatchEpsilonArc, $4);
-    $$ = new PmatchMappingPairsContainer($2, $1, markup);
+    $$ = new PmatchMappingPairsContainer($2, new PmatchMarkupContainer($1, new PmatchEpsilonArc, $4));
 } | LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED REPLACE_ARROW EXPRESSION3 {
     $$ = new PmatchMappingPairsContainer($3, new PmatchEpsilonArc, $4);
 } | LEFT_BRACKET_DOTTED EXPRESSION3 RIGHT_BRACKET_DOTTED REPLACE_ARROW EXPRESSION3 {
@@ -303,13 +298,11 @@ EXPRESSION6 LEFT_RIGHT_ARROW EXPRESSION6 CENTER_MARKER EXPRESSION6 { pmatcherror
 
 RESTR_CONTEXTS: RESTR_CONTEXT {
     $$ = new MappingPairVector();
-    $$->push_back(*$1);
-    delete $1;
+    $$->push_back($1);
 } |
 RESTR_CONTEXTS COMMA RESTR_CONTEXT {
-     $1->push_back(*$3);
+     $1->push_back($3);
      $$ = $1;
-     delete $3;
 };
 
 RESTR_CONTEXT:

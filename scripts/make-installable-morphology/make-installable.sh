@@ -79,7 +79,7 @@ if [ "$punct" == "true" ]; then
 fi
 
 hfst-invert ${langname}_tmp.hfst | hfst-minimize | $fst2fstcommand > \
-    ${target_dir}/${langcode}-generation.hfst.ol
+    ${target_dir}/${langname}-generation.hfst.ol
 
 if [ "$capcase" == "true" ]; then
     hfst-pmatch2fst <<< 'set need-separators off regex (OptDownCase(?, L)) ?*;' | hfst-fst2fst -t | hfst-compose -1 - -2 ${langname}_tmp.hfst > ${langname}_capcase.hfst
@@ -90,8 +90,8 @@ fi
 echo "\"’\" (->) \"'\"" | hfst-regexp2fst | hfst-compose -1 - -2 ${langname}_tmp.hfst > ${langname}_normalized.hfst
 mv ${langname}_normalized.hfst ${langname}_tmp.hfst
 
-sed s/LANGCODE/${langcode}/g < analyze.sh > ${target_dir}/${langname}-analyze-words
-sed s/LANGCODE/${langcode}/g < generate.sh > ${target_dir}/${langname}-generate-words
+sed s/LANGNAME/${langname}/g < analyze.sh > ${target_dir}/${langname}-analyze-words
+sed s/LANGNAME/${langname}/g < generate.sh > ${target_dir}/${langname}-generate-words
 sed -e s/LANGNAME/${langname}/g -e s/LANGCODE/${langcode}/g < Makefile-skeleton > \
     ${target_dir}/Makefile
 
@@ -101,10 +101,10 @@ rest=${langname:1}
 sed -e s/Langname/$firstletter$rest/g -e s/LANGNAME/${langname}/g < README-skeleton > \
     ${target_dir}/README
 
-sed -e s/LANG/${langname}_tmp.hfst/g < tokenizer-skeleton > ${langcode}-tokenizer.txt
+sed -e s/LANG/${langname}_tmp.hfst/g < tokenizer-skeleton > ${langname}-tokenizer.txt
 if [ -e ${langname}-tokenizer-patch.txt ]; then
-    patch ${langcode}-tokenizer.txt ${langname}-tokenizer-patch.txt
+    patch ${langname}-tokenizer.txt ${langname}-tokenizer-patch.txt
 fi
 
-hfst-pmatch2fst ${langcode}-tokenizer.txt > ${target_dir}/${langcode}-tokenize.pmatch
-rm -f ${langcode}-tokenizer.txt ${langname}_tmp.hfst
+hfst-pmatch2fst ${langname}-tokenizer.txt > ${target_dir}/${langname}-tokenize.pmatch
+rm -f ${langname}-tokenizer.txt ${langname}_tmp.hfst
