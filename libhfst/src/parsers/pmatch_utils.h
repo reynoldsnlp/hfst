@@ -739,8 +739,24 @@ struct PmatchBuiltinFunction: public PmatchObject {
 
 using hfst::xeroxRules::ReplaceArrow;
 using hfst::xeroxRules::ReplaceType;
-typedef std::pair<PmatchObject *, PmatchObject *> PmatchObjectPair;
-typedef std::vector<PmatchObjectPair> MappingPairVector;
+
+typedef std::pair<HfstTransducer*, HfstTransducer*> TransducerPointerPair;
+
+struct PmatchObjectPair
+{
+    PmatchObject * left;
+    PmatchObject * right;
+    PmatchObjectPair(PmatchObject * l, PmatchObject * r): left(l), right(r) {}
+    virtual TransducerPointerPair evaluate_pair(void) {
+        TransducerPointerPair retval;
+        retval.first = left->evaluate();
+        retval.second = right->evaluate();
+        return retval;
+    }
+    virtual ~PmatchObjectPair() { delete left; delete right; }
+};
+
+typedef std::vector<PmatchObjectPair*> MappingPairVector;
 
 struct PmatchRestrictionContainer: public PmatchObject
 {
@@ -756,37 +772,33 @@ struct PmatchRestrictionContainer: public PmatchObject
         }
 };
 
-struct PmatchMarkupContainer: public PmatchObject
+struct PmatchMarkupContainer: public PmatchObjectPair
 {
-    PmatchObject * left;
-    PmatchObject * right;
-    PmatchMarkupContainer(PmatchObject * l, PmatchObject * r):
-        left(l), right(r) {}
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
-    void mark_context_children(void)
-        {
-            parent_is_context = true;
-            left->mark_context_children();
-            right->mark_context_children();
-        }
+    PmatchObject * left_of_arrow;
+    PmatchMarkupContainer(PmatchObject * loa, PmatchObject * lom, PmatchObject * rom):
+        PmatchObjectPair(lom, rom), left_of_arrow(loa) {}
+    TransducerPointerPair evaluate_pair(void) override;
+    ~PmatchMarkupContainer() { delete left_of_arrow; }
 };
 
 struct PmatchMappingPairsContainer: public PmatchObject
 {
     ReplaceArrow arrow;
     MappingPairVector mapping_pairs;
-    PmatchMarkupContainer * markup_marks;
     PmatchMappingPairsContainer(ReplaceArrow a, MappingPairVector pairs):
         arrow(a), mapping_pairs(pairs) {}
     PmatchMappingPairsContainer(ReplaceArrow a,
                                 PmatchObject * left, PmatchObject * right):
-        arrow(a) { mapping_pairs.push_back(PmatchObjectPair(left, right)); }
+        arrow(a) { mapping_pairs.push_back(new PmatchObjectPair(left, right)); }
+    PmatchMappingPairsContainer(ReplaceArrow a,
+                                PmatchObjectPair * pair):
+        arrow(a) { mapping_pairs.push_back(pair); }
     void push_back(PmatchMappingPairsContainer * one_pair)
         {
             for(MappingPairVector::iterator it = one_pair->mapping_pairs.begin();
                 it != one_pair->mapping_pairs.end(); ++it) {
-                mapping_pairs.push_back(PmatchObjectPair(
-                                            it->first, it->second));
+                mapping_pairs.push_back(new PmatchObjectPair(
+                                            (*it)->left, (*it)->right));
             }
         }
     HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
@@ -804,13 +816,13 @@ struct PmatchContextsContainer: public PmatchObject
     PmatchContextsContainer(PmatchContextsContainer * context):
         type(context->type), context_pairs(context->context_pairs) {}
     PmatchContextsContainer(PmatchObject * left, PmatchObject * right)
-        { context_pairs.push_back(PmatchObjectPair(left, right)); }
+        { context_pairs.push_back(new PmatchObjectPair(left, right)); }
     void push_back(PmatchContextsContainer * one_context)
         {
             for(MappingPairVector::iterator it = one_context->context_pairs.begin();
                 it != one_context->context_pairs.end(); ++it) {
-                context_pairs.push_back(PmatchObjectPair(
-                                            it->first, it->second));
+                context_pairs.push_back(new PmatchObjectPair(
+                                            (*it)->left, (*it)->right));
             }
         }
     HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);

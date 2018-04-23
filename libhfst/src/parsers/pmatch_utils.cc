@@ -2031,7 +2031,6 @@ void PmatchObject::collect_initial_symbols_into(StringSet & allowed_initial_symb
     // Now we can assume that there is a genuine RC constraint.
 
     for (StringSet::iterator it = required.begin(); it != required.end(); ++it) {
-        std::cerr << *it << std::endl;
         if (allowed.count(*it) == 1 && disallowed.count(*it) == 0) {
             allowed_initial_symbols.insert(*it);
         }
@@ -2731,11 +2730,11 @@ hfst::xeroxRules::Rule PmatchReplaceRuleContainer::make_mapping(void)
     HfstTransducerPairVector pair_vector;
     for(MappingPairVector::iterator it = mapping.begin();
         it != mapping.end(); ++it) {
-        HfstTransducer * l = it->first->evaluate();
-        HfstTransducer * r = it->second->evaluate();
-        pair_vector.push_back(HfstTransducerPair(HfstTransducer(*l),
-                                                 HfstTransducer(*r)));
-        delete l; delete r;
+        TransducerPointerPair pp = (*it)->evaluate_pair();
+        HfstTransducerPair p(HfstTransducer(*(pp.first)), HfstTransducer(*(pp.second)));
+        delete pp.first;
+        delete pp.second;
+        pair_vector.push_back(p);
     }
     if (context.size() == 0) {
         return hfst::xeroxRules::Rule(pair_vector);
@@ -2743,11 +2742,11 @@ hfst::xeroxRules::Rule PmatchReplaceRuleContainer::make_mapping(void)
     HfstTransducerPairVector context_vector;
     for (MappingPairVector::iterator it = context.begin();
          it != context.end(); ++it) {
-        HfstTransducer * l = it->first->evaluate();
-        HfstTransducer * r = it->second->evaluate();
-        context_vector.push_back(HfstTransducerPair(HfstTransducer(*l),
-                                                    HfstTransducer(*r)));
-        delete l; delete r;
+        TransducerPointerPair pp = (*it)->evaluate_pair();
+        HfstTransducerPair p(HfstTransducer(*(pp.first)), HfstTransducer(*(pp.second)));
+        delete pp.first;
+        delete pp.second;
+        context_vector.push_back(p);
     }
     return hfst::xeroxRules::Rule(pair_vector, context_vector, type);
 }
@@ -2776,11 +2775,11 @@ HfstTransducer * PmatchRestrictionContainer::evaluate(PmatchEvalType eval_type)
     HfstTransducerPairVector pair_vector;
     for (MappingPairVector::iterator it = contexts->begin();
          it != contexts->end(); ++it) {
-        HfstTransducer * lside = it->first->evaluate();
-        HfstTransducer * rside = it->second->evaluate();
-        pair_vector.push_back(HfstTransducerPair(HfstTransducer(*lside),
-                                                 HfstTransducer(*rside)));
-        delete lside; delete rside;
+        TransducerPointerPair pp = (*it)->evaluate_pair();
+        HfstTransducerPair p(HfstTransducer(*(pp.first)), HfstTransducer(*(pp.second)));
+        delete pp.first;
+        delete pp.second;
+        pair_vector.push_back(p);
     }
     HfstTransducer * l = left->evaluate();
     retval = new HfstTransducer(hfst::xeroxRules::restriction(*l, pair_vector));
@@ -2795,7 +2794,20 @@ HfstTransducer * PmatchRestrictionContainer::evaluate(PmatchEvalType eval_type)
     return retval;
 }
 
-HfstTransducer * PmatchMarkupContainer::evaluate(PmatchEvalType eval_type) { pmatcherror("Should never happen\n"); }
+TransducerPointerPair PmatchMarkupContainer::evaluate_pair(void) {
+    TransducerPointerPair retval;
+    HfstTransducer * loa = left_of_arrow->evaluate();
+    HfstTransducer * lom = left->evaluate();
+    HfstTransducer * rom = right->evaluate();
+    HfstTransducerPair tmpMappingPair(*loa, HfstTransducer(format));
+    HfstTransducerPair marks(*lom, *rom);
+    HfstTransducerPair MappingPair = hfst::xeroxRules::create_mapping_for_mark_up_replace(tmpMappingPair, marks);
+    delete loa; delete lom; delete rom;
+    retval.first = new HfstTransducer(MappingPair.first);
+    retval.second = new HfstTransducer(MappingPair.second);
+    return retval;
+}
+
 HfstTransducer * PmatchMappingPairsContainer::evaluate(PmatchEvalType eval_type) { pmatcherror("Should never happen\n"); }
 HfstTransducer * PmatchContextsContainer::evaluate(PmatchEvalType eval_type) { pmatcherror("Should never happen\n"); }
 
