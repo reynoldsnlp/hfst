@@ -232,6 +232,10 @@ int process_input_visl(hfst_ol::PmatchContainer& container, std::ostream& outstr
                 match_and_print(container, outstream, line, settings);
             }
         }
+        else {
+            outstream << '\n';
+        }
+        outstream.flush();
 
         buffer[0] = 0;
         len = 0;
@@ -255,6 +259,7 @@ int process_input_visl(hfst_ol::PmatchContainer& container, std::ostream& outstr
             match_and_print(container, outstream, line, settings);
         }
     }
+    outstream.flush();
 
     free(buffer);
     return EXIT_SUCCESS;
