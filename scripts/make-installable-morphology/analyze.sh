@@ -4,8 +4,8 @@ if [ ! -d "$trdir" ] ; then
     echo $trdir not found
     exit 1
 fi
-if [ ! -e "$trdir"/LANGCODE-tokenize.pmatch ] ; then
-    echo "$trdir/LANGCODE-tokenize.pmatch not found"
+if [ ! -e "$trdir"/LANGNAME-tokenize.pmatch ] ; then
+    echo "$trdir/LANGNAME-tokenize.pmatch not found"
     exit 1
 fi
 if ! command -v hfst-tokenize > /dev/null; then
@@ -19,4 +19,4 @@ if [ "$1" == "--help" ] ; then
     exit 0
 fi
 
-hfst-tokenize --unique --xerox $trdir/LANGCODE-tokenize.pmatch
+hfst-tokenize --unique --xerox $trdir/LANGNAME-tokenize.pmatch

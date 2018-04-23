@@ -4,8 +4,8 @@ if [ ! -d "$trdir" ] ; then
     echo $trdir not found
     exit 1
 fi
-if [ ! -e "$trdir"/LANGCODE-generation.hfst.ol ] ; then
-    echo "$trdir/LANGCODE-generation.hfst.ol not found"
+if [ ! -e "$trdir"/LANGNAME-generation.hfst.ol ] ; then
+    echo "$trdir/LANGNAME-generation.hfst.ol not found"
     exit 1
 fi
 if ! command -v hfst-lookup > /dev/null; then
@@ -19,4 +19,4 @@ if [ "$1" == "--help" ] ; then
     exit 0
 fi
 
-hfst-lookup -p $trdir/LANGCODE-generation.hfst.ol | cut -f1,2
+hfst-lookup -p $trdir/LANGNAME-generation.hfst.ol | cut -f1,2
