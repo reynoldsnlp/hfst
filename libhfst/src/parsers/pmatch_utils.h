@@ -412,12 +412,6 @@ struct PmatchUtilityTransducers
                              bool optional = false );
 };
 
-enum PmatchEvalType {
-    InputSide,
-    OutputSide,
-    Transducer
-};
-
 struct PmatchObject {
     std::string name; // optional, given if the object appears as a definition
     double weight;
@@ -460,8 +454,9 @@ struct PmatchObject {
     virtual StringSet get_initial_RC_initial_symbols(void);
     virtual StringSet get_initial_NRC_initial_symbols(void);
     void expand_Ins_arcs(StringSet & ss);
-    virtual HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer) = 0;
+    virtual HfstTransducer * evaluate(void) = 0;
     virtual HfstTransducer * evaluate(std::vector<PmatchObject *> args);
+    virtual PmatchObject * evaluate_as_arg(void);
     virtual void mark_context_children(void) { parent_is_context = true; }
     virtual std::string as_string(void) { return ""; }
     virtual StringPair as_string_pair(void)
@@ -473,7 +468,9 @@ struct PmatchSymbol: public PmatchObject {
     // which are the same thing under the hood.
     std::string sym;
     PmatchSymbol(std::string str): sym(str) { }
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
+    void collect_strings_into(StringVector & strings);
+    PmatchObject * evaluate_as_arg(void);
 };
 
 struct PmatchString: public PmatchObject {
@@ -481,17 +478,18 @@ struct PmatchString: public PmatchObject {
     bool multichar;
     PmatchString(std::string str, bool is_multichar = false):
         string(str), multichar(is_multichar) { }
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
     std::string as_string(void) { return string; }
     StringPair as_string_pair(void)
         { return StringPair(string, string); }
     bool is_unweighted_disjunction_of_strings(void)
         { return weight == 0.0 && (multichar || (string.size() < 2)); }
     void collect_strings_into(StringVector & strings);
+    PmatchObject * evaluate_as_arg(void);
 };
 
 struct PmatchQuestionMark: public PmatchObject {
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
     std::string as_string(void) { return hfst::internal_unknown; }
     StringPair as_string_pair(void)
         { return StringPair(
@@ -561,8 +559,7 @@ enum PmatchBinaryOp {
     After,
     InsertFreely,
     IgnoreInternally,
-    Merge,
-    ConcatenateStrings
+    Merge
 };
 
 enum PmatchTernaryOp {
@@ -595,7 +592,7 @@ struct PmatchNumericOperation: public PmatchObject{
     std::vector<int> values;
     PmatchNumericOperation(PmatchNumericOp _op, PmatchObject * _root):
         op(_op), root(_root) {}
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
     void mark_context_children(void)
         {
             parent_is_context = true;
@@ -608,7 +605,7 @@ struct PmatchUnaryOperation: public PmatchObject{
     PmatchObject * root;
     PmatchUnaryOperation(PmatchUnaryOp _op, PmatchObject * _root):
         op(_op), root(_root) {}
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
     StringSet get_initial_RC_initial_symbols(void);
     StringSet get_initial_NRC_initial_symbols(void);
     bool is_context(void);
@@ -627,7 +624,7 @@ struct PmatchBinaryOperation: public PmatchObject{
     PmatchObject * right;
     PmatchBinaryOperation(PmatchBinaryOp _op, PmatchObject * _left, PmatchObject * _right):
         op(_op), left(_left), right(_right) {}
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
     StringPair as_string_pair(void);
     bool is_unweighted_disjunction_of_strings(void);
     void collect_strings_into(StringVector & strings);
@@ -650,7 +647,7 @@ struct PmatchTernaryOperation: public PmatchObject{
     PmatchObject * right;
     PmatchTernaryOperation(PmatchTernaryOp _op, PmatchObject * _left, PmatchObject * _middle, PmatchObject * _right):
         op(_op), left(_left), middle(_middle), right(_right) {}
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
     void mark_context_children(void)
         {
             parent_is_context = true;
@@ -665,7 +662,7 @@ struct PmatchTransducerContainer: public PmatchObject{
     PmatchTransducerContainer(HfstTransducer * target):
         t(target) {}
     ~PmatchTransducerContainer(void) { delete t; }
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer) {
+    HfstTransducer * evaluate(void) {
         if (t->get_type() != format) {
             t->convert(format);
         }
@@ -687,7 +684,7 @@ struct PmatchFunction: public PmatchObject {
     args(argument_vector), root(function_root) { }
 
     HfstTransducer * evaluate(std::vector<PmatchObject *> funargs);
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
 
 };
 
@@ -697,22 +694,7 @@ struct PmatchFuncall: public PmatchObject {
     PmatchFuncall(std::vector<PmatchObject *>* argument_vector,
                   PmatchFunction * function): args(argument_vector),
                                               fun(function) { }
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer)
-        {
-            std::vector<PmatchObject * > evaluated_args;
-            for (std::vector<PmatchObject *>::iterator it = args->begin();
-                 it != args->end(); ++it) {
-                evaluated_args.push_back(
-                    new PmatchTransducerContainer((*it)->evaluate()));
-            }
-            HfstTransducer * retval = fun->evaluate(evaluated_args);
-            for (std::vector<PmatchObject *>::iterator it =
-                     evaluated_args.begin(); it != evaluated_args.end();
-                 ++it) {
-                delete static_cast<PmatchTransducerContainer*>(*it);
-            }
-            return retval;
-        }
+    HfstTransducer * evaluate(void);
     void mark_context_children(void)
         {
             for (std::vector<PmatchObject *>::iterator it = args->begin();
@@ -729,7 +711,7 @@ struct PmatchBuiltinFunction: public PmatchObject {
     PmatchBuiltinFunction(PmatchBuiltin _type,
                           std::vector<PmatchObject*>* argument_vector):
     args(argument_vector), type(_type) {}
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
     void mark_context_children(void)
         {
             parent_is_context = true;
@@ -767,7 +749,7 @@ struct PmatchRestrictionContainer: public PmatchObject
     MappingPairVector * contexts;
     PmatchRestrictionContainer(PmatchObject * l, MappingPairVector * c):
         left(l), contexts(c) { }
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
     void mark_context_children(void)
         {
             parent_is_context = true;
@@ -804,7 +786,7 @@ struct PmatchMappingPairsContainer: public PmatchObject
                                             (*it)->left, (*it)->right));
             }
         }
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
 };
 
 struct PmatchContextsContainer: public PmatchObject
@@ -828,7 +810,7 @@ struct PmatchContextsContainer: public PmatchObject
                                             (*it)->left, (*it)->right));
             }
         }
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
 };
 
 struct PmatchReplaceRuleContainer: public PmatchObject
@@ -850,7 +832,7 @@ struct PmatchReplaceRuleContainer: public PmatchObject
         arrow(pairs->arrow), type(contexts->type),
           mapping(pairs->mapping_pairs), context(contexts->context_pairs) {}
     hfst::xeroxRules::Rule make_mapping(void);
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
 };
 
 struct PmatchParallelRulesContainer: public PmatchObject
@@ -860,19 +842,19 @@ struct PmatchParallelRulesContainer: public PmatchObject
     PmatchParallelRulesContainer(PmatchReplaceRuleContainer * rule):
         arrow(rule->arrow), rules(1, rule) {}
     std::vector<hfst::xeroxRules::Rule> make_mappings(void);
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
 };
 
 struct PmatchEpsilonArc: public PmatchObject
 {
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer)
+    HfstTransducer * evaluate(void)
         { return new HfstTransducer(hfst::internal_epsilon, format); }
     std::string as_string(void) { return hfst::internal_epsilon; }
 };
 
 struct PmatchEmpty: public PmatchObject
 {
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer)
+    HfstTransducer * evaluate(void)
         { return new HfstTransducer(format); }
 };
 
@@ -880,7 +862,7 @@ struct PmatchAcceptor: public PmatchObject
 {
     PmatchPredefined set;
     PmatchAcceptor(PmatchPredefined s): set(s) {}
-    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
+    HfstTransducer * evaluate(void);
 };
 
 } } // namespaces
