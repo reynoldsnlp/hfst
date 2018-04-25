@@ -2061,7 +2061,7 @@ HfstTransducer * PmatchSymbol::evaluate(void)
     if (symbol_in_local_context(sym)) {
         retval = symbol_from_local_context(sym)->evaluate();
     } else if (symbol_in_global_context(sym)) {
-        if (!flatten && def_insed_expressions.count(sym) == 1) {
+        if (flatten && def_insed_expressions.count(sym) == 1) {
             retval = def_insed_expressions[sym]->evaluate();
         } else {
             retval = symbol_from_global_context(sym)->evaluate();
