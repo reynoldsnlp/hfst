@@ -86,7 +86,7 @@ enum Side {
 void add_to_pmatch_symbols(StringSet symbols);
 void warn(std::string warning);
 PmatchUtilityTransducers* get_utils();
-void zero_minimization_guard(void);
+void zero_minimization_guard();
 bool symbol_in_global_context(std::string & sym);
 bool symbol_in_local_context(std::string & sym);
 PmatchObject * symbol_from_global_context(std::string & sym);
@@ -173,16 +173,16 @@ HfstTransducer * make_list(HfstTransducer * t,
 HfstTransducer * make_exc_list(HfstTransducer * t,
                                ImplementationType f = format);
 HfstTransducer * make_sigma(HfstTransducer * t);
-PmatchTransducerContainer * make_minimization_guard(void);
-PmatchTransducerContainer * make_passthrough(void);
-PmatchTransducerContainer * make_rc_entry(void);
-PmatchTransducerContainer * make_lc_entry(void);
-PmatchTransducerContainer * make_nrc_entry(void);
-PmatchTransducerContainer * make_nlc_entry(void);
-PmatchTransducerContainer * make_rc_exit(void);
-PmatchTransducerContainer * make_lc_exit(void);
-PmatchTransducerContainer * make_nrc_exit(void);
-PmatchTransducerContainer * make_nlc_exit(void);
+PmatchTransducerContainer * make_minimization_guard();
+PmatchTransducerContainer * make_passthrough();
+PmatchTransducerContainer * make_rc_entry();
+PmatchTransducerContainer * make_lc_entry();
+PmatchTransducerContainer * make_nrc_entry();
+PmatchTransducerContainer * make_nlc_entry();
+PmatchTransducerContainer * make_rc_exit();
+PmatchTransducerContainer * make_lc_exit();
+PmatchTransducerContainer * make_nrc_exit();
+PmatchTransducerContainer * make_nlc_exit();
 
 /**
  * @brief find first segment from strign @a s delimited by char delim.
@@ -203,7 +203,7 @@ int* get_n_to_k(const char* s);
 
 double get_weight(const char* s);
 
-void init_globals(void);
+void init_globals();
 
 string expand_includes(const string & script);
 
@@ -290,7 +290,7 @@ template<typename T, size_t N>
         "Ð", "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ",
         "ẞ"
     };
-    
+
     static const char * latin1_lower[] =
     {
         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
@@ -319,14 +319,14 @@ template<typename T, size_t N>
         "\xCC\xB7", "\xCC\xB8"
 #endif
     };
-    
+
     static const char * latin1_punct[] =
     {
         "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".",
         "/", ":", ";", "<", "=", ">", "?", "@", "[", "\\", "]", "^", "_",
         "{", "|", "}", "~", "`", "´", "¡", "«", "»", "¿"
     };
-    
+
     static const char * latin1_whitespace[] =
     {
         " ", "\n", "\t",
@@ -364,46 +364,46 @@ struct PmatchUtilityTransducers
     const HfstTransducer * latin1_whitespace_acceptor;
     const HfstTransducer * capify;
     const HfstTransducer * lowerfy;
-    
+
     static HfstTransducer * make_latin1_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
-    
+
     static HfstTransducer * make_latin1_alpha_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
-    
+
     static HfstTransducer * make_latin1_lowercase_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
-    
+
     static HfstTransducer * make_latin1_uppercase_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
-    
+
     static HfstTransducer * make_combining_accent_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
-    
+
 /** @brief Return a transducer that accepts one arabic numeral character.
  */
     static HfstTransducer * make_latin1_numeral_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
-    
+
 /** @brief Return a transducer that accepts one utf-8 symbol that is also a
  *  latin-1 punctuation character.
  */
     static HfstTransducer * make_latin1_punct_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
-    
+
 /** @brief Return a transducer that accepts one utf-8 symbol that is also a
  *  latin-1 whitespace character.
  */
 
     static HfstTransducer * make_latin1_whitespace_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
-    
+
     HfstTransducer * make_lowerfy(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
-    
+
     HfstTransducer * make_capify(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
-    
+
     HfstTransducer * cap(HfstTransducer & t, Side side = Both,
                          bool optional = false);
     HfstTransducer * tolower(HfstTransducer & t, Side side = Both,
@@ -419,47 +419,48 @@ struct PmatchObject {
     clock_t my_timer;
     HfstTransducer * cache;
     bool parent_is_context;
-    PmatchObject(void);
-    void start_timing(void)
+    PmatchObject();
+    virtual ~PmatchObject() = default;
+    void start_timing()
         {
             if (verbose && name != "") {
                 my_timer = clock();
             }
         }
-    void report_time(void)
+    void report_time()
         {
             if (verbose && name != "") {
                 double duration = (clock() - my_timer) /
                     (double) CLOCKS_PER_SEC;
                 std::cerr << name << " compiled in " << duration << " seconds\n";
-                
+
             }
         }
-    bool should_use_cache(void)
+    bool should_use_cache()
         {
             return name != "" && call_stack.size() == 0;
         }
 
-    virtual bool is_unweighted_disjunction_of_strings(void)
+    virtual bool is_unweighted_disjunction_of_strings()
         { return false; }
     virtual void collect_strings_into(StringVector & strings) { return; }
     virtual void collect_initial_symbols_into(
         StringSet & allowed, StringSet & disallowed);
-    virtual StringSet get_real_initial_symbols(void);
-    virtual StringSet get_real_initial_symbols_from_right(void);
-    virtual bool is_left_concatenation_with_context(void);
-    virtual bool is_context(void);
-    virtual bool is_delimiter(void);
-    virtual StringSet get_initial_symbols_from_unary_root(void);
-    virtual StringSet get_initial_RC_initial_symbols(void);
-    virtual StringSet get_initial_NRC_initial_symbols(void);
+    virtual StringSet get_real_initial_symbols();
+    virtual StringSet get_real_initial_symbols_from_right();
+    virtual bool is_left_concatenation_with_context();
+    virtual bool is_context();
+    virtual bool is_delimiter();
+    virtual StringSet get_initial_symbols_from_unary_root();
+    virtual StringSet get_initial_RC_initial_symbols();
+    virtual StringSet get_initial_NRC_initial_symbols();
     void expand_Ins_arcs(StringSet & ss);
-    virtual HfstTransducer * evaluate(void) = 0;
+    virtual HfstTransducer * evaluate() = 0;
     virtual HfstTransducer * evaluate(std::vector<PmatchObject *> args);
-    virtual PmatchObject * evaluate_as_arg(void);
-    virtual void mark_context_children(void) { parent_is_context = true; }
-    virtual std::string as_string(void) { return ""; }
-    virtual StringPair as_string_pair(void)
+    virtual PmatchObject * evaluate_as_arg();
+    virtual void mark_context_children() { parent_is_context = true; }
+    virtual std::string as_string() { return ""; }
+    virtual StringPair as_string_pair()
         { return StringPair("", ""); }
 };
 
@@ -468,9 +469,9 @@ struct PmatchSymbol: public PmatchObject {
     // which are the same thing under the hood.
     std::string sym;
     PmatchSymbol(std::string str): sym(str) { }
-    HfstTransducer * evaluate(void);
+    HfstTransducer * evaluate();
     void collect_strings_into(StringVector & strings);
-    PmatchObject * evaluate_as_arg(void);
+    PmatchObject * evaluate_as_arg();
 };
 
 struct PmatchString: public PmatchObject {
@@ -478,20 +479,20 @@ struct PmatchString: public PmatchObject {
     bool multichar;
     PmatchString(std::string str, bool is_multichar = false):
         string(str), multichar(is_multichar) { }
-    HfstTransducer * evaluate(void);
-    std::string as_string(void) { return string; }
-    StringPair as_string_pair(void)
+    HfstTransducer * evaluate();
+    std::string as_string() { return string; }
+    StringPair as_string_pair()
         { return StringPair(string, string); }
-    bool is_unweighted_disjunction_of_strings(void)
+    bool is_unweighted_disjunction_of_strings()
         { return weight == 0.0 && (multichar || (string.size() < 2)); }
     void collect_strings_into(StringVector & strings);
-    PmatchObject * evaluate_as_arg(void);
+    PmatchObject * evaluate_as_arg();
 };
 
 struct PmatchQuestionMark: public PmatchObject {
-    HfstTransducer * evaluate(void);
-    std::string as_string(void) { return hfst::internal_unknown; }
-    StringPair as_string_pair(void)
+    HfstTransducer * evaluate();
+    std::string as_string() { return hfst::internal_unknown; }
+    StringPair as_string_pair()
         { return StringPair(
                 hfst::internal_identity, hfst::internal_identity); }
 };
@@ -592,8 +593,8 @@ struct PmatchNumericOperation: public PmatchObject{
     std::vector<int> values;
     PmatchNumericOperation(PmatchNumericOp _op, PmatchObject * _root):
         op(_op), root(_root) {}
-    HfstTransducer * evaluate(void);
-    void mark_context_children(void)
+    HfstTransducer * evaluate();
+    void mark_context_children()
         {
             parent_is_context = true;
             root->mark_context_children();
@@ -605,13 +606,13 @@ struct PmatchUnaryOperation: public PmatchObject{
     PmatchObject * root;
     PmatchUnaryOperation(PmatchUnaryOp _op, PmatchObject * _root):
         op(_op), root(_root) {}
-    HfstTransducer * evaluate(void);
-    StringSet get_initial_RC_initial_symbols(void);
-    StringSet get_initial_NRC_initial_symbols(void);
-    bool is_context(void);
-    bool is_delimiter(void);
-    StringSet get_initial_symbols_from_unary_root(void);
-    void mark_context_children(void)
+    HfstTransducer * evaluate();
+    StringSet get_initial_RC_initial_symbols();
+    StringSet get_initial_NRC_initial_symbols();
+    bool is_context();
+    bool is_delimiter();
+    StringSet get_initial_symbols_from_unary_root();
+    void mark_context_children()
         {
             parent_is_context = true;
             root->mark_context_children();
@@ -624,15 +625,15 @@ struct PmatchBinaryOperation: public PmatchObject{
     PmatchObject * right;
     PmatchBinaryOperation(PmatchBinaryOp _op, PmatchObject * _left, PmatchObject * _right):
         op(_op), left(_left), right(_right) {}
-    HfstTransducer * evaluate(void);
-    StringPair as_string_pair(void);
-    bool is_unweighted_disjunction_of_strings(void);
+    HfstTransducer * evaluate();
+    StringPair as_string_pair();
+    bool is_unweighted_disjunction_of_strings();
     void collect_strings_into(StringVector & strings);
-    StringSet get_real_initial_symbols_from_right(void);
-    bool is_left_concatenation_with_context(void);
-    StringSet get_initial_RC_initial_symbols(void);
-    StringSet get_initial_NRC_initial_symbols(void);
-    void mark_context_children(void)
+    StringSet get_real_initial_symbols_from_right();
+    bool is_left_concatenation_with_context();
+    StringSet get_initial_RC_initial_symbols();
+    StringSet get_initial_NRC_initial_symbols();
+    void mark_context_children()
         {
             parent_is_context = true;
             left->mark_context_children();
@@ -647,8 +648,8 @@ struct PmatchTernaryOperation: public PmatchObject{
     PmatchObject * right;
     PmatchTernaryOperation(PmatchTernaryOp _op, PmatchObject * _left, PmatchObject * _middle, PmatchObject * _right):
         op(_op), left(_left), middle(_middle), right(_right) {}
-    HfstTransducer * evaluate(void);
-    void mark_context_children(void)
+    HfstTransducer * evaluate();
+    void mark_context_children()
         {
             parent_is_context = true;
             left->mark_context_children();
@@ -661,8 +662,8 @@ struct PmatchTransducerContainer: public PmatchObject{
     HfstTransducer * t;
     PmatchTransducerContainer(HfstTransducer * target):
         t(target) {}
-    ~PmatchTransducerContainer(void) { delete t; }
-    HfstTransducer * evaluate(void) {
+    ~PmatchTransducerContainer() { delete t; }
+    HfstTransducer * evaluate() {
         if (t->get_type() != format) {
             t->convert(format);
         }
@@ -678,13 +679,13 @@ struct PmatchTransducerContainer: public PmatchObject{
 struct PmatchFunction: public PmatchObject {
     std::vector<std::string> args;
     PmatchObject * root;
-    
+
     PmatchFunction(std::vector<std::string> argument_vector,
                    PmatchObject * function_root):
     args(argument_vector), root(function_root) { }
 
     HfstTransducer * evaluate(std::vector<PmatchObject *> funargs);
-    HfstTransducer * evaluate(void);
+    HfstTransducer * evaluate();
 
 };
 
@@ -694,8 +695,8 @@ struct PmatchFuncall: public PmatchObject {
     PmatchFuncall(std::vector<PmatchObject *>* argument_vector,
                   PmatchFunction * function): args(argument_vector),
                                               fun(function) { }
-    HfstTransducer * evaluate(void);
-    void mark_context_children(void)
+    HfstTransducer * evaluate();
+    void mark_context_children()
         {
             for (std::vector<PmatchObject *>::iterator it = args->begin();
                  it != args->end(); ++it) {
@@ -711,8 +712,8 @@ struct PmatchBuiltinFunction: public PmatchObject {
     PmatchBuiltinFunction(PmatchBuiltin _type,
                           std::vector<PmatchObject*>* argument_vector):
     args(argument_vector), type(_type) {}
-    HfstTransducer * evaluate(void);
-    void mark_context_children(void)
+    HfstTransducer * evaluate();
+    void mark_context_children()
         {
             parent_is_context = true;
             for (std::vector<PmatchObject *>::iterator it = args->begin();
@@ -732,7 +733,7 @@ struct PmatchObjectPair
     PmatchObject * left;
     PmatchObject * right;
     PmatchObjectPair(PmatchObject * l, PmatchObject * r): left(l), right(r) {}
-    virtual TransducerPointerPair evaluate_pair(void) {
+    virtual TransducerPointerPair evaluate_pair() {
         TransducerPointerPair retval;
         retval.first = left->evaluate();
         retval.second = right->evaluate();
@@ -749,8 +750,8 @@ struct PmatchRestrictionContainer: public PmatchObject
     MappingPairVector * contexts;
     PmatchRestrictionContainer(PmatchObject * l, MappingPairVector * c):
         left(l), contexts(c) { }
-    HfstTransducer * evaluate(void);
-    void mark_context_children(void)
+    HfstTransducer * evaluate();
+    void mark_context_children()
         {
             parent_is_context = true;
             left->mark_context_children();
@@ -762,7 +763,7 @@ struct PmatchMarkupContainer: public PmatchObjectPair
     PmatchObject * left_of_arrow;
     PmatchMarkupContainer(PmatchObject * loa, PmatchObject * lom, PmatchObject * rom):
         PmatchObjectPair(lom, rom), left_of_arrow(loa) {}
-    TransducerPointerPair evaluate_pair(void) override;
+    TransducerPointerPair evaluate_pair() override;
     ~PmatchMarkupContainer() { delete left_of_arrow; }
 };
 
@@ -786,7 +787,7 @@ struct PmatchMappingPairsContainer: public PmatchObject
                                             (*it)->left, (*it)->right));
             }
         }
-    HfstTransducer * evaluate(void);
+    HfstTransducer * evaluate();
 };
 
 struct PmatchContextsContainer: public PmatchObject
@@ -810,7 +811,7 @@ struct PmatchContextsContainer: public PmatchObject
                                             (*it)->left, (*it)->right));
             }
         }
-    HfstTransducer * evaluate(void);
+    HfstTransducer * evaluate();
 };
 
 struct PmatchReplaceRuleContainer: public PmatchObject
@@ -831,8 +832,8 @@ struct PmatchReplaceRuleContainer: public PmatchObject
                                PmatchContextsContainer * contexts):
         arrow(pairs->arrow), type(contexts->type),
           mapping(pairs->mapping_pairs), context(contexts->context_pairs) {}
-    hfst::xeroxRules::Rule make_mapping(void);
-    HfstTransducer * evaluate(void);
+    hfst::xeroxRules::Rule make_mapping();
+    HfstTransducer * evaluate();
 };
 
 struct PmatchParallelRulesContainer: public PmatchObject
@@ -841,20 +842,20 @@ struct PmatchParallelRulesContainer: public PmatchObject
     std::vector<PmatchReplaceRuleContainer *> rules;
     PmatchParallelRulesContainer(PmatchReplaceRuleContainer * rule):
         arrow(rule->arrow), rules(1, rule) {}
-    std::vector<hfst::xeroxRules::Rule> make_mappings(void);
-    HfstTransducer * evaluate(void);
+    std::vector<hfst::xeroxRules::Rule> make_mappings();
+    HfstTransducer * evaluate();
 };
 
 struct PmatchEpsilonArc: public PmatchObject
 {
-    HfstTransducer * evaluate(void)
+    HfstTransducer * evaluate()
         { return new HfstTransducer(hfst::internal_epsilon, format); }
-    std::string as_string(void) { return hfst::internal_epsilon; }
+    std::string as_string() { return hfst::internal_epsilon; }
 };
 
 struct PmatchEmpty: public PmatchObject
 {
-    HfstTransducer * evaluate(void)
+    HfstTransducer * evaluate()
         { return new HfstTransducer(format); }
 };
 
@@ -862,7 +863,7 @@ struct PmatchAcceptor: public PmatchObject
 {
     PmatchPredefined set;
     PmatchAcceptor(PmatchPredefined s): set(s) {}
-    HfstTransducer * evaluate(void);
+    HfstTransducer * evaluate();
 };
 
 } } // namespaces

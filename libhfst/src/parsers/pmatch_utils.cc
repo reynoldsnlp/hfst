@@ -58,7 +58,7 @@ pmatcherror(const char *msg)
 
     // TODO: clean the potentially large amounts of data we're leaking in case
     // the caller isn't the command line utility that exits after this
-    
+
     HFST_THROW_MESSAGE(HfstException, errmsg);
 }
 
@@ -376,7 +376,7 @@ std::vector<std::pair<WordVector, WordVecFloat> > get_top_n(size_t n,
             retval.erase(retval.begin());
         }
     }
-    return retval;    
+    return retval;
 }
 
 // Get the n best candidates in the transformed space using an insertion sort
@@ -441,7 +441,7 @@ std::vector<std::pair<WordVector, WordVecFloat> > get_top_n_transformed(
             retval.erase(retval.begin());
         }
     }
-    return retval;    
+    return retval;
 }
 
 template<typename T> std::vector<T> pointwise_minus(std::vector<T> l,
@@ -608,7 +608,7 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
      * half of the norm of |B - A|.
      *
      */
-        
+
     std::vector<WordVecFloat> B_minus_A = pointwise_minus(
         this_word1.vector, this_word2.vector);
     WordVecFloat hyperplane_translation_term = dot_product(B_minus_A, this_word1.vector)
@@ -624,7 +624,7 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
         comparison_point = pointwise_plus(this_word2.vector, pointwise_multiplication(
                                               static_cast<WordVecFloat>(0.5), B_minus_A));
     }
-    
+
     std::vector<std::pair<WordVector, WordVecFloat> > top_n = get_top_n_transformed(nwords,
                                                                                     word_vectors,
                                                                                     B_minus_A,
@@ -1091,7 +1091,7 @@ void init_globals(void)
 string expand_includes(const string & script)
 {
     return string(script);
-    
+
 //     string filepath = hfst::pmatch::path_from_filename($1);
 }
 
@@ -1155,7 +1155,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         std::cerr << "\nCompiling and harmonizing...\n";
         timer = clock();
     }
-    
+
     if (inserted_names.size() > 0) {
         HfstTransducer dummy(format);
         // We keep TOP and any inserted transducers
@@ -1197,7 +1197,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
             retval.insert(std::pair<std::string, hfst::HfstTransducer*>("TOP", tmp));
         }
     }
-    
+
     if (hfst::pmatch::verbose) {
         double duration = (clock() - hfst::pmatch::timer) /
             (double) CLOCKS_PER_SEC;
@@ -1393,12 +1393,12 @@ void read_vec(std::string filename)
     size_t words_read = 0;
     if (binary_format) {
         size_t vector_data_size = sizeof(float) * dimension;
-        char * vector_data = new char[vector_data_size];
+        std::vector<char> vector_data(vector_data_size);
         while (infile.good() && words_read <= lexicon_size) {
             // The actual number of vectors is 1 more than lexicon_size
             // due to <s>
             std::getline(infile, line, separator);
-            infile.read(vector_data, vector_data_size);
+            infile.read(&vector_data[0], vector_data_size);
             infile.ignore(1);
             WordVector wv;
             wv.word = line;
@@ -1406,12 +1406,11 @@ void read_vec(std::string filename)
             // in which case a conversion needs to happen, but
             // we can reasonably expect it to be a float for the
             // foreseeable future
-            wv.vector.assign((float*) vector_data, (float*) (vector_data + vector_data_size));
+            wv.vector.assign((float*) vector_data.data(), (float*) (vector_data.data() + vector_data_size));
             wv.norm = norm(wv.vector);
             word_vectors.push_back(wv);
             ++words_read;
         }
-        delete vector_data;
     } else {
         while(infile.good() && words_read <= lexicon_size) {
             std::getline(infile, line);
@@ -1981,7 +1980,7 @@ void PmatchObject::collect_initial_symbols_into(StringSet & allowed_initial_symb
 {
     // One or neither of allowed_initial_symbols and disallowed_initial_symbols
     // will have some symbols inserted to it.
-    
+
     StringSet allowed = this->get_real_initial_symbols();
     StringSet required = this->get_initial_RC_initial_symbols();
     StringSet disallowed = this->get_initial_NRC_initial_symbols();
@@ -1999,7 +1998,7 @@ void PmatchObject::collect_initial_symbols_into(StringSet & allowed_initial_symb
         // Probably something went wrong, we'll just not make no judgement
         return;
     }
-    
+
     if (string_set_has_meta_arc(allowed)) {
         if (required.size() != 0 && !string_set_has_meta_arc(required)) {
             // RC sets a constraint
@@ -2302,7 +2301,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(void)
         report_time();
         return retval;
     }
-    
+
     retval = root->evaluate();
     if (op == AddDelimiters) {
         retval = add_pmatch_delimiters(retval);
@@ -2658,7 +2657,7 @@ StringPair PmatchBinaryOperation::as_string_pair(void)
 
 bool PmatchBinaryOperation::is_unweighted_disjunction_of_strings(void)
 {
-    return weight == 0.0 && 
+    return weight == 0.0 &&
         op == Disjunct &&
         left->is_unweighted_disjunction_of_strings() &&
         right->is_unweighted_disjunction_of_strings();
@@ -2777,7 +2776,7 @@ std::vector<hfst::xeroxRules::Rule> PmatchParallelRulesContainer::make_mappings(
         it != rules.end(); ++it) {
         retval.push_back((*it)->make_mapping());
     }
-    
+
     return retval;
 }
 
