@@ -21,8 +21,6 @@
 %include "std_map.i"
 %include "exception.i"
 
-// %feature("autodoc", "3");
-
 // We want warnings to be printed to standard error.
 %init %{
     hfst::set_warning_stream(&std::cerr);
