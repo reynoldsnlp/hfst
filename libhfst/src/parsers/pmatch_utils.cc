@@ -2906,7 +2906,7 @@ TransducerPointerPair PmatchMarkupContainer::evaluate_pair(void) {
     return retval;
 }
 
-HfstTransducer * PmatchMappingPairsContainer::evaluate(void) { pmatcherror("Should never happen\n"); }
-HfstTransducer * PmatchContextsContainer::evaluate(void) { pmatcherror("Should never happen\n"); }
+HfstTransducer * PmatchMappingPairsContainer::evaluate(void) { pmatcherror("Should never happen\n"); return 0; }
+HfstTransducer * PmatchContextsContainer::evaluate(void) { pmatcherror("Should never happen\n"); return 0; }
 
 } }
