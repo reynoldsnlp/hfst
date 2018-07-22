@@ -52,10 +52,11 @@ HfstOneLevelPaths lookup_vector(const hfst::HfstTransducer * tr, bool fd, const 
 {
   if (tr->get_type() == hfst::HFST_OL_TYPE || tr->get_type() == hfst::HFST_OLW_TYPE)
     {
-      if (fd)
-        { return *(tr->lookup_fd(s, limit, time_cutoff)); }
-      else
-        { return *(tr->lookup(s, limit, time_cutoff)); }
+      HfstOneLevelPaths *res_ptr = \
+        fd ? tr->lookup_fd(s, limit, time_cutoff) : tr->lookup(s, limit, time_cutoff);
+      HfstOneLevelPaths res = *res_ptr;
+      delete res_ptr;
+      return res;
     }
 
   hfst::HfstTwoLevelPaths result;
@@ -69,10 +70,11 @@ HfstOneLevelPaths lookup_string(const hfst::HfstTransducer * tr, bool fd, const 
 {
   if (tr->get_type() == hfst::HFST_OL_TYPE || tr->get_type() == hfst::HFST_OLW_TYPE)
     {
-      if (fd)
-        { return *(tr->lookup_fd(s, limit, time_cutoff)); }
-      else
-        { return *(tr->lookup(s, limit, time_cutoff)); }
+      HfstOneLevelPaths *res_ptr = \
+        fd ? tr->lookup_fd(s, limit, time_cutoff) : tr->lookup(s, limit, time_cutoff);
+      HfstOneLevelPaths res = *res_ptr;
+      delete res_ptr;
+      return res;
     }
   hfst::HfstBasicTransducer fsm(*tr);
   hfst::StringSet alpha = fsm.get_input_symbols();
