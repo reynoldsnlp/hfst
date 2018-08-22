@@ -41,7 +41,7 @@ endif
 endif
 
 if WANT_FOMA
-  libhfst_la_LIBADD +=$(top_builddir)/back-ends/foma/libfoma.la
+  libhfst_la_LIBADD += $(top_builddir)/back-ends/foma/libfoma.la
 endif
 
 if WANT_MINGW
