@@ -2513,7 +2513,8 @@ void HfstTransducer::extract_paths_fd(ExtractStringsCb& callback,
         (implementation.hfst_ol);
         hfst::implementations::HfstOlTransducer::extract_paths
         (implementation.hfst_ol,callback,cycles,t_hfst_ol,filter_fd);
-        delete t_hfst_ol;
+        // don't delete t_hfst_ol, it's not a copy of the FdTable but the
+        // real thing
     }
     break;
     case ERROR_TYPE:
