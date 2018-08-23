@@ -1090,9 +1090,63 @@ void init_globals(void)
 
 string expand_includes(const string & script)
 {
-    return string(script);
-
-//     string filepath = hfst::pmatch::path_from_filename($1);
+    if (script.find("@include\"") == string::npos) {
+        return string(script);
+    }
+    bool in_quoted_literal = false;
+    bool in_curly_literal = false;
+    bool in_comment = false;
+    string::const_iterator it = script.begin();
+    string retval = "";
+    while (it != script.end()) {
+        if (in_quoted_literal && *it == '"' && *(it-1) != '\\')
+            in_quoted_literal = false;
+        else if (in_curly_literal && *it == '}' && *(it-1) != '\\')
+            in_curly_literal = false;
+        else if (in_comment && *it == '\n')
+            in_comment = false;
+        else if (*it == '"')
+            in_quoted_literal = true;
+        else if (*it == '{')
+            in_curly_literal = true;
+        else if (*it == '!')
+            in_comment = true;
+        else if (*it == '%') {
+            retval.push_back(*it);
+            ++it;
+            if (it != script.end()) {
+                retval.push_back(*it);
+                ++it;
+            }
+            continue;
+        } else if (script.compare(it - script.begin(), 9, "@include\"") == 0) {
+            size_t terminating_quote_pos = script.find('"', it - script.begin() + 9);
+            if (terminating_quote_pos != string::npos) {
+                size_t filename_start_pos = it - script.begin() + 9;
+                size_t filename_len = terminating_quote_pos - filename_start_pos;
+                string filepath = path_from_filename(script.substr(filename_start_pos,
+                                                                   filename_len).c_str());
+                std::ifstream infile;
+                infile.open(filepath.c_str());
+                if(!infile.good()) {
+                    std::stringstream errstring;
+                    errstring << "could not open file " << filepath << " for @include\n";
+                    pmatcherror(errstring.str().c_str());
+                }
+                char c = infile.get();
+                while(infile.good()) {
+                    retval.push_back(c);
+                    c = infile.get();
+                }
+                infile.close();
+                it += 10 + filename_len;
+                continue;
+            }
+        }
+        retval.push_back(*it);
+        ++it;
+    }
+    return retval;
 }
 
 std::map<std::string, HfstTransducer*>
@@ -1349,7 +1403,7 @@ HfstTransducer * read_text(std::string filename, ImplementationType type,
 HfstTransducer * read_spaced_text(std::string filename, ImplementationType type)
 { return read_text(filename, type, true); }
 
-std::string path_from_filename(char * filename)
+std::string path_from_filename(const char * filename)
 {
     std::string retval(filename);
     if (includedir.size() > 0 && retval.size() > 0) {

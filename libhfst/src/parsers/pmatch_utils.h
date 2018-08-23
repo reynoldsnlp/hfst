@@ -235,7 +235,7 @@ HfstTransducer * read_spaced_text(std::string filename,
  * @brief Concatenate include directory with filename to get a real path
  * (unless the filename is already an absolute path)
  */
-std::string path_from_filename(char * filename);
+std::string path_from_filename(const char * filename);
 
 struct WordVector
 {
