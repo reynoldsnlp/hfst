@@ -140,11 +140,11 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           }
         if (transducer_n==1)
         {
-          verbose_printf("Eliminating %s %s...\n", flags, inputname);
+          verbose_printf("Eliminating %s %s...\n", flags.c_str(), inputname);
         }
         else
         {
-          verbose_printf("Eliminating %s %s..." SIZE_T_SPECIFIER "\n", flags, inputname, transducer_n);
+          verbose_printf("Eliminating %s %s..." SIZE_T_SPECIFIER "\n", flags.c_str(), inputname, transducer_n);
         }
 	if (flag == NULL)
 	  {
