@@ -406,7 +406,7 @@ LexcCompiler&
 LexcCompiler::addStringEntry(const string& data,
         const string& continuation, double weight)
 {
-    string str = replace_zero(data);
+    //string str = replace_zero(data);
 
     currentEntries_++;
     totalEntries_++;
@@ -447,7 +447,34 @@ LexcCompiler::addStringEntry(const string& data,
         joinerEncode(joinerEnc);
     }
     tokenizer_.add_multichar_symbol(joinerEnc);
-    StringPairVector newVector(tokenizer_.tokenize(joinerEnc + str + encodedCont));
+    tokenizer_.add_multichar_symbol("0");      // epsilon
+    tokenizer_.add_multichar_symbol("@ZERO@"); // literal zero
+    StringPairVector newVector(tokenizer_.tokenize(joinerEnc + data + encodedCont));
+    // "0"      -> "@0@"  (single symbols)
+    // "@ZERO@" -> "0"    (everywhere)
+    std::string zero("@ZERO@");
+    size_t start_pos = 0;
+    for (StringPairVector::iterator it = newVector.begin(); it != newVector.end(); it++)
+      {
+	if (it->first == "0")
+	  {
+	    it->first = "@0@";
+	  }
+	start_pos = it->first.find(zero);
+	if(start_pos != std::string::npos)
+	  {
+	    it->first.replace(start_pos, zero.length(), "0");
+	  }
+	if (it->second == "0")
+	  {
+	    it->second = "@0@";
+	  }
+	start_pos = it->second.find(zero);
+	if(start_pos != std::string::npos)
+	  {
+	    it->second.replace(start_pos, zero.length(), "0");
+	  }
+      }
     stringsTrie_.disjunct(newVector, hfst::double_to_float(weight));
 
     return *this;
