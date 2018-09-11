@@ -263,6 +263,12 @@ AC_ARG_ENABLE([edit_metadata],
 			  [enable_edit_metadata=$enableval],
 			  [if test x$enable_no_tools != xno; then enable_edit_metadata=no; else enable_edit_metadata=yes; fi])
 AM_CONDITIONAL([WANT_EDIT_METADATA], [test x$enable_edit_metadata != xno])
+AC_ARG_ENABLE([eliminate_flags],
+			  [AS_HELP_STRING([--enable-eliminate-flags],
+							  [build eliminate-flags tool @<:@default=yes@:>@])],
+			  [enable_eliminate_flags=$enableval],
+			  [if test x$enable_no_tools != xno; then enable_eliminate_flags=no; else enable_eliminate_flags=yes; fi])
+AM_CONDITIONAL([WANT_ELIMINATE_FLAGS], [test x$enable_eliminate_flags != xno])
 AC_ARG_ENABLE([format],
 			  [AS_HELP_STRING([--enable-format],
 							  [build format tool @<:@default=yes@:>@])],
@@ -795,6 +801,7 @@ cat <<EOF
     *                 conjunct: $enable_conjunct (intersect)
     *                 determinize: $enable_determinize (determinise)
     *                 disjunct: $enable_disjunct (union)
+    *                 eliminate-flags: $enable_eliminate_flags
     *                 foma: $enable_foma_wrapper
     *                 format: $enable_format
     *                 fst2fst: $enable_fst2fst
