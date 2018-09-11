@@ -471,7 +471,8 @@ struct PmatchSymbol: public PmatchObject {
     PmatchSymbol(std::string str): sym(str) { }
     HfstTransducer * evaluate();
     void collect_strings_into(StringVector & strings);
-    PmatchObject * evaluate_as_arg();
+    PmatchObject * evaluate_as_arg(void);
+    std::string as_string(void) { return sym; }
 };
 
 struct PmatchString: public PmatchObject {
