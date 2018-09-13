@@ -537,7 +537,13 @@ PmatchObject * compile_like_arc(std::string word,
 
     HfstTokenizer tok;
     HfstTransducer * retval = new HfstTransducer(format);
+    if (verbose) {
+        std::cerr << "Inserting into Like(" << word << "):" << std::endl;
+    }
     for (size_t i = 0; i < top_n.size(); ++i) {
+        if (verbose) {
+            std::cerr << "  " << top_n[i].first.word << std::endl;
+        }
         HfstTransducer tmp(top_n[i].first.word, tok, format);
         if (include_cosine_distances) {
             tmp.set_final_weights(top_n[i].second);
@@ -579,7 +585,14 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
         std::vector<std::pair<WordVector, WordVecFloat> > top_n = get_top_n(nwords, word_vectors, this_word);
         HfstTokenizer tok;
         HfstTransducer * retval = new HfstTransducer(format);
+        if (verbose) {
+            std::cerr << "Inserting into Like(" << this_word.word << "):" << std::endl;
+        }
+
         for (size_t i = 0; i < top_n.size(); ++i) {
+            if (verbose) {
+                std::cerr << "  " << top_n[i].first.word << std::endl;
+            }
             HfstTransducer tmp(top_n[i].first.word, tok, format);
             if (include_cosine_distances) {
                 tmp.set_final_weights(top_n[i].second);
@@ -616,11 +629,17 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
 
     std::vector<WordVecFloat> comparison_point;
     if (is_negative == true) {
+        if (verbose) {
+            std::cerr << "Inserting into Unlike(" << this_word1.word << ", " << this_word2.word << "):" << std::endl;
+        }
         WordVecFloat comparison_scaler =
             (hyperplane_translation_term - dot_product(this_word1.vector, B_minus_A)) / square_sum(B_minus_A);
         comparison_scaler *= vector_similarity_projection_factor;
         comparison_point = pointwise_minus(this_word1.vector, pointwise_multiplication(comparison_scaler, B_minus_A));
     } else {
+        if (verbose) {
+            std::cerr << "Inserting into Like(" << this_word1.word << ", " << this_word2.word << "):" << std::endl;
+        }
         comparison_point = pointwise_plus(this_word2.vector, pointwise_multiplication(
                                               static_cast<WordVecFloat>(0.5), B_minus_A));
     }
@@ -634,6 +653,9 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
     HfstTokenizer tok;
     HfstTransducer * retval = new HfstTransducer(format);
     for (size_t i = 0; i < top_n.size() && i <= nwords; ++i) {
+        if (verbose) {
+            std::cerr << "  " << top_n[i].first.word << std::endl;
+        }
         HfstTransducer tmp(top_n[i].first.word, tok, format);
         if (include_cosine_distances) {
             tmp.set_final_weights(top_n[i].second);
