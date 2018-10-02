@@ -75,7 +75,7 @@ do
 	"$tooltest" != "lexc2fst-stress.sh" -a \
 	"$tooltest" != "valgrind.sh" -a \
 	"$tooltest" != "lookup-stress.sh" ]; then
-	if (./$tooltest $PREFIX) ; then
+	if (./$tooltest $PREFIX 2> /dev/null) ; then
 	    printf "%-40s%s\n" $tooltest "PASS"
 	elif [ "$?" -eq "77" ] ; then
             printf "%-40s%s\n" $tooltest "** SKIP **"
