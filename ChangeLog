@@ -1,4 +1,5 @@
-432203d (HEAD -> master, origin/master, origin/HEAD) When verbose, print what goes into Like() operations
+1c8e521 (HEAD -> master, origin/master, origin/HEAD) pmatch: Make INPUT_MARK not special_symbols, so we can refer to it in pmscripts
+432203d When verbose, print what goes into Like() operations
 e80aade as_string() for symbols
 93f3280 Allow negative weights
 f1bc247 Merge branch 'master' of https://github.com/hfst/hfst
