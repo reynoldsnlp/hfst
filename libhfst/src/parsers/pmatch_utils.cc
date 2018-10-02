@@ -1517,7 +1517,7 @@ void read_vec(std::string filename)
             if (line.back() != separator) {
 #endif
 #if defined _MSC_VER && 1200 <= _MSC_VER
-                components.push_back((float)strtod(line.substr(pos + 1).ctr(), NULL));
+                components.push_back((float)strtod(line.substr(pos + 1).c_str(), NULL));
             }
 #else
                 components.push_back(strtof(line.substr(pos + 1).c_str(), NULL));
