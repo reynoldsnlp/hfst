@@ -1,4 +1,90 @@
-90e161a (HEAD -> master, origin/master, origin/HEAD) Implement a cautious form of first-input-symbol scanning
+432203d (HEAD -> master, origin/master, origin/HEAD) When verbose, print what goes into Like() operations
+e80aade as_string() for symbols
+93f3280 Allow negative weights
+f1bc247 Merge branch 'master' of https://github.com/hfst/hfst
+da7bcee Remove "." from internal punctuation & adjust url rule
+2ae7765 Option to print weights in location mode
+35557c0 Allow both escaped and unescaped zeros in multicharacters in all lexicon entries. Fixes issue #274.
+640b91d Use c strings with printf.
+34cbfc3 Allow both escaped and unescaped zeros in multicharacters in one-level lexicon entries. Partially fixes issue #274.
+cc258f5 Make link to hfst-apertium-proc only if proc is enabled.
+14309ef Add tool hfst-eliminate-flags.
+d69404d Warn user if transducer file contains more than one transducer in hfst-optimized-lookup.
+37bdede Expand @include"filename" directives as a preprocessing stage
+732d645 Also reweight state that is both initial and final in hfst-reweight. Fixes issue #368.
+6d9c495 Don't delete the implementation's FdTable
+3048e03 Print warnings and error messages also in earlier stages of twol compilation.
+a7f2714 Do not let distributed files depend on configuration.
+cbf1e94 Update man files and include all of them in dist.
+444c886 Remove nonexistent files from dist.
+59e314d Add option --execute-and-quit (-E) to hfst-xfst.
+b0a2be5 Merge pull request #392 from frankier/fix-python-lookup-leak
+6a7ac65 Fix memory leak in Python .lookup(...) method
+99dc9ff Add returns in non-void functions
+22448e0 Option --no-readline should be enough.
+a6c923b Document datatype Location and function locate and make them visible in the API.
+245ae4d Add missing file pmatch_tokenize.cc.
+d6258bc Fix incorrect use of delete; Fix missing virtual dtor; Remove some (void)
+a1eeead Fix typo
+630fd7b Merge branch 'pmatch-implode-explode-fixes'
+1afaca8 Make Implode() and Explode() allow symbol expansion
+ae00e6b Preserve empty lines; Flush
+f1ff773 (origin/pmatch-implode-explode-fixes) Merge branch 'master' into pmatch-implode-explode-fixes
+295b126 Don't try to collect initial symbols if initial state is -1
+87e74a6 Merge branch 'master' of https://github.com/hfst/hfst
+01cfc9f Fix internal punctuation case
+9073e21 Name transducers for langname instead of langcode in these scripts too
+8df796e Correct handling of markup markers
+a6e96d3 No need for an allocation there; Fix final read
+bb8e4d4 Be more verbose in READMEs.
+4de9548 Add urns to metashare articles.
+856902d Make implode and explode accept more than just bare symbolsw
+3184e2a Return a list of strings by default in tokenize.
+18f88cc Use langname instead of langcode in transducer names
+5f69423 Merge branch 'master' of https://github.com/hfst/hfst
+61713be Fix indentation
+b4f726d Replace containment implementations with correct ones
+f7985c7 Add keyword arguments to PmatchContainer.tokenize.
+75a69b3 Quote array expansions, otherwise they break on spaces
+1d0d062 Use * to concatenate array to string
+f3b5acb Quote grep pattern so shell won't interpret
+859de38 Convert dos2unix line endings
+af328c4 Force type
+8b297fd Protect line-based XML/HTML tags (WIP issue #379)
+fe4c2f6 Modify tokenization implemented via PmatchContainer.
+ceb5d2b Merge branch 'master' of https://github.com/hfst/hfst
+d44f394 Don't free data pointer until after we've evaluated everything
+80a2bcd Add package data, i.e. readme and licensing information for each language package.
+1c463a0 Add metadata for each language package for download directory.
+683a5f4 (tag: v3.14.0) Ready for release 3.14.0.
+e824094 Update morphology tests so that they pass after small changes in pmatching and tokenization.
+48e3c36 Move hacky foreign conjugation guessing to unknown token part
+85ef061 Don't tag numbers after all
+bcde7b9 One more weight typo
+c815db6 Fix same typo again and merge changes from skeleton
+ddac854 Foreign word conjugations
+eb8efa4 Annotate numerical expressions
+e980a90 Adjust indentation
+1231580 Fix typo
+9b8e3bb Merge branch 'master' of https://github.com/hfst/hfst
+4b215fc Use language-specific patches when provided
+9365b6c Bugfixes related to internal punctuation
+ce5a05a Some language-specific customisations to the tokenizer
+c685c41 Implement Ins() arcs inside right contexts
+de9cc37 Fix to xerox output mode with plain, unanalyzed tokens
+c4056f8 Normalize unicode apostrophies
+4f2a4ce Rename morphology directory accordingly.
+fcc122b Get rid of *new in new morphology tests.
+d5e87db Rename old morphology tests as *old.
+904647e Tentatively add tests for upcoming new morphology scripts.
+e019c23 Merge branch 'master' of https://github.com/hfst/hfst
+86f98c8 When uniqifying without regard for weights, make sure to sort by weights
+857624e Return a skip value if tool is not found.
+47ba60b Update morphology tests: omit deprecated .sh extensions and omorfi-analyze/generate. Do not include python tests in tool test.
+3ab9303 Add missing file.
+ffd1797 Add missing files to dist.
+1032bf7 Explicitly list all functionality tests in dist.
+90e161a Implement a cautious form of first-input-symbol scanning
 9730a4e Correct variable name
 a450d58 When not printing weights and in --unique xerox mode, suppress weight differences
 4b05205 --uniq does not require an arg!
