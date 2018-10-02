@@ -770,7 +770,7 @@ void process_input(hfst_ol::PmatchContainer & container,
                    const TokenizeSettings& s)
 {
     container.set_single_codepoint_tokenization(!s.tokenize_multichar);
-    size_t bufsize = 4096;
+    const size_t bufsize = 4096;
     for(char line[bufsize]; instream.getline(line, bufsize); ) {
         string input_text(line);
         if(!input_text.empty()) {
