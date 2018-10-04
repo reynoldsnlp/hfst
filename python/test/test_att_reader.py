@@ -29,7 +29,7 @@ assert(f.closed)
 assert(len(transducers)) == 4
 
 transducers = []
-with open('testfile_unicode.att', 'r') as f:
+with open('testfile_unicode.att', 'r', encoding='utf-8') as f:
     r = hfst.AttReader(f)
     for tr in r:
         transducers.append(tr)
