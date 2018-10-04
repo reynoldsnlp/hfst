@@ -1388,7 +1388,7 @@ void PmatchContainer::initialize_input(const char * input_s)
     SymbolNumber k = NO_SYMBOL_NUMBER;
     SymbolNumber boundary_sym = alphabet.get_special(boundary);
     char * single_codepoint_scratch;
-    char single_codepoint_scratch_orig[5]{};
+    char single_codepoint_scratch_orig[5] = {};
     if (boundary_sym != NO_SYMBOL_NUMBER) {
         input.push_back(boundary_sym);
     }
