@@ -669,7 +669,7 @@ bool PmatchAlphabet::is_special(const std::string & symbol)
     if (symbol.size() < 3) {
         return false;
     }
-    if (symbol == "@PMATCH_INPUT_MARK@") { // seems like is_special symbols can't be referred to in pmatch scripts
+    if (symbol == "@PMATCH_INPUT_MARK@" || symbol == "@PMATCH_BACKTRACK@") { // seems like is_special symbols can't be referred to in pmatch scripts
         return false;
     }
     if (is_insertion(symbol) || symbol == "@BOUNDARY@") {
