@@ -1,28 +1,15 @@
+import hfst_commandline
 import hfst
-from sys import argv
-impl=hfst.ImplementationType.TROPICAL_OPENFST_TYPE
-skip_next = False
-for i in range(1, len(argv)):
-    if skip_next:
-        skip_next = False
-        continue
-    arg = argv[i]
-    if arg == '-f':
-        skip_next= True
-        val = argv[i+1]
-        if val == 'sfst':
-            impl = hfst.ImplementationType.SFST_TYPE
-        elif val == 'openfst-tropical':
-            impl = hfst.ImplementationType.TROPICAL_OPENFST_TYPE
-        elif val == 'foma':
-            impl = hfst.ImplementationType.FOMA_TYPE
-        else:
-            raise RuntimeError('type not recognized: ' + val)
-    else:
-        raise RuntimeError('argument not recognized: ' + arg)
 
-hfst.set_default_fst_type(impl)
+short_getopts='f:'
+long_getopts=['format=',]
+short_opts=['-f',]
+long_opts=['--format',]
+
+hfst_commandline.hfst_getopt(short_opts, short_getopts, long_opts, long_getopts)
+
+hfst.set_default_fst_type(hfst_commandline.impl)
 result = hfst.compile_sfst_file("")
-result.convert(impl)
+result.convert(hfst.get_default_fst_type())
 ostr = hfst.HfstOutputStream(type=hfst.get_default_fst_type())
 ostr.write(result)
