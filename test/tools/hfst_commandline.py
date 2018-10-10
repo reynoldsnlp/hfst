@@ -4,7 +4,7 @@ from hfst import ImplementationType, HfstInputStream
 # check if option opt is listed in short_getopts or long_getopts
 # '-' chars are stripped from the beginning of opt before comparing
 # ':' chars in short_getopts and '=' chars in long_getopts are ignored
-def _check_option(opt, short_getopts, long_getopts):
+def _check_option(opt, short_getopts, long_getopts, errmsg='TODO'):
     opt_ = opt.lstrip('-')
     if (len(opt_) == 1 and opt_ in short_getopts):
         return
@@ -27,12 +27,12 @@ def get_implementation_type(val):
 # - that any optional arguments are allowed (given as --foo FOO or --foo=FOO)
 # - that parameters are listed in short_getopts or long_getopts
 # - that number of free parameters is not bigger than free_params
-def hfst_getopt(short_getopts, long_getopts, free_params=0):
+def hfst_getopt(short_getopts, long_getopts, free_params=0, errmsg='TODO'):
     import getopt
     global argv
     options = getopt.gnu_getopt(argv[1:], short_getopts, long_getopts)
     for opt in options[0]:
-        _check_option(opt[0], short_getopts, long_getopts)
+        _check_option(opt[0], short_getopts, long_getopts, errmsg)
     if len(options) == 2:
         if len(options[1]) > free_params:
             raise RuntimeError('too many free parameters given (' + str(len(options[1])) + '), maximum is ' + str(free_params))
@@ -51,13 +51,15 @@ def get_two_hfst_input_streams(options):
     explicit_ifile2=None
     arg1=None
     arg2=None
+    name1='TODO'
+    name2='TODO'
     for opt in options[0]:
         if opt[0] == '-1':
             explicit_ifile1 = opt[1] 
         elif opt[0] == '-2':
             explicit_ifile2 = opt[1]
         else:
-            pass        
+            pass
     # free arguments were given
     if len(options) == 2:
         # at least one
@@ -87,4 +89,4 @@ def get_two_hfst_input_streams(options):
         else:
             istr1 = _get_input_stream(arg1)
             istr2 = _get_input_stream(arg2)
-    return (istr1, istr2)
+    return ((istr1, name1), (istr2, name2))
