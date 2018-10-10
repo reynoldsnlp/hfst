@@ -1,10 +1,6 @@
 import hfst, sys
 import hfst_commandline
 
-explicit_ifile1=None
-explicit_ifile2=None
-arg1=None
-arg2=None
 silent=False
 harmonize=True
 eliminate_flags=False
@@ -14,62 +10,27 @@ short_getopts='sqHe'
 long_getopts=['silent','quiet','do-not-harmonize','eliminate-flags']
 options = hfst_commandline.hfst_getopt(short_getopts, long_getopts, 2)
 
-from sys import argv
-if len(argv) < 2 or len(argv) > 5:
-    raise RuntimeError('Usage: hfst-compare.py INFILE1 INFILE2')
-for arg in argv[1:]:
-    if arg == '-s' or arg == '--silent' or arg == '-q' or arg == '--quiet':
+# todo: handle this to hfst_commandline...
+# raise RuntimeError('Usage: hfst-compare.py INFILE1 INFILE2')
+    
+#for arg in argv[1:]:
+for opt in options[0]:
+    if opt[0] == '-s' or opt[0] == '--silent' or opt[0] == '-q' or opt[0] == '--quiet':
         silent = True
-    elif arg == '-H' or arg == '--do-not-harmonize':
+    elif opt[0] == '-H' or opt[0] == '--do-not-harmonize':
         harmonize = False
-    elif arg == '-e' or arg == '--eliminate-flags':
+    elif opt[0] == '-e' or opt[0] == '--eliminate-flags':
         eliminate_flags=True
-    elif arg == '-1':
-        explicit_ifile1 = '<next>'
-    elif arg == '-2':
-        explicit_ifile2 = '<next>'
-    elif explicit_ifile1 == '<next>':
-        explicit_ifile1 = arg
-    elif explicit_ifile2 == '<next>':
-        explicit_ifile2 = arg
-    elif arg1 == None:
-        arg1 = arg
-    elif arg2 == None:
-        arg2 = arg
+    #elif opt[0] == '-1':
+    #    explicit_ifile1 = opt[1] 
+    #elif opt[0] == '-2':
+    #    explicit_ifile2 = opt[1]
     else:
-        raise RuntimeError('Usage: hfst-compare.py INFILE1 INFILE2')
+        pass # unknown options were already checked in hfst_getopt
 
-istr1 = None
-istr2 = None
-
-def get_input_stream(filename):
-    if filename == '-':
-        return hfst.HfstInputStream()
-    elif filename != None:
-        return hfst.HfstInputStream(filename)
-    else:
-        return None
-
-istr1 = get_input_stream(explicit_ifile1)
-istr2 = get_input_stream(explicit_ifile2)
-
-if istr1 != None and istr2 != None:
-    pass
-elif istr1 == None and istr2 != None:
-    if arg1 == None:
-        arg1 = '-'
-    istr1 = get_input_stream(arg1)
-elif istr1 != None and istr2 == None:
-    if arg1 == None:
-        arg1 = '-'
-    istr2 = get_input_stream(arg1)
-else:
-    if arg2 == None:
-        istr1 = get_input_stream('-')
-        istr2 = get_input_stream(arg1)
-    else:
-        istr1 = get_input_stream(arg1)
-        istr2 = get_input_stream(arg2)
+streams = hfst_commandline.get_two_hfst_input_streams(options)
+istr1 = streams[0]
+istr2 = streams[1]
 
 if (istr1.get_type() != istr2.get_type()):
     raise RuntimeError('Error: transducer types differ in ' + argv[1] + ' and ' + argv[2])
