@@ -1,4 +1,5 @@
 import hfst, sys
+import hfst_commandline
 
 explicit_ifile1=None
 explicit_ifile2=None
@@ -8,6 +9,10 @@ silent=False
 harmonize=True
 eliminate_flags=False
 retval=0
+
+short_getopts='sqHe'
+long_getopts=['silent','quiet','do-not-harmonize','eliminate-flags']
+options = hfst_commandline.hfst_getopt(short_getopts, long_getopts, 2)
 
 from sys import argv
 if len(argv) < 2 or len(argv) > 5:
