@@ -20,12 +20,8 @@ for opt in options[0]:
             raise RuntimeError('error: hfst-fst2strings.py: option --xfst supports only variable obey-flags')
     else:
         pass
-if len(options[1]) == 1:
-    infilename = options[1][0]
-else:
-    raise RuntimeError('usage: hfst-fst2strings.py INFILE')
+istr = hfst_commandline.get_one_hfst_input_stream(options)[0]
 
-istr = hfst.HfstInputStream(infilename)
 for tr in istr:
     weighted = tr.get_type() != hfst.ImplementationType.SFST_TYPE and tr.get_type() != hfst.ImplementationType.FOMA_TYPE
     paths=None
