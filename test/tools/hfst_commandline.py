@@ -45,6 +45,52 @@ def _get_input_stream(filename):
         return HfstInputStream(filename)
     else:
         return None
+    
+def _get_output_stream(filename, impl):
+    if filename == '-':
+        return HfstOutputStream(type=impl)
+    elif filename != None:
+        return HfstOutputStream(filename, type=impl)
+    else:
+        return None
+    
+def get_one_hfst_output_stream(options, impl):
+    explicit_file=None
+    arg=None
+    name='TODO'
+    for opt in options[0]:
+        if opt[0] == '-o':
+            explicit_file = opt[1]
+    stream=None
+    stream = _get_output_stream(explicit_file, impl)
+    if stream != None:
+        pass
+    else:
+        if arg == None:
+            arg = '-'
+        stream = _get_output_stream(arg, impl)
+    return ((stream, name))
+    
+def get_one_hfst_input_stream(options):
+    explicit_file=None
+    arg=None
+    name='TODO'
+    for opt in options[0]:
+        if opt[0] == '-i':
+            explicit_file = opt[1]
+    # free argument was given
+    if len(options) == 2:
+        if len(options[1] == 1):
+            arg = options[1][0]
+    stream=None
+    stream = _get_input_stream(explicit_file)
+    if stream != None:
+        pass
+    else:
+        if arg == None:
+            arg = '-'
+        stream = _get_input_stream(arg)
+    return ((stream, name))
 
 def get_two_hfst_input_streams(options):
     explicit_ifile1=None
