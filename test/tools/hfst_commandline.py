@@ -1,5 +1,5 @@
-from sys import argv
-from hfst import ImplementationType, HfstInputStream
+from sys import argv, stdin, stdout
+from hfst import ImplementationType, HfstInputStream, HfstOutputStream
 
 # check if option opt is listed in short_getopts or long_getopts
 # '-' chars are stripped from the beginning of opt before comparing
@@ -38,25 +38,39 @@ def hfst_getopt(short_getopts, long_getopts, free_params=0, errmsg='TODO'):
             raise RuntimeError('too many free parameters given (' + str(len(options[1])) + '), maximum is ' + str(free_params))
     return options
 
-def _get_input_stream(filename):
+def _get_input_stream(filename, stream_type):
+    if stream_type != 'hfst' and stream_type != 'text':
+        raise RuntimeError('stream_type ' + stream_type + 'not recognized')
     if filename == '-':
-        return HfstInputStream()
+        if stream_type == 'hfst':
+            return HfstInputStream()
+        else:
+            return stdin
     elif filename != None:
-        return HfstInputStream(filename)
+        if stream_type == 'hfst':
+            return HfstInputStream(filename)
+        else:
+            return open(filename, 'r') # TODO: encoding?
     else:
         return None
     
-def _get_output_stream(filename, impl):
+def _get_output_stream(filename, stream_type, impl=None):
+    if stream_type != 'hfst' and stream_type != 'text':
+        raise RuntimeError('stream_type ' + stream_type + 'not recognized')
     if filename == '-':
-        return HfstOutputStream(type=impl)
+        if stream_type == 'hfst':
+            return HfstOutputStream(type=impl)
+        else:
+            return stdout
     elif filename != None:
-        return HfstOutputStream(filename, type=impl)
+        if stream_type == 'hfst':
+            return HfstOutputStream(filename, type=impl)
+        else:
+            return open(filename, 'w') # TODO: encoding?
     else:
         return None
 
-# any number of free arguments may be given but none will be
-# interpreted as OFILE
-def get_one_hfst_output_stream(options, impl):
+def _get_one_output_stream(options, stream_type, impl=None):
     explicit_file=None
     stream=None
     name='TODO'
@@ -64,15 +78,21 @@ def get_one_hfst_output_stream(options, impl):
     for opt in options[0]:
         if opt[0] == '-o' or opt[0] == '--output':
             explicit_file = opt[1]
-            stream = _get_output_stream(explicit_file, impl)
+            stream = _get_output_stream(explicit_file, stream_type, impl)
             return (stream, name)
-    # 2) not given, defaults to standard input
-    stream = _get_output_stream('-', impl)
+    # 2) not given, defaults to standard output
+    stream = _get_output_stream('-', stream_type, impl)
     return (stream, name)
 
-# any number of free arguments may be given but the first one
-# will be interpreted as IFILE (unless -i or --input is used)
-def get_one_hfst_input_stream(options):
+# any number of free arguments may be given but none will be
+# interpreted as OFILE
+def get_one_hfst_output_stream(options, impl):
+    return _get_one_output_stream(options, 'hfst', impl)
+
+def get_one_text_output_stream(options):
+    return _get_one_output_stream(options, 'text')
+
+def _get_one_input_stream(options, stream_type):
     explicit_file=None
     arg=None
     stream=None
@@ -81,17 +101,25 @@ def get_one_hfst_input_stream(options):
     for opt in options[0]:
         if opt[0] == '-i' or opt[0] == '--input':
             explicit_file = opt[1]
-            stream = _get_input_stream(explicit_file)
+            stream = _get_input_stream(explicit_file, stream_type)
             return (stream, name)
     if len(options) == 2:
         # 2) given as free argument
         if len(options[1]) >= 1:
             arg = options[1][0]
-            stream = _get_input_stream(arg)
+            stream = _get_input_stream(arg, stream_type)
             return (stream, name)
     # 3) not given, defaults to standard input
-    stream = _get_input_stream('-')
+    stream = _get_input_stream('-', stream_type)
     return (stream, name)
+
+def get_one_text_input_stream(options):
+    return _get_one_input_stream(options, 'text')
+
+# any number of free arguments may be given but the first one
+# will be interpreted as IFILE (unless -i or --input is used)
+def get_one_hfst_input_stream(options):
+    return _get_one_input_stream(options, 'hfst')
 
 # no more than two free arguments may be given and they are always
 # interpreted as IFILE1 and IFILE2 (unless -1, -2, --input1 or --input2 are used)
@@ -119,23 +147,23 @@ def get_two_hfst_input_streams(options):
             arg2 = options[1][1]
     istr1 = None
     istr2 = None
-    istr1 = _get_input_stream(explicit_ifile1)
-    istr2 = _get_input_stream(explicit_ifile2)
+    istr1 = _get_input_stream(explicit_ifile1, 'hfst')
+    istr2 = _get_input_stream(explicit_ifile2, 'hfst')
     if istr1 != None and istr2 != None:
         pass
     elif istr1 == None and istr2 != None:
         if arg1 == None:
             arg1 = '-'
-        istr1 = _get_input_stream(arg1)
+        istr1 = _get_input_stream(arg1, 'hfst')
     elif istr1 != None and istr2 == None:
         if arg1 == None:
             arg1 = '-'
-        istr2 = _get_input_stream(arg1)
+        istr2 = _get_input_stream(arg1, 'hfst')
     else:
         if arg2 == None:
-            istr1 = _get_input_stream('-')
-            istr2 = _get_input_stream(arg1)
+            istr1 = _get_input_stream('-', 'hfst')
+            istr2 = _get_input_stream(arg1, 'hfst')
         else:
-            istr1 = _get_input_stream(arg1)
-            istr2 = _get_input_stream(arg2)
+            istr1 = _get_input_stream(arg1, 'hfst')
+            istr2 = _get_input_stream(arg2, 'hfst')
     return ((istr1, name1), (istr2, name2))
