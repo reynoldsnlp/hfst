@@ -1377,13 +1377,13 @@ void print_size_info(HfstTransducer * net)
     if (!hfst::pmatch::verbose) {
         return;
     }
-    HfstBasicTransducer tmp(*net);
+    HfstIterableTransducer tmp(*net);
     size_t states = 0;
     size_t arcs = 0;
-    for(HfstBasicTransducer::const_iterator state_it = tmp.begin();
+    for(HfstIterableTransducer::const_iterator state_it = tmp.begin();
         state_it != tmp.end(); ++state_it) {
         ++states;
-        for(hfst::implementations::HfstBasicTransitions::const_iterator tr_it =
+        for(hfst::implementations::HfstTransitions::const_iterator tr_it =
                 state_it->begin(); tr_it != state_it->end(); ++tr_it) {
             ++arcs;
         }

@@ -691,7 +691,7 @@ READ_FROM: READ_BIN {
     } else {
         try {
             unsigned int linecount = 0;
-            HfstBasicTransducer tmp = HfstBasicTransducer::read_in_prolog_format(f, linecount);
+            HfstIterableTransducer tmp = HfstIterableTransducer::read_in_prolog_format(f, linecount);
             fclose(f);
             HfstTransducer * t = new HfstTransducer(tmp, hfst::pmatch::format);
             t->minimize();

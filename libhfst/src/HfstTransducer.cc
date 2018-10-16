@@ -247,7 +247,7 @@ void HfstTransducer::insert_to_alphabet(const std::string &symbol)
 #endif
     if (this->type != XFSM_TYPE)
       {
-        hfst::implementations::HfstBasicTransducer * net
+        hfst::implementations::HfstIterableTransducer * net
           = convert_to_basic_transducer();
         net->add_symbol_to_alphabet(symbol);
         convert_to_hfst_transducer(net);
@@ -272,7 +272,7 @@ void HfstTransducer::insert_to_alphabet(const std::set<std::string> &symbols)
 
     if (this->type != XFSM_TYPE)
       {
-        hfst::implementations::HfstBasicTransducer * net
+        hfst::implementations::HfstIterableTransducer * net
           = convert_to_basic_transducer();
         net->add_symbols_to_alphabet(symbols);
         convert_to_hfst_transducer(net);
@@ -297,7 +297,7 @@ void HfstTransducer::remove_from_alphabet(const std::string &symbol)
   if (symbol == "")
     HFST_THROW_MESSAGE(EmptyStringException, "remove_from_alphabet");
 
-    hfst::implementations::HfstBasicTransducer * net
+    hfst::implementations::HfstIterableTransducer * net
       = convert_to_basic_transducer();
     net->remove_symbol_from_alphabet(symbol);
     convert_to_hfst_transducer(net);
@@ -313,7 +313,7 @@ void HfstTransducer::remove_from_alphabet(const std::set<std::string> &symbols)
     }
 }
   
-/* Implemented for XFSM_TYPE, as conversion between HfstBasicFormat and XFSM_TYPE is slow. */
+/* Implemented for XFSM_TYPE, as conversion between HfstIterableTransducer and XFSM_TYPE is slow. */
 void HfstTransducer::remove_symbols_from_alphabet(const StringSet & symbols)
 {
   if (this->type != XFSM_TYPE)
@@ -327,7 +327,7 @@ void HfstTransducer::remove_symbols_from_alphabet(const StringSet & symbols)
 
 HfstTransducer &HfstTransducer::prune_alphabet(bool force)
 {
-  hfst::implementations::HfstBasicTransducer * net
+  hfst::implementations::HfstIterableTransducer * net
     = convert_to_basic_transducer();
   net->prune_alphabet(force);
   return convert_to_hfst_transducer(net);;
@@ -421,8 +421,8 @@ StringSet HfstTransducer::get_alphabet() const
 */
 HfstTransducer * HfstTransducer::harmonize_symbol_encodings(const HfstTransducer &another)
 {
-  HfstBasicTransducer another_basic(another);
-  HfstBasicTransducer this_basic(*this);
+  HfstIterableTransducer another_basic(another);
+  HfstIterableTransducer this_basic(*this);
   *this = HfstTransducer(this_basic, this->get_type());
   return new HfstTransducer(another_basic, another.get_type());
 }
@@ -502,8 +502,8 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
     case (LOG_OPENFST_TYPE):
 #endif
       {
-    HfstBasicTransducer * another_basic = another_copy.get_basic_transducer();
-    HfstBasicTransducer * this_basic = this->convert_to_basic_transducer();
+    HfstIterableTransducer * another_basic = another_copy.get_basic_transducer();
+    HfstIterableTransducer * this_basic = this->convert_to_basic_transducer();
 
     this_basic->harmonize(*another_basic);
 
@@ -583,8 +583,8 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
     case (LOG_OPENFST_TYPE):
 #endif
       {
-    HfstBasicTransducer * this_basic = this->convert_to_basic_transducer();
-    HfstBasicTransducer * another_basic =
+    HfstIterableTransducer * this_basic = this->convert_to_basic_transducer();
+    HfstIterableTransducer * another_basic =
       another.convert_to_basic_transducer();
 
     this_basic->harmonize(*another_basic);
@@ -615,7 +615,7 @@ void HfstTransducer::print_alphabet()
 #if HAVE_FOMA
     if (this->type == FOMA_TYPE)
       {
-    HfstBasicTransducer net(*this);
+    HfstIterableTransducer net(*this);
     net.print_alphabet();
       }
 #endif
@@ -775,7 +775,7 @@ bool HfstTransducer::is_infinitely_ambiguous()
     case (ERROR_TYPE):
       HFST_THROW(TransducerHasWrongTypeException);
     default:
-      hfst::implementations::HfstBasicTransducer net(*this);
+      hfst::implementations::HfstIterableTransducer net(*this);
       return net.is_infinitely_ambiguous();
     }
 }
@@ -1233,7 +1233,7 @@ HfstTransducer::HfstTransducer(const HfstTransducer &another):
 }
 
 HfstTransducer::HfstTransducer
-( const hfst::implementations::HfstBasicTransducer &net,
+( const hfst::implementations::HfstIterableTransducer &net,
   ImplementationType type):
     type(type),anonymous(false),is_trie(false), name("")
 {
@@ -1932,7 +1932,7 @@ static void flag_purge(HfstTransducer & transducer, const std::string & flag)
 {
   ImplementationType type = transducer.get_type();
   // slow for xfsm_transducer..
-  HfstBasicTransducer net(transducer);
+  HfstIterableTransducer net(transducer);
   net.flag_purge(flag);
   transducer = HfstTransducer(net, type);
   return;
@@ -1956,7 +1956,7 @@ HfstTransducer &HfstTransducer::eliminate_flags()
     }
 #endif
 
-  HfstBasicTransducer basic(*this);
+  HfstIterableTransducer basic(*this);
   StringSet flags = basic.get_flags();
   HfstTransducer * filter = get_flag_filter(this, flags, "");
   
@@ -1978,7 +1978,7 @@ HfstTransducer &HfstTransducer::eliminate_flags()
 
 HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
 {
-  HfstBasicTransducer basic(*this);
+  HfstIterableTransducer basic(*this);
   StringSet flags = basic.get_flags();
   bool feature_found = false;
   for (StringSet::const_iterator it = flags.begin(); it != flags.end(); it++)
@@ -2550,7 +2550,7 @@ int HfstTransducer::longest_path_size(bool obey_flags) const
 
   if (! obey_flags)
     {
-      HfstBasicTransducer net(*this);
+      HfstIterableTransducer net(*this);
       return net.longest_path_size();
     }
 
@@ -2592,7 +2592,7 @@ bool HfstTransducer::extract_longest_paths
       HFST_THROW(TransducerIsCyclicException);
     }
 
-  HfstBasicTransducer net(*this);
+  HfstIterableTransducer net(*this);
   std::vector<unsigned int> path_lengths = net.path_sizes();
   if (path_lengths.size() == 0)
     return false;
@@ -2897,7 +2897,7 @@ void HfstTransducer::insert_freely_missing_flags_from
     if (check_for_missing_flags_in(another, missing_flags,
                                    false /* do not return on first miss */ ))
     {
-      HfstBasicTransducer basic(*this);
+      HfstIterableTransducer basic(*this);
 
       for (unsigned int s = 0; s <= (unsigned int)basic.get_max_state(); ++s)
         {
@@ -2905,7 +2905,7 @@ void HfstTransducer::insert_freely_missing_flags_from
                it != missing_flags.end(); it++)
             {
               basic.add_transition
-                (s, HfstBasicTransition(s,*it,*it,0.0));
+                (s, HfstTransition(s,*it,*it,0.0));
             }
         }
 
@@ -2948,24 +2948,24 @@ std::string add_suffix_to_feature_name(const std::string &flag_diacritic,
 void rename_flag_diacritics(HfstTransducer &fst,const std::string &suffix)
 {
   
-  HfstBasicTransducer basic_fst(fst);
-  HfstBasicTransducer basic_fst_copy;
+  HfstIterableTransducer basic_fst(fst);
+  HfstIterableTransducer basic_fst_copy;
   (void)basic_fst_copy.add_state(basic_fst.get_max_state());
 
   hfst::implementations::HfstState s = 0;
 
-  for (HfstBasicTransducer::const_iterator it = basic_fst.begin();
+  for (HfstIterableTransducer::const_iterator it = basic_fst.begin();
        it != basic_fst.end();
        ++it)
     {
-      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
+      for (hfst::implementations::HfstTransitions::const_iterator jt =
              it->begin();
            jt != it->end();
            ++jt)
         {
           basic_fst_copy.add_transition
             (s,
-             HfstBasicTransition
+             HfstTransition
              (jt->get_target_state(),
 
               FdOperation::is_diacritic(jt->get_input_symbol())  ?
@@ -2989,17 +2989,17 @@ void rename_flag_diacritics(HfstTransducer &fst,const std::string &suffix)
 
 void HfstTransducer::twosided_flag_diacritics()
 {
-  HfstBasicTransducer basic_fst(*this);
-  HfstBasicTransducer basic_fst_copy;
+  HfstIterableTransducer basic_fst(*this);
+  HfstIterableTransducer basic_fst_copy;
   (void)basic_fst_copy.add_state(basic_fst.get_max_state());
 
   hfst::implementations::HfstState s = 0;
 
-  for (HfstBasicTransducer::const_iterator it = basic_fst.begin();
+  for (HfstIterableTransducer::const_iterator it = basic_fst.begin();
        it != basic_fst.end();
        ++it)
     {
-      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
+      for (hfst::implementations::HfstTransitions::const_iterator jt =
              it->begin();
            jt != it->end();
            ++jt)
@@ -3024,7 +3024,7 @@ void HfstTransducer::twosided_flag_diacritics()
 
               basic_fst_copy.add_transition
                 (s,
-                 HfstBasicTransition
+                 HfstTransition
                  (new_state, in, out, 0/*?*/));
 
               in = (ostr_is_flag)? ostr : hfst::internal_epsilon;
@@ -3032,14 +3032,14 @@ void HfstTransducer::twosided_flag_diacritics()
 
               basic_fst_copy.add_transition
                 (new_state,
-                 HfstBasicTransition
+                 HfstTransition
                  (jt->get_target_state(), in, out, jt->get_weight()/*?*/));
             }
           else
             {
               basic_fst_copy.add_transition
                 (s,
-                 HfstBasicTransition
+                 HfstTransition
                  (jt->get_target_state(), istr, ostr, jt->get_weight()));
             }
         }
@@ -3074,24 +3074,24 @@ std::string decode_flag(const std::string &flag_diacritic)
 void encode_flag_diacritics(HfstTransducer &fst)
 {
   
-  HfstBasicTransducer basic_fst(fst);
-  HfstBasicTransducer basic_fst_copy;
+  HfstIterableTransducer basic_fst(fst);
+  HfstIterableTransducer basic_fst_copy;
   (void)basic_fst_copy.add_state(basic_fst.get_max_state());
 
   hfst::implementations::HfstState s = 0;
 
-  for (HfstBasicTransducer::const_iterator it = basic_fst.begin();
+  for (HfstIterableTransducer::const_iterator it = basic_fst.begin();
        it != basic_fst.end();
        it++)
     {
-      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
+      for (hfst::implementations::HfstTransitions::const_iterator jt =
              it->begin();
            jt != it->end();
            jt++)
         {
           basic_fst_copy.add_transition
             (s,
-             HfstBasicTransition
+             HfstTransition
              (jt->get_target_state(),
 
               FdOperation::is_diacritic(jt->get_input_symbol())  ?
@@ -3141,17 +3141,17 @@ void encode_flag_diacritics(HfstTransducer &fst)
 void decode_flag_diacritics(HfstTransducer &fst)
 {
   
-  HfstBasicTransducer basic_fst(fst);
-  HfstBasicTransducer basic_fst_copy;
+  HfstIterableTransducer basic_fst(fst);
+  HfstIterableTransducer basic_fst_copy;
   (void)basic_fst_copy.add_state(basic_fst.get_max_state());
 
   hfst::implementations::HfstState s = 0;
 
-  for (HfstBasicTransducer::const_iterator it = basic_fst.begin();
+  for (HfstIterableTransducer::const_iterator it = basic_fst.begin();
        it != basic_fst.end();
        it++)
     {
-      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
+      for (hfst::implementations::HfstTransitions::const_iterator jt =
              it->begin();
            jt != it->end();
            jt++)
@@ -3166,7 +3166,7 @@ void decode_flag_diacritics(HfstTransducer &fst)
 
           basic_fst_copy.add_transition
             (s,
-             HfstBasicTransition
+             HfstTransition
              (jt->get_target_state(),
               istr,
               ostr,
@@ -3348,12 +3348,12 @@ HfstTransducer &HfstTransducer::insert_freely
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
     {
-    hfst::implementations::HfstBasicTransducer * net =
+    hfst::implementations::HfstIterableTransducer * net =
             ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
             (implementation.tropical_ofst);
     tropical_ofst_interface.delete_transducer(implementation.tropical_ofst);
           
-    hfst::implementations::HfstBasicTransducer * substituting_net =
+    hfst::implementations::HfstIterableTransducer * substituting_net =
             ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
             (tr_harmonized->implementation.tropical_ofst);
     delete tr_harmonized;
@@ -3369,12 +3369,12 @@ HfstTransducer &HfstTransducer::insert_freely
 #if HAVE_OPENFST_LOG
     case LOG_OPENFST_TYPE:
     {
-    hfst::implementations::HfstBasicTransducer * net =
+    hfst::implementations::HfstIterableTransducer * net =
             ConversionFunctions::log_ofst_to_hfst_basic_transducer
             (implementation.log_ofst);
     log_ofst_interface.delete_transducer(implementation.log_ofst);
           
-    hfst::implementations::HfstBasicTransducer * substituting_net =
+    hfst::implementations::HfstIterableTransducer * substituting_net =
             ConversionFunctions::log_ofst_to_hfst_basic_transducer
             (tr_harmonized->implementation.log_ofst);
     delete tr_harmonized;
@@ -3401,12 +3401,12 @@ HfstTransducer &HfstTransducer::insert_freely
             (implementation.foma,tr_harmonized->implementation.foma);
         }
 
-    hfst::implementations::HfstBasicTransducer * net =
+    hfst::implementations::HfstIterableTransducer * net =
             ConversionFunctions::foma_to_hfst_basic_transducer
             (implementation.foma);
     this->foma_interface.delete_foma(implementation.foma);
           
-    hfst::implementations::HfstBasicTransducer * substituting_net =
+    hfst::implementations::HfstIterableTransducer * substituting_net =
             ConversionFunctions::foma_to_hfst_basic_transducer
             (tr_harmonized->implementation.foma);
     delete tr_harmonized;
@@ -3423,12 +3423,12 @@ HfstTransducer &HfstTransducer::insert_freely
 #if HAVE_SFST
     case SFST_TYPE:
     {
-    hfst::implementations::HfstBasicTransducer * net =
+    hfst::implementations::HfstIterableTransducer * net =
             ConversionFunctions::sfst_to_hfst_basic_transducer
             (implementation.sfst);
     sfst_interface.delete_transducer(implementation.sfst);
           
-    hfst::implementations::HfstBasicTransducer * substituting_net =
+    hfst::implementations::HfstIterableTransducer * substituting_net =
             ConversionFunctions::sfst_to_hfst_basic_transducer
             (tr_harmonized->implementation.sfst);
     delete tr_harmonized;
@@ -3465,7 +3465,7 @@ HfstTransducer &HfstTransducer::substitute
   if (this->type == XFSM_TYPE)
     HFST_THROW(FunctionNotImplementedException);
 #endif
-  hfst::implementations::HfstBasicTransducer * net
+  hfst::implementations::HfstIterableTransducer * net
     = convert_to_basic_transducer();
   net->substitute(func);
   return convert_to_hfst_transducer(net);
@@ -3523,8 +3523,8 @@ HfstTransducer &HfstTransducer::substitute
 #endif
 #endif
     
-    // use the default HfstBasicTransducer function
-    hfst::implementations::HfstBasicTransducer * net =
+    // use the default HfstIterableTransducer function
+    hfst::implementations::HfstIterableTransducer * net =
       convert_to_basic_transducer();
     net->substitute(old_symbol,
                     new_symbol,
@@ -3548,7 +3548,7 @@ HfstTransducer &HfstTransducer::substitute
       (EmptyStringException,
        "substitute(const StringPair&, const StringPair&)");
   
-  hfst::implementations::HfstBasicTransducer * net
+  hfst::implementations::HfstIterableTransducer * net
     = convert_to_basic_transducer();
   net->substitute(old_symbol_pair, new_symbol_pair);
   convert_to_hfst_transducer(net);
@@ -3568,7 +3568,7 @@ HfstTransducer &HfstTransducer::substitute
       (EmptyStringException,
        "substitute(const StringPair&, const StringPairSet&");
 
-  hfst::implementations::HfstBasicTransducer * net
+  hfst::implementations::HfstIterableTransducer * net
     = convert_to_basic_transducer();
   net->substitute(old_symbol_pair, new_symbol_pair_set);
   return convert_to_hfst_transducer(net);
@@ -3595,7 +3595,7 @@ HfstTransducer &HfstTransducer::substitute
   if (this->type == XFSM_TYPE)
     HFST_THROW(FunctionNotImplementedException);
 #endif
-  hfst::implementations::HfstBasicTransducer * net
+  hfst::implementations::HfstIterableTransducer * net
     = convert_to_basic_transducer();
 
   try  {
@@ -3625,7 +3625,7 @@ HfstTransducer &HfstTransducer::substitute
   if (this->type == XFSM_TYPE)
     HFST_THROW(FunctionNotImplementedException);
 #endif
-  hfst::implementations::HfstBasicTransducer * net
+  hfst::implementations::HfstIterableTransducer * net
     = convert_to_basic_transducer();
   net->substitute(substitutions);
   return convert_to_hfst_transducer(net);
@@ -3695,12 +3695,12 @@ HfstTransducer &HfstTransducer::substitute
         this->foma_interface.harmonize
         (implementation.foma,transducer.implementation.foma);
 
-        hfst::implementations::HfstBasicTransducer * net =
+        hfst::implementations::HfstIterableTransducer * net =
         ConversionFunctions::foma_to_hfst_basic_transducer
         (implementation.foma);
         this->foma_interface.delete_foma(implementation.foma);
 
-        hfst::implementations::HfstBasicTransducer * substituting_net =
+        hfst::implementations::HfstIterableTransducer * substituting_net =
         ConversionFunctions::foma_to_hfst_basic_transducer
         (transducer.implementation.foma);
 
@@ -3889,10 +3889,10 @@ HfstTransducer &HfstTransducer::merge
   if (this->type == XFSM_TYPE)
     HFST_THROW(FunctionNotImplementedException);
 #endif
-  HfstBasicTransducer this_basic(*this);
-  HfstBasicTransducer another_basic(another);
+  HfstIterableTransducer this_basic(*this);
+  HfstIterableTransducer another_basic(another);
   std::set<std::string> markers_added;
-  HfstBasicTransducer result = hfst::implementations::HfstBasicTransducer::merge(this_basic, another_basic, args.list_definitions, markers_added);
+  HfstIterableTransducer result = hfst::implementations::HfstIterableTransducer::merge(this_basic, another_basic, args.list_definitions, markers_added);
   HfstTransducer initial_merge(result, this->get_type());
   initial_merge.optimize();
 
@@ -3917,7 +3917,7 @@ HfstTransducer &HfstTransducer::merge
       initial_merge.subtract(cp).optimize();
       initial_merge.substitute(marker, internal_epsilon);
 
-      HfstBasicTransducer fsm(initial_merge);
+      HfstIterableTransducer fsm(initial_merge);
       StringSet symbols = fsm.symbols_used();
       if (symbols.find(symbol) == symbols.end())
         {
@@ -4140,7 +4140,7 @@ HfstTransducer get_flag_path_restriction(const StringSet &_1_flags,
                                          ImplementationType type)
 {
   // Two state fst with borh states final.
-  HfstBasicTransducer basic_restriction;
+  HfstIterableTransducer basic_restriction;
   basic_restriction.add_state();
   implementations::HfstState start_state = 0;
   implementations::HfstState seen_2_state = 1;
@@ -4150,14 +4150,14 @@ HfstTransducer get_flag_path_restriction(const StringSet &_1_flags,
 
   basic_restriction.add_transition
     (start_state,
-     HfstBasicTransition(start_state,
+     HfstTransition(start_state,
                          internal_identity,
                          internal_identity,
                          0.0));
 
   basic_restriction.add_transition
     (seen_2_state,
-     HfstBasicTransition(start_state,
+     HfstTransition(start_state,
                          internal_identity,
                          internal_identity,
                          0.0));
@@ -4174,7 +4174,7 @@ HfstTransducer get_flag_path_restriction(const StringSet &_1_flags,
 
       basic_restriction.add_transition
         (start_state,
-         HfstBasicTransition(start_state,
+         HfstTransition(start_state,
                              dollar_flag,
                              dollar_flag,
                              0.0));
@@ -4192,14 +4192,14 @@ HfstTransducer get_flag_path_restriction(const StringSet &_1_flags,
 
       basic_restriction.add_transition
         (start_state,
-         HfstBasicTransition(seen_2_state,
+         HfstTransition(seen_2_state,
                              dollar_flag,
                              dollar_flag,
                              0.0));
 
       basic_restriction.add_transition
         (seen_2_state,
-         HfstBasicTransition(seen_2_state,
+         HfstTransition(seen_2_state,
                              dollar_flag,
                              dollar_flag,
                              0.0));
@@ -4458,9 +4458,9 @@ HfstTransducer &HfstTransducer::shuffle(const HfstTransducer &another, bool)
     HFST_THROW_MESSAGE(TransducerTypeMismatchException,
                        "HfstTransducer::shuffle(const HfstTransducer&)");
 
-  // We use HfstBasicTransducers for efficiency
-  HfstBasicTransducer this_basic(*this);
-  HfstBasicTransducer another_basic(another);
+  // We use HfstIterableTransducers for efficiency
+  HfstIterableTransducer this_basic(*this);
+  HfstIterableTransducer another_basic(another);
 
   // Expand (unknowns and) identities
   this_basic.harmonize(another_basic);
@@ -4518,8 +4518,8 @@ HfstTransducer &HfstTransducer::shuffle(const HfstTransducer &another, bool)
   this1.intersect(another1);
   this1.optimize();
   
-  // We use HfstBasicTransducers again
-  HfstBasicTransducer this1_basic(this1);
+  // We use HfstIterableTransducers again
+  HfstIterableTransducer this1_basic(this1);
 
   // Decode the shuffled transducer, i.e. remove the prefixes
   // "@1" and "@2" from symbols
@@ -4608,7 +4608,7 @@ HfstTransducer &HfstTransducer::compose_intersect
 
       // Add the word boundary symbol to the alphabet so harmonization
       // won't touch it.
-      HfstBasicTransducer basic_this(*this);
+      HfstIterableTransducer basic_this(*this);
       basic_this.add_symbol_to_alphabet("@#@");
       *this = HfstTransducer(basic_this,this->get_type());
 
@@ -4656,7 +4656,7 @@ HfstTransducer &HfstTransducer::compose_intersect
       //implementations::ComposeIntersectLexicon lexicon(*this);
       implementations::ComposeIntersectLexicon lexicon(*harmonized_lexicon);
       
-      hfst::implementations::HfstBasicTransducer res =
+      hfst::implementations::HfstIterableTransducer res =
         lexicon.compose_with_rules(&rule);
       
       res.prune_alphabet();
@@ -4720,7 +4720,7 @@ HfstTransducer &HfstTransducer::compose_intersect
           }
         // Create a ComposeIntersectLexicon from *this.
         implementations::ComposeIntersectLexicon lexicon(*harmonized_lexicon);
-        hfst::implementations::HfstBasicTransducer res =
+        hfst::implementations::HfstIterableTransducer res =
           lexicon.compose_with_rules(rules);
         
         res.prune_alphabet();
@@ -4907,13 +4907,13 @@ HfstTransducer &HfstTransducer::subtract
 //
 // -----------------------------------------------------------------------
 
-implementations::HfstBasicTransducer * HfstTransducer::
+implementations::HfstIterableTransducer * HfstTransducer::
 get_basic_transducer() const
 {
 #if HAVE_SFST || HAVE_LEAN_SFST
     if (this->type == SFST_TYPE)
       {
-        hfst::implementations::HfstBasicTransducer * net =
+        hfst::implementations::HfstIterableTransducer * net =
       ConversionFunctions::sfst_to_hfst_basic_transducer
       (implementation.sfst);
     return net;
@@ -4922,7 +4922,7 @@ get_basic_transducer() const
 #if HAVE_OPENFST
     if (this->type == TROPICAL_OPENFST_TYPE)
       {
-                hfst::implementations::HfstBasicTransducer * net =
+                hfst::implementations::HfstIterableTransducer * net =
       ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
       (implementation.tropical_ofst);
     return net;
@@ -4930,7 +4930,7 @@ get_basic_transducer() const
 #if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
     if (this->type == LOG_OPENFST_TYPE)
       {
-        hfst::implementations::HfstBasicTransducer * net =
+        hfst::implementations::HfstIterableTransducer * net =
       ConversionFunctions::log_ofst_to_hfst_basic_transducer
       (implementation.log_ofst);
     return net;
@@ -4940,7 +4940,7 @@ get_basic_transducer() const
 #if HAVE_FOMA
     if (this->type == FOMA_TYPE)
       {
-        hfst::implementations::HfstBasicTransducer * net =
+        hfst::implementations::HfstIterableTransducer * net =
       ConversionFunctions::foma_to_hfst_basic_transducer
       (implementation.foma);
     return net;
@@ -4953,13 +4953,13 @@ get_basic_transducer() const
 }
 
 
-implementations::HfstBasicTransducer * HfstTransducer::
+implementations::HfstIterableTransducer * HfstTransducer::
 convert_to_basic_transducer()
 {
 #if HAVE_SFST || HAVE_LEAN_SFST
     if (this->type == SFST_TYPE)
       {
-        hfst::implementations::HfstBasicTransducer * net =
+        hfst::implementations::HfstIterableTransducer * net =
       ConversionFunctions::sfst_to_hfst_basic_transducer
       (implementation.sfst);
         sfst_interface.delete_transducer(implementation.sfst);
@@ -4969,7 +4969,7 @@ convert_to_basic_transducer()
 #if HAVE_OPENFST
     if (this->type == TROPICAL_OPENFST_TYPE)
       {
-        hfst::implementations::HfstBasicTransducer * net =
+        hfst::implementations::HfstIterableTransducer * net =
       ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
       (implementation.tropical_ofst);
         tropical_ofst_interface.delete_transducer(implementation.tropical_ofst);
@@ -4978,7 +4978,7 @@ convert_to_basic_transducer()
 #if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
     if (this->type == LOG_OPENFST_TYPE)
       {
-        hfst::implementations::HfstBasicTransducer * net =
+        hfst::implementations::HfstIterableTransducer * net =
       ConversionFunctions::log_ofst_to_hfst_basic_transducer
       (implementation.log_ofst);
         log_ofst_interface.delete_transducer(implementation.log_ofst);
@@ -4989,7 +4989,7 @@ convert_to_basic_transducer()
 #if HAVE_FOMA
     if (this->type == FOMA_TYPE)
       {
-        hfst::implementations::HfstBasicTransducer * net =
+        hfst::implementations::HfstIterableTransducer * net =
       ConversionFunctions::foma_to_hfst_basic_transducer
       (implementation.foma);
         foma_interface.delete_foma(implementation.foma);
@@ -5004,7 +5004,7 @@ convert_to_basic_transducer()
 
 
 HfstTransducer &HfstTransducer::
-convert_to_hfst_transducer(implementations::HfstBasicTransducer *t)
+convert_to_hfst_transducer(implementations::HfstIterableTransducer *t)
 {
 #if HAVE_SFST || HAVE_LEAN_SFST
     if (this->type == SFST_TYPE)
@@ -5066,7 +5066,7 @@ HfstTransducer &HfstTransducer::convert(const HfstTransducer &t,
       throw ImplementationTypeNotAvailableException("HfstTransducer::convert", __FILE__, __LINE__, type);
     }
 
-    hfst::implementations::HfstBasicTransducer net(t);
+    hfst::implementations::HfstIterableTransducer net(t);
 
     HfstTransducer * retval = new HfstTransducer(net, type);
 
@@ -5156,7 +5156,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
       throw ImplementationTypeNotAvailableException("HfstTransducer::convert", __FILE__, __LINE__, type);
     }
 
-    hfst::implementations::HfstBasicTransducer * internal=NULL;
+    hfst::implementations::HfstIterableTransducer * internal=NULL;
     switch (this->type)
       {
 #if HAVE_FOMA
@@ -5306,7 +5306,7 @@ void HfstTransducer::write_in_att_format_number
   if (this->type == XFSM_TYPE)
     HFST_THROW(FunctionNotImplementedException);
 #endif
-  hfst::implementations::HfstBasicTransducer net(*this);
+  hfst::implementations::HfstIterableTransducer net(*this);
   net.write_in_att_format_number(ofile, print_weights);
 }
 
@@ -5317,7 +5317,7 @@ void HfstTransducer::write_in_att_format
   if (this->type == XFSM_TYPE)
     HFST_THROW(FunctionNotImplementedException);
 #endif
-  hfst::implementations::HfstBasicTransducer net(*this);
+  hfst::implementations::HfstIterableTransducer net(*this);
   net.write_in_att_format(buffer, print_weights);
 }
 
@@ -5330,7 +5330,7 @@ void HfstTransducer::write_in_att_format
     HFST_THROW(FunctionNotImplementedException);
 #endif
     // Implemented only for internal transducer format.
-    hfst::implementations::HfstBasicTransducer net(*this);
+    hfst::implementations::HfstIterableTransducer net(*this);
     net.write_in_att_format(ofile, print_weights);
 }
 
@@ -5364,7 +5364,7 @@ void HfstTransducer::write_in_prolog_format(FILE * file, const std::string & nam
   /* For big transducers, converting from xfsm is slow. */
   if (type == XFSM_TYPE)
     HFST_THROW(FunctionNotImplementedException);
-  HfstBasicTransducer fsm(*this);
+  HfstIterableTransducer fsm(*this);
   fsm.write_in_prolog_format(file, name, write_weights);
 }
 
@@ -5397,10 +5397,10 @@ HfstTransducer::HfstTransducer(FILE * ifile,
     HfstTokenizer::check_utf8_correctness(epsilon_symbol);
 
     // Implemented only for internal transducer format.
-    hfst::implementations::HfstBasicTransducer net =
+    hfst::implementations::HfstIterableTransducer net =
       /*hfst::implementations::HfstTransitionGraph<hfst::implementations::
         HfstTropicalTransducerTransitionData>::*/
-      HfstBasicTransducer::read_in_att_format(ifile, std::string(epsilon_symbol), linecount);
+      HfstIterableTransducer::read_in_att_format(ifile, std::string(epsilon_symbol), linecount);
 
     // Conversion is done here.
     switch (type)
@@ -5473,10 +5473,10 @@ HfstTransducer::HfstTransducer(FILE * ifile,
     HfstTokenizer::check_utf8_correctness(epsilon_symbol);
 
     // Implemented only for internal transducer format.
-    hfst::implementations::HfstBasicTransducer net =
+    hfst::implementations::HfstIterableTransducer net =
       /*hfst::implementations::HfstTransitionGraph<hfst::implementations::
         HfstTropicalTransducerTransitionData>::*/
-      HfstBasicTransducer::read_in_att_format(ifile, std::string(epsilon_symbol), linecount);
+      HfstIterableTransducer::read_in_att_format(ifile, std::string(epsilon_symbol), linecount);
 
     // Conversion is done here.
     switch (type)
@@ -5563,10 +5563,10 @@ HfstTransducer &HfstTransducer::read_in_att_format
     HfstTokenizer::check_utf8_correctness(epsilon_symbol);
 
     unsigned int foo = 0;
-    hfst::implementations::HfstBasicTransducer net =
+    hfst::implementations::HfstIterableTransducer net =
       /*hfst::implementations::HfstTransitionGraph<hfst::implementations::
         HfstTropicalTransducerTransitionData>*/
-      HfstBasicTransducer::read_in_att_format(ifile, std::string(epsilon_symbol), foo);
+      HfstIterableTransducer::read_in_att_format(ifile, std::string(epsilon_symbol), foo);
     HfstTransducer *retval = new HfstTransducer(net,type);
     (void)foo;
     return *retval;
@@ -5584,11 +5584,11 @@ HfstTransducer &HfstTransducer::read_in_att_format
 HfstTransducer HfstTransducer::universal_pair( ImplementationType type )
 {
         using namespace implementations;
-        HfstBasicTransducer bt;
-        bt.add_transition(0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
-        bt.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
-        bt.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "@_EPSILON_SYMBOL_@", 0) );
-        bt.add_transition(0, HfstBasicTransition(1, "@_EPSILON_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
+        HfstIterableTransducer bt;
+        bt.add_transition(0, HfstTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+        bt.add_transition(0, HfstTransition(1, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
+        bt.add_transition(0, HfstTransition(1, "@_UNKNOWN_SYMBOL_@", "@_EPSILON_SYMBOL_@", 0) );
+        bt.add_transition(0, HfstTransition(1, "@_EPSILON_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
         bt.set_final_weight(1, 0);
 
         HfstTransducer Retval(bt, type);
@@ -5599,8 +5599,8 @@ HfstTransducer HfstTransducer::universal_pair( ImplementationType type )
 HfstTransducer HfstTransducer::identity_pair( ImplementationType type )
 {
         using namespace implementations;
-        HfstBasicTransducer bt;
-        bt.add_transition(0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+        HfstIterableTransducer bt;
+        bt.add_transition(0, HfstTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
         bt.set_final_weight(1, 0);
 
         HfstTransducer Retval(bt, type);
@@ -5743,7 +5743,7 @@ HfstTokenizer HfstTransducer::create_tokenizer()
     }
     else
     {
-        hfst::implementations::HfstBasicTransducer t(*this);
+        hfst::implementations::HfstIterableTransducer t(*this);
         t.prune_alphabet();
         StringSet alpha = t.get_alphabet();
         for (StringSet::iterator it = alpha.begin();
@@ -5834,7 +5834,7 @@ std::ostream & operator<<
     HFST_THROW(FunctionNotImplementedException);
 #endif
     // Implemented only for internal transducer format.
-    hfst::implementations::HfstBasicTransducer net(t);
+    hfst::implementations::HfstIterableTransducer net(t);
     bool write_weights;
     if (t.type == SFST_TYPE || t.type == FOMA_TYPE)
     write_weights=false;
@@ -5979,7 +5979,7 @@ void priority_union_test ( ImplementationType type )
     assert ( testTr1.priority_union( t2 ).compare( result1a ) );
 
 
-    HfstBasicTransducer                btEmpty,
+    HfstIterableTransducer                btEmpty,
                                                     btEmptyString,
                                                     epsilon,
                                                     bt1,
@@ -6001,131 +6001,131 @@ void priority_union_test ( ImplementationType type )
     btEmptyString.set_final_weight(0, 3);
 
     // First test transducer
-    bt1.add_transition(0, HfstBasicTransition(1, "a", "a", 1) );
-    bt1.add_transition(0, HfstBasicTransition(1, "b", "b", 2) );
-    bt1.add_transition(1, HfstBasicTransition(2, "@_EPSILON_SYMBOL_@", "1", 3) );
+    bt1.add_transition(0, HfstTransition(1, "a", "a", 1) );
+    bt1.add_transition(0, HfstTransition(1, "b", "b", 2) );
+    bt1.add_transition(1, HfstTransition(2, "@_EPSILON_SYMBOL_@", "1", 3) );
     bt1.set_final_weight(2, 5);
 
     // Second test transducer
-    bt2.add_transition(0, HfstBasicTransition(1, "c", "C", 10) );
-    bt2.add_transition(0, HfstBasicTransition(1, "b", "B", 20) );
-    bt2.add_transition(1, HfstBasicTransition(2, "@_EPSILON_SYMBOL_@", "1", 30) );
+    bt2.add_transition(0, HfstTransition(1, "c", "C", 10) );
+    bt2.add_transition(0, HfstTransition(1, "b", "B", 20) );
+    bt2.add_transition(1, HfstTransition(2, "@_EPSILON_SYMBOL_@", "1", 30) );
     bt2.set_final_weight(2, 50);
 
     // Second test transducer without priority string
-    bt2withoutPriority.add_transition(0, HfstBasicTransition(1, "c", "C", 10) );
-    bt2withoutPriority.add_transition(1, HfstBasicTransition(2, "@_EPSILON_SYMBOL_@", "1", 30) );
+    bt2withoutPriority.add_transition(0, HfstTransition(1, "c", "C", 10) );
+    bt2withoutPriority.add_transition(1, HfstTransition(2, "@_EPSILON_SYMBOL_@", "1", 30) );
     bt2withoutPriority.set_final_weight(2, 50);
 
     // Third test transducer
-    bt3.add_transition(0, HfstBasicTransition(1, "a", "b", 55) );
-    bt3.add_transition(0, HfstBasicTransition(1, "b", "b", 65) );
+    bt3.add_transition(0, HfstTransition(1, "a", "b", 55) );
+    bt3.add_transition(0, HfstTransition(1, "b", "b", 65) );
     bt3.set_final_weight(1, 75);
 
     // Identity to Identity
-    btIdentity.add_transition(0, HfstBasicTransition(0, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 100) );
+    btIdentity.add_transition(0, HfstTransition(0, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 100) );
     btIdentity.set_final_weight(0, 100);
 
     // Unknown to unknown
-    btUnknown.add_transition(0, HfstBasicTransition(0, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 200) );
+    btUnknown.add_transition(0, HfstTransition(0, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 200) );
     btUnknown.set_final_weight(0, 200);
 
     // Epsilon
-    btEpsilon.add_transition(0, HfstBasicTransition(0, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@", 300) );
+    btEpsilon.add_transition(0, HfstTransition(0, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@", 300) );
     btEpsilon.set_final_weight(0, 300);
 
     // Result 1 ... tr1 .P. emptyString
     //                        ...        emptyString .p. tr1
-    btResult1.add_transition(0, HfstBasicTransition(1, "a", "a", 1) );
-    btResult1.add_transition(0, HfstBasicTransition(1, "b", "b", 2) );
-    btResult1.add_transition(1, HfstBasicTransition(2, "@_EPSILON_SYMBOL_@", "1", 3) );
+    btResult1.add_transition(0, HfstTransition(1, "a", "a", 1) );
+    btResult1.add_transition(0, HfstTransition(1, "b", "b", 2) );
+    btResult1.add_transition(1, HfstTransition(2, "@_EPSILON_SYMBOL_@", "1", 3) );
     btResult1.set_final_weight(2, 5);
     btResult1.set_final_weight(0, 3);
 
     // Result 2 ... tr1 .P. tr2
-      btResult2.add_transition(0, HfstBasicTransition(1, "c", "C", 10) );
-    btResult2.add_transition(0, HfstBasicTransition(1, "b", "b", 20) );
-    btResult2.add_transition(0, HfstBasicTransition(2, "a", "a", 1) );
-    btResult2.add_transition(1, HfstBasicTransition(3, "@_EPSILON_SYMBOL_@", "1", 30) );
-    btResult2.add_transition(2, HfstBasicTransition(4, "@_EPSILON_SYMBOL_@", "1", 3) );
+      btResult2.add_transition(0, HfstTransition(1, "c", "C", 10) );
+    btResult2.add_transition(0, HfstTransition(1, "b", "b", 20) );
+    btResult2.add_transition(0, HfstTransition(2, "a", "a", 1) );
+    btResult2.add_transition(1, HfstTransition(3, "@_EPSILON_SYMBOL_@", "1", 30) );
+    btResult2.add_transition(2, HfstTransition(4, "@_EPSILON_SYMBOL_@", "1", 3) );
     btResult2.set_final_weight(3, 50);
     btResult2.set_final_weight(4, 5);
 
     // Result 3 ... tr1 .P. tr2 without priority
-    btResult3.add_transition(0, HfstBasicTransition(1, "c", "C", 10) );
-    btResult3.add_transition(0, HfstBasicTransition(2, "b", "b", 2) );
-    btResult3.add_transition(0, HfstBasicTransition(2, "a", "a", 1) );
-    btResult3.add_transition(1, HfstBasicTransition(3, "@_EPSILON_SYMBOL_@", "1", 30) );
-    btResult3.add_transition(2, HfstBasicTransition(4, "@_EPSILON_SYMBOL_@", "1", 3) );
+    btResult3.add_transition(0, HfstTransition(1, "c", "C", 10) );
+    btResult3.add_transition(0, HfstTransition(2, "b", "b", 2) );
+    btResult3.add_transition(0, HfstTransition(2, "a", "a", 1) );
+    btResult3.add_transition(1, HfstTransition(3, "@_EPSILON_SYMBOL_@", "1", 30) );
+    btResult3.add_transition(2, HfstTransition(4, "@_EPSILON_SYMBOL_@", "1", 3) );
     btResult3.set_final_weight(3, 50);
     btResult3.set_final_weight(4, 5);
 
     // Result 4 ... tr1 .P. trIdentity
-    btResult4.add_transition(0, HfstBasicTransition(0, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 100) );
-    btResult4.add_transition(0, HfstBasicTransition(0, "b", "b", 100) );
-    btResult4.add_transition(0, HfstBasicTransition(0, "a", "a", 100) );
-    btResult4.add_transition(0, HfstBasicTransition(0, "1", "1", 100) );
+    btResult4.add_transition(0, HfstTransition(0, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 100) );
+    btResult4.add_transition(0, HfstTransition(0, "b", "b", 100) );
+    btResult4.add_transition(0, HfstTransition(0, "a", "a", 100) );
+    btResult4.add_transition(0, HfstTransition(0, "1", "1", 100) );
     btResult4.set_final_weight(0, 100);
 
     // Result 5 ... trIdentity .P. tr3
-    btResult5.add_transition(0, HfstBasicTransition(1, "a", "b", 130) );
-    btResult5.add_transition(0, HfstBasicTransition(2, "b", "b", 140) );
-    btResult5.add_transition(0, HfstBasicTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 200) );
-    btResult5.add_transition(0, HfstBasicTransition(4, "a", "a", 300) );
-    btResult5.add_transition(2, HfstBasicTransition(3, "b", "b", 160) );
-    btResult5.add_transition(2, HfstBasicTransition(3, "a", "a", 160) );
-    btResult5.add_transition(2, HfstBasicTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 160) );
-    btResult5.add_transition(3, HfstBasicTransition(3, "b", "b", 100) );
-    btResult5.add_transition(3, HfstBasicTransition(3, "a", "a", 100) );
-    btResult5.add_transition(3, HfstBasicTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 100) );
-    btResult5.add_transition(4, HfstBasicTransition(3, "b", "b", 0) );
-    btResult5.add_transition(4, HfstBasicTransition(3, "a", "a", 0) );
-    btResult5.add_transition(4, HfstBasicTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+    btResult5.add_transition(0, HfstTransition(1, "a", "b", 130) );
+    btResult5.add_transition(0, HfstTransition(2, "b", "b", 140) );
+    btResult5.add_transition(0, HfstTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 200) );
+    btResult5.add_transition(0, HfstTransition(4, "a", "a", 300) );
+    btResult5.add_transition(2, HfstTransition(3, "b", "b", 160) );
+    btResult5.add_transition(2, HfstTransition(3, "a", "a", 160) );
+    btResult5.add_transition(2, HfstTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 160) );
+    btResult5.add_transition(3, HfstTransition(3, "b", "b", 100) );
+    btResult5.add_transition(3, HfstTransition(3, "a", "a", 100) );
+    btResult5.add_transition(3, HfstTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 100) );
+    btResult5.add_transition(4, HfstTransition(3, "b", "b", 0) );
+    btResult5.add_transition(4, HfstTransition(3, "a", "a", 0) );
+    btResult5.add_transition(4, HfstTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
     btResult5.set_final_weight(0, 100);
     btResult5.set_final_weight(1, 0);
     btResult5.set_final_weight(2, 0);
     btResult5.set_final_weight(3, 0);
 
     // Result 6 ... tr3 .P. trUnknown
-    btResult6.add_transition(0, HfstBasicTransition(0, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 200) );
-    btResult6.add_transition(0, HfstBasicTransition(0, "@_UNKNOWN_SYMBOL_@", "b", 200) );
-    btResult6.add_transition(0, HfstBasicTransition(0, "b", "@_UNKNOWN_SYMBOL_@", 200) );
-    btResult6.add_transition(0, HfstBasicTransition(0, "b", "a", 200) );
-    btResult6.add_transition(0, HfstBasicTransition(0, "@_UNKNOWN_SYMBOL_@", "a", 200) );
-    btResult6.add_transition(0, HfstBasicTransition(0, "a", "@_UNKNOWN_SYMBOL_@", 200) );
-    btResult6.add_transition(0, HfstBasicTransition(0, "a", "b", 200) );
+    btResult6.add_transition(0, HfstTransition(0, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 200) );
+    btResult6.add_transition(0, HfstTransition(0, "@_UNKNOWN_SYMBOL_@", "b", 200) );
+    btResult6.add_transition(0, HfstTransition(0, "b", "@_UNKNOWN_SYMBOL_@", 200) );
+    btResult6.add_transition(0, HfstTransition(0, "b", "a", 200) );
+    btResult6.add_transition(0, HfstTransition(0, "@_UNKNOWN_SYMBOL_@", "a", 200) );
+    btResult6.add_transition(0, HfstTransition(0, "a", "@_UNKNOWN_SYMBOL_@", 200) );
+    btResult6.add_transition(0, HfstTransition(0, "a", "b", 200) );
     btResult6.set_final_weight(0, 200);
 
     // Result 7 ... trUnknown .P. tr3
-    btResult7.add_transition(0, HfstBasicTransition(1, "a", "b", 130) );
-    btResult7.add_transition(0, HfstBasicTransition(2, "b", "b", 140) );
-    btResult7.add_transition(0, HfstBasicTransition(3, "b", "a", 600) );
-    btResult7.add_transition(0, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 400) );
-    btResult7.add_transition(0, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 400) );
-    btResult7.add_transition(0, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 400) );
-    btResult7.add_transition(0, HfstBasicTransition(3, "b", "@_UNKNOWN_SYMBOL_@", 600) );
-    btResult7.add_transition(0, HfstBasicTransition(3, "a", "@_UNKNOWN_SYMBOL_@", 600) );
-    btResult7.add_transition(1, HfstBasicTransition(4, "a", "b", 470) );
-    btResult7.add_transition(1, HfstBasicTransition(4, "b", "a", 470) );
-    btResult7.add_transition(1, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 470) );
-    btResult7.add_transition(1, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 470) );
-    btResult7.add_transition(1, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 470) );
-    btResult7.add_transition(1, HfstBasicTransition(4, "b", "@_UNKNOWN_SYMBOL_@", 470) );
-    btResult7.add_transition(1, HfstBasicTransition(4, "a", "@_UNKNOWN_SYMBOL_@", 470) );
-    btResult7.add_transition(3, HfstBasicTransition(4, "a", "b", 0) );
-    btResult7.add_transition(3, HfstBasicTransition(4, "b", "a", 0) );
-    btResult7.add_transition(3, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 0) );
-    btResult7.add_transition(3, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 0) );
-    btResult7.add_transition(3, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
-    btResult7.add_transition(3, HfstBasicTransition(4, "b", "@_UNKNOWN_SYMBOL_@", 0) );
-    btResult7.add_transition(3, HfstBasicTransition(4, "a", "@_UNKNOWN_SYMBOL_@", 0) );
-    btResult7.add_transition(4, HfstBasicTransition(4, "a", "b", 200) );
-    btResult7.add_transition(4, HfstBasicTransition(4, "b", "a", 200) );
-    btResult7.add_transition(4, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 200) );
-    btResult7.add_transition(4, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 200) );
-    btResult7.add_transition(4, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 200) );
-    btResult7.add_transition(4, HfstBasicTransition(4, "b", "@_UNKNOWN_SYMBOL_@", 200) );
-    btResult7.add_transition(4, HfstBasicTransition(4, "a", "@_UNKNOWN_SYMBOL_@", 200) );
+    btResult7.add_transition(0, HfstTransition(1, "a", "b", 130) );
+    btResult7.add_transition(0, HfstTransition(2, "b", "b", 140) );
+    btResult7.add_transition(0, HfstTransition(3, "b", "a", 600) );
+    btResult7.add_transition(0, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 400) );
+    btResult7.add_transition(0, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 400) );
+    btResult7.add_transition(0, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 400) );
+    btResult7.add_transition(0, HfstTransition(3, "b", "@_UNKNOWN_SYMBOL_@", 600) );
+    btResult7.add_transition(0, HfstTransition(3, "a", "@_UNKNOWN_SYMBOL_@", 600) );
+    btResult7.add_transition(1, HfstTransition(4, "a", "b", 470) );
+    btResult7.add_transition(1, HfstTransition(4, "b", "a", 470) );
+    btResult7.add_transition(1, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 470) );
+    btResult7.add_transition(1, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 470) );
+    btResult7.add_transition(1, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 470) );
+    btResult7.add_transition(1, HfstTransition(4, "b", "@_UNKNOWN_SYMBOL_@", 470) );
+    btResult7.add_transition(1, HfstTransition(4, "a", "@_UNKNOWN_SYMBOL_@", 470) );
+    btResult7.add_transition(3, HfstTransition(4, "a", "b", 0) );
+    btResult7.add_transition(3, HfstTransition(4, "b", "a", 0) );
+    btResult7.add_transition(3, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 0) );
+    btResult7.add_transition(3, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 0) );
+    btResult7.add_transition(3, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
+    btResult7.add_transition(3, HfstTransition(4, "b", "@_UNKNOWN_SYMBOL_@", 0) );
+    btResult7.add_transition(3, HfstTransition(4, "a", "@_UNKNOWN_SYMBOL_@", 0) );
+    btResult7.add_transition(4, HfstTransition(4, "a", "b", 200) );
+    btResult7.add_transition(4, HfstTransition(4, "b", "a", 200) );
+    btResult7.add_transition(4, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 200) );
+    btResult7.add_transition(4, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 200) );
+    btResult7.add_transition(4, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 200) );
+    btResult7.add_transition(4, HfstTransition(4, "b", "@_UNKNOWN_SYMBOL_@", 200) );
+    btResult7.add_transition(4, HfstTransition(4, "a", "@_UNKNOWN_SYMBOL_@", 200) );
     btResult7.set_final_weight(0, 200);
     btResult7.set_final_weight(1, 0);
     btResult7.set_final_weight(2, 0);
@@ -6205,7 +6205,7 @@ void priority_union_test ( ImplementationType type )
 // Universal pair test function
 void universal_pair_test ( ImplementationType type )
 {
-    HfstBasicTransducer     bt,
+    HfstIterableTransducer     bt,
                             bt2,
                             bt3,
                             btResult1,
@@ -6215,37 +6215,37 @@ void universal_pair_test ( ImplementationType type )
                             btEmpty;
 
     // Test transducer a:a
-    bt.add_transition(0, HfstBasicTransition(1, "a", "a", 0) );
+    bt.add_transition(0, HfstTransition(1, "a", "a", 0) );
     bt.set_final_weight(1, 0);
     // Test transducer b:b
-    bt2.add_transition(0, HfstBasicTransition(1, "a", "b", 0) );
+    bt2.add_transition(0, HfstTransition(1, "a", "b", 0) );
     bt2.set_final_weight(1, 0);
     // Test transducer aa:bb
-    bt3.add_transition(0, HfstBasicTransition(1, "a", "b", 0) );
-    bt3.add_transition(1, HfstBasicTransition(2, "a", "b", 0) );
+    bt3.add_transition(0, HfstTransition(1, "a", "b", 0) );
+    bt3.add_transition(1, HfstTransition(2, "a", "b", 0) );
     bt3.set_final_weight(2, 0);
 
     // Result 1 ( a:a .o. universal pair )
-    btResult1.add_transition(0, HfstBasicTransition(1, "a", "a", 0) );
-    btResult1.add_transition(0, HfstBasicTransition(1, "a", "@_UNKNOWN_SYMBOL_@", 0) );
-    btResult1.add_transition(0, HfstBasicTransition(1, "a", "@_EPSILON_SYMBOL_@",  0) );
+    btResult1.add_transition(0, HfstTransition(1, "a", "a", 0) );
+    btResult1.add_transition(0, HfstTransition(1, "a", "@_UNKNOWN_SYMBOL_@", 0) );
+    btResult1.add_transition(0, HfstTransition(1, "a", "@_EPSILON_SYMBOL_@",  0) );
     btResult1.set_final_weight(1, 0);
     // Result 2 ( universal pair .o. a:a )
-    btResult2.add_transition(0, HfstBasicTransition(1, "a", "a", 0) );
-    btResult2.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "a", 0) );
-    btResult2.add_transition(0, HfstBasicTransition(1, "@_EPSILON_SYMBOL_@", "a", 0) );
+    btResult2.add_transition(0, HfstTransition(1, "a", "a", 0) );
+    btResult2.add_transition(0, HfstTransition(1, "@_UNKNOWN_SYMBOL_@", "a", 0) );
+    btResult2.add_transition(0, HfstTransition(1, "@_EPSILON_SYMBOL_@", "a", 0) );
     btResult2.set_final_weight(1, 0);
     // Result 3 ( a:b .o. universal pair )
-    btResult3.add_transition(0, HfstBasicTransition(1, "a", "b", 0) );
-    btResult3.add_transition(0, HfstBasicTransition(1, "a", "a", 0) );
-    btResult3.add_transition(0, HfstBasicTransition(1, "a", "@_UNKNOWN_SYMBOL_@", 0) );
-    btResult3.add_transition(0, HfstBasicTransition(1, "a", "@_EPSILON_SYMBOL_@", 0) );
+    btResult3.add_transition(0, HfstTransition(1, "a", "b", 0) );
+    btResult3.add_transition(0, HfstTransition(1, "a", "a", 0) );
+    btResult3.add_transition(0, HfstTransition(1, "a", "@_UNKNOWN_SYMBOL_@", 0) );
+    btResult3.add_transition(0, HfstTransition(1, "a", "@_EPSILON_SYMBOL_@", 0) );
     btResult3.set_final_weight(1, 0);
     // Result 4 ( universal pair .o. a:b )
-    btResult4.add_transition(0, HfstBasicTransition(1, "a", "b", 0) );
-    btResult4.add_transition(0, HfstBasicTransition(1, "b", "b", 0) );
-    btResult4.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "b", 0) );
-    btResult4.add_transition(0, HfstBasicTransition(1, "@_EPSILON_SYMBOL_@", "b", 0) );
+    btResult4.add_transition(0, HfstTransition(1, "a", "b", 0) );
+    btResult4.add_transition(0, HfstTransition(1, "b", "b", 0) );
+    btResult4.add_transition(0, HfstTransition(1, "@_UNKNOWN_SYMBOL_@", "b", 0) );
+    btResult4.add_transition(0, HfstTransition(1, "@_EPSILON_SYMBOL_@", "b", 0) );
     btResult4.set_final_weight(1, 0);
 
     HfstTransducer tr1(bt, type);

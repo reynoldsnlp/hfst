@@ -897,7 +897,7 @@ xfst_label_to_transducer(const char* input, const char* output)
     alphabet.insert(StringPair("@_IDENTITY_SYMBOL_@","@_IDENTITY_SYMBOL_@"));
 
     // and identity pairs of symbols that occur in t
-    HfstBasicTransducer basic(*t);
+    HfstIterableTransducer basic(*t);
     StringPairSet symbol_pairs = basic.get_transition_pairs();
     for (StringPairSet::const_iterator it = symbol_pairs.begin();
          it != symbol_pairs.end(); it++)
@@ -1146,7 +1146,7 @@ void check_multichar_symbol(const char * symbol)
 
 bool has_non_identity_pairs(const HfstTransducer * t)
 {
-  hfst::implementations::HfstBasicTransducer basic(*t);
+  hfst::implementations::HfstIterableTransducer basic(*t);
   StringPairSet sps = basic.get_transition_pairs();
   for (StringPairSet::const_iterator it = sps.begin(); it != sps.end(); it++)
     {

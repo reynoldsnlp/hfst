@@ -37,10 +37,10 @@
 using hfst::HfstTransducer;
 using hfst::ImplementationType;
 using hfst::implementations::HfstState;
-using hfst::implementations::HfstBasicTransducer;
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstIterableTransducer;
+using hfst::implementations::HfstTransition;
 using hfst::implementations::HfstState;
-typedef std::set<HfstBasicTransition> HfstBasicTransitionSet;
+typedef std::set<HfstTransition> HfstTransitionSet;
 typedef std::pair<HfstState,HfstState> StatePair;
 
 class EmptySymbolPairSet
@@ -128,7 +128,7 @@ class OtherSymbolTransducer
   void check_pair(const std::string &input_symbol,
           const std::string &output_symbol);
   void add_diamond_transition(void);
-  static bool empty(const HfstBasicTransducer &fsm);
+  static bool empty(const HfstIterableTransducer &fsm);
 
  public:
 
@@ -225,16 +225,16 @@ class OtherSymbolTransducer
 
   //! Add a transition to @a center_t (badly placed...).
   static void add_transition
-    (HfstBasicTransducer &center_t, size_t source_state,size_t target_state,
+    (HfstIterableTransducer &center_t, size_t source_state,size_t target_state,
      const std::string &input, const std::string &output);
 
   //! Return true, iff @a sym exists in the alphabet of @a t.
-  static bool has_symbol(const HfstBasicTransducer &t,const std::string &sym);
+  static bool has_symbol(const HfstIterableTransducer &t,const std::string &sym);
 
   OtherSymbolTransducer &harmonize_diacritics(OtherSymbolTransducer &t);
     
   //! @brief Set the state @a state final.
-  static void set_final(HfstBasicTransducer &center_t,size_t state);
+  static void set_final(HfstIterableTransducer &center_t,size_t state);
 
   //! @brief Return true, iff the intersection of @a this and @a another is
   //! empty. If it is non-empty, store the first common string found in v.

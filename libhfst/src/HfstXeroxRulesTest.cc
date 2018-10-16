@@ -1231,16 +1231,16 @@ void test1b( ImplementationType type )
 //    HfstTransducer result1("aaana", TOK, type);
 
 
-    HfstBasicTransducer bt;
-    bt.add_transition(0, HfstBasicTransition(1, "a", "a", 0) );
-    bt.add_transition(0, HfstBasicTransition(1, "a", "x", 0) );
-    bt.add_transition(1, HfstBasicTransition(2, "a", "a", 0) );
-    bt.add_transition(1, HfstBasicTransition(2, "a", "x", 0) );
-    bt.add_transition(2, HfstBasicTransition(3, "a", "a", 0) );
-    bt.add_transition(2, HfstBasicTransition(3, "a", "x", 0) );
-    bt.add_transition(3, HfstBasicTransition(4, "n", "n", 0) );
-    bt.add_transition(4, HfstBasicTransition(5, "a", "a", 0) );
-    bt.add_transition(4, HfstBasicTransition(5, "a", "x", 0) );
+    HfstIterableTransducer bt;
+    bt.add_transition(0, HfstTransition(1, "a", "a", 0) );
+    bt.add_transition(0, HfstTransition(1, "a", "x", 0) );
+    bt.add_transition(1, HfstTransition(2, "a", "a", 0) );
+    bt.add_transition(1, HfstTransition(2, "a", "x", 0) );
+    bt.add_transition(2, HfstTransition(3, "a", "a", 0) );
+    bt.add_transition(2, HfstTransition(3, "a", "x", 0) );
+    bt.add_transition(3, HfstTransition(4, "n", "n", 0) );
+    bt.add_transition(4, HfstTransition(5, "a", "a", 0) );
+    bt.add_transition(4, HfstTransition(5, "a", "x", 0) );
     bt.set_final_weight(5, 0);
 
     HfstTransducer result1(bt, type);
@@ -3171,10 +3171,10 @@ void test7h( ImplementationType type )
      *
      */
 
-    HfstBasicTransducer bt;
-    bt.add_transition(0, HfstBasicTransition(1, "@_EPSILON_SYMBOL_@", "a", 0) );
-    bt.add_transition(1, HfstBasicTransition(0, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
-    bt.add_transition(1, HfstBasicTransition(0, "a", "a", 0) );
+    HfstIterableTransducer bt;
+    bt.add_transition(0, HfstTransition(1, "@_EPSILON_SYMBOL_@", "a", 0) );
+    bt.add_transition(1, HfstTransition(0, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+    bt.add_transition(1, HfstTransition(0, "a", "a", 0) );
     bt.set_final_weight(1, 0);
 
     HfstTransducer result1(bt, type);

@@ -9,7 +9,7 @@
 
 #include "HarmonizeUnknownAndIdentitySymbols.h"
 #include "HfstTransducer.h"
-#include "implementations/HfstBasicTransducer.h"
+#include "implementations/HfstIterableTransducer.h"
 #include "HfstFlagDiacritics.h"
 #include "implementations/optimized-lookup/pmatch.h"
 
@@ -55,7 +55,7 @@ static StringSet remove_flags(const StringSet & alpha)
 }
 
 HarmonizeUnknownAndIdentitySymbols::HarmonizeUnknownAndIdentitySymbols
-(HfstBasicTransducer &t1,HfstBasicTransducer &t2) :
+(HfstIterableTransducer &t1,HfstIterableTransducer &t2) :
   t1(t1),
   t2(t2)
 {
@@ -156,11 +156,11 @@ HarmonizeUnknownAndIdentitySymbols::HarmonizeUnknownAndIdentitySymbols
 }
 
 void HarmonizeUnknownAndIdentitySymbols::populate_symbol_set
-(const HfstBasicTransducer &t,StringSet &s)
+(const HfstIterableTransducer &t,StringSet &s)
 {
-  for (HfstBasicTransducer::const_iterator it = t.begin(); it != t.end(); ++it)
+  for (HfstIterableTransducer::const_iterator it = t.begin(); it != t.end(); ++it)
     {
-      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
+      for (hfst::implementations::HfstTransitions::const_iterator jt =
          it->begin();
        jt != it->end();
        ++jt)
@@ -177,7 +177,7 @@ void HarmonizeUnknownAndIdentitySymbols::populate_symbol_set
 }
 
 void HarmonizeUnknownAndIdentitySymbols::add_symbols_to_alphabet
-(HfstBasicTransducer &t, const StringSet &s)
+(HfstIterableTransducer &t, const StringSet &s)
 {
   for (StringSet::const_iterator it = s.begin(); it != s.end(); it++)
     {
@@ -187,17 +187,17 @@ void HarmonizeUnknownAndIdentitySymbols::add_symbols_to_alphabet
 
 // --- documentation would make this function easier to follow
 void HarmonizeUnknownAndIdentitySymbols::harmonize_identity_symbols
-(HfstBasicTransducer &t,const StringSet &missing_symbols)
+(HfstIterableTransducer &t,const StringSet &missing_symbols)
 {
   if (missing_symbols.empty())
     { return; }
 
-  for (HfstBasicTransducer::iterator it = t.begin(); it != t.end(); ++it)
+  for (HfstIterableTransducer::iterator it = t.begin(); it != t.end(); ++it)
     {
 
-      hfst::implementations::HfstBasicTransitions added_transitions;
+      hfst::implementations::HfstTransitions added_transitions;
 
-      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
+      for (hfst::implementations::HfstTransitions::const_iterator jt =
          it->begin();
        jt != it->end();
        ++jt)
@@ -211,7 +211,7 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_identity_symbols
            kt != missing_symbols.end();
            ++kt)
         { added_transitions.push_back
-            (HfstBasicTransition(jt->get_target_state(),
+            (HfstTransition(jt->get_target_state(),
                      *kt,*kt,
                      jt->get_weight())); }
         }
@@ -223,16 +223,16 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_identity_symbols
 
 // --- documentation would make this function easier to follow
 void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
-(HfstBasicTransducer &t,const StringSet &missing_symbols)
+(HfstIterableTransducer &t,const StringSet &missing_symbols)
 {
   if (missing_symbols.empty())
     { return; }
 
-  for (HfstBasicTransducer::iterator it = t.begin(); it != t.end(); ++it)
+  for (HfstIterableTransducer::iterator it = t.begin(); it != t.end(); ++it)
     {
-      hfst::implementations::HfstBasicTransitions added_transitions;
+      hfst::implementations::HfstTransitions added_transitions;
 
-      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
+      for (hfst::implementations::HfstTransitions::const_iterator jt =
          it->begin();
        jt != it->end();
        ++jt)
@@ -248,7 +248,7 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
            ++kt)
         {
           added_transitions.push_back
-            (HfstBasicTransition(jt->get_target_state(),
+            (HfstTransition(jt->get_target_state(),
                      *kt,jt->get_output_symbol(),
                      jt->get_weight()));
         }
@@ -263,7 +263,7 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
            kt != missing_symbols.end();
            ++kt)
         { added_transitions.push_back
-            (HfstBasicTransition(jt->get_target_state(),
+            (HfstTransition(jt->get_target_state(),
                      jt->get_input_symbol(),*kt,
                      jt->get_weight())); }
 
@@ -283,7 +283,7 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
             { continue; }
 
               added_transitions.push_back
-            (HfstBasicTransition(jt->get_target_state(),
+            (HfstTransition(jt->get_target_state(),
                          *lt,*kt,
                          jt->get_weight()));
             }
@@ -314,7 +314,7 @@ void debug_harmonize_print(const std::string &s)
 using hfst::HfstInputStream;
 using hfst::HfstTransducer;
 using hfst::HfstOutputStream;
-using hfst::HfstBasicTransducer;
+using hfst::HfstIterableTransducer;
 
 int main(int argc, char * argv[])
 {
@@ -329,13 +329,13 @@ int main(int argc, char * argv[])
   HfstTransducer t1(in);
 
   std::cerr << "Converting first transducer to basic transducer" << std::endl;
-  HfstBasicTransducer b1(t1);
+  HfstIterableTransducer b1(t1);
 
   std::cerr << "Reading second transducer" << std::endl;
   HfstTransducer t2(in);
 
   std::cerr << "Converting second transducer to basic transducer" << std::endl;
-  HfstBasicTransducer b2(t2);
+  HfstIterableTransducer b2(t2);
   
   std::cerr << "Harmonizing" << std::endl;
   hfst::HarmonizeUnknownAndIdentitySymbols(b1,b2);

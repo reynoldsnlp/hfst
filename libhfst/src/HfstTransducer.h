@@ -70,7 +70,7 @@
 namespace hfst
 {
   namespace implementations {
-    class HfstBasicTransducer;
+    class HfstIterableTransducer;
   }
   class SfstCompiler;
   class HfstTransducer;
@@ -207,7 +207,7 @@ namespace hfst
 
     With HfstTransducer constructors it is possible to create empty,
     epsilon, one-transition and single-path transducers.
-    Transducers can also be created from scratch with HfstBasicTransducer
+    Transducers can also be created from scratch with HfstIterableTransducer
     and converted to an HfstTransducer.
     More complex transducers can be combined from simple ones with various
     functions.
@@ -225,23 +225,23 @@ An example:
   // In the xerox formalism used here, "?" means the unknown symbol
   // and "?:?" the identity pair
 
-  HfstBasicTransducer tr1;
+  HfstIterableTransducer tr1;
   tr1.add_state(1);
   tr1.set_final_weight(1, 0);
   tr1.add_transition
-    (0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "foo", 0) );
+    (0, HfstTransition(1, "@_UNKNOWN_SYMBOL_@", "foo", 0) );
 
   // tr1 is now [ ?:foo ]
   
-  HfstBasicTransducer tr2;
+  HfstIterableTransducer tr2;
   tr2.add_state(1);
   tr2.add_state(2);
   tr2.set_final_weight(2, 0);
   tr2.add_transition
-    (0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@",
+    (0, HfstTransition(1, "@_IDENTITY_SYMBOL_@",
                     "@_IDENTITY_SYMBOL_@", 0) );
   tr2.add_transition
-    (1, HfstBasicTransition(2, "bar", "bar", 0) );
+    (1, HfstTransition(2, "bar", "bar", 0) );
 
   // tr2 is now [ [ ?:? ] [ bar:bar ] ]
 
@@ -402,13 +402,13 @@ An example:
       (const HfstTransducer &t, ImplementationType type);
 
     /* For internal use:
-       Create an HfstBasicTransducer equivalent to \a t end delete
+       Create an HfstIterableTransducer equivalent to \a t end delete
        the backend implementation of \a t. */
-    implementations::HfstBasicTransducer * convert_to_basic_transducer();
+    implementations::HfstIterableTransducer * convert_to_basic_transducer();
 
     /* For internal use:
-       Create an HfstBasicTransducer equivalent to \a t. */
-    implementations::HfstBasicTransducer * get_basic_transducer() const;
+       Create an HfstIterableTransducer equivalent to \a t. */
+    implementations::HfstIterableTransducer * get_basic_transducer() const;
 
     /* For internal use:
        Create a backend implementation of the same type that this transducer
@@ -416,7 +416,7 @@ An example:
        backend implementation as the value of the implementation of this
        transducer. */
     HfstTransducer &convert_to_hfst_transducer
-      (implementations::HfstBasicTransducer *t);
+      (implementations::HfstIterableTransducer *t);
 
     /* \brief For internal use: Create a transducer of type \a type as
        defined in AT&T format in file named \a filename.
@@ -573,7 +573,7 @@ An example:
     /** \brief Create an HFST transducer equivalent to
         HFST basic transducer \a t. The type of the created transducer
         is defined by \a type.  **/
-    HFSTDLL HfstTransducer(const hfst::implementations::HfstBasicTransducer &t,
+    HFSTDLL HfstTransducer(const hfst::implementations::HfstIterableTransducer &t,
                    ImplementationType type);
 
     /** \brief Create a transducer that recognizes the string pair
@@ -799,7 +799,7 @@ in \a ifile.
         or #HFST_OLW_TYPE transducer cannot be converted to any other type.
 
         @note For conversion between implementations::HfstTransitionGraph and HfstTransducer,
-        see HfstTransducer(const hfst::implementations::HfstBasicTransducer&, ImplementationType) and #hfst::implementations::HfstTransitionGraph::HfstTransitionGraph(const hfst::HfstTransducer&).
+        see HfstTransducer(const hfst::implementations::HfstIterableTransducer&, ImplementationType) and #hfst::implementations::HfstTransitionGraph::HfstTransitionGraph(const hfst::HfstTransducer&).
     */
     HFSTDLL HfstTransducer &convert(ImplementationType type, std::string options="");
 
@@ -1465,7 +1465,7 @@ ccc : ddd
         The weights of the final states in \a tr are copied to the
         epsilon transitions leading to state S.
         
-        Implemented only for implementations::HfstBasicTransducer.
+        Implemented only for implementations::HfstIterableTransducer.
         Conversion is carried out for an HfstTransducer, if this function
         is called.
      */
@@ -1719,7 +1719,7 @@ transducer.transform_weights(&func);
     HFSTDLL friend std::ostream& redirect(std::ostream &out, const HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
-    friend class hfst::implementations::HfstTransitionGraph<class C>;
+    friend class hfst::implementations::HfstIterableTransducer;
     friend class SfstCompiler;
     friend class hfst::implementations::ConversionFunctions;
     friend class HfstGrammar;

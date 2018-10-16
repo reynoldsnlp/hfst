@@ -17,7 +17,7 @@ using std::string;
 #include "HfstInputStream.h"
 #include "implementations/ConvertTransducerFormat.h"
 
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstIterableTransducer;
 using hfst::implementations::ConversionFunctions;
 
 #ifndef MAIN_TEST
@@ -343,7 +343,7 @@ namespace hfst
              "@_IDENTITY_SYMBOL_@". */
           if (not has_hfst_header)
             {
-              HfstBasicTransducer * net =
+              HfstIterableTransducer * net =
                 ConversionFunctions::
                   sfst_to_hfst_basic_transducer
                 (t.implementation.sfst);
@@ -370,7 +370,7 @@ namespace hfst
              "@_UNKNOWN_SYMBOL_@" or "@_IDENTITY_SYMBOL_@". */
           if (! has_hfst_header)
             {
-              HfstBasicTransducer * net =
+              HfstIterableTransducer * net =
                 ConversionFunctions::
                   tropical_ofst_to_hfst_basic_transducer
                 (t.implementation.tropical_ofst, false);
@@ -486,7 +486,7 @@ namespace hfst
              "@_UNKNOWN_SYMBOL_@" or "@_IDENTITY_SYMBOL_@". */
           if (! has_hfst_header)
             {
-              HfstBasicTransducer * net =
+              HfstIterableTransducer * net =
                 ConversionFunctions::
                   log_ofst_to_hfst_basic_transducer
                 (t.implementation.log_ofst, false);

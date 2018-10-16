@@ -1052,7 +1052,7 @@ REGEXP12: LABEL { $$ = $1; }
               YYABORT;
             }
             else {
-              HfstBasicTransducer tmp;
+              HfstIterableTransducer tmp;
               HfstTokenizer tok;
               char line [1000];
 
@@ -1078,7 +1078,7 @@ REGEXP12: LABEL { $$ = $1; }
             }
             else {
               HfstTokenizer tok;
-              HfstBasicTransducer tmp;
+              HfstIterableTransducer tmp;
               char line [1000];
 
               while( fgets(line, 1000, f) != NULL )
@@ -1104,7 +1104,7 @@ REGEXP12: LABEL { $$ = $1; }
             else {
               try {
                 unsigned int linecount = 0;
-                HfstBasicTransducer tmp = HfstBasicTransducer::read_in_prolog_format(f, linecount);
+                HfstIterableTransducer tmp = HfstIterableTransducer::read_in_prolog_format(f, linecount);
                 fclose(f);
                 HfstTransducer * retval = new HfstTransducer(tmp, hfst::xre::format);
                 retval->optimize();

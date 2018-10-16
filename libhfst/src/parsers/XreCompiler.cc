@@ -372,48 +372,48 @@ main(int, char**)
     std::cout << " (Foma)..." << std::endl;;
     XreCompiler fomaXre = XreCompiler(FOMA_TYPE);
 #endif
-    HfstBasicTransducer basicCat;
+    HfstIterableTransducer basicCat;
     basicCat.add_state(1);
     basicCat.add_state(2);
     basicCat.add_state(3);
-    basicCat.add_transition(0, HfstBasicTransition(1, "c", "c", 0));
-    basicCat.add_transition(1, HfstBasicTransition(2, "a", "a", 0));
-    basicCat.add_transition(2, HfstBasicTransition(3, "t", "t", 0));
+    basicCat.add_transition(0, HfstTransition(1, "c", "c", 0));
+    basicCat.add_transition(1, HfstTransition(2, "a", "a", 0));
+    basicCat.add_transition(2, HfstTransition(3, "t", "t", 0));
     basicCat.set_final_weight(3, 0);
-    HfstBasicTransducer basicFight;
+    HfstIterableTransducer basicFight;
     basicFight.add_state(1);
     basicFight.add_state(2);
     basicFight.add_state(3);
     basicFight.add_state(4);
     basicFight.add_state(5);
     basicFight.add_state(6);
-    basicFight.add_transition(0, HfstBasicTransition(1, "f", "f", 0));
-    basicFight.add_transition(1, HfstBasicTransition(2, "i", "o", 0));
-    basicFight.add_transition(2, HfstBasicTransition(3, hfst::internal_epsilon,
+    basicFight.add_transition(0, HfstTransition(1, "f", "f", 0));
+    basicFight.add_transition(1, HfstTransition(2, "i", "o", 0));
+    basicFight.add_transition(2, HfstTransition(3, hfst::internal_epsilon,
                                                      "u", 0));
-    basicFight.add_transition(3, HfstBasicTransition(4, "g", "g", 0));
-    basicFight.add_transition(4, HfstBasicTransition(5, "h", "h", 0));
-    basicFight.add_transition(5, HfstBasicTransition(6, "t", "t", 0));
+    basicFight.add_transition(3, HfstTransition(4, "g", "g", 0));
+    basicFight.add_transition(4, HfstTransition(5, "h", "h", 0));
+    basicFight.add_transition(5, HfstTransition(6, "t", "t", 0));
     basicFight.set_final_weight(6, 0);
-    HfstBasicTransducer basicCatOrDog;
+    HfstIterableTransducer basicCatOrDog;
     basicCatOrDog.add_state(1);
     basicCatOrDog.add_state(2);
     basicCatOrDog.add_state(3);
-    basicCatOrDog.add_transition(0, HfstBasicTransition(1, "c", "c", 0));
-    basicCatOrDog.add_transition(1, HfstBasicTransition(2, "a", "a", 0));
-    basicCatOrDog.add_transition(2, HfstBasicTransition(3, "t", "t", 0));
-    basicCatOrDog.add_transition(0, HfstBasicTransition(3, "dog", "dog", 0));
+    basicCatOrDog.add_transition(0, HfstTransition(1, "c", "c", 0));
+    basicCatOrDog.add_transition(1, HfstTransition(2, "a", "a", 0));
+    basicCatOrDog.add_transition(2, HfstTransition(3, "t", "t", 0));
+    basicCatOrDog.add_transition(0, HfstTransition(3, "dog", "dog", 0));
     basicCatOrDog.set_final_weight(3, 0);
     // <http://sourceforge.net/tracker/
     // ?func=detail&atid=1061990&aid=3468932&group_id=224521>
-    HfstBasicTransducer basicAaOrBc;
+    HfstIterableTransducer basicAaOrBc;
     basicAaOrBc.add_state(1);
     basicAaOrBc.add_state(2);
     basicAaOrBc.add_state(3);
-    basicAaOrBc.add_transition(0, HfstBasicTransition(1, "a", "a", 0));
-    basicAaOrBc.add_transition(1, HfstBasicTransition(2, "a", "a", 0));
-    basicAaOrBc.add_transition(0, HfstBasicTransition(3, "b", "b", 0));
-    basicAaOrBc.add_transition(3, HfstBasicTransition(2, "c", "c", 0));
+    basicAaOrBc.add_transition(0, HfstTransition(1, "a", "a", 0));
+    basicAaOrBc.add_transition(1, HfstTransition(2, "a", "a", 0));
+    basicAaOrBc.add_transition(0, HfstTransition(3, "b", "b", 0));
+    basicAaOrBc.add_transition(3, HfstTransition(2, "c", "c", 0));
     basicAaOrBc.set_final_weight(2, 0);
     std::cout << std::endl << "compilation: " << std::endl;;
 #if HAVE_SFST

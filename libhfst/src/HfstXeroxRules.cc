@@ -1095,7 +1095,7 @@ namespace hfst
                                "Vector sizes don't match");
           }
         
-        std::map<std::string,hfst::HfstBasicTransducer> contextReplaceMap;
+        std::map<std::string,hfst::HfstIterableTransducer> contextReplaceMap;
         
         
         HfstTransducer unionContextReplace(type);
@@ -1178,8 +1178,8 @@ namespace hfst
            
            if (contextReplaceMap.find(contx_key) == contextReplaceMap.end())
            {
-           contextReplaceMap.insert(pair<string,HfstBasicTransducer>(contx_key,
-           HfstBasicTransducer(unionContextReplaceTmp)));
+           contextReplaceMap.insert(pair<string,HfstIterableTransducer>(contx_key,
+           HfstIterableTransducer(unionContextReplaceTmp)));
            }
            
            //disjunct all keys
@@ -1202,7 +1202,7 @@ namespace hfst
         with transducers
         printf("substitute labels with real tr: \n");
         //substitute labels with real tr
-        HfstBasicTransducer btr(unionContextReplace_labels);
+        HfstIterableTransducer btr(unionContextReplace_labels);
         btr.substitute(contextReplaceMap, true);
         btr.prune_alphabet();
         

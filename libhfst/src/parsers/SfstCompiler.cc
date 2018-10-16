@@ -28,10 +28,9 @@
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "implementations/HfstBasicTransducer.h"
+#include "implementations/HfstIterableTransducer.h"
 
-using hfst::implementations::HfstTransitionGraph;
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstIterableTransducer;
 using hfst::implementations::HfstState;
 
 using std::cerr;
@@ -650,7 +649,7 @@ namespace hfst
     free( filename );
 
     HfstTransducer * retval_hfst = NULL;
-    hfst::implementations::HfstBasicTransducer retval_fsm;
+    hfst::implementations::HfstIterableTransducer retval_fsm;
 
     if (type != FOMA_TYPE &&
     type != TROPICAL_OPENFST_TYPE &&
@@ -899,12 +898,12 @@ namespace hfst
  
     else {
       
-      HfstBasicTransducer t(*tr);
+      HfstIterableTransducer t(*tr);
       
-      for (HfstBasicTransducer::const_iterator it = t.begin();
+      for (HfstIterableTransducer::const_iterator it = t.begin();
        it != t.end(); it++)
     {
-      for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
+      for (hfst::implementations::HfstTransitions::const_iterator tr_it
          = it->begin();
            tr_it != it->end(); tr_it++)
         {

@@ -98,7 +98,7 @@ implinclude_HEADERS = \
 		LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h \
 		XfsmTransducer.h \
-		HfstOlTransducer.h HfstTransitionGraph.h HfstTransition.h \
+		HfstOlTransducer.h \
 		HfstTransition.h HfstIterableTransducer.h\
 		HfstTropicalTransducerTransitionData.h \
 		compose_intersect/ComposeIntersectRulePair.h \

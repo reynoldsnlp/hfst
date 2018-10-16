@@ -264,7 +264,7 @@ HFST_EXCEPTION_CHILD_DECLARATION(NotValidLexcFormatException);
     An example:
 
 \verbatim
-HfstBasicTransducer tr;
+HfstIterableTransducer tr;
 tr.add_state(1);
 // An exception is thrown as state number 1 is not final
 float w = tr.get_final_weight(1);
@@ -323,7 +323,7 @@ HFST_EXCEPTION_CHILD_DECLARATION(TransducerIsNotAutomatonException);
     An example:
 
 \verbatim
-HfstBasicTransducer tr;
+HfstIterableTransducer tr;
 tr.add_state(1);
 // An exception is thrown as there is no state number 2
 float w = tr.get_final_weight(2);

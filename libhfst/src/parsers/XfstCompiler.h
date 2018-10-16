@@ -636,7 +636,7 @@ class XfstCompiler
 
   bool can_arc_be_followed(int number, unsigned int number_of_arcs);
 
-  unsigned int print_arcs(const hfst::implementations::HfstBasicTransitions & transitions);
+  unsigned int print_arcs(const hfst::implementations::HfstTransitions & transitions);
 
   //! @brief Perform lookup on the top transducer using strings in \a infile.
   //! \a direction specifies whether apply is done on input (up) or output (down)
@@ -695,7 +695,7 @@ class XfstCompiler
   XfstCompiler& add_prop_line(char* line);
 
   XfstCompiler& lookup(char* line, const HfstTransducer * t, size_t cutoff);
-  XfstCompiler& lookup(char* line, HfstBasicTransducer * t);
+  XfstCompiler& lookup(char* line, HfstIterableTransducer * t);
 
   XfstCompiler& apply_up_line(char* line);
   XfstCompiler& apply_down_line(char* line);

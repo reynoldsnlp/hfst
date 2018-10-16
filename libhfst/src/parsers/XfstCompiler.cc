@@ -69,10 +69,10 @@ typedef yy_buffer_state *YY_BUFFER_STATE;
 extern YY_BUFFER_STATE hxfst_scan_string(const char*);
 extern void hxfst_delete_buffer(YY_BUFFER_STATE);
 
-#include "implementations/HfstBasicTransducer.h"
+#include "implementations/HfstIterableTransducer.h"
 
-using hfst::implementations::HfstBasicTransducer;
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstIterableTransducer;
+using hfst::implementations::HfstTransition;
 #ifdef WINDOWS
   using hfst::hfst_fprintf_console;
 #endif
@@ -677,7 +677,7 @@ namespace xfst {
   }
 
     XfstCompiler&
-    XfstCompiler::lookup(char* line, HfstBasicTransducer * t)
+    XfstCompiler::lookup(char* line, HfstIterableTransducer * t)
       {
         char* token = strstrip(line);
         StringSet alpha = t->get_input_symbols();
@@ -898,7 +898,7 @@ namespace xfst {
         if (t->get_type() != hfst::HFST_OL_TYPE && t->get_type() != hfst::HFST_OLW_TYPE)
           {
             //hfst_fprintf(warnstream_, "lookup might be slow, consider 'convert net'\n");
-            HfstBasicTransducer fsm(*t);
+            HfstIterableTransducer fsm(*t);
             return this->lookup(line, &fsm);
           }
 
@@ -932,7 +932,7 @@ namespace xfst {
           }
         t = new HfstTransducer(*(stack_.top()));
         t->invert().minimize(); // the user has been warned for possible slow performance
-        HfstBasicTransducer fsm(*t);
+        HfstIterableTransducer fsm(*t);
         this->lookup(line, &fsm);
         delete t;
         return *this;
@@ -1072,7 +1072,7 @@ namespace xfst {
         size_t ol_cutoff = string_to_size_t(variables_["lookup-cycle-cutoff"]); ; // -1; fix this // number of cycles needs to be limited for an infinitely ambiguous ol transducer
                                // because it doesn't support is_lookup_infinitely_ambiguous(const string &)
 
-        HfstBasicTransducer * fsm = NULL;
+        HfstIterableTransducer * fsm = NULL;
 
         if (direction == APPLY_UP_DIRECTION)
           {
@@ -1098,7 +1098,7 @@ namespace xfst {
 
         if (t->get_type() != hfst::HFST_OL_TYPE && t->get_type() != hfst::HFST_OLW_TYPE)
           {
-            fsm = new HfstBasicTransducer(*t);
+            fsm = new HfstIterableTransducer(*t);
           }
         else
           {
@@ -2611,12 +2611,12 @@ namespace xfst {
           PROMPT_AND_RETURN_THIS;
         }
 
-      HfstBasicTransducer fsm(*top);
+      HfstIterableTransducer fsm(*top);
       
-      for (HfstBasicTransducer::const_iterator it = fsm.begin();
+      for (HfstIterableTransducer::const_iterator it = fsm.begin();
            it != fsm.end(); it++ )
         {
-          for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
+          for (hfst::implementations::HfstTransitions::const_iterator tr_it
                  = it->begin(); tr_it != it->end(); tr_it++)
             {
               std::string isymbol = tr_it->get_input_symbol();
@@ -2687,13 +2687,13 @@ namespace xfst {
         {
           StringPair target_label = symbol_vector_to_symbol_pair(target_vector);
 
-          HfstBasicTransducer fsm(*top);
+          HfstIterableTransducer fsm(*top);
           bool target_label_found = false;
 
-          for (HfstBasicTransducer::const_iterator it = fsm.begin();
+          for (HfstIterableTransducer::const_iterator it = fsm.begin();
                it != fsm.end() && !target_label_found; it++ )
             {
-              for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
+              for (hfst::implementations::HfstTransitions::const_iterator tr_it
                      = it->begin(); tr_it != it->end(); tr_it++)
                 {
                   if (target_label.first == tr_it->get_input_symbol() &&
@@ -2916,12 +2916,12 @@ namespace xfst {
     {
       std::ostream * oss = get_stream(oss_);
       std::set<std::pair<std::string, std::string> > label_set;
-      HfstBasicTransducer fsm(*tr);
+      HfstIterableTransducer fsm(*tr);
       
-      for (HfstBasicTransducer::const_iterator it = fsm.begin();
+      for (HfstIterableTransducer::const_iterator it = fsm.begin();
            it != fsm.end(); it++ )
         {
-          for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
+          for (hfst::implementations::HfstTransitions::const_iterator tr_it
                  = it->begin(); tr_it != it->end(); tr_it++)
             {
               std::pair<std::string, std::string> label_pair
@@ -2966,12 +2966,12 @@ namespace xfst {
     GET_TOP(topmost);
 
     std::map<std::pair<std::string, std::string>, unsigned int > label_map;
-    HfstBasicTransducer fsm(*topmost);
+    HfstIterableTransducer fsm(*topmost);
       
-      for (HfstBasicTransducer::const_iterator it = fsm.begin();
+      for (HfstIterableTransducer::const_iterator it = fsm.begin();
            it != fsm.end(); it++ )
         {
-          for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
+          for (hfst::implementations::HfstTransitions::const_iterator tr_it
                  = it->begin(); tr_it != it->end(); tr_it++)
             {
               std::pair<std::string, std::string> label_pair
@@ -3550,7 +3550,7 @@ namespace xfst {
           this->print_sigma(oss_, false /*do not prompt*/);
         }
       GET_TOP(tmp);
-      HfstBasicTransducer basic(*tmp);
+      HfstIterableTransducer basic(*tmp);
       std::ostream * oss = get_stream(oss_);
       basic.write_in_xfst_format(*oss, variables_["print-weight"] == "ON");
       flush(oss);
@@ -3577,7 +3577,7 @@ namespace xfst {
               this->print_sigma(oss_, false /*do not prompt*/);
               stack_.pop();
             }
-          HfstBasicTransducer basic(*(it->second));
+          HfstIterableTransducer basic(*(it->second));
           std::ostream * oss = get_stream(oss_);
           basic.write_in_xfst_format(*oss, variables_["print-weight"] == "ON");
           flush(oss);
@@ -3648,11 +3648,11 @@ namespace xfst {
     unknown = false;
     identity = false;
 
-    HfstBasicTransducer fsm(*t);
-    for (HfstBasicTransducer::const_iterator it = fsm.begin();
+    HfstIterableTransducer fsm(*t);
+    for (HfstIterableTransducer::const_iterator it = fsm.begin();
          it != fsm.end(); it++ )
       {
-        for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
+        for (hfst::implementations::HfstTransitions::const_iterator tr_it
                = it->begin(); tr_it != it->end(); tr_it++)
           {
             std::string istr = tr_it->get_input_symbol();
@@ -3831,7 +3831,7 @@ namespace xfst {
           std::string name = tr->get_name();
           if (name == "")
             name = "NO_NAME";
-          HfstBasicTransducer fsm(*tr);
+          HfstIterableTransducer fsm(*tr);
           fsm.write_in_prolog_format(*oss, name, variables_["print-weight"] == "ON");
           if (stack_.size() != 1) // separator
             *oss << std::endl; //hfst_fprintf(outfile, "\n");
@@ -4080,8 +4080,8 @@ namespace xfst {
     {
       try {
         unsigned int linecount=0;
-        HfstBasicTransducer tr =
-          HfstBasicTransducer::read_in_prolog_format(infile, linecount);
+        HfstIterableTransducer tr =
+          HfstIterableTransducer::read_in_prolog_format(infile, linecount);
         stack_.push(new HfstTransducer(tr, format_));
         MAYBE_MINIMIZE(stack_.top());
         PRINT_INFO_PROMPT_AND_RETURN_THIS;
@@ -4190,7 +4190,7 @@ namespace xfst {
     {
       GET_TOP(topmost);
 
-      HfstBasicTransducer fsm(*topmost);
+      HfstIterableTransducer fsm(*topmost);
       fsm.complete();
       HfstTransducer * result = new HfstTransducer(fsm, topmost->get_type());
       stack_.pop();
@@ -4358,7 +4358,7 @@ namespace xfst {
         return *this;
       }
     HfstTransducer* result = stack_.top();
-    //HfstBasicTransducer fsm(*result);
+    //HfstIterableTransducer fsm(*result);
 
     stack_.pop();
     while (!stack_.empty())
@@ -4480,12 +4480,12 @@ namespace xfst {
       HfstTransducer * result = new HfstTransducer(topmost->get_type());
       
       std::set<std::pair<std::string, std::string> > label_set;
-      HfstBasicTransducer fsm(*topmost);
+      HfstIterableTransducer fsm(*topmost);
       
-      for (HfstBasicTransducer::const_iterator it = fsm.begin();
+      for (HfstIterableTransducer::const_iterator it = fsm.begin();
            it != fsm.end(); it++ )
         {
-          for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
+          for (hfst::implementations::HfstTransitions::const_iterator tr_it
                  = it->begin(); tr_it != it->end(); tr_it++)
             {
               std::pair<std::string, std::string> label_pair
@@ -4663,11 +4663,11 @@ namespace xfst {
   // For 'inspect_net': print to outstream_ all arcs in
   // \a transitions. Return the number of arcs.
   unsigned int XfstCompiler::print_arcs
-  (const hfst::implementations::HfstBasicTransitions & transitions)
+  (const hfst::implementations::HfstTransitions & transitions)
   {
     bool first_loop = true;
     unsigned int arc_number = 1;
-    for (hfst::implementations::HfstBasicTransitions::const_iterator it
+    for (hfst::implementations::HfstTransitions::const_iterator it
            = transitions.begin(); it != transitions.end(); it++)
       {
         if (first_loop)
@@ -4924,7 +4924,7 @@ namespace xfst {
     {
       GET_TOP(t);
 
-      HfstBasicTransducer net(*t);
+      HfstIterableTransducer net(*t);
 
       output() << inspect_net_help_msg;
       //hfst_fprintf(outstream_, "%s", inspect_net_help_msg);
@@ -4945,7 +4945,7 @@ namespace xfst {
       flush(&output());
 
       // transitions of current state
-      hfst::implementations::HfstBasicTransitions transitions = net[0];
+      hfst::implementations::HfstTransitions transitions = net[0];
       // number of arcs in current state
       unsigned int number_of_arcs = print_arcs(transitions);
 
@@ -5013,7 +5013,7 @@ namespace xfst {
                 }
               else
                 {
-                  HfstBasicTransition tr = transitions[number - 1];
+                  HfstTransition tr = transitions[number - 1];
                   output() << "  " << tr.get_input_symbol() << ":" << tr.get_output_symbol() << " --> ";
                   //hfst_fprintf(outstream_, "  %s:%s --> ", tr.get_input_symbol().c_str(),
                   //        tr.get_output_symbol().c_str());
@@ -5212,7 +5212,7 @@ namespace xfst {
           return *this;
         }
 
-      HfstBasicTransducer fsm(*tmp);
+      HfstIterableTransducer fsm(*tmp);
       try
         {
           HfstReplacementsMap replacement_map = fsm.find_replacements((level == UPPER_LEVEL));
@@ -5251,7 +5251,7 @@ namespace xfst {
                      }
 
                    replacement->optimize();
-                   HfstBasicTransducer repl(*replacement);
+                   HfstIterableTransducer repl(*replacement);
                    delete replacement;
                    fsm.insert_transducer(start_state, end_state, repl);
                   }
@@ -5422,7 +5422,7 @@ namespace xfst {
     {
       std::ostream * oss = get_stream(oss_);
       GET_TOP(tmp);
-      HfstBasicTransducer fsm(*tmp);
+      HfstIterableTransducer fsm(*tmp);
       fsm.write_in_att_format(*oss, variables_["print-weight"] == "ON");
       flush(oss);
       PROMPT_AND_RETURN_THIS;

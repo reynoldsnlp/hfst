@@ -32,7 +32,7 @@
 namespace hfst { class HfstTransducer; }
 #include "XreCompiler.h"
 #include "../HfstTokenizer.h"
-#include "../implementations/HfstBasicTransducer.h"
+#include "../implementations/HfstIterableTransducer.h"
 
 namespace hfst {
 //! @brief Namespace for Xerox LexC related specific functions and classes.
@@ -172,8 +172,8 @@ class LexcCompiler
   hfst::xre::XreCompiler xre_;
   std::string initialLexiconName_;
   std::map<std::string,hfst::HfstTransducer*> stringTries_;
-  std::map<std::string,HfstBasicTransducer*> stringVectors_;
-  HfstBasicTransducer stringsTrie_;
+  std::map<std::string,HfstIterableTransducer*> stringVectors_;
+  HfstIterableTransducer stringsTrie_;
 
 
 

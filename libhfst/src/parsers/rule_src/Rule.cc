@@ -179,7 +179,7 @@ OtherSymbolTransducer Rule::get_center
 void Rule::add_missing_symbols_freely(const SymbolRange &diacritics)
 {
   std::set<std::string> symbol_set =
-    HfstBasicTransducer(rule_transducer.get_transducer()).get_alphabet();
+    HfstIterableTransducer(rule_transducer.get_transducer()).get_alphabet();
   for (SymbolRange::const_iterator it = diacritics.begin();
        it != diacritics.end();
        ++it)

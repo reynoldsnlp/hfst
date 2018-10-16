@@ -14,7 +14,7 @@
 
 #include "HfstTransducer.h"
 using hfst::HfstTransducer;
-using hfst::HfstBasicTransducer;
+using hfst::HfstIterableTransducer;
 using hfst::implementations::HfstState;
 
 namespace hfst {
@@ -89,10 +89,10 @@ print_dot(FILE* out, HfstTransducer& t)
     fprintf(out, "charset = UTF8;\n");
     fprintf(out, "rankdir = LR;\n");
     fprintf(out, "node [shape=circle,style=filled,fillcolor=yellow]\n");
-    HfstBasicTransducer* mutt = new HfstBasicTransducer(t);
+    HfstIterableTransducer* mutt = new HfstIterableTransducer(t);
     HfstState s = 0;
     // for some reason, dot works nicer if I first have all nodes, then arcs
-    for (HfstBasicTransducer::const_iterator state = mutt->begin();
+    for (HfstIterableTransducer::const_iterator state = mutt->begin();
          state != mutt->end();
          ++state)
       {
@@ -119,12 +119,12 @@ print_dot(FILE* out, HfstTransducer& t)
         ++s;
       } // each state
     s = 0;
-    for (HfstBasicTransducer::const_iterator state = mutt->begin();
+    for (HfstIterableTransducer::const_iterator state = mutt->begin();
          state != mutt->end();
          ++state)
       {
         std::map<HfstState, std::string> target_labels;
-        for (hfst::implementations::HfstBasicTransitions::const_iterator arc =
+        for (hfst::implementations::HfstTransitions::const_iterator arc =
              state->begin();
              arc != state->end();
              ++arc)
@@ -291,10 +291,10 @@ print_dot(std::ostream & out, HfstTransducer& t)
     out << "charset = UTF8;" << std::endl;
     out << "rankdir = LR;" << std::endl;
     out << "node [shape=circle,style=filled,fillcolor=yellow]" << std::endl;
-    HfstBasicTransducer* mutt = new HfstBasicTransducer(t);
+    HfstIterableTransducer* mutt = new HfstIterableTransducer(t);
     HfstState s = 0;
     // for some reason, dot works nicer if I first have all nodes, then arcs
-    for (HfstBasicTransducer::const_iterator state = mutt->begin();
+    for (HfstIterableTransducer::const_iterator state = mutt->begin();
          state != mutt->end();
          ++state)
       {
@@ -318,12 +318,12 @@ print_dot(std::ostream & out, HfstTransducer& t)
         ++s;
       } // each state
     s = 0;
-    for (HfstBasicTransducer::const_iterator state = mutt->begin();
+    for (HfstIterableTransducer::const_iterator state = mutt->begin();
          state != mutt->end();
          ++state)
       {
         std::map<HfstState, std::string> target_labels;
-        for (hfst::implementations::HfstBasicTransitions::const_iterator arc =
+        for (hfst::implementations::HfstTransitions::const_iterator arc =
              state->begin();
              arc != state->end();
              ++arc)

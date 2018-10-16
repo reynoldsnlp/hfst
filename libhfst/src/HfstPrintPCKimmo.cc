@@ -9,7 +9,7 @@
 
 #include "HfstTransducer.h"
 using hfst::HfstTransducer;
-using hfst::HfstBasicTransducer;
+using hfst::HfstIterableTransducer;
 using hfst::implementations::HfstState;
 
 namespace hfst {
@@ -17,15 +17,15 @@ namespace hfst {
 void
 print_pckimmo(FILE* out, HfstTransducer& t)
   {
-    HfstBasicTransducer* mutt = new HfstBasicTransducer(t);
+    HfstIterableTransducer* mutt = new HfstIterableTransducer(t);
     HfstState s = 0;
     HfstState last = 0;
     std::set<std::pair<std::string,std::string> > pairs;
-    for (HfstBasicTransducer::const_iterator state = mutt->begin();
+    for (HfstIterableTransducer::const_iterator state = mutt->begin();
          state != mutt->end();
          ++state)
       {
-        for (hfst::implementations::HfstBasicTransitions::const_iterator arc =
+        for (hfst::implementations::HfstTransitions::const_iterator arc =
              state->begin();
              arc != state->end();
              ++arc)
@@ -84,7 +84,7 @@ print_pckimmo(FILE* out, HfstTransducer& t)
       }
     // the transition table per state
     fprintf(out, "\n");
-    for (HfstBasicTransducer::const_iterator state = mutt->begin();
+    for (HfstIterableTransducer::const_iterator state = mutt->begin();
          state != mutt->end();
          ++state)
       {
@@ -104,7 +104,7 @@ print_pckimmo(FILE* out, HfstTransducer& t)
           {
             transitions[*p] = -1;
           }
-        for (hfst::implementations::HfstBasicTransitions::const_iterator arc =
+        for (hfst::implementations::HfstTransitions::const_iterator arc =
              state->begin();
              arc != state->end();
              ++arc)

@@ -47,10 +47,9 @@ using hfst::hfst_fprintf_console;
 #endif // WINDOWS
 
 using hfst::HfstTransducer;
-using hfst::implementations::HfstTransitionGraph;
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstIterableTransducer;
 using hfst::implementations::HfstState;
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstTransition;
 using hfst::ImplementationType;
 using hfst::xre::XreCompiler;
 using hfst::StringVector;
@@ -185,7 +184,7 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
       currentLexiconName_ = ""; // ?
       string hash("#");
       lexiconNames_.insert(hash);
-      stringsTrie_ =hfst::implementations::HfstBasicTransducer(); // ?
+      stringsTrie_ =hfst::implementations::HfstIterableTransducer(); // ?
       stringTries_.clear();
       stringVectors_.clear();
       regexps_.clear();
@@ -890,7 +889,7 @@ LexcCompiler::compileLexical()
     lexicons.substitute(smallSubstitutions);
     lexicons.prune_alphabet();
 
-    HfstBasicTransducer joinersTrie_;
+    HfstIterableTransducer joinersTrie_;
 
     HfstSymbolSubstitutions allJoinersToEpsilon;
 
@@ -981,14 +980,14 @@ LexcCompiler::compileLexical()
 
 
         /// get right side of every pair
-        HfstBasicTransducer fsm(lexicons);
+        HfstIterableTransducer fsm(lexicons);
         StringSet rightSymbols;
         // Go through all states
-        for (HfstBasicTransducer::const_iterator it = fsm.begin();
+        for (HfstIterableTransducer::const_iterator it = fsm.begin();
         it != fsm.end(); it++ )
         {
             // Go through all transitions
-          for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
+          for (hfst::implementations::HfstTransitions::const_iterator tr_it
              = it->begin(); tr_it != it->end(); tr_it++)
             {
                 String alph2 = tr_it->get_output_symbol();
@@ -1132,7 +1131,7 @@ LexcCompiler::compileLexical()
         lexicons.substitute(fakeRegexprToReal).optimize();
         lexicons.prune_alphabet();
 
-        std::map<String, HfstBasicTransducer> regMarkToTr;
+        std::map<String, HfstIterableTransducer> regMarkToTr;
 
 
         for (std::map<std::string,hfst::HfstTransducer*>::const_iterator it = regexps_.begin();
@@ -1146,7 +1145,7 @@ LexcCompiler::compileLexical()
                 // TODO: do this only for strings that look like $.....$
                 replace(alph.begin(), alph.end(), '$', '@');
             }
-            HfstBasicTransducer btr(*(it->second));
+            HfstIterableTransducer btr(*(it->second));
             regMarkToTr[alph] = btr;
             if (debug)
               {
@@ -1156,7 +1155,7 @@ LexcCompiler::compileLexical()
               }
         }
       
-        HfstBasicTransducer lexicons_basic(lexicons);
+        HfstIterableTransducer lexicons_basic(lexicons);
         lexicons_basic.substitute(regMarkToTr, true);
 
         lexicons_basic.prune_alphabet();
