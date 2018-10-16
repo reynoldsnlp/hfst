@@ -7,8 +7,8 @@
 #include "auxiliary_functions.cc"
 
 using namespace hfst;
-using hfst::implementations::HfstBasicTransducer;
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstIterableTransducer;
+using hfst::implementations::HfstTransition;
 
 
 int main(int argc, char **argv)
@@ -43,11 +43,11 @@ int main(int argc, char **argv)
       HfstTransducer foobar_copy(foobar);
       assert(foobar.compare(foobar_copy));
 
-      /* Conversion from HfstBasicTransducer. */
-      verbose_print("Conversion from HfstBasicTransducer", types[i]);
-      HfstBasicTransducer basic;
+      /* Conversion from HfstIterableTransducer. */
+      verbose_print("Conversion from HfstIterableTransducer", types[i]);
+      HfstIterableTransducer basic;
       basic.add_state(1);
-      basic.add_transition(0, HfstBasicTransition(1, "foo", "bar", 0));
+      basic.add_transition(0, HfstTransition(1, "foo", "bar", 0));
       basic.set_final_weight(1, 0);
       HfstTransducer foobar_basic(basic, types[i]);
       assert(foobar.compare(foobar_basic));

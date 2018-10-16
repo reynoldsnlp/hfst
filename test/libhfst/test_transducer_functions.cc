@@ -40,8 +40,8 @@
 
 using namespace hfst;
 
-using hfst::implementations::HfstBasicTransition;
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstTransition;
+using hfst::implementations::HfstIterableTransducer;
 
 /* Used by the tests. */
 bool compare_alphabets(const HfstTransducer &t1, const HfstTransducer &t2)
@@ -675,9 +675,9 @@ int main(int argc, char **argv)
 
         /* Create an HFST basic transducer [a:b] with transition
            weight 0.3 and final weight 0.5. */
-        HfstBasicTransducer t;
+        HfstIterableTransducer t;
         t.add_state(1);
-        t.add_transition(0, HfstBasicTransition(1, "a", "b", 0.3));
+        t.add_transition(0, HfstTransition(1, "a", "b", 0.3));
         t.set_final_weight(1, 0.5);
         
         /* Convert to tropical OpenFst format and push weights
@@ -688,8 +688,8 @@ int main(int argc, char **argv)
         T_initial.push_weights(TO_INITIAL_STATE);
         
         /* Convert back to HFST basic transducer. */
-        HfstBasicTransducer t_final(T_final);
-        HfstBasicTransducer t_initial(T_initial);
+        HfstIterableTransducer t_final(T_final);
+        HfstIterableTransducer t_initial(T_initial);
         
         /* Test the final weight. */
         try {
@@ -705,7 +705,7 @@ int main(int argc, char **argv)
 
         /* Test the transition weight. */
         try {
-          hfst::implementations::HfstBasicTransitions transitions = t_initial[0];
+          hfst::implementations::HfstTransitions transitions = t_initial[0];
           assert(transitions.size() == 1);
           float weight = transitions.begin()->get_weight();
           /* Rounding can affect the precision. */
@@ -732,9 +732,9 @@ int main(int argc, char **argv)
         
         /* Create an HFST basic transducer [a:b] with transition
            weight 0.3 and final weight 0.5. */
-        HfstBasicTransducer t;
+        HfstIterableTransducer t;
         t.add_state(1);
-        t.add_transition(0, HfstBasicTransition(1, "a", "b", 0.3));
+        t.add_transition(0, HfstTransition(1, "a", "b", 0.3));
         t.set_final_weight(1, 0.5);
 
         /* Modify weights. */
@@ -744,7 +744,7 @@ int main(int argc, char **argv)
         T.push_weights(TO_FINAL_STATE);
 
         /* Convert back to HFST basic transducer and test the weight. */
-        HfstBasicTransducer tc(T);
+        HfstIterableTransducer tc(T);
         try {
           assert(0.24 < tc.get_final_weight(1) &&
              tc.get_final_weight(1) < 0.26);

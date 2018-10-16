@@ -303,7 +303,7 @@ int main(int argc, char * argv[])
     new ComposeIntersectRule(universal);
   
   ComposeIntersectRulePair three_rules(some_rule,rules);
-  HfstItearableTransducer lex = l.compose_with_rules(&three_rules);
+  HfstIterableTransducer lex = l.compose_with_rules(&three_rules);
   HfstTransducer lex_fst(lex,TROPICAL_OPENFST_TYPE);
   lex_fst.minimize();
   std::cerr << lex_fst << std::endl;

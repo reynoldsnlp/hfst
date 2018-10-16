@@ -7,13 +7,13 @@
 
 using namespace hfst;
 using hfst::implementations::HfstState;
-using hfst::implementations::HfstBasicTransducer;
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstIterableTransducer;
+using hfst::implementations::HfstTransition;
 
 int main(int argc, char **argv)
 {
 
-  HfstBasicTransducer t;
+  HfstIterableTransducer t;
   HfstState s1 = t.add_state();
   HfstState s2 = t.add_state();
   HfstState s3 = t.add_state();
@@ -25,14 +25,14 @@ int main(int argc, char **argv)
   std::string fd1("@U.FEATURE.FOO@");
   std::string fd2("@U.FEATURE.BAR@");
   
-  t.add_transition(0, HfstBasicTransition(s1, fd1, fd1, 0));
-  t.add_transition(0, HfstBasicTransition(s2, "a", "a", 0));
-  t.add_transition(s1, HfstBasicTransition(s3, "b", "b", 0));
-  t.add_transition(s2, HfstBasicTransition(s3, fd2, fd2, 0));
-  t.add_transition(s3, HfstBasicTransition(s4, "c", "c", 0));
-  t.add_transition(s3, HfstBasicTransition(s5, "d", "d", 0));
-  t.add_transition(s4, HfstBasicTransition(s6, fd2, fd2, 0));
-  t.add_transition(s5, HfstBasicTransition(s6, fd1, fd1, 0));
+  t.add_transition(0, HfstTransition(s1, fd1, fd1, 0));
+  t.add_transition(0, HfstTransition(s2, "a", "a", 0));
+  t.add_transition(s1, HfstTransition(s3, "b", "b", 0));
+  t.add_transition(s2, HfstTransition(s3, fd2, fd2, 0));
+  t.add_transition(s3, HfstTransition(s4, "c", "c", 0));
+  t.add_transition(s3, HfstTransition(s5, "d", "d", 0));
+  t.add_transition(s4, HfstTransition(s6, fd2, fd2, 0));
+  t.add_transition(s5, HfstTransition(s6, fd1, fd1, 0));
 
 
   const unsigned int TYPES_SIZE=5;

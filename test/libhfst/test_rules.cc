@@ -190,20 +190,20 @@ int main(int argc, char **argv) {
     {
       ImplementationType type = SFST_TYPE;
       
-      HfstBasicTransducer mapping;
+      HfstIterableTransducer mapping;
       
       mapping.add_transition
-	(0, HfstBasicTransition(1, "@_EPSILON_SYMBOL_@", "X", 0));
+	(0, HfstTransition(1, "@_EPSILON_SYMBOL_@", "X", 0));
       mapping.set_final_weight(1, 0);
       
       mapping.add_transition
-	(0, HfstBasicTransition(2, "@_UNKNOWN_SYMBOL_@", "X", 0));
+	(0, HfstTransition(2, "@_UNKNOWN_SYMBOL_@", "X", 0));
       mapping.add_transition
-	(0, HfstBasicTransition(2, "X", "X", 0));
+	(0, HfstTransition(2, "X", "X", 0));
       mapping.add_transition
-	(2, HfstBasicTransition(2, "X", "@_EPSILON_SYMBOL_@", 0));
+	(2, HfstTransition(2, "X", "@_EPSILON_SYMBOL_@", 0));
       mapping.add_transition
-	(2, HfstBasicTransition
+	(2, HfstTransition
 	 (2, "@_UNKNOWN_SYMBOL_@", "@_EPSILON_SYMBOL_@", 0));
       mapping.set_final_weight(2, 0);
       

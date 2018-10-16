@@ -7,8 +7,8 @@
 
 using namespace hfst;
 
-using hfst::implementations::HfstBasicTransition;
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstTransition;
+using hfst::implementations::HfstIterableTransducer;
 
 bool function(const StringPair &sp, StringPairSet &sps)
 {
@@ -40,43 +40,43 @@ int main(int argc, char **argv)
                        /*LOG_OPENFST_TYPE,*/
                        FOMA_TYPE};
 
-  HfstBasicTransducer tr1;
+  HfstIterableTransducer tr1;
   tr1.add_state(1);
   tr1.set_final_weight(1, 0);
   tr1.add_transition
-    (0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "foo", 0) );
+    (0, HfstTransition(1, "@_UNKNOWN_SYMBOL_@", "foo", 0) );
   // tr1 is [ @_UNKNOWN_SYMBOL_@:foo ]
   
-  HfstBasicTransducer tr2;
+  HfstIterableTransducer tr2;
   tr2.add_state(1);
   tr2.add_state(2);
   tr2.set_final_weight(2, 0);
   tr2.add_transition
-    (0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@",
+    (0, HfstTransition(1, "@_IDENTITY_SYMBOL_@",
                 "@_IDENTITY_SYMBOL_@", 0) );
   tr2.add_transition
-    (1, HfstBasicTransition(2, "bar", "bar", 0) );
+    (1, HfstTransition(2, "bar", "bar", 0) );
   // tr2 is [ [ @_IDENTITY_SYMBOL_@:@_IDENTITY_SYMBOL_@ ] [ bar:bar ] ]
 
   // The disjunction should be
-  HfstBasicTransducer disj;
+  HfstIterableTransducer disj;
   disj.add_state(1);
   disj.add_state(2);
   disj.set_final_weight(2, 0);
 
   disj.add_transition
-    (0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@",
+    (0, HfstTransition(1, "@_IDENTITY_SYMBOL_@",
                 "@_IDENTITY_SYMBOL_@", 0) );
   disj.add_transition
-    (0, HfstBasicTransition(1, "foo", "foo", 0) );
+    (0, HfstTransition(1, "foo", "foo", 0) );
 
   disj.add_transition
-    (0, HfstBasicTransition(2, "@_UNKNOWN_SYMBOL_@", "foo", 0) );
+    (0, HfstTransition(2, "@_UNKNOWN_SYMBOL_@", "foo", 0) );
   disj.add_transition
-    (0, HfstBasicTransition(2, "bar", "foo", 0) );
+    (0, HfstTransition(2, "bar", "foo", 0) );
 
   disj.add_transition
-    (1, HfstBasicTransition(2, "bar", "bar", 0) );
+    (1, HfstTransition(2, "bar", "bar", 0) );
 
 
   FILE * ofile = fopen("testfile.att", "wb");
