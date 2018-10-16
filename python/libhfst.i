@@ -41,8 +41,8 @@
 #include "parsers/LexcCompiler.h"
 #include "parsers/XfstCompiler.h"
 #include "parsers/SfstCompiler.h"
-#include "implementations/HfstBasicTransition.h"
-#include "implementations/HfstBasicTransducer.h"
+#include "implementations/HfstTransition.h"
+#include "implementations/HfstIterableTransducer.h"
 #include "implementations/optimized-lookup/pmatch.h"
 #include "implementations/optimized-lookup/pmatch_tokenize.h"
 #include "parsers/TwolcCompiler.h"
@@ -85,9 +85,9 @@ namespace std {
 %template(HfstTransducerVector) vector<hfst::HfstTransducer>;
 %template(HfstSymbolSubstitutions) map<string, string>;
 %template(HfstSymbolPairSubstitutions) map<pair<string, string>, pair<string, string> >;
-// needed for HfstBasicTransducer.states()
+// needed for HfstIterableTransducer.states()
 %template(BarBazFoo) vector<unsigned int>;
-%template(HfstBasicTransitions) vector<hfst::implementations::HfstBasicTransition>;
+%template(HfstTransitions) vector<hfst::implementations::HfstTransition>;
 %template(HfstOneLevelPath) pair<float, vector<string> >;
 %template(HfstOneLevelPaths) set<pair<float, vector<string> > >;
 %template(HfstTwoLevelPath) pair<float, vector<pair<string, string > > >;
@@ -409,8 +409,8 @@ public:
 
     HfstTransducer() { return hfst::empty_transducer(); }
     HfstTransducer(const hfst::HfstTransducer & t) { return hfst::copy_hfst_transducer(t); }
-    HfstTransducer(const hfst::implementations::HfstBasicTransducer & t) { return hfst::copy_hfst_transducer_from_basic_transducer(t); }
-    HfstTransducer(const hfst::implementations::HfstBasicTransducer & t, hfst::ImplementationType impl) { return hfst::copy_hfst_transducer_from_basic_transducer(t, impl); }
+    HfstTransducer(const hfst::implementations::HfstIterableTransducer & t) { return hfst::copy_hfst_transducer_from_basic_transducer(t); }
+    HfstTransducer(const hfst::implementations::HfstIterableTransducer & t, hfst::ImplementationType impl) { return hfst::copy_hfst_transducer_from_basic_transducer(t, impl); }
     ~HfstTransducer()
     {
         if ($self->get_type() == hfst::UNSPECIFIED_TYPE || $self->get_type() == hfst::ERROR_TYPE)
@@ -422,7 +422,7 @@ public:
     // For python's 'print'
     char *__str__() {
          std::ostringstream oss;
-         hfst::implementations::HfstBasicTransducer fsm(*$self);
+         hfst::implementations::HfstIterableTransducer fsm(*$self);
          fsm.write_in_att_format(oss,true);
          return strdup(oss.str().c_str());
     }
@@ -519,7 +519,7 @@ public:
       * `write_weights` :
           Whether weights are written.
       """
-      fsm = HfstBasicTransducer(self)
+      fsm = HfstIterableTransducer(self)
       fsm.name = self.get_name()
       prologstr = fsm.get_prolog_string(write_weights)
       f.write(prologstr)
@@ -536,7 +536,7 @@ public:
       * `write_weights` :
           Whether weights are written.
       """
-      fsm = HfstBasicTransducer(self)
+      fsm = HfstIterableTransducer(self)
       fsm.name = self.get_name()
       xfststr = fsm.get_xfst_string(write_weights)
       f.write(xfst)
@@ -553,7 +553,7 @@ public:
       * `write_weights` :
           Whether weights are written.
       """
-      fsm = HfstBasicTransducer(self)
+      fsm = HfstIterableTransducer(self)
       fsm.name = self.get_name()
       attstr = fsm.get_att_string(write_weights)
       f.write(attstr)
@@ -583,8 +583,8 @@ public:
       Note: This function has an efficient implementation only for optimized lookup format
       (hfst.ImplementationType.HFST_OL_TYPE or hfst.ImplementationType.HFST_OLW_TYPE). Other formats perform the
       lookup via composition. Consider converting the transducer to optimized lookup format
-      or to a HfstBasicTransducer. Conversion to HFST_OL(W)_TYPE might take a while but the
-      lookup is fast. Conversion to HfstBasicTransducer is quick but lookup is slower.
+      or to a HfstIterableTransducer. Conversion to HFST_OL(W)_TYPE might take a while but the
+      lookup is fast. Conversion to HfstIterableTransducer is quick but lookup is slower.
       """
       obey_flags=True
       max_number=-1
@@ -897,11 +897,11 @@ public:
           Whether substitution is performed on output side, defaults to True. Valid
           only if *s* and \\ S are strings.
 
-      For more information, see hfst.HfstBasicTransducer.substitute. The function
+      For more information, see hfst.HfstIterableTransducer.substitute. The function
       works similarly, with the exception of argument *S*, which must be
-      hfst.HfstTransducer instead of hfst.HfstBasicTransducer.
+      hfst.HfstTransducer instead of hfst.HfstIterableTransducer.
 
-      See also: hfst.HfstBasicTransducer.substitute
+      See also: hfst.HfstIterableTransducer.substitute
       """
       if S == None:
          if not isinstance(s, dict):
@@ -1136,22 +1136,22 @@ def __next__(self):
 
 namespace implementations {
 
-  class HfstBasicTransducer;
-  class HfstBasicTransition;
+  class HfstIterableTransducer;
+  class HfstTransition;
   typedef unsigned int HfstState;
 
-  typedef std::vector<hfst::implementations::HfstBasicTransition> HfstBasicTransitions;
+  typedef std::vector<hfst::implementations::HfstTransition> HfstTransitions;
 
 
-// *** HfstBasicTransducer *** //
+// *** HfstIterableTransducer *** //
 
-class HfstBasicTransducer {
+class HfstIterableTransducer {
 
   public:
 
-    HfstBasicTransducer(void);
-    HfstBasicTransducer(const HfstBasicTransducer &graph);
-    HfstBasicTransducer(const hfst::HfstTransducer &transducer);
+    HfstIterableTransducer(void);
+    HfstIterableTransducer(const HfstIterableTransducer &graph);
+    HfstIterableTransducer(const hfst::HfstTransducer &transducer);
 
     std::string name;
     void add_symbol_to_alphabet(const std::string &symbol);
@@ -1169,14 +1169,14 @@ class HfstBasicTransducer {
     HfstState add_state(HfstState s);
     HfstState get_max_state() const;
     std::vector<HfstState> states() const;
-    void add_transition(HfstState s, const hfst::implementations::HfstBasicTransition & transition, bool add_symbols_to_alphabet=true);
-    void remove_transition(HfstState s, const hfst::implementations::HfstBasicTransition & transition, bool remove_symbols_from_alphabet=false);
+    void add_transition(HfstState s, const hfst::implementations::HfstTransition & transition, bool add_symbols_to_alphabet=true);
+    void remove_transition(HfstState s, const hfst::implementations::HfstTransition & transition, bool remove_symbols_from_alphabet=false);
     bool is_final_state(HfstState s) const;
     float get_final_weight(HfstState s) const throw(StateIsNotFinalException, StateIndexOutOfBoundsException);
     void set_final_weight(HfstState s, const float & weight);
     void remove_final_weight(HfstState s);
 %rename("_transitions") transitions(HfstState s);
-    hfst::implementations::HfstBasicTransitions & transitions(HfstState s);
+    hfst::implementations::HfstTransitions & transitions(HfstState s);
     bool is_infinitely_ambiguous();
     bool is_lookup_infinitely_ambiguous(const StringVector & s);
     int longest_path_size();
@@ -1186,14 +1186,14 @@ class HfstBasicTransducer {
     void _substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true) { self->substitute_symbol(old_symbol, new_symbol, input_side, output_side); }
     void _substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair) { self->substitute_symbol_pair(old_symbol_pair, new_symbol_pair); }
     void _substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set) { self->substitute_symbol_pair_with_set(old_symbol_pair, new_symbol_pair_set); }
-    void _substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstBasicTransducer &transducer) { self->substitute_symbol_pair_with_transducer(symbol_pair, transducer); }
+    void _substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstIterableTransducer &transducer) { self->substitute_symbol_pair_with_transducer(symbol_pair, transducer); }
     void _substitute_symbols(const hfst::HfstSymbolSubstitutions &substitutions) { self->substitute_symbols(substitutions); } // alias for the previous function which is shadowed
     void _substitute_symbol_pairs(const hfst::HfstSymbolPairSubstitutions &substitutions) { self->substitute_symbol_pairs(substitutions); } // alias for the previous function which is shadowed
     void insert_freely(const StringPair &symbol_pair, float weight) { self->insert_freely(symbol_pair, weight); }
-    void insert_freely(const HfstBasicTransducer &tr) { self->insert_freely(tr); }
+    void insert_freely(const HfstIterableTransducer &tr) { self->insert_freely(tr); }
     void sort_arcs() { self->sort_arcs(); }
     void disjunct(const StringPairVector &spv, float weight) { self->disjunct(spv, weight); }
-    void harmonize(HfstBasicTransducer &another) { self->harmonize(another); }
+    void harmonize(HfstIterableTransducer &another) { self->harmonize(another); }
 
   HfstTwoLevelPaths _lookup(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight, bool obey_flags) throw(TransducerIsCyclicException)
   {
@@ -1234,7 +1234,7 @@ class HfstBasicTransducer {
   }
 
   void add_transition(HfstState source, HfstState target, std::string input, std::string output, float weight=0) {
-    hfst::implementations::HfstBasicTransition tr(target, input, output, weight);
+    hfst::implementations::HfstTransition tr(target, input, output, weight);
     $self->add_transition(source, tr);
   }
 
@@ -1378,7 +1378,7 @@ class HfstBasicTransducer {
           substitutions, if S == None.
       * `S` :
           The symbol, transition, a tuple of transitions or a transducer
-          (hfst.HfstBasicTransducer) that substitutes *s*.
+          (hfst.HfstIterableTransducer) that substitutes *s*.
       * `kwargs` :
           Arguments recognized are 'input' and 'output', their values can be False or
           True, True being the default. These arguments are valid only if *s* and *S*
@@ -1471,7 +1471,7 @@ class HfstBasicTransducer {
             return self._substitute_symbol_pair(s, S)
          elif _is_string_pair_vector(S):
             return self._substitute_symbol_pair_with_set(s, S)
-         elif isinstance(S, HfstBasicTransducer):
+         elif isinstance(S, HfstIterableTransducer):
             return self._substitute_symbol_pair_with_transducer(s, S)
          else:
             raise RuntimeError('...')
@@ -1482,15 +1482,15 @@ class HfstBasicTransducer {
 
 }
         
-}; // class HfstBasicTransducer
+}; // class HfstIterableTransducer
 
-// *** HfstBasicTransition *** //
+// *** HfstTransition *** //
 
-class HfstBasicTransition {
+class HfstTransition {
   public:
-    HfstBasicTransition();
-    HfstBasicTransition(hfst::implementations::HfstState, std::string, std::string, float);
-    ~HfstBasicTransition();
+    HfstTransition();
+    HfstTransition(hfst::implementations::HfstState, std::string, std::string, float);
+    ~HfstTransition();
     HfstState get_target_state() const;
     std::string get_input_symbol() const;
     void set_input_symbol(const std::string & symbol);
@@ -1507,7 +1507,7 @@ class HfstBasicTransition {
     }
 }
 
-}; // class HfstBasicTransition
+}; // class HfstTransition
 
 } // namespace implementations
 
@@ -1615,10 +1615,10 @@ hfst::HfstTransducer * hfst::hfst_compile_sfst(const std::string & filename, con
 std::string hfst::one_level_paths_to_string(const HfstOneLevelPaths &);
 std::string hfst::two_level_paths_to_string(const HfstTwoLevelPaths &);
 
-bool parse_prolog_network_line(const std::string & line, hfst::implementations::HfstBasicTransducer * graph);
-bool parse_prolog_arc_line(const std::string & line, hfst::implementations::HfstBasicTransducer * graph);
-bool parse_prolog_symbol_line(const std::string & line, hfst::implementations::HfstBasicTransducer * graph);
-bool parse_prolog_final_line(const std::string & line, hfst::implementations::HfstBasicTransducer * graph);
+bool parse_prolog_network_line(const std::string & line, hfst::implementations::HfstIterableTransducer * graph);
+bool parse_prolog_arc_line(const std::string & line, hfst::implementations::HfstIterableTransducer * graph);
+bool parse_prolog_symbol_line(const std::string & line, hfst::implementations::HfstIterableTransducer * graph);
+bool parse_prolog_final_line(const std::string & line, hfst::implementations::HfstIterableTransducer * graph);
 
 
 // fuctions visible under module hfst

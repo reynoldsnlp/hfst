@@ -16,8 +16,8 @@ namespace hfst {
     return hfst::hfst_regex(comp, "[0 - 0]", "");
   }
   HfstTransducer * copy_hfst_transducer(const hfst::HfstTransducer & t) { return new HfstTransducer(t); }
-  HfstTransducer * copy_hfst_transducer_from_basic_transducer(const hfst::implementations::HfstBasicTransducer & t) { return new HfstTransducer(t, type); }
-  HfstTransducer * copy_hfst_transducer_from_basic_transducer(const hfst::implementations::HfstBasicTransducer & t, hfst::ImplementationType impl) { return new HfstTransducer(t, impl); }
+  HfstTransducer * copy_hfst_transducer_from_basic_transducer(const hfst::implementations::HfstIterableTransducer & t) { return new HfstTransducer(t, type); }
+  HfstTransducer * copy_hfst_transducer_from_basic_transducer(const hfst::implementations::HfstIterableTransducer & t, hfst::ImplementationType impl) { return new HfstTransducer(t, impl); }
 
   hfst::HfstOutputStream * create_hfst_output_stream(const std::string & filename, hfst::ImplementationType type, bool hfst_format)
   {

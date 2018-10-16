@@ -6,7 +6,7 @@ import hfst
 
 diritems = \
 ['EPSILON',
- 'HfstBasicTransducer', 'HfstBasicTransition', 'HfstInputStream', 'HfstOutputStream',
+ 'HfstIterableTransducer', 'HfstTransition', 'HfstInputStream', 'HfstOutputStream',
  'HfstTokenizer', 'HfstTransducer', 'IDENTITY', 'LexcCompiler', 'PmatchContainer',
  'UNKNOWN',
  'XfstCompiler', 'XreCompiler', 'compile_lexc_file',

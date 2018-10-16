@@ -62,7 +62,7 @@ for type in types:
         f.close()
         
         # StateIsNotFinalException
-        tr = hfst.HfstBasicTransducer()
+        tr = hfst.HfstIterableTransducer()
         tr.add_state(1)
         # An exception is thrown as state number 1 is not final
         try:
@@ -85,7 +85,7 @@ for type in types:
             print('Transducers must be automata in cross product.')
         
         # StateIndexOutOfBoundsException
-        tr = hfst.HfstBasicTransducer()
+        tr = hfst.HfstIterableTransducer()
         tr.add_state(1)
         try:
             w = tr.get_final_weight(2)
@@ -137,20 +137,20 @@ for type in types:
         if not tr.compare(hfst.regex('[foo:foo bar:b 0:a 0:z]')):
             raise RuntimeError('')
 
-        # HfstBasicTransducer
+        # HfstIterableTransducer
         # Create an empty transducer
         # The transducer has initially one start state (number zero)
         # that is not final
-        fsm = hfst.HfstBasicTransducer()
+        fsm = hfst.HfstIterableTransducer()
         # Add two states to the transducer
         fsm.add_state(1)
         fsm.add_state(2)
         # Create a transition [foo:bar] leading to state 1 with weight 0.1
-        tr = hfst.HfstBasicTransition(1, 'foo', 'bar', 0.1)
+        tr = hfst.HfstTransition(1, 'foo', 'bar', 0.1)
         # and add it to state zero
         fsm.add_transition(0, tr)
         # Add a transition [baz:baz] with weight 0 from state 1 to state 2
-        fsm.add_transition(1, hfst.HfstBasicTransition(2, 'baz', 'baz', 0.0))
+        fsm.add_transition(1, hfst.HfstTransition(2, 'baz', 'baz', 0.0))
         # Set state 2 as final with weight 0.3
         fsm.set_final_weight(2, 0.3)
         # Go through all states
@@ -168,8 +168,8 @@ for type in types:
             if fsm.is_final_state(state):
                 print('%i %f' % (state, fsm.get_final_weight(state)) )
         
-        # HfstBasicTransducer.disjunct
-        lexicon = hfst.HfstBasicTransducer()
+        # HfstIterableTransducer.disjunct
+        lexicon = hfst.HfstIterableTransducer()
         tok = hfst.HfstTokenizer()
         lexicon.disjunct(tok.tokenize('dog'), 0.3)
         lexicon.disjunct(tok.tokenize('cat'), 0.5)
@@ -178,7 +178,7 @@ for type in types:
         if not lexicon.compare(hfst.regex('{dog}::0.3|{cat}::0.5|{elephant}::1.6')):
             raise RuntimeError('')
         
-        # HfstBasicTransducer.transitions
+        # HfstIterableTransducer.transitions
         for state in fsm.states():
             for arc in fsm.transitions(state):
                 print('%i ' % (state), end='')
@@ -186,38 +186,38 @@ for type in types:
             if fsm.is_final_state(state):
                 print('%i %f' % (state, fsm.get_final_weight(state)) )
         
-        # HfstBasicTransducer.substitute and HfstTransducer.substitute
+        # HfstIterableTransducer.substitute and HfstTransducer.substitute
         HFST = hfst.regex('a:a')
-        basic = hfst.HfstBasicTransducer(HFST)
+        basic = hfst.HfstIterableTransducer(HFST)
         HFST.substitute('a', 'A', input=True, output=False)
         basic.substitute('a', 'A', input=True, output=False)
         
         HFST = hfst.regex('a a:b b')
-        basic = hfst.HfstBasicTransducer(HFST)
+        basic = hfst.HfstIterableTransducer(HFST)
         HFST.substitute(('a','b'),('A','B'))
         basic.substitute(('a','b'),('A','B'))
         
         HFST = hfst.regex('a a:b b')
-        basic = hfst.HfstBasicTransducer(HFST)
+        basic = hfst.HfstIterableTransducer(HFST)
         HFST.substitute(('a','b'), (('A','B'),('a','B'),('A','b')))
         basic.substitute(('a','b'), (('A','B'),('a','B'),('A','b')))
         
         HFST = hfst.regex('a a:b b')
-        basic = hfst.HfstBasicTransducer(HFST)
+        basic = hfst.HfstIterableTransducer(HFST)
         HFST.substitute(('a','b'), hfst.regex('[a:b]+'))
-        basic.substitute(('a','b'), hfst.HfstBasicTransducer(hfst.regex('[a:b]+')))
+        basic.substitute(('a','b'), hfst.HfstIterableTransducer(hfst.regex('[a:b]+')))
         
         HFST = hfst.regex('a b c d')
-        basic = hfst.HfstBasicTransducer(HFST)
+        basic = hfst.HfstIterableTransducer(HFST)
         HFST.substitute({'a':'A', 'b':'B', 'c':'C'})
         basic.substitute({'a':'A', 'b':'B', 'c':'C'})
         
         HFST = hfst.regex('a a:b b b:c c c:d d')
-        basic = hfst.HfstBasicTransducer(HFST)
+        basic = hfst.HfstIterableTransducer(HFST)
         HFST.substitute( {('a','a'):('A','A'), ('b','b'):('B','B'), ('c','c'):('C','C')} )
         basic.substitute( {('a','a'):('A','A'), ('b','b'):('B','B'), ('c','c'):('C','C')} )
         
-        # HfstBasicTransducer.enumerate
+        # HfstIterableTransducer.enumerate
         for state, arcs in enumerate(fsm):
             for arc in arcs:
                 print('%i ' % (state), end='')
@@ -342,7 +342,7 @@ for type in types:
 # QuickStart (2/3)
 
 # Create as HFST basic transducer [a:b] with transition weight 0.3 and final weight 0.5.
-        t = hfst.HfstBasicTransducer()
+        t = hfst.HfstIterableTransducer()
         t.add_state(1)
         t.add_transition(0, 1, 'a', 'b', 0.3)
         t.set_final_weight(1, 0.5)
@@ -352,7 +352,7 @@ for type in types:
         T.push_weights_to_end()
 
 # Convert back to HFST basic transducer.
-        tc = hfst.HfstBasicTransducer(T)
+        tc = hfst.HfstIterableTransducer(T)
         try:
         # Rounding might affect the precision.
             if (0.79 < tc.get_final_weight(1)) and (tc.get_final_weight(1) < 0.81):

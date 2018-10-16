@@ -32,8 +32,8 @@ FUNCTIONS:
 CLASSES:
 
     AttReader
-    HfstBasicTransducer
-    HfstBasicTransition
+    HfstIterableTransducer
+    HfstTransition
     HfstInputStream
     HfstOutputStream
     HfstTokenizer
@@ -53,7 +53,7 @@ import hfst.exceptions
 import hfst.sfst_rules
 import hfst.xerox_rules
 from libhfst import is_diacritic, compile_pmatch_expression, HfstTransducer, HfstOutputStream, HfstInputStream, \
-HfstTokenizer, HfstBasicTransducer, HfstBasicTransition, XreCompiler, LexcCompiler, \
+HfstTokenizer, HfstIterableTransducer, HfstTransition, XreCompiler, LexcCompiler, \
 XfstCompiler, set_default_fst_type, get_default_fst_type, fst_type_to_string, PmatchContainer, Location
 import libhfst
 
@@ -381,7 +381,7 @@ def read_att_string(att):
     Create a transducer as defined in AT&T format in *att*.
     """
     linecount = 0
-    fsm = HfstBasicTransducer()
+    fsm = HfstIterableTransducer()
     lines = att.split('\n')
     for line in lines:
         linecount = linecount + 1
@@ -395,7 +395,7 @@ def read_att_input():
     An empty line signals the end of input.
     """
     linecount = 0
-    fsm = HfstBasicTransducer()
+    fsm = HfstIterableTransducer()
     while True:
         line = input().rstrip()
         if line == "":
@@ -412,7 +412,7 @@ def read_att_transducer(f, epsilonstr=EPSILON, linecount=[0]):
     line in the file.
     """
     linecount_ = 0
-    fsm = HfstBasicTransducer()
+    fsm = HfstIterableTransducer()
     while True:
         line = f.readline()
         if line == "":
@@ -528,7 +528,7 @@ def read_prolog_transducer(f, linecount=[0]):
     keeps track of the current line in the file.
     """
     linecount_ = 0
-    fsm = HfstBasicTransducer()
+    fsm = HfstIterableTransducer()
     
     line = ""
     while(True):
@@ -983,7 +983,7 @@ def fsa(arg):
 
     """
     deftok = HfstTokenizer()
-    retval = HfstBasicTransducer()
+    retval = HfstIterableTransducer()
     if isinstance(arg, str):
        if len(arg) == 0:
            retval.set_final_weight(0, 0) # epsilon transducer with zero weight
@@ -1095,7 +1095,7 @@ def fst_to_fsa(fst, separator=''):
 
     """
     encoded_symbols = libhfst.StringSet()
-    retval = hfst.HfstBasicTransducer(fst)
+    retval = hfst.HfstIterableTransducer(fst)
     for state in retval.states():
         arcs = retval.transitions(state)
         for arc in arcs:
@@ -1155,7 +1155,7 @@ def fsa_to_fst(fsa, separator=''):
 
     will create again the original transducer [f:b o:a o:r].
     """
-    retval = hfst.HfstBasicTransducer(fsa)
+    retval = hfst.HfstIterableTransducer(fsa)
     encoded_symbols = libhfst.StringSet()
     for state in retval.states():
         arcs = retval.transitions(state)
@@ -1215,7 +1215,7 @@ def tokenized_fst(arg, weight=0):
 
     will create the transducer [foo:foo bar:b 0:a 0:z].
     """
-    retval = HfstBasicTransducer()
+    retval = HfstIterableTransducer()
     state = 0
     if isinstance(arg, list) or isinstance(arg, tuple):
        for token in arg:

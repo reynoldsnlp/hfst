@@ -60,7 +60,7 @@ HfstOneLevelPaths lookup_vector(const hfst::HfstTransducer * tr, bool fd, const 
     }
 
   hfst::HfstTwoLevelPaths result;
-  hfst::HfstBasicTransducer fsm(*tr);
+  hfst::HfstIterableTransducer fsm(*tr);
   (void)time_cutoff;
   fsm.lookup(s, result, NULL, NULL, limit, fd);
   return hfst::extract_output_side(result);
@@ -76,7 +76,7 @@ HfstOneLevelPaths lookup_string(const hfst::HfstTransducer * tr, bool fd, const 
       delete res_ptr;
       return res;
     }
-  hfst::HfstBasicTransducer fsm(*tr);
+  hfst::HfstIterableTransducer fsm(*tr);
   hfst::StringSet alpha = fsm.get_input_symbols();
   hfst::HfstTokenizer tok;
   for (hfst::StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)

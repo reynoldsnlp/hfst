@@ -244,7 +244,7 @@ for type in types:
 #      output='dict' # 'dict' (default), 'text', 'raw'
 
 
-    fsm = hfst.HfstBasicTransducer(tr)
+    fsm = hfst.HfstIterableTransducer(tr)
     print(fsm.lookup((('foo'))), file=f)
 
     print(tr.extract_paths(obey_flags='True', filter_flags='False', max_number=3, output='dict'), file=f)
@@ -450,14 +450,14 @@ for type in types:
     tr = hfst.regex('foo bar')
     assert(tr.compare(hfst.regex('foo bar')))
 
-# print('\n--- Testing HfstBasicTransducer ---\n')
+# print('\n--- Testing HfstIterableTransducer ---\n')
 
 # Create basic transducer, write it to file, read it, and test equivalence
-fsm = hfst.HfstBasicTransducer()
+fsm = hfst.HfstIterableTransducer()
 fsm.add_state(0)
 fsm.add_state(1)
 fsm.set_final_weight(1, 0.3)
-tr = hfst.HfstBasicTransition(1, 'foo', 'bar', 0.5)
+tr = hfst.HfstTransition(1, 'foo', 'bar', 0.5)
 fsm.add_transition(0, tr)
 fsm.add_transition(0, 0, 'baz', 'baz')
 fsm.add_transition(0, 0, 'baz', 'BAZ', 0.1)
@@ -467,11 +467,11 @@ fsm.write_att(f)
 f.close()
 
 f = open('foo_basic', 'r')
-fsm2 = hfst.HfstBasicTransducer(hfst.read_att_transducer(f, hfst.EPSILON))
+fsm2 = hfst.HfstIterableTransducer(hfst.read_att_transducer(f, hfst.EPSILON))
 f.close()
 
 # Modify weights of a basic transducer
-fsm = hfst.HfstBasicTransducer()
+fsm = hfst.HfstIterableTransducer()
 fsm.add_state(0)
 fsm.add_state(1)
 fsm.set_final_weight(1, 0.3)
@@ -492,13 +492,13 @@ assert(arcs[0].get_weight() == 0.5)
 # this test does not assert anything
 #for type in types:
 #    FSM.convert(type)
-#    Fsm = hfst.HfstBasicTransducer(FSM)
+#    Fsm = hfst.HfstIterableTransducer(FSM)
 #    FSM2.convert(type)
-#    Fsm2 = hfst.HfstBasicTransducer(FSM2)
+#    Fsm2 = hfst.HfstIterableTransducer(FSM2)
 
 
 # Print basic transducer
-fsm = hfst.HfstBasicTransducer()
+fsm = hfst.HfstIterableTransducer()
 for state in [0,1,2]:
     fsm.add_state(state)
 fsm.add_transition(0,1,'foo','bar',1)
@@ -533,19 +533,19 @@ for state in fsm.states_and_transitions():
 print(fsm, file=f)
 f.close()
 
-tr = hfst.HfstBasicTransducer(hfst.regex('foo'))
+tr = hfst.HfstIterableTransducer(hfst.regex('foo'))
 tr.substitute({'foo':'bar'})
 tr.substitute({('foo','foo'):('bar','bar')})
 
 tr = hfst.fst({'foo':'bar'})
-fst = hfst.HfstBasicTransducer(tr)
+fst = hfst.HfstIterableTransducer(tr)
 fsa = hfst.fst_to_fsa(fst, '^')
 fst = hfst.fsa_to_fst(fsa, '^')
 TR = hfst.HfstTransducer(fst)
 assert(TR.compare(tr))
 
 tr = hfst.regex('{foo}:{bar}|{FOO}:{BAR}')
-fsm = hfst.HfstBasicTransducer(tr)
+fsm = hfst.HfstIterableTransducer(tr)
 net = fsm.states_and_transitions()
 for state in net:
     for arc in state:

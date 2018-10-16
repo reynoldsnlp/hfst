@@ -45,7 +45,7 @@ std::vector<hfst::HfstTransducer> compile_pmatch_expression(const std::string & 
     harmonizer.convert(hfst::HFST_OLW_TYPE);
     // Use these for naughty intermediate steps to make sure
     // everything has the same alphabet
-    hfst::HfstBasicTransducer * intermediate_tmp;
+    hfst::HfstIterableTransducer * intermediate_tmp;
     hfst_ol::Transducer * harmonized_tmp;
     hfst::HfstTransducer * output_tmp;
 
