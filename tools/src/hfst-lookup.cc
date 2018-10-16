@@ -54,7 +54,7 @@ using hfst::hfst_fprintf_console;
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "implementations/HfstBasicTransducer.h"
+#include "implementations/HfstIterableTransducer.h"
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
@@ -70,8 +70,8 @@ using hfst::HfstTransducer;
 using hfst::HFST_OL_TYPE;
 using hfst::HFST_OLW_TYPE;
 using hfst::implementations::HfstState;
-using hfst::implementations::HfstBasicTransducer;
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstIterableTransducer;
+using hfst::implementations::HfstTransition;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
@@ -1124,7 +1124,7 @@ line_to_lookup_path(char** s, hfst::HfstStrings2FstTokenizer& tok,
     return rv;
 }
 
-void lookup_fd_and_print(HfstBasicTransducer * tr, HfstTransducer * TR, HfstOneLevelPaths& results,
+void lookup_fd_and_print(HfstIterableTransducer * tr, HfstTransducer * TR, HfstOneLevelPaths& results,
                          const HfstOneLevelPath& s, size_t * limit = NULL, bool print_pairs_at_this_point = false,
                          bool print_fail = false, const HfstOneLevelPath * input_to_print = NULL,
                          bool no_newline = false);
@@ -1247,7 +1247,7 @@ bool is_possible_to_get_result(const HfstOneLevelPath & s,
 static unsigned int transducer_number=0;
 
 
-void lookup_fd_and_print(HfstBasicTransducer * tr, HfstTransducer * TR, HfstOneLevelPaths& results,
+void lookup_fd_and_print(HfstIterableTransducer * tr, HfstTransducer * TR, HfstOneLevelPaths& results,
                          const HfstOneLevelPath& s, size_t * limit /* = NULL*/, bool print_pairs_at_this_point/* = false*/,
                          bool print_fail /* = false*/, const HfstOneLevelPath * input_to_print /* = NULL*/,
                          bool no_newline /* = false*/)
@@ -1398,7 +1398,7 @@ void lookup_fd_and_print(HfstBasicTransducer * tr, HfstTransducer * TR, HfstOneL
 
 
 HfstOneLevelPaths*
-lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity, bool print_pairs_at_this_point=false, bool print_fail=false, const HfstOneLevelPath * input_to_print = NULL, bool no_newline=false)
+lookup_simple(const HfstOneLevelPath& s, HfstIterableTransducer& t, bool* infinity, bool print_pairs_at_this_point=false, bool print_fail=false, const HfstOneLevelPath * input_to_print = NULL, bool no_newline=false)
 {
   HfstOneLevelPaths* results = new HfstOneLevelPaths;
 
@@ -1527,7 +1527,7 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstTransducer> & cascade,
 
 
 HfstOneLevelPaths*
-lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> & cascade,
+lookup_cascading(const HfstOneLevelPath& s, vector<HfstIterableTransducer> & cascade,
                  bool* infinity)
 {
   HfstOneLevelPaths* results = new HfstOneLevelPaths;
@@ -1712,7 +1712,7 @@ perform_lookups(HfstOneLevelPath& origin, std::vector<HfstTransducer>& cascade,
 
 
 HfstOneLevelPaths*
-perform_lookups(HfstOneLevelPath& origin, std::vector<HfstBasicTransducer>& cascade,
+perform_lookups(HfstOneLevelPath& origin, std::vector<HfstIterableTransducer>& cascade,
                 bool unknown, bool* infinite)
 {
   HfstOneLevelPaths* kvs;
@@ -1738,7 +1738,7 @@ int
 process_stream(HfstInputStream& inputstream, FILE* outstream)
 {
     std::vector<HfstTransducer> cascade;
-    std::vector<HfstBasicTransducer> cascade_mut;
+    std::vector<HfstIterableTransducer> cascade_mut;
     // set to false if non-ol transducer is pushed into the cascade
     bool only_optimized_lookup=true;
     
@@ -1777,11 +1777,11 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
             type == hfst::LOG_OPENFST_TYPE ||
             type == hfst::FOMA_TYPE)
         {
-            HfstBasicTransducer basic(trans);
-            for (HfstBasicTransducer::const_iterator it = basic.begin();
+            HfstIterableTransducer basic(trans);
+            for (HfstIterableTransducer::const_iterator it = basic.begin();
                  it != basic.end(); it++)
               {
-                for (hfst::implementations::HfstBasicTransitions::const_iterator
+                for (hfst::implementations::HfstTransitions::const_iterator
                        tr_it = it->begin(); tr_it != it->end(); tr_it++)
                   {
                     std::string mcs = tr_it->get_input_symbol();
@@ -1834,7 +1834,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     }
 
     // if transducer type is other than optimized_lookup,
-    // convert to HfstBasicTransducer
+    // convert to HfstIterableTransducer
 
     char* line = 0;
     size_t llen = 0;

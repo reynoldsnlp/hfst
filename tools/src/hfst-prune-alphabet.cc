@@ -47,7 +47,7 @@
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstIterableTransducer;
 
 // add tools-specific variables here
 bool force_pruning = false;

@@ -42,7 +42,7 @@
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "implementations/HfstBasicTransducer.h"
+#include "implementations/HfstIterableTransducer.h"
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
@@ -51,8 +51,8 @@ using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::implementations::HfstState;
-using hfst::implementations::HfstBasicTransducer;
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstIterableTransducer;
+using hfst::implementations::HfstTransition;
 
 
 // add tools-specific variables here
@@ -351,18 +351,18 @@ static
 HfstTransducer&
 do_reweight(HfstTransducer& trans)
   {
-        HfstBasicTransducer original(trans);
-        HfstBasicTransducer replication;
+        HfstIterableTransducer original(trans);
+        HfstIterableTransducer replication;
         HfstState state_count = 1;
         std::map<HfstState,HfstState> rebuilt;
-        rebuilt[0] = 0;  // HfstBasicTransducer initially has state number zero
+        rebuilt[0] = 0;  // HfstIterableTransducer initially has state number zero
 	if (original.is_final_state(0))
 	  {
 	    float nuweight = reweight(original.get_final_weight(0), 0, 0);
 	    replication.set_final_weight(0, nuweight);
 	  }
         HfstState source_state=0;
-        for (HfstBasicTransducer::const_iterator state = original.begin();
+        for (HfstIterableTransducer::const_iterator state = original.begin();
              state != original.end();
              ++state)
           {
@@ -377,7 +377,7 @@ do_reweight(HfstTransducer& trans)
                 rebuilt[source_state] = state_count;
                 state_count++;
               }
-            for (hfst::implementations::HfstBasicTransitions::const_iterator arc =
+            for (hfst::implementations::HfstTransitions::const_iterator arc =
                  state->begin();
                  arc != state->end();
                  ++arc)
@@ -393,7 +393,7 @@ do_reweight(HfstTransducer& trans)
                     rebuilt[arc->get_target_state()] = state_count;
                     state_count++;
                   }
-                HfstBasicTransition nu(rebuilt[arc->get_target_state()],
+                HfstTransition nu(rebuilt[arc->get_target_state()],
                                        arc->get_input_symbol(),
                                        arc->get_output_symbol(),
                                        reweight(arc->get_weight(),

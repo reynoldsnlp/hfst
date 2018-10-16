@@ -48,7 +48,7 @@
 
 using hfst::HfstTransducer;
 using hfst::HfstOutputStream;
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstIterableTransducer;
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
@@ -213,8 +213,8 @@ process_stream(HfstOutputStream& outstream)
             }
 
           try {
-            HfstBasicTransducer fsm =
-              HfstBasicTransducer::read_in_prolog_format(inputfile, linecount);
+            HfstIterableTransducer fsm =
+              HfstIterableTransducer::read_in_prolog_format(inputfile, linecount);
 
             if (check_negative_epsilon_cycles)
               {
@@ -254,7 +254,7 @@ process_stream(HfstOutputStream& outstream)
             if (check_negative_epsilon_cycles)
               {
                 verbose_printf("Checking if the transducer has epsilon cycles with a negative weight...\n");
-                hfst::implementations::HfstBasicTransducer fsm(t);
+                hfst::implementations::HfstIterableTransducer fsm(t);
                 if (fsm.has_negative_epsilon_cycles())
                   {
                     if (!silent)

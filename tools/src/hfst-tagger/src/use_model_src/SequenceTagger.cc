@@ -3,7 +3,7 @@
 
 #ifndef MAIN_TEST
 
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstTransition;
 using hfst::HfstTwoLevelPaths;
 using hfst::HfstTwoLevelPath;
 using hfst::HfstTransducer;
@@ -38,7 +38,7 @@ WeightedStringPairVector SequenceTagger::operator[]
   agenda.push(start_pair);
 
   // Initialize the result.
-  //HfstBasicTransducer result;
+  //HfstIterableTransducer result;
 
   // The start configuration (0,0) correspond to the start state of the result
   // which is 0.
@@ -187,27 +187,27 @@ SequenceTagger::get_weighted_analysis(AcyclicAutomaton &result) const
 using hfst::implementations::HfstState;
 using hfst::HfstTransducer;
 using hfst::TROPICAL_OPENFST_TYPE;
-using hfst::implementations::HfstBasicTransducer;
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstIterableTransducer;
+using hfst::implementations::HfstTransition;
 
 int main(void)
 {
-  HfstBasicTransducer b_a;
+  HfstIterableTransducer b_a;
   b_a.add_state();
   b_a.add_state();
   b_a.add_state();
 
-  b_a.add_transition(0,HfstBasicTransition(1,DEFAULT_SYMBOL,DEFAULT_SYMBOL,0.0));
+  b_a.add_transition(0,HfstTransition(1,DEFAULT_SYMBOL,DEFAULT_SYMBOL,0.0));
 
-  b_a.add_transition(1,HfstBasicTransition(2,"A","A",1.0));
-  b_a.add_transition(1,HfstBasicTransition(2,"B","B",10.0));
-  b_a.add_transition(1,HfstBasicTransition(2,DEFAULT_SYMBOL,DEFAULT_SYMBOL,10.0));
+  b_a.add_transition(1,HfstTransition(2,"A","A",1.0));
+  b_a.add_transition(1,HfstTransition(2,"B","B",10.0));
+  b_a.add_transition(1,HfstTransition(2,DEFAULT_SYMBOL,DEFAULT_SYMBOL,10.0));
 
-  b_a.add_transition(2,HfstBasicTransition(3,DEFAULT_SYMBOL,DEFAULT_SYMBOL,0.0));
+  b_a.add_transition(2,HfstTransition(3,DEFAULT_SYMBOL,DEFAULT_SYMBOL,0.0));
 
-  b_a.add_transition(3,HfstBasicTransition(0,"A","A",10.0));
-  b_a.add_transition(3,HfstBasicTransition(0,"B","B",2.0));
-  b_a.add_transition(3,HfstBasicTransition(0,DEFAULT_SYMBOL,DEFAULT_SYMBOL,10.0));
+  b_a.add_transition(3,HfstTransition(0,"A","A",10.0));
+  b_a.add_transition(3,HfstTransition(0,"B","B",2.0));
+  b_a.add_transition(3,HfstTransition(0,DEFAULT_SYMBOL,DEFAULT_SYMBOL,10.0));
 
   for (HfstState s = 0; s <= b_a.get_max_state(); ++s)
     { b_a.set_final_weight(s,0.0); }

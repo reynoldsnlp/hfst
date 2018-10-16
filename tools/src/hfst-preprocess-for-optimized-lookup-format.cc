@@ -45,8 +45,8 @@ using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::implementations::HfstState;
-using hfst::implementations::HfstBasicTransducer;
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstIterableTransducer;
+using hfst::implementations::HfstTransition;
 
 
 // add tools-specific variables here
@@ -137,13 +137,13 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         {
           verbose_printf("Rebuilding and fisting %s..." SIZE_T_SPECIFIER "\n", inputname, transducer_n);
         }
-        HfstBasicTransducer original(trans);
-        HfstBasicTransducer replication;
+        HfstIterableTransducer original(trans);
+        HfstIterableTransducer replication;
         HfstState state_count = 1;
         std::map<HfstState,HfstState> rebuilt;
         rebuilt[0] = 0;
         HfstState source_state=0;
-        for (HfstBasicTransducer::const_iterator state = original.begin();
+        for (HfstIterableTransducer::const_iterator state = original.begin();
              state != original.end();
              ++state)
           {
@@ -158,7 +158,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                 rebuilt[source_state] = state_count;
                 state_count++;
               }
-            for (HfstBasicTransducer::HfstTransitions::const_iterator arc =
+            for (HfstIterableTransducer::HfstTransitions::const_iterator arc =
                  state->begin();
                  arc != state->end();
                  ++arc)
@@ -174,7 +174,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                     rebuilt[arc->get_target_state()] = state_count;
                     state_count++;
                   }
-                HfstBasicTransition nu(rebuilt[arc->get_target_state()],
+                HfstTransition nu(rebuilt[arc->get_target_state()],
                                        arc->get_input_symbol(),
                                        arc->get_output_symbol(),
                                        arc->get_weight());

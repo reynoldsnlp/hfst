@@ -177,7 +177,7 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer * dictionary)
          it != tokenizer_minus_dict.end(); ++it) {
         dictionary->insert_to_alphabet(*it);
     }
-    hfst::HfstBasicTransducer * tokenizer_basic = hfst::implementations::ConversionFunctions::
+    hfst::HfstIterableTransducer * tokenizer_basic = hfst::implementations::ConversionFunctions::
         hfst_transducer_to_hfst_basic_transducer(*tokenizer);
     hfst_ol::Transducer * tokenizer_ol = hfst::implementations::ConversionFunctions::
         hfst_basic_transducer_to_hfst_ol(tokenizer_basic,

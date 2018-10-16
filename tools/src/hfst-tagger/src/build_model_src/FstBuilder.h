@@ -31,7 +31,7 @@
 #include "HfstTransducer.h"
 #include "WeightedStringVectorCollection.h"
 
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstIterableTransducer;
 using hfst::HfstTransducer;
 using hfst::ImplementationType;
 using hfst::implementations::HfstState;
@@ -62,7 +62,7 @@ class FstBuilder
   ImplementationType type;
   float default_final_weight;
   std::string name;
-  HfstBasicTransducer model_fst;
+  HfstIterableTransducer model_fst;
   SymbolTargetStateMap start_state_targets;
   
   void add_transition(HfstState initial_state,

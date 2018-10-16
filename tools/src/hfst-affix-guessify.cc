@@ -34,7 +34,7 @@
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "implementations/HfstBasicTransducer.h"
+#include "implementations/HfstIterableTransducer.h"
 
 using std::map;
 using std::string;
@@ -43,9 +43,8 @@ using std::set;
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
-using hfst::implementations::HfstTransitionGraph;
-using hfst::implementations::HfstBasicTransducer;
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstIterableTransducer;
+using hfst::implementations::HfstTransition;
 using hfst::implementations::HfstState;
 using hfst::StringSet;
 
@@ -174,22 +173,22 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         {
           verbose_printf("Guessifying %s... " SIZE_T_SPECIFIER "\n", inputname, transducer_n);
         }
-      HfstBasicTransducer* repl = 0;
+      HfstIterableTransducer* repl = 0;
       HfstTransducer* t = 0;
       HfstState guess_state = 0;
-      HfstBasicTransducer* mutt = 0;
+      HfstIterableTransducer* mutt = 0;
       set<HfstState> replayed;
-      HfstBasicTransducer::const_iterator i;
+      HfstIterableTransducer::const_iterator i;
       StringSet alpha = trans->get_alphabet();
       switch (direction)
         {
         case GUESS_SUFFIX:
             {
           verbose_printf("Creating guesser prefix...\n");
-          mutt = new HfstBasicTransducer(*trans);
-          repl = new HfstBasicTransducer();
+          mutt = new HfstIterableTransducer(*trans);
+          repl = new HfstIterableTransducer();
           guess_state = repl->add_state(0);
-          HfstBasicTransition guess_arc(guess_state,
+          HfstTransition guess_arc(guess_state,
                                         hfst::internal_identity,
                                         hfst::internal_identity,
                                         weight);
@@ -198,7 +197,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                x != alpha.end();
                ++x)
             {
-              HfstBasicTransition x_arc(guess_state,
+              HfstTransition x_arc(guess_state,
                                         *x,
                                         *x,
                                         weight);
@@ -214,7 +213,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                   repl->set_final_weight(d,
                                         mutt->get_final_weight(s));
                 }
-              HfstBasicTransition guess_arc(d,
+              HfstTransition guess_arc(d,
                                             hfst::internal_identity,
                                             hfst::internal_identity,
                                             weight);
@@ -223,18 +222,18 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                    x != alpha.end();
                    ++x)
                 {
-                  HfstBasicTransition x_arc(d,
+                  HfstTransition x_arc(d,
                                             *x,
                                             *x,
                                             weight);
                   repl->add_transition(guess_state, x_arc);
                 }
-              for (hfst::implementations::HfstBasicTransitions::const_iterator arc =
+              for (hfst::implementations::HfstTransitions::const_iterator arc =
                    i->begin();
                    arc != i->end();
                    ++arc)
                 {
-                  HfstBasicTransition newarc(arc->get_target_state() + 1,
+                  HfstTransition newarc(arc->get_target_state() + 1,
                                              arc->get_input_symbol(),
                                              arc->get_output_symbol(),
                                              arc->get_weight());
@@ -250,10 +249,10 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         case GUESS_PREFIX:
             {
           verbose_printf("Creating guesser suffix...\n");
-          repl = new HfstBasicTransducer(*trans);
+          repl = new HfstIterableTransducer(*trans);
           guess_state = repl->add_state();
           repl->set_final_weight(guess_state, 0);
-          HfstBasicTransition guess_arc(guess_state,
+          HfstTransition guess_arc(guess_state,
                                         hfst::internal_identity,
                                         hfst::internal_identity,
                                         weight);
@@ -262,7 +261,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           HfstState max_state = repl->get_max_state();
           for (HfstState s = 0; s <= max_state; s++)
             {
-              HfstBasicTransition newarc(guess_state,
+              HfstTransition newarc(guess_state,
                                          hfst::internal_identity,
                                          hfst::internal_identity,
                                          weight);

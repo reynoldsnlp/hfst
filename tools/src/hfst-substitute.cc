@@ -37,14 +37,14 @@
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "implementations/HfstBasicTransducer.h"
+#include "implementations/HfstIterableTransducer.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::implementations::HfstState;
-using hfst::implementations::HfstBasicTransducer;
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstIterableTransducer;
+using hfst::implementations::HfstTransition;
 using hfst::String;
 using hfst::StringPair;
 typedef std::map<String, String> HfstSymbolSubstitutions;
@@ -315,8 +315,8 @@ parse_options(int argc, char** argv)
 }
 
 static
-HfstBasicTransducer&
-do_substitute(HfstBasicTransducer& trans, size_t transducer_n)
+HfstIterableTransducer&
+do_substitute(HfstIterableTransducer& trans, size_t transducer_n)
 {
   if (from_pair && to_pair)
     {
@@ -596,7 +596,7 @@ process_stream(HfstInputStream& instream)
   HfstOutputStream outstream = (outfile != stdout) ?
     HfstOutputStream(outfilename, output_type) : HfstOutputStream(output_type);
 
-  HfstBasicTransducer* fallback = 0;
+  HfstIterableTransducer* fallback = 0;
   bool warnedAlready = false;
   bool fellback = false;
   while (instream.is_good())
@@ -721,7 +721,7 @@ process_stream(HfstInputStream& instream)
                           warning(0, 0, "substitution is not supported for this transducer type"
                                   " falling back to internal formats and trying...");
                         }
-                        fallback = new HfstBasicTransducer(trans);
+                        fallback = new HfstIterableTransducer(trans);
                         warnedAlready = true;
                       }
                     do_substitute(*fallback, transducer_n);
@@ -764,7 +764,7 @@ process_stream(HfstInputStream& instream)
                     warning(0, 0, "substitution is not supported for this transducer type"
                             " falling back to internal formats and trying...");
                   }
-                  fallback = new HfstBasicTransducer(trans);
+                  fallback = new HfstIterableTransducer(trans);
                 }
               do_substitute(*fallback, transducer_n);
               fellback = true;
@@ -859,7 +859,7 @@ process_stream(HfstInputStream& instream)
         }
       delete fallback;
       // TODO: remove this, this should be taken care in the interface
-      //fallback = new HfstBasicTransducer(trans);
+      //fallback = new HfstIterableTransducer(trans);
       //fallback->prune_alphabet();
       //trans = HfstTransducer(*fallback, trans.get_type());
       //#if HAVE_SFST

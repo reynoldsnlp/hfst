@@ -53,7 +53,7 @@ using std::map;
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
-using hfst::HfstBasicTransducer;
+using hfst::HfstIterableTransducer;
 using hfst::implementations::HfstState;
 
 // add tools-specific variables here

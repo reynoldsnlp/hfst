@@ -9,7 +9,7 @@
 
 #include "HfstTransducer.h"
 
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstIterableTransducer;
 
 #include "DataTypes.h"
 
@@ -17,7 +17,7 @@ class SequenceModelComponent
 {
  public:
   SequenceModelComponent(void);
-  SequenceModelComponent(const HfstBasicTransducer &fst);
+  SequenceModelComponent(const HfstIterableTransducer &fst);
   virtual ~SequenceModelComponent(void);
 
   static const State START_STATE;
@@ -37,11 +37,11 @@ class SequenceModelComponent
   StateFinalWeightMap state_final_weight_map;
   TransitionMap       transition_map;
 
-  static void add_symbols_from(const HfstBasicTransducer &fst);
+  static void add_symbols_from(const HfstIterableTransducer &fst);
   static void add_symbol(const std::string &string_symbol);
 
-  void add_state_final_weights_from(const HfstBasicTransducer &fst);
-  void add_transitions_from(const HfstBasicTransducer &fst);
+  void add_state_final_weights_from(const HfstIterableTransducer &fst);
+  void add_transitions_from(const HfstIterableTransducer &fst);
 
   void add_transition_to_map(Symbol2TransitionDataMap &symbol_to_transition,
 			     Symbol symbol,

@@ -43,18 +43,18 @@ TransitionData DelayedSequenceModelComponent::get_transition
 #include <cassert>
 #include <iostream>
 
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstTransition;
 
 int main(void)
 {
   // fst initially has one state.
-  HfstBasicTransducer fst;
+  HfstIterableTransducer fst;
 
   // Add a state, so that a transition can be added.
   fst.add_state();
 
   // Add a transition from state 0 to state 1.
-  fst.add_transition(0,HfstBasicTransition(1,"a","a",0.0));
+  fst.add_transition(0,HfstTransition(1,"a","a",0.0));
 
   // Set state 1 final.
   fst.set_final_weight(1,2.0);

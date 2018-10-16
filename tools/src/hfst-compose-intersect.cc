@@ -151,7 +151,7 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstIterableTransducer;
 using hfst::implementations::HfstState;
 using hfst::HfstTokenizer;
 
@@ -163,13 +163,13 @@ bool is_special_symbol(const std::string &symbol)
 std::string check_all_symbols(const HfstTransducer &lexicon,
                               const HfstTransducer &rule)
 {
-  HfstBasicTransducer rule_b(rule);
+  HfstIterableTransducer rule_b(rule);
 
   StringSet rule_input_symbols;
 
   for (HfstState s = 0; s <= rule_b.get_max_state(); ++s)
     {
-      for (hfst::implementations::HfstBasicTransitions::const_iterator it =
+      for (hfst::implementations::HfstTransitions::const_iterator it =
              rule_b[s].begin();
            it != rule_b[s].end();
            ++it)
@@ -182,11 +182,11 @@ std::string check_all_symbols(const HfstTransducer &lexicon,
   if (rule_input_symbols.count(hfst::internal_identity) != 0)
     { return ""; }
 
-  HfstBasicTransducer lexicon_b(lexicon);
+  HfstIterableTransducer lexicon_b(lexicon);
 
   for (HfstState s = 0; s <= lexicon_b.get_max_state(); ++s)
     {
-      for (hfst::implementations::HfstBasicTransitions::const_iterator it =
+      for (hfst::implementations::HfstTransitions::const_iterator it =
              lexicon_b[s].begin();
            it != lexicon_b[s].end();
            ++it)
@@ -204,8 +204,8 @@ std::string check_all_symbols(const HfstTransducer &lexicon,
 std::string check_multi_char_symbols
 (const HfstTransducer &lexicon, const HfstTransducer &rule)
 {
-  HfstBasicTransducer lexicon_b(lexicon);
-  HfstBasicTransducer rule_b(rule);
+  HfstIterableTransducer lexicon_b(lexicon);
+  HfstIterableTransducer rule_b(rule);
 
   HfstTokenizer tokenizer;
 
@@ -213,7 +213,7 @@ std::string check_multi_char_symbols
 
   for (HfstState s = 0; s <= rule_b.get_max_state(); ++s)
     {
-      for (hfst::implementations::HfstBasicTransitions::const_iterator it =
+      for (hfst::implementations::HfstTransitions::const_iterator it =
              rule_b[s].begin();
            it != rule_b[s].end();
            ++it)
@@ -225,7 +225,7 @@ std::string check_multi_char_symbols
 
   for (HfstState s = 0; s <= lexicon_b.get_max_state(); ++s)
     {
-      for (hfst::implementations::HfstBasicTransitions::const_iterator it =
+      for (hfst::implementations::HfstTransitions::const_iterator it =
              lexicon_b[s].begin();
            it != lexicon_b[s].end();
            ++it)

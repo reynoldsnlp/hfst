@@ -26,11 +26,11 @@
 using hfst::TROPICAL_OPENFST_TYPE;
 using hfst::HFST_OLW_TYPE;
 
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstIterableTransducer;
 using hfst::implementations::HfstState;
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstTransition;
 
-typedef hfst::implementations::HfstBasicTransitions HfstBasicTransitions;
+typedef hfst::implementations::HfstTransitions HfstTransitions;
 
 using hfst::internal_default;
 using hfst::internal_epsilon;
@@ -92,7 +92,7 @@ HfstTransducer get_prefix_remover(const StringSet &alphabet)
 
   HfstTransducer identity_except_cathegory(internal_identity,
                                            TROPICAL_OPENFST_TYPE);
-  HfstBasicTransducer basic_identity(identity_except_cathegory);
+  HfstIterableTransducer basic_identity(identity_except_cathegory);
 
   // Add cathegory symbols as paths in cathegory_symbols_fst and add
   // them to the alphabet of basic_identity so that the identity
@@ -220,7 +220,7 @@ HfstTransducer guessify_analyzer(HfstTransducer morphological_analyzer,
   // Add a sink state and default transitions from every state
   // (including the sink state) to the sink state. The default
   // transitions all have the same weight @a penalty.
-  HfstBasicTransducer basic_guesser(morphological_analyzer);
+  HfstIterableTransducer basic_guesser(morphological_analyzer);
 
   HfstState sink_state = basic_guesser.add_state();
 
@@ -233,7 +233,7 @@ HfstTransducer guessify_analyzer(HfstTransducer morphological_analyzer,
   for (HfstState s = 0; s <= basic_guesser.get_max_state(); ++s)
     {
       basic_guesser.add_transition
-        (s,HfstBasicTransition(sink_state,
+        (s,HfstTransition(sink_state,
                                my_default,
                                my_default,
                                penalty));
@@ -249,7 +249,7 @@ HfstTransducer guessify_analyzer(HfstTransducer morphological_analyzer,
           basic_guesser[s][0].get_input_symbol() == my_default)
         {
           basic_guesser.add_transition
-            (s, HfstBasicTransition(sink_state, "a",  "a", penalty));
+            (s, HfstTransition(sink_state, "a",  "a", penalty));
         }
     }
   

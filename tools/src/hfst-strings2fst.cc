@@ -51,7 +51,7 @@ using std::pair;
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "implementations/HfstBasicTransducer.h"
+#include "implementations/HfstIterableTransducer.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 #include "hfst-tool-metadata.h"
@@ -63,7 +63,7 @@ using std::pair;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
 using hfst::HfstTransducer;
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstIterableTransducer;
 //using hfst::HfstInternalTransducer;
 //using hfst::implementations::HfstTrie;
 using hfst::StringPairVector;
@@ -266,7 +266,7 @@ process_stream(HfstOutputStream& outstream)
   char* line = 0;
   size_t len = 0;
   HfstTokenizer tok;
-  HfstBasicTransducer disjunction;
+  HfstIterableTransducer disjunction;
   size_t line_n = 0;
 
   hfst::HfstStrings2FstTokenizer
@@ -355,7 +355,7 @@ process_stream(HfstOutputStream& outstream)
 
       if (!disjunct_strings) // each string into a transducer
         {
-          HfstBasicTransducer tr;
+          HfstIterableTransducer tr;
 
       if (logarithmic_weights_e)
         {

@@ -56,13 +56,13 @@ static bool   xerox_mode = false;
 
 using hfst::HfstInputStream;
 using hfst::HfstTransducer;
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstIterableTransducer;
 using hfst::implementations::HfstState;
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstTransition;
 using hfst::TROPICAL_OPENFST_TYPE;
 using hfst::ImplementationType;
 
-typedef std::vector<HfstBasicTransducer> BasicTransducerVector;
+typedef std::vector<HfstIterableTransducer> BasicTransducerVector;
 typedef std::vector<std::string> StringVector;
 typedef std::set<std::string> SymbolSet;
 
@@ -243,12 +243,12 @@ std::string backslash_escape(std::string perc_escaped)
 
 HfstState get_target(const std::string &isymbol,
              const std::string &osymbol,
-             HfstState s,const HfstBasicTransducer &t,
+             HfstState s,const HfstIterableTransducer &t,
              const SymbolSet &known_symbols)
 {
   HfstState identity_target = -1;
 
-  for (hfst::implementations::HfstBasicTransitions::const_iterator it = t[s].begin();
+  for (hfst::implementations::HfstTransitions::const_iterator it = t[s].begin();
        it != t[s].end();
        ++it)
     {
@@ -267,11 +267,11 @@ HfstState get_target(const std::string &isymbol,
     { return -1; }
 }
 
-bool is_final_state(HfstState s,const HfstBasicTransducer &t)
+bool is_final_state(HfstState s,const HfstIterableTransducer &t)
 { return t.is_final_state(s); }
 
 int test(const StringPairVector &tokenized_pair_string,
-     const HfstBasicTransducer &t,
+     const HfstIterableTransducer &t,
      bool positive,
      FILE * outfile,
      const SymbolSet &known_symbols)
@@ -303,7 +303,7 @@ int test(const StringPairVector &tokenized_pair_string,
 
 HfstTransducer get_transducer(const StringPairVector &tokenized_pair_string)
 {
-  HfstBasicTransducer t;
+  HfstIterableTransducer t;
   HfstState s = 0;
   for (StringPairVector::const_iterator it = tokenized_pair_string.begin();
        it != tokenized_pair_string.end();
@@ -311,7 +311,7 @@ HfstTransducer get_transducer(const StringPairVector &tokenized_pair_string)
     {
       HfstState target = t.add_state();
       t.add_transition
-    (s,HfstBasicTransition(target,it->first,it->second,0.0));
+    (s,HfstTransition(target,it->first,it->second,0.0));
       s = target;
     }
   t.set_final_weight(s,0.0);
@@ -328,7 +328,7 @@ std::string unescape(std::string symbol)
 }
 
 void print_recognized_prefix(const StringPairVector &tokenized_pair_string,
-                 const HfstBasicTransducer &str_transducer,
+                 const HfstIterableTransducer &str_transducer,
                  const std::string &name,
                  FILE * outfile,
                  const SymbolSet &known_symbols)
@@ -370,7 +370,7 @@ void print_recognized_prefix(const StringPairVector &tokenized_pair_string,
 }
 
 void print_failure_info(const StringPairVector &tokenized_pair_string,
-            const HfstBasicTransducer &t,const std::string &name,
+            const HfstIterableTransducer &t,const std::string &name,
             FILE * outfile,
             const SymbolSet &known_symbols)
 {
@@ -463,11 +463,11 @@ bool is_empty_or_comment(const char * line)
   return false;
 }
 
-void get_symbols(HfstBasicTransducer &t,SymbolSet &known_symbols)
+void get_symbols(HfstIterableTransducer &t,SymbolSet &known_symbols)
 {
-  for (HfstBasicTransducer::const_iterator it = t.begin(); it != t.end(); ++it)
+  for (HfstIterableTransducer::const_iterator it = t.begin(); it != t.end(); ++it)
     {
-      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
+      for (hfst::implementations::HfstTransitions::const_iterator jt =
          it->begin();
        jt != it->end();
        ++jt)

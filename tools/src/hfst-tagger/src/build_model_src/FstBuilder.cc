@@ -2,7 +2,7 @@
 
 #ifndef MAIN_TEST
 
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstTransition;
 
 FstBuilder::FstBuilder(ImplementationType type,
 		       float default_final_weight,
@@ -26,7 +26,7 @@ void FstBuilder::add_transition
  float weight)
 {
   model_fst.add_transition(initial_state,
-			   HfstBasicTransition
+			   HfstTransition
 			   (target_state,symbol,symbol,weight));
 }
 
@@ -38,7 +38,7 @@ void FstBuilder::add_transition
  float weight)
 {
   model_fst.add_transition(initial_state,
-			   HfstBasicTransition
+			   HfstTransition
 			   (target_state,isymbol,osymbol,weight));
 }
 
@@ -47,9 +47,9 @@ bool FstBuilder::has_target(HfstState s, const std::string &symbol)
   if (s == START_STATE)
     { return start_state_targets.count(symbol) != 0; }
 
-  const hfst::implementations::HfstBasicTransitions &transitions = model_fst[s];
+  const hfst::implementations::HfstTransitions &transitions = model_fst[s];
 
-  for (hfst::implementations::HfstBasicTransitions::const_iterator it =
+  for (hfst::implementations::HfstTransitions::const_iterator it =
 	 transitions.begin();
        it != transitions.end();
        ++it)
@@ -83,9 +83,9 @@ HfstState FstBuilder::get_target(HfstState s,
     }
   else
     {
-      const hfst::implementations::HfstBasicTransitions &transitions = model_fst[s];
+      const hfst::implementations::HfstTransitions &transitions = model_fst[s];
 
-      for (hfst::implementations::HfstBasicTransitions::const_iterator it =
+      for (hfst::implementations::HfstTransitions::const_iterator it =
 	     transitions.begin();
 	   it != transitions.end();
 	   ++it)

@@ -7,7 +7,7 @@
 
 const State SequenceModelComponent::START_STATE = 0;
 
-typedef HfstBasicTransducer::HfstAlphabet
+typedef HfstIterableTransducer::HfstAlphabet
 HfstTransitionGraphAlphabet;
 
 using hfst::internal_epsilon;
@@ -20,7 +20,7 @@ SequenceModelComponent::SequenceModelComponent(void):
   transition_map(1)
 { state_final_weight_map[0] = std::numeric_limits<float>::infinity(); }
 
-SequenceModelComponent::SequenceModelComponent(const HfstBasicTransducer &fst):
+SequenceModelComponent::SequenceModelComponent(const HfstIterableTransducer &fst):
   state_final_weight_map(fst.get_max_state() + 1),
   transition_map(fst.get_max_state() + 1)
 {
@@ -35,7 +35,7 @@ SequenceModelComponent::~SequenceModelComponent(void)
 void SequenceModelComponent::clear(void)
 { /* none */ }
 
-void SequenceModelComponent::add_symbols_from(const HfstBasicTransducer &fst)
+void SequenceModelComponent::add_symbols_from(const HfstIterableTransducer &fst)
 {
   add_symbol(internal_epsilon);
   add_symbol(DEFAULT_SYMBOL);
@@ -72,7 +72,7 @@ std::string SequenceModelComponent::get_string_symbol(Symbol symbol)
 }
 
 void SequenceModelComponent::add_state_final_weights_from
-(const HfstBasicTransducer &fst)
+(const HfstIterableTransducer &fst)
 {
   Weight infinity = std::numeric_limits<float>::infinity();
 
@@ -86,15 +86,15 @@ void SequenceModelComponent::add_state_final_weights_from
 }
 
 void SequenceModelComponent::add_transitions_from
-(const HfstBasicTransducer &fst)
+(const HfstIterableTransducer &fst)
 {
   for (State s = 0; s <= static_cast<int>(fst.get_max_state()); ++s)
     {
-      const hfst::implementations::HfstBasicTransitions transitions = fst[s];
+      const hfst::implementations::HfstTransitions transitions = fst[s];
 
       Symbol2TransitionDataMap &symbol_to_transition = transition_map[s];
 
-      for (hfst::implementations::HfstBasicTransitions::const_iterator it =
+      for (hfst::implementations::HfstTransitions::const_iterator it =
 	     transitions.begin();
 	   it != transitions.end();
 	   ++it)
@@ -172,12 +172,12 @@ TransitionData SequenceModelComponent::get_transition(State state,
 #include <cassert>
 #include <iostream>
 
-using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstTransition;
 
 int main(void)
 {
   // fst initially has one state.
-  HfstBasicTransducer fst;
+  HfstIterableTransducer fst;
 
   // Add three states in order to get four state totally.
   fst.add_state();
@@ -189,19 +189,19 @@ int main(void)
   fst.set_final_weight(3,2.0);
 
   // Add clockwise a-transitions.
-  fst.add_transition(0,HfstBasicTransition(1,"a","a",0.1));
-  fst.add_transition(1,HfstBasicTransition(2,"a","a",0.2));
-  fst.add_transition(2,HfstBasicTransition(3,"a","a",0.3));
-  fst.add_transition(3,HfstBasicTransition(0,"a","a",0.4));
+  fst.add_transition(0,HfstTransition(1,"a","a",0.1));
+  fst.add_transition(1,HfstTransition(2,"a","a",0.2));
+  fst.add_transition(2,HfstTransition(3,"a","a",0.3));
+  fst.add_transition(3,HfstTransition(0,"a","a",0.4));
 
   // Add counter clockwise b-transitions.
-  fst.add_transition(0,HfstBasicTransition(3,"b","b",1.1));
-  fst.add_transition(3,HfstBasicTransition(2,"b","b",1.2));
-  fst.add_transition(2,HfstBasicTransition(1,"b","b",1.3));
-  fst.add_transition(1,HfstBasicTransition(0,"b","b",1.4));
+  fst.add_transition(0,HfstTransition(3,"b","b",1.1));
+  fst.add_transition(3,HfstTransition(2,"b","b",1.2));
+  fst.add_transition(2,HfstTransition(1,"b","b",1.3));
+  fst.add_transition(1,HfstTransition(0,"b","b",1.4));
 
   // Add an extra <NONE>-transition from state 1 to state 2.
-  fst.add_transition(1,HfstBasicTransition(2,
+  fst.add_transition(1,HfstTransition(2,
 					   DEFAULT_SYMBOL,
 					   DEFAULT_SYMBOL,
 					   10.0));

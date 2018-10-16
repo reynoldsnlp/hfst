@@ -56,7 +56,7 @@ using std::pair;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::HfstTransducer;
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstIterableTransducer;
 using hfst::implementations::HfstState;
 
 // add tools-specific variables here
@@ -162,14 +162,14 @@ parse_options(int argc, char** argv)
 }
 
 int
-main_loop(HfstBasicTransducer trans)
+main_loop(HfstIterableTransducer trans)
 {
     fprintf(message_out,
             "Enter labels to seek all paths\n");
     // record current paths with their end states
     multimap<string, HfstState> paths;
     paths.insert(pair<string, HfstState>("", 0));
-    HfstBasicTransducer::const_iterator state = trans.begin();
+    HfstIterableTransducer::const_iterator state = trans.begin();
     (void)state;
 #if HAVE_READLINE_READLINE_H
 #if HAVE_RL_COMPLETION_MATCHES
@@ -199,7 +199,7 @@ main_loop(HfstBasicTransducer trans)
                 fprintf(message_out,
                         "<Nothing, you've hit a dead end here>\n");
               }
-            for (hfst::implementations::HfstBasicTransitions::const_iterator arc = trans[p->second].begin();
+            for (hfst::implementations::HfstTransitions::const_iterator arc = trans[p->second].begin();
                  arc != trans[p->second].end();
                  ++arc)
               {
@@ -219,7 +219,7 @@ main_loop(HfstBasicTransducer trans)
              p != paths.end();
              ++p)
           {
-            for (hfst::implementations::HfstBasicTransitions::const_iterator arc = trans[p->second].begin();
+            for (hfst::implementations::HfstTransitions::const_iterator arc = trans[p->second].begin();
                  arc != trans[p->second].end();
                  ++arc)
               {
@@ -271,7 +271,7 @@ process_stream(HfstInputStream& instream)
           {
             trans_name = inputfilename;
           }
-        HfstBasicTransducer walkable(trans);
+        HfstIterableTransducer walkable(trans);
         if (cave_mode)
           {
             fprintf(message_out,

@@ -35,15 +35,14 @@
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "implementations/HfstBasicTransducer.h"
+#include "implementations/HfstIterableTransducer.h"
 
 using std::map;
 using std::string;
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
-using hfst::implementations::HfstTransitionGraph;
-using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstIterableTransducer;
 using hfst::implementations::HfstState;
 using hfst::StringSet;
 
@@ -158,7 +157,7 @@ process_stream(HfstInputStream& instream)
           verbose_printf("Summarizing... " SIZE_T_SPECIFIER "\n", transducer_n);
         }
       HfstTransducer *trans = new HfstTransducer(instream);
-      HfstBasicTransducer *mutt = new HfstBasicTransducer(*trans);
+      HfstIterableTransducer *mutt = new HfstIterableTransducer(*trans);
       size_t states = 0;
       size_t final_states = 0;
       //size_t paths = 0;
@@ -237,7 +236,7 @@ process_stream(HfstInputStream& instream)
       std::map<std::pair<std::string, std::string>,unsigned int> symbol_pairs;
       // iterate states in random order
       HfstState source_state=0;
-      for (HfstBasicTransducer::const_iterator it = mutt->begin();
+      for (HfstIterableTransducer::const_iterator it = mutt->begin();
            it != mutt->end();
            it++)
         {
@@ -251,7 +250,7 @@ process_stream(HfstInputStream& instream)
           map<string,unsigned int> input_ambiguity;
           map<string,unsigned int> output_ambiguity;
 
-      for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
+      for (hfst::implementations::HfstTransitions::const_iterator tr_it
            = it->begin();
            tr_it != it->end(); tr_it++)
         {
