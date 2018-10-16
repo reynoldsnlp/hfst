@@ -7,28 +7,22 @@
 // See the file COPYING included with this distribution for more
 // information.
 
-#include "HfstBasicTransition.h"
+#include "HfstTransition.h"
 
 namespace hfst {
 
   namespace implementations {
 
-    /*unsigned int HfstBasicTransition::get_symbol_number
-    (const HfstTropicalTransducerTransitionData::SymbolType &symbol) 
-    {
-      return HfstTropicalTransducerTransitionData::get_symbol_number(symbol);
-      }*/
+    HfstTransition::HfstTransition(): target_state(0) {};
 
-    HfstBasicTransition::HfstBasicTransition(): target_state(0) {};
-
-    HfstBasicTransition::HfstBasicTransition(HfstState s,
+    HfstTransition::HfstTransition(HfstState s,
                      HfstTropicalTransducerTransitionData::SymbolType isymbol,
                      HfstTropicalTransducerTransitionData::SymbolType osymbol,
                      HfstTropicalTransducerTransitionData::WeightType weight):
         target_state(s), transition_data(isymbol, osymbol, weight)
     {};
         
-    HfstBasicTransition::HfstBasicTransition(HfstState s,
+    HfstTransition::HfstTransition(HfstState s,
                                              unsigned int inumber,
                                              unsigned int onumber,
                                              HfstTropicalTransducerTransitionData::WeightType weight,
@@ -36,61 +30,61 @@ namespace hfst {
       target_state(s), transition_data(inumber, onumber, weight)
     { (void)foo; };
         
-    HfstBasicTransition::HfstBasicTransition(const HfstBasicTransition &another):
+    HfstTransition::HfstTransition(const HfstTransition &another):
       target_state(another.target_state),
       transition_data(another.transition_data)
     {};
     
-    HfstBasicTransition::~HfstBasicTransition() {};
+    HfstTransition::~HfstTransition() {};
     
-    bool HfstBasicTransition::operator<(const HfstBasicTransition &another) const {
+    bool HfstTransition::operator<(const HfstTransition &another) const {
       if (target_state == another.target_state)
         return (transition_data < another.transition_data);
       return (target_state < another.target_state);
     }
 
-    void HfstBasicTransition::operator=(const HfstBasicTransition &another) {
+    void HfstTransition::operator=(const HfstTransition &another) {
       target_state = another.target_state;
       transition_data = another.transition_data;
     }
     
-    HfstState HfstBasicTransition::get_target_state() const {
+    HfstState HfstTransition::get_target_state() const {
       return target_state;
     }
     
-    const HfstTropicalTransducerTransitionData & HfstBasicTransition::get_transition_data() const {
+    const HfstTropicalTransducerTransitionData & HfstTransition::get_transition_data() const {
       return transition_data;
     }
     
-    HfstTropicalTransducerTransitionData::SymbolType HfstBasicTransition::get_input_symbol() const {
+    HfstTropicalTransducerTransitionData::SymbolType HfstTransition::get_input_symbol() const {
       return transition_data.get_input_symbol();
     }
     
-    void HfstBasicTransition::set_input_symbol(const HfstTropicalTransducerTransitionData::SymbolType & symbol) {
+    void HfstTransition::set_input_symbol(const HfstTropicalTransducerTransitionData::SymbolType & symbol) {
       transition_data.set_input_symbol(symbol);
     }
 
-    HfstTropicalTransducerTransitionData::SymbolType HfstBasicTransition::get_output_symbol() const {
+    HfstTropicalTransducerTransitionData::SymbolType HfstTransition::get_output_symbol() const {
       return transition_data.get_output_symbol();
     }
 
-    void HfstBasicTransition::set_output_symbol(const HfstTropicalTransducerTransitionData::SymbolType & symbol) {
+    void HfstTransition::set_output_symbol(const HfstTropicalTransducerTransitionData::SymbolType & symbol) {
       transition_data.set_output_symbol(symbol);
     }
     
-    unsigned int HfstBasicTransition::get_input_number() const {
+    unsigned int HfstTransition::get_input_number() const {
       return transition_data.get_input_number();
     }
     
-    unsigned int HfstBasicTransition::get_output_number() const {
+    unsigned int HfstTransition::get_output_number() const {
       return transition_data.get_output_number();
     }
     
-    HfstTropicalTransducerTransitionData::WeightType HfstBasicTransition::get_weight() const {
+    HfstTropicalTransducerTransitionData::WeightType HfstTransition::get_weight() const {
       return transition_data.get_weight();
     }
     
-    void HfstBasicTransition::set_weight(HfstTropicalTransducerTransitionData::WeightType w) {
+    void HfstTransition::set_weight(HfstTropicalTransducerTransitionData::WeightType w) {
       transition_data.set_weight(w);
     }
   }

@@ -15,7 +15,7 @@ namespace hfst
   namespace implementations
   {
     ComposeIntersectLexicon::ComposeIntersectLexicon
-    (const HfstBasicTransducer &t):
+    (const HfstIterableTransducer &t):
       ComposeIntersectFst(t,false)
     {}
 
@@ -35,7 +35,7 @@ namespace hfst
       while (! agenda.empty())
     { agenda.pop(); }
 
-      result = HfstBasicTransducer();
+      result = HfstIterableTransducer();
     }
 
     HfstState ComposeIntersectLexicon::map_state_and_add_to_agenda
@@ -62,7 +62,7 @@ namespace hfst
     bool ComposeIntersectLexicon::can_have_lexicon_epsilons(HfstState s)
     { return lexicon_non_epsilon_states.count(s) > 0; }
 
-    HfstBasicTransducer ComposeIntersectLexicon::compose_with_rules
+    HfstIterableTransducer ComposeIntersectLexicon::compose_with_rules
     (ComposeIntersectRule * rules)
     {
       clear_all_info();
@@ -98,7 +98,7 @@ namespace hfst
     }
     }
 
-    HfstBasicTransducer &ComposeIntersectLexicon::compute_composition_result
+    HfstIterableTransducer &ComposeIntersectLexicon::compute_composition_result
     (ComposeIntersectRule * rules)
     {
       while (! agenda.empty())
@@ -214,7 +214,7 @@ namespace hfst
      float weight,HfstState target)
     { result.add_transition
     (origin,
-     HfstBasicTransition
+     HfstTransition
      (target,
       HfstTropicalTransducerTransitionData::get_symbol(hfst::size_t_to_uint(input)),
       HfstTropicalTransducerTransitionData::get_symbol(hfst::size_t_to_uint(output)),
@@ -255,7 +255,7 @@ int main(int argc, char * argv[])
   universal.disjunct(x).disjunct(x_a).disjunct(y).disjunct(z).repeat_star().
     minimize();
   
-  HfstBasicTransducer b(universal);
+  HfstIterableTransducer b(universal);
   b.add_symbol_to_alphabet("D");
   universal = HfstTransducer(b,TROPICAL_OPENFST_TYPE);
   HfstTransducer right_rule_context(universal);
@@ -303,7 +303,7 @@ int main(int argc, char * argv[])
     new ComposeIntersectRule(universal);
   
   ComposeIntersectRulePair three_rules(some_rule,rules);
-  HfstBasicTransducer lex = l.compose_with_rules(&three_rules);
+  HfstItearableTransducer lex = l.compose_with_rules(&three_rules);
   HfstTransducer lex_fst(lex,TROPICAL_OPENFST_TYPE);
   lex_fst.minimize();
   std::cerr << lex_fst << std::endl;

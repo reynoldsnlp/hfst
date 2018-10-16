@@ -24,7 +24,7 @@
 
 #include "ConvertTransducerFormat.h"
 #include "optimized-lookup/convert.h"
-#include "HfstBasicTransducer.h"
+#include "HfstIterableTransducer.h"
 #include "HfstTransducer.h"
 
 #ifndef MAIN_TEST
@@ -77,12 +77,12 @@ namespace hfst { namespace implementations
   }
 
 
-  HfstBasicTransducer * ConversionFunctions::
+  HfstIterableTransducer * ConversionFunctions::
   hfst_transducer_to_hfst_basic_transducer
   (const hfst::HfstTransducer &t) {
 #if HAVE_SFST || HAVE_LEAN_SFST
     if (t.type == SFST_TYPE) {
-      HfstBasicTransducer * retval = sfst_to_hfst_basic_transducer(t.implementation.sfst);
+      HfstIterableTransducer * retval = sfst_to_hfst_basic_transducer(t.implementation.sfst);
       retval->name = t.get_name();
       return retval;
     }
@@ -90,14 +90,14 @@ namespace hfst { namespace implementations
 
 #if HAVE_OPENFST
     if (t.type == TROPICAL_OPENFST_TYPE) {
-      HfstBasicTransducer * retval = tropical_ofst_to_hfst_basic_transducer
+      HfstIterableTransducer * retval = tropical_ofst_to_hfst_basic_transducer
         (t.implementation.tropical_ofst);
       retval->name = t.get_name();
       return retval;
     }
 #if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
     if (t.type == LOG_OPENFST_TYPE) {
-      HfstBasicTransducer * retval = log_ofst_to_hfst_basic_transducer(t.implementation.log_ofst);
+      HfstIterableTransducer * retval = log_ofst_to_hfst_basic_transducer(t.implementation.log_ofst);
       retval->name = t.get_name();
       return retval;
     }
@@ -106,7 +106,7 @@ namespace hfst { namespace implementations
     
 #if HAVE_FOMA
     if (t.type == FOMA_TYPE) {
-      HfstBasicTransducer * retval = foma_to_hfst_basic_transducer(t.implementation.foma);
+      HfstIterableTransducer * retval = foma_to_hfst_basic_transducer(t.implementation.foma);
       retval->name = t.get_name();
       return retval;
     }
@@ -114,7 +114,7 @@ namespace hfst { namespace implementations
 
 #if HAVE_XFSM
     if (t.type == XFSM_TYPE) {
-      HfstBasicTransducer * retval = xfsm_to_hfst_basic_transducer(t.implementation.xfsm);
+      HfstIterableTransducer * retval = xfsm_to_hfst_basic_transducer(t.implementation.xfsm);
       retval->name = t.get_name();
       return retval;
     }
@@ -130,7 +130,7 @@ namespace hfst { namespace implementations
 
     if (t.type == HFST_OL_TYPE || t.type == HFST_OLW_TYPE)
       {
-      HfstBasicTransducer * retval = hfst_ol_to_hfst_basic_transducer(t.implementation.hfst_ol);
+      HfstIterableTransducer * retval = hfst_ol_to_hfst_basic_transducer(t.implementation.hfst_ol);
       retval->name = t.get_name();
       return retval;
       }
@@ -142,7 +142,7 @@ namespace hfst { namespace implementations
   /* Add here your conversion functions or write them to a separate file. */
   //#if HAVE_MY_TRANSDUCER_LIBRARY
   //
-  //HfstBasicTransducer * ConversionFunctions::
+  //HfstIterableTransducer * ConversionFunctions::
   //my_transducer_library_transducer_to_hfst_basic_transducer
   //  (my_namespace::MyFst * t) {
   //(void)t;
@@ -151,7 +151,7 @@ namespace hfst { namespace implementations
 
   //my_namespace::MyFst * ConversionFunctions::
   //hfst_basic_transducer_to_my_transducer_library_transducer
-  //  (const HfstBasicTransducer * t) {
+  //  (const HfstIterableTransducer * t) {
   //(void)t;
   //HFST_THROW(FunctionNotImplementedException);
   //}
@@ -183,7 +183,7 @@ int main(void)
             HfstTransducer fsm1("cat", "dog", tok, types[i]);
             fsm1.set_final_weights(4);
             
-            HfstBasicTransducer * fsm1_converted =
+            HfstIterableTransducer * fsm1_converted =
               ConversionFunctions::hfst_transducer_to_hfst_basic_transducer(fsm1);
             
             HfstTransducer fsm1_converted_twice(*fsm1_converted, types[i]);

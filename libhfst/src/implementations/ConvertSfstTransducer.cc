@@ -19,7 +19,7 @@
 #include "back-ends/sfst/fst.h"
 
 #include "ConvertTransducerFormat.h"
-#include "HfstBasicTransducer.h"
+#include "HfstIterableTransducer.h"
 #include "SfstTransducer.h"
 
 #include <stdexcept>
@@ -31,7 +31,7 @@ namespace hfst { namespace implementations
 
   /* -----------------------------------------------------------
 
-      Conversion functions between HfstBasicTransducer and SFST transducer.
+      Conversion functions between HfstIterableTransducer and SFST transducer.
 
      ----------------------------------------------------------- */
 
@@ -41,13 +41,13 @@ namespace hfst { namespace implementations
      Used by function sfst_to_hfst_basic_transducer(SFST::Transducer * t).
 
      @param node  The current node in the SFST transducer
-     @param net   The HfstBasicTransducer that is being created
+     @param net   The HfstIterableTransducer that is being created
      @harmonization_vector A vector that defines how symbol numbers are recoded
   */
 
   void ConversionFunctions::sfst_to_hfst_basic_transducer
   ( SFST::Node *node,
-    HfstBasicTransducer *net,
+    HfstIterableTransducer *net,
     std::vector<unsigned int> &harmonization_vector) {
     
     // If node has not been visited before
@@ -68,7 +68,7 @@ namespace hfst { namespace implementations
         
         net->add_transition
           (node->index,
-           HfstBasicTransition
+           HfstTransition
            (arc->target_node()->index,
             harmonization_vector.at(arc->label().lower_char()),
             harmonization_vector.at(arc->label().upper_char()),
@@ -91,9 +91,9 @@ namespace hfst { namespace implementations
 
 
 
-  /* Create an HfstBasicTransducer equivalent to an SFST transducer \a t. */
+  /* Create an HfstIterableTransducer equivalent to an SFST transducer \a t. */
   
-  HfstBasicTransducer * ConversionFunctions::sfst_to_hfst_basic_transducer
+  HfstIterableTransducer * ConversionFunctions::sfst_to_hfst_basic_transducer
   ( SFST::Transducer * t ) {
     
 #ifdef DEBUG_CONVERSION
@@ -109,8 +109,8 @@ namespace hfst { namespace implementations
       }
 #endif
 
-    // The resulting HfstBasicTransducer
-    HfstBasicTransducer * net = new HfstBasicTransducer();
+    // The resulting HfstIterableTransducer
+    HfstIterableTransducer * net = new HfstIterableTransducer();
 
     // How numbers are recoded in the conversion
     StringVector symbol_vector = SfstTransducer::get_symbol_vector(t);
@@ -153,10 +153,10 @@ namespace hfst { namespace implementations
   }
   
   
-  /* Create an SFST::Transducer equivalent to HfstBasicTransducer \a net. */
+  /* Create an SFST::Transducer equivalent to HfstIterableTransducer \a net. */
 
   SFST::Transducer * ConversionFunctions::
-  hfst_basic_transducer_to_sfst(const HfstBasicTransducer * net) {
+  hfst_basic_transducer_to_sfst(const HfstIterableTransducer * net) {
     
     // Create an SFST transducer and insert HFST special symbols to its alphabet
     SFST::Transducer * t = new SFST::Transducer();
@@ -164,7 +164,7 @@ namespace hfst { namespace implementations
     t->alphabet.add_symbol(internal_identity.c_str(), 2);
     
     // Copy the alphabet
-    for (HfstBasicTransducer::HfstAlphabet::const_iterator it
+    for (HfstIterableTransducer::HfstAlphabet::const_iterator it
            = net->alphabet.begin();
          it != net->alphabet.end(); it++) {
       if (not is_epsilon(*it) && not is_unknown(*it) && not is_identity(*it))
@@ -190,11 +190,11 @@ namespace hfst { namespace implementations
     
     // Go through all states
     unsigned int source_state=0;
-    for (HfstBasicTransducer::const_iterator it = net->begin();
+    for (HfstIterableTransducer::const_iterator it = net->begin();
          it != net->end(); it++)
       {
         // Go through the set of transitions in each state
-        for (HfstBasicTransitions::const_iterator tr_it
+        for (HfstTransitions::const_iterator tr_it
                = it->begin();
              tr_it != it->end(); tr_it++)
           {
@@ -211,7 +211,7 @@ namespace hfst { namespace implementations
       }
     
     // Go through the final states
-    for (HfstBasicTransducer::FinalWeightMap::const_iterator it
+    for (HfstIterableTransducer::FinalWeightMap::const_iterator it
            = net->final_weight_map.begin();
          it != net->final_weight_map.end(); it++)
       {

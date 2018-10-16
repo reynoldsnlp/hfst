@@ -19,7 +19,7 @@ namespace hfst
     class ComposeIntersectRule : public ComposeIntersectFst
     {
     public:
-      ComposeIntersectRule(const HfstBasicTransducer &);
+      ComposeIntersectRule(const HfstIterableTransducer &);
       ComposeIntersectRule(void);
       bool known_symbol(size_t symbol);
     protected:

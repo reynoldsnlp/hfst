@@ -13,7 +13,7 @@
 
 #include "ComposeIntersectUtilities.h"
 #include "../../HfstExceptionDefs.h"
-#include "../HfstBasicTransducer.h"
+#include "../HfstIterableTransducer.h"
 
 HFST_EXCEPTION_CHILD_DECLARATION(StateNotDefined);
 
@@ -30,7 +30,7 @@ namespace hfst
         size_t olabel;
         float weight;
         HfstState target;
-        Transition(const HfstBasicTransition &);
+        Transition(const HfstTransition &);
         Transition(HfstState,size_t,size_t,float);
         bool operator==(const Transition&) const;
       };
@@ -46,7 +46,7 @@ namespace hfst
     TransitionSet;
       typedef std::set<size_t> SymbolSet;
       static const HfstState START; // = 0;
-      ComposeIntersectFst(const HfstBasicTransducer &, bool input_keys);
+      ComposeIntersectFst(const HfstIterableTransducer &, bool input_keys);
       ComposeIntersectFst(void);
       virtual ~ComposeIntersectFst(void);
       virtual const TransitionSet &
@@ -65,7 +65,7 @@ namespace hfst
       bool has_identity_transition(HfstState);
       bool is_known_symbol(size_t) const;
       size_t get_symbol_number(const std::string &symbol);
-      HfstBasicTransducer t;
+      HfstIterableTransducer t;
       SymbolSet symbol_set;
       TransitionMapVector transition_map_vector;
       FloatVector finality_vector;

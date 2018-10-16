@@ -27,9 +27,9 @@ namespace hfst
     {
     public:
       typedef ComposeIntersectFst::SymbolTransitionMap SymbolTransitionMap;
-      ComposeIntersectLexicon(const HfstBasicTransducer &);
+      ComposeIntersectLexicon(const HfstIterableTransducer &);
       ComposeIntersectLexicon(void);
-      HfstBasicTransducer compose_with_rules(ComposeIntersectRule *);
+      HfstIterableTransducer compose_with_rules(ComposeIntersectRule *);
     protected:
       typedef std::pair<HfstState,HfstState> StatePair;
       typedef std::map<StatePair,HfstState> StatePairMap;
@@ -42,7 +42,7 @@ namespace hfst
       StatePairMap state_pair_map;
       PairVector   pair_vector;
       StateQueue   agenda;
-      HfstBasicTransducer result;
+      HfstIterableTransducer result;
       StateSet lexicon_non_epsilon_states;
 
       bool is_flag_diacritic(size_t);
@@ -51,7 +51,7 @@ namespace hfst
       void clear_all_info(void);
       HfstState map_state_and_add_to_agenda(const StatePair &,
                                             bool allow_lexicon_epsilons);
-      HfstBasicTransducer &compute_composition_result
+      HfstIterableTransducer &compute_composition_result
     (ComposeIntersectRule *);
       void compute_state(HfstState state,ComposeIntersectRule *,
                          bool allow_lexicon_epsilons);
@@ -64,7 +64,7 @@ namespace hfst
       void add_transition
     (HfstState, size_t,size_t,float,HfstState);
       void identity_compose
-    (const TransitionSet &,const HfstBasicTransition &,HfstState);
+    (const TransitionSet &,const HfstTransition &,HfstState);
     };
   }
 }

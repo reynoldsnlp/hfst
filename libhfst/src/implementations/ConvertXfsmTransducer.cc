@@ -12,7 +12,7 @@
 #endif
 
 #include "ConvertTransducerFormat.h"
-#include "HfstBasicTransducer.h"
+#include "HfstIterableTransducer.h"
 //#include "HfstTransducer.h"
 
 #ifndef MAIN_TEST
@@ -21,7 +21,7 @@ namespace hfst { namespace implementations
 
   /* -----------------------------------------------------------
 
-      Conversion functions between HfstBasicTransducer and xfsm transducer.
+      Conversion functions between HfstIterableTransducer and xfsm transducer.
 
       ---------------------------------------------------------- */
 
@@ -31,8 +31,8 @@ namespace hfst { namespace implementations
 #include "XfsmTransducer.h"
 
   // Insert all symbols in an xfsm transducer alphabet (sigma) into
-  // the alphabet of an HfstBasicTransducer.
-  static void copy_xfsm_alphabet_into_hfst_alphabet(NETptr t, HfstBasicTransducer * fsm)
+  // the alphabet of an HfstIterableTransducer.
+  static void copy_xfsm_alphabet_into_hfst_alphabet(NETptr t, HfstIterableTransducer * fsm)
     {
       ALPHABETptr alpha_ptr = net_sigma(t);
       ALPH_ITptr alpha_it_ptr = start_alph_iterator(NULL, alpha_ptr);
@@ -49,14 +49,14 @@ namespace hfst { namespace implementations
   
   /* ----------------------------------------------------------------------
 
-     Create an HfstBasicTransducer equivalent to foma transducer \a t.
+     Create an HfstIterableTransducer equivalent to foma transducer \a t.
      
      ---------------------------------------------------------------------- */
 
-  HfstBasicTransducer * ConversionFunctions::
+  HfstIterableTransducer * ConversionFunctions::
   xfsm_to_hfst_basic_transducer(NETptr t)
   {
-    HfstBasicTransducer * result = new HfstBasicTransducer();
+    HfstIterableTransducer * result = new HfstIterableTransducer();
 
     // Map states of t into states in result
     std::map<STATEptr, HfstState> xfsm_to_hfst_state;
@@ -117,7 +117,7 @@ namespace hfst { namespace implementations
             
             STATEptr target_state_ptr = arc_ptr->destination;
 
-            HfstBasicTransition tr(xfsm_to_hfst_state[target_state_ptr], isymbol, osymbol, 0);
+            HfstTransition tr(xfsm_to_hfst_state[target_state_ptr], isymbol, osymbol, 0);
             result->add_transition(xfsm_to_hfst_state[state_ptr], tr);
 
             arc_ptr = arc_ptr->next;
@@ -133,21 +133,21 @@ namespace hfst { namespace implementations
 
   /* ------------------------------------------------------------------------
      
-     Create an xfsm transducer equivalent to HfstBasicTransducer \a hfst_fsm.
+     Create an xfsm transducer equivalent to HfstIterableTransducer \a hfst_fsm.
 
      ------------------------------------------------------------------------ */
 
   NETptr ConversionFunctions::
-    hfst_basic_transducer_to_xfsm(const HfstBasicTransducer * hfst_fsm)
+    hfst_basic_transducer_to_xfsm(const HfstIterableTransducer * hfst_fsm)
   {
     NETptr result = null_net();
 
-    // Maps HfstBasicTransducer states (i.e. vector indices) into xfsm transducer states.
+    // Maps HfstIterableTransducer states (i.e. vector indices) into xfsm transducer states.
     std::vector<STATEptr> state_vector;
 
     // ---- Copy states -----
     unsigned int fsm_state = 0;
-    for (HfstBasicTransducer::const_iterator it = hfst_fsm->begin();
+    for (HfstIterableTransducer::const_iterator it = hfst_fsm->begin();
          it != hfst_fsm->end(); it++)
       {
         // 'null_net()' creates the initial state
@@ -167,12 +167,12 @@ namespace hfst { namespace implementations
 
     // ----- Go through all states -----
     unsigned int source_state=0;
-    for (HfstBasicTransducer::const_iterator it = hfst_fsm->begin();
+    for (HfstIterableTransducer::const_iterator it = hfst_fsm->begin();
          it != hfst_fsm->end(); it++)
       {
         STATEptr xfsm_source_state = state_vector.at(source_state);
         // ----- Go through the set of transitions in each state -----
-        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+        for (HfstIterableTransducer::HfstTransitions::const_iterator tr_it
                = it->begin();
              tr_it != it->end(); tr_it++)
           {
@@ -216,9 +216,9 @@ namespace hfst { namespace implementations
 
     // Copy alphabet
     ALPHABETptr ap = net_sigma(result);
-    const HfstBasicTransducer::HfstTransitionGraphAlphabet & alpha
+    const HfstIterableTransducer::HfstTransitionGraphAlphabet & alpha
       = hfst_fsm->get_alphabet();
-    for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it
+    for (HfstIterableTransducer::HfstTransitionGraphAlphabet::iterator it
            = alpha.begin();
          it != alpha.end(); it++)
       {

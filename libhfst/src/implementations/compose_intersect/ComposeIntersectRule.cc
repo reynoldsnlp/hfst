@@ -14,7 +14,7 @@ namespace hfst
 {
   namespace implementations
   {
-   ComposeIntersectRule::ComposeIntersectRule(const HfstBasicTransducer &t):
+   ComposeIntersectRule::ComposeIntersectRule(const HfstIterableTransducer &t):
       ComposeIntersectFst(t,true)
     { symbols = t.get_alphabet(); }
     ComposeIntersectRule::ComposeIntersectRule(void):

@@ -7,11 +7,11 @@
 // See the file COPYING included with this distribution for more
 // information.
 
- #ifndef _HFST_BASIC_TRANSDUCER_H_
- #define _HFST_BASIC_TRANSDUCER_H_
+ #ifndef _HFST_ITERABLE_TRANSDUCER_H_
+ #define _HFST_ITERABLE_TRANSDUCER_H_
 
- /** @file HfstBasicTransducer.h
-     @brief Class HfstBasicTransducer */
+ /** @file HfstIterableTransducer.h
+     @brief Class HfstIterableTransducer */
 
  #include <cstdio>
  #include <string>
@@ -29,7 +29,7 @@
  #include "../HfstLookupFlagDiacritics.h"
  #include "../HfstEpsilonHandler.h"
  #include "ConvertTransducerFormat.h"
- #include "HfstBasicTransition.h"
+ #include "HfstTransition.h"
  #include "HfstTropicalTransducerTransitionData.h"
  #include "../string-utils.h"
 
@@ -55,46 +55,46 @@
      typedef std::map<HfstState, HfstReplacements > HfstReplacementsMap;
 
      /** @brief Datatype for the states of a transition in a graph. */
-     typedef std::vector<hfst::implementations::HfstBasicTransition> HfstBasicTransitions;
+     typedef std::vector<hfst::implementations::HfstTransition> HfstTransitions;
      /* Datatype for the states of a graph and their transitions.
         Each index of the vector is a state and the transitions
         on that index are the transitions of that state. */
-     typedef std::vector<hfst::implementations::HfstBasicTransitions> HfstBasicStates;
+     typedef std::vector<hfst::implementations::HfstTransitions> HfstStates;
      
      /** @brief A simple transition graph format that consists of
          states and transitions between those states.
          
          Probably the easiest way to use this template is to choose
-         the implementations #HfstBasicTransducer
+         the implementations #HfstIterableTransducer
          (HfstTransitionGraph<HfstTropicalTransducerTransitionData>)
-         and #HfstBasicTransition
+         and #HfstTransition
          (HfstTransition<HfstTropicalTransducerTransitionData>).
          The class HfstTropicalTransducerTransitionData contains an input string,
-         an output string and a float weight. HfstBasicTransducer is the
+         an output string and a float weight. HfstIterableTransducer is the
          implementation that is used as an example in this documentation.
          
-         An example of creating a HfstBasicTransducer [foo:bar baz:baz]
+         An example of creating a HfstIterableTransducer [foo:bar baz:baz]
          with weight 0.4 from scratch:
          
  \verbatim
    // Create an empty transducer
    // The transducer has initially one start state (number zero)
    // that is not final
-   HfstBasicTransducer fsm;
+   HfstIterableTransducer fsm;
    // Add two states to the transducer
    fsm.add_state(1);
    fsm.add_state(2);
    // Create a transition [foo:bar] leading to state 1 with weight 0.1 ...
-   HfstBasicTransition tr(1, "foo", "bar", 0.1);
+   HfstTransition tr(1, "foo", "bar", 0.1);
    // ... and add it to state zero
    fsm.add_transition(0, tr);
    // Add a transition [baz:baz] with weight 0 from state 1 to state 2
-   fsm.add_transition(1, HfstBasicTransition(2, "baz", "baz", 0.0));
+   fsm.add_transition(1, HfstTransition(2, "baz", "baz", 0.0));
    // Set state 2 as final with weight 0.3
    fsm.set_final_weight(2, 0.3);
  \endverbatim
 
-        An example of iterating through a HfstBasicTransducer's states
+        An example of iterating through a HfstIterableTransducer's states
         and transitions when printing it in AT&T format to stderr:
 
  \verbatim
@@ -102,11 +102,11 @@
    unsigned int source_state=0;
 
    // Go through all states
-     for (HfstBasicTransducer::const_iterator it = fsm.begin();
+     for (HfstIterableTransducer::const_iterator it = fsm.begin();
       it != fsm.end(); it++ )
        {
          // Go through all transitions
-     for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+     for (HfstIterableTransducer::HfstTransitions::const_iterator tr_it
             = it->begin(); tr_it != it->end(); tr_it++)
        {
          std::cerr << source_state << "\t"
@@ -127,8 +127,8 @@
        }
  \endverbatim
 
- @see #HfstBasicTransducer HfstBasicTransition */
-     class HfstBasicTransducer
+ @see #HfstIterableTransducer HfstTransition */
+     class HfstIterableTransducer
      {
        
        // --- Datatypes and variables ---
@@ -149,7 +149,7 @@
        typedef std::set<HfstSymbol> HfstAlphabet;
        
        /* States of the graph and their transitions. */
-       HfstBasicStates state_vector;
+       HfstStates state_vector;
        
      protected:
        /* The initial state number. */
@@ -172,14 +172,14 @@
      protected:
        /* @brief An iterator type that points to a state in a graph.
           
-          The value pointed by the iterator is of type HfstBasicTransitions. */
-       typedef HfstBasicStates::iterator iterator;
+          The value pointed by the iterator is of type HfstTransitions. */
+       typedef HfstStates::iterator iterator;
        
      public:
        /** @brief A const iterator type that points a state in a graph.
            
-           The value pointed by the iterator is of type HfstBasicTransitions. */
-       typedef HfstBasicStates::const_iterator const_iterator;
+           The value pointed by the iterator is of type HfstTransitions. */
+       typedef HfstStates::const_iterator const_iterator;
 
        /** @brief The name of the graph. */
        std::string name;
@@ -188,10 +188,10 @@
        std::vector<HfstState> states() const;
        
        /** @brief The states of the graph and their transitions. */
-       const HfstBasicStates & states_and_transitions() const;
+       const HfstStates & states_and_transitions() const;
 
        /** @brief The states of the graph and their transitions, mutable. */
-       HfstBasicStates & states_and_transitions();  
+       HfstStates & states_and_transitions();  
 
        // --------------------------------------------------------
        // --- Construction, assignment, copying and conversion ---
@@ -199,22 +199,22 @@
        
        /** @brief Create a graph with one initial state that has state number
            zero and is not a final state, i.e. create an empty graph. */
-       HFSTDLL HfstBasicTransducer(void);
+       HFSTDLL HfstIterableTransducer(void);
        
-       HFSTDLL HfstBasicTransducer(FILE *file);
+       HFSTDLL HfstIterableTransducer(FILE *file);
        
        
        /** @brief The assignment operator. */
-       HFSTDLL HfstBasicTransducer &operator=(const HfstBasicTransducer &graph);
+       HFSTDLL HfstIterableTransducer &operator=(const HfstIterableTransducer &graph);
        
-       HFSTDLL HfstBasicTransducer &assign(const HfstBasicTransducer &graph);
+       HFSTDLL HfstIterableTransducer &assign(const HfstIterableTransducer &graph);
        
-       /** @brief Create a deep copy of HfstBasicTransducer \a graph. */
-       HFSTDLL HfstBasicTransducer(const HfstBasicTransducer &graph);
+       /** @brief Create a deep copy of HfstIterableTransducer \a graph. */
+       HFSTDLL HfstIterableTransducer(const HfstIterableTransducer &graph);
        
-       /** @brief Create an HfstBasicTransducer equivalent to HfstTransducer
+       /** @brief Create an HfstIterableTransducer equivalent to HfstTransducer
            \a transducer. FIXME: move to a separate file */
-       HFSTDLL HfstBasicTransducer(const hfst::HfstTransducer &transducer);
+       HFSTDLL HfstIterableTransducer(const hfst::HfstTransducer &transducer);
        
        // --------------------------------------------------
        // --- Initialization, optimization and debugging ---
@@ -327,7 +327,7 @@
        /** @brief Add a transition \a transition to state \a s.
            
            If state \a s does not exist, it is created. */
-     HFSTDLL void add_transition(HfstState s, const HfstBasicTransition & transition,
+     HFSTDLL void add_transition(HfstState s, const HfstTransition & transition,
                                  bool add_symbols_to_alphabet=true);
      
      /** @brief Remove transition \a transition from state \a s.
@@ -336,7 +336,7 @@
          if they are no longer used in the graph.
          
          If \a state or \a transition does not exist, nothing is done. */
-     HFSTDLL void remove_transition(HfstState s, const HfstBasicTransition & transition,
+     HFSTDLL void remove_transition(HfstState s, const HfstTransition & transition,
                                     bool remove_symbols_from_alphabet=false);
      
      /** @brief Whether state \a s is final.
@@ -358,7 +358,7 @@
      
      /** @brief Sort the arcs of this transducer according to input and
          output symbols. */
-     HFSTDLL HfstBasicTransducer &sort_arcs(void);
+     HFSTDLL HfstIterableTransducer &sort_arcs(void);
      
      /** @brief Get an iterator to the beginning of the states in
          the graph.
@@ -384,7 +384,7 @@
              If the state does not exist, a @a StateIndexOutOfBoundsException
              is thrown.
      */
-     HFSTDLL const HfstBasicTransitions & operator[](HfstState s) const;
+     HFSTDLL const HfstTransitions & operator[](HfstState s) const;
      
      /** @brief Alternative name for operator[].
          
@@ -392,11 +392,11 @@
          
          @see operator[]
      */
-     HFSTDLL const HfstBasicTransitions & transitions(HfstState s) const;
+     HFSTDLL const HfstTransitions & transitions(HfstState s) const;
      
      /** @brief Get mutable transitions.
       */
-     HFSTDLL HfstBasicTransitions & transitions(HfstState s);
+     HFSTDLL HfstTransitions & transitions(HfstState s);
      
      // --------------------------------------------------
      // -----   Reading and writing in AT&T format   -----
@@ -456,7 +456,7 @@
      // Else, return false.
      HFSTDLL static bool strip_ending_parenthesis_and_comma(std::string & str);
      
-     HFSTDLL static bool parse_prolog_network_line(const std::string & line, HfstBasicTransducer & graph);
+     HFSTDLL static bool parse_prolog_network_line(const std::string & line, HfstIterableTransducer & graph);
 
      // Get positions of \a c in \a str. If \a esc is precedes
      // \a c, \a c is not included.
@@ -472,11 +472,11 @@
      
      HFSTDLL static bool extract_weight(std::string & symbol, float & weight);
 
-     HFSTDLL static bool parse_prolog_arc_line(const std::string & line, HfstBasicTransducer & graph);
+     HFSTDLL static bool parse_prolog_arc_line(const std::string & line, HfstIterableTransducer & graph);
      
-     HFSTDLL static bool parse_prolog_final_line(const std::string & line, HfstBasicTransducer & graph);
+     HFSTDLL static bool parse_prolog_final_line(const std::string & line, HfstIterableTransducer & graph);
      
-     HFSTDLL static bool parse_prolog_symbol_line(const std::string & line, HfstBasicTransducer & graph);
+     HFSTDLL static bool parse_prolog_symbol_line(const std::string & line, HfstIterableTransducer & graph);
      
      // Erase newlines from the end of \a str and return \a str.
      HFSTDLL static std::string strip_newlines(std::string & str);
@@ -496,14 +496,14 @@
         read_in_prolog_format(FILE*).
         If \a file is NULL, it is ignored and \a is is used.
         If \a file is not NULL, it is used and \a is is ignored. */
-     HFSTDLL static HfstBasicTransducer read_in_prolog_format
+     HFSTDLL static HfstIterableTransducer read_in_prolog_format
        (std::istream &is, FILE *file, unsigned int & linecount);
      
-     HFSTDLL static HfstBasicTransducer read_in_prolog_format
+     HFSTDLL static HfstIterableTransducer read_in_prolog_format
        (std::istream &is,
         unsigned int & linecount);
      
-     HFSTDLL static HfstBasicTransducer read_in_prolog_format
+     HFSTDLL static HfstIterableTransducer read_in_prolog_format
        (FILE *file,
         unsigned int & linecount);
      
@@ -537,7 +537,7 @@
         read_in_att_format(FILE*, std::string).
         If \a file is NULL, it is ignored and \a is is used.
         If \a file is not NULL, it is used and \a is is ignored. */
-     HFSTDLL static HfstBasicTransducer read_in_att_format
+     HFSTDLL static HfstIterableTransducer read_in_att_format
        (std::istream &is,
         FILE *file,
         std::string epsilon_symbol,
@@ -549,7 +549,7 @@
          @pre \a is not at end, otherwise an exception is thrown.
          @note Multiple AT&T transducer definitions are separated with
          the line "--". */
-     HFSTDLL static HfstBasicTransducer read_in_att_format
+     HFSTDLL static HfstIterableTransducer read_in_att_format
        (std::istream &is,
         std::string epsilon_symbol,
         unsigned int & linecount);
@@ -560,7 +560,7 @@
          @pre \a is not at end, otherwise an exception is thrown.
          @note Multiple AT&T transducer definitions are separated with
          the line "--". */
-     HFSTDLL static HfstBasicTransducer read_in_att_format
+     HFSTDLL static HfstIterableTransducer read_in_att_format
        (FILE *file,
         std::string epsilon_symbol,
         unsigned int & linecount);
@@ -615,20 +615,20 @@
      /** @brief Substitute \a old_symbol with \a new_symbol in
          all transitions. \a input_side and \a output_side define
          whether the substitution is made on input and output sides. */
-     HFSTDLL HfstBasicTransducer &
+     HFSTDLL HfstIterableTransducer &
        substitute(const HfstSymbol &old_symbol,
                       const HfstSymbol  &new_symbol,
                   bool input_side=true,
                   bool output_side=true);
      
-     HFSTDLL HfstBasicTransducer &substitute_symbols
+     HFSTDLL HfstIterableTransducer &substitute_symbols
        (const HfstSymbolSubstitutions &substitutions);
      
      /** @brief Substitute all transitions as defined in \a substitutions */
-     HfstBasicTransducer &substitute
+     HfstIterableTransducer &substitute
        (const HfstSymbolSubstitutions &substitutions);
      
-     HFSTDLL HfstBasicTransducer &substitute_symbol_pairs
+     HFSTDLL HfstIterableTransducer &substitute_symbol_pairs
        (const HfstSymbolPairSubstitutions &substitutions);
      
      /** @brief Substitute all transitions as defined in \a substitutions.
@@ -637,17 +637,17 @@
          a mapping x:y -> X:Y is found, the transition x:y is replaced
          with X:Y. If no mapping is found, the transition remains the same.
      */
-     HFSTDLL HfstBasicTransducer &substitute
+     HFSTDLL HfstIterableTransducer &substitute
        (const HfstSymbolPairSubstitutions &substitutions);
      
      /** @brief Substitute all transitions \a sp with a set of transitions
          \a sps. */
-     HFSTDLL HfstBasicTransducer &substitute
+     HFSTDLL HfstIterableTransducer &substitute
        (const HfstSymbolPair &sp, const HfstSymbolPairSet &sps);
      
      /** @brief Substitute all transitions \a old_pair with
          \a new_pair. */
-     HFSTDLL HfstBasicTransducer &substitute
+     HFSTDLL HfstIterableTransducer &substitute
        (const HfstSymbolPair &old_pair,
         const HfstSymbolPair &new_pair);
      
@@ -659,7 +659,7 @@
          the original transition \a sp must be replaced. \a func returns
          a value indicating whether any substitution must be made, i.e.
          whether any transition was inserted into \a sps. */
-     HFSTDLL HfstBasicTransducer &
+     HFSTDLL HfstIterableTransducer &
        substitute(bool (*func)
                   (const HfstSymbolPair &sp, HfstSymbolPairSet &sps) );
      
@@ -674,12 +674,12 @@
        HfstState origin_state;
        HfstState target_state;
        HfstTropicalTransducerTransitionData::WeightType weight;
-       HfstBasicTransducer * substituting_graph;
+       HfstIterableTransducer * substituting_graph;
        
        substitution_data(HfstState origin,
                          HfstState target,
                          HfstTropicalTransducerTransitionData::WeightType weight,
-                         HfstBasicTransducer * substituting)
+                         HfstIterableTransducer * substituting)
        {
          origin_state=origin;
          target_state=target;
@@ -714,35 +714,35 @@
              \a old_symbol : \a new_symbol (that are substituted)
              in this graph.
      */
-     HFSTDLL HfstBasicTransducer &
+     HFSTDLL HfstIterableTransducer &
        substitute(const HfstSymbolPair &sp,
-                  const HfstBasicTransducer &graph);
+                  const HfstIterableTransducer &graph);
      
      HFSTDLL std::string weight2marker(float weight);
      
-     HFSTDLL HfstBasicTransducer & substitute_weights_with_markers();
+     HFSTDLL HfstIterableTransducer & substitute_weights_with_markers();
      
      // ####
      // another version of substitute for internal use..
      // ####
-     typedef std::map<HfstSymbol, HfstBasicTransducer> SubstMap;
+     typedef std::map<HfstSymbol, HfstIterableTransducer> SubstMap;
      
-     HFSTDLL HfstBasicTransducer &
+     HFSTDLL HfstIterableTransducer &
        substitute(SubstMap & substitution_map,
                   bool harmonize);
      
      HFSTDLL bool marker2weight(const std::string & str, float & weight);
      
-     HFSTDLL HfstBasicTransducer & substitute_markers_with_weights();
+     HFSTDLL HfstIterableTransducer & substitute_markers_with_weights();
      
      // aliases
-     HFSTDLL HfstBasicTransducer & substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true);
+     HFSTDLL HfstIterableTransducer & substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true);
      
-     HFSTDLL HfstBasicTransducer & substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair);
+     HFSTDLL HfstIterableTransducer & substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair);
      
-     HFSTDLL HfstBasicTransducer & substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set);
+     HFSTDLL HfstIterableTransducer & substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set);
      
-     HFSTDLL HfstBasicTransducer & substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstBasicTransducer &transducer);
+     HFSTDLL HfstIterableTransducer & substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstIterableTransducer &transducer);
      
      
      /* ----------------------------
@@ -752,19 +752,19 @@
      
      /** @brief Insert freely any number of \a symbol_pair in
          the graph with weight \a weight. */
-     HFSTDLL HfstBasicTransducer &insert_freely
+     HFSTDLL HfstIterableTransducer &insert_freely
        (const HfstSymbolPair &symbol_pair, HfstTropicalTransducerTransitionData::WeightType weight);
      
      /** @brief Insert freely any number of any symbol in \a symbol_pairs in
          the graph with weight \a weight. */
-     HFSTDLL HfstBasicTransducer &insert_freely
+     HFSTDLL HfstIterableTransducer &insert_freely
        (const HfstSymbolPairSet &symbol_pairs,
         HfstTropicalTransducerTransitionData::WeightType weight);
      
      /** @brief Insert freely any number of \a graph in this
          graph. */
-     HFSTDLL HfstBasicTransducer &insert_freely
-       (const HfstBasicTransducer &graph);
+     HFSTDLL HfstIterableTransducer &insert_freely
+       (const HfstIterableTransducer &graph);
      
      /* -------------------------------
         Harmonization function
@@ -796,7 +796,7 @@
          that take two or more graphs as their arguments, unless otherwise
          said.
      */
-     HFSTDLL HfstBasicTransducer &harmonize(HfstBasicTransducer &another);
+     HFSTDLL HfstIterableTransducer &harmonize(HfstIterableTransducer &another);
      
      /* -------------------------------
         Disjunction functions
@@ -825,7 +825,7 @@
          of a lexicon. Here is an example:
          
          \verbatim
-         HfstBasicTransducer lexicon;
+         HfstIterableTransducer lexicon;
          HfstTokenizer TOK;
          lexicon.disjunct(TOK.tokenize("dog"), 0.3);
          lexicon.disjunct(TOK.tokenize("cat"), 0.5);
@@ -833,12 +833,12 @@
          \endverbatim
          
      */
-     HFSTDLL HfstBasicTransducer &disjunct
+     HFSTDLL HfstIterableTransducer &disjunct
        (const StringPairVector &spv, HfstTropicalTransducerTransitionData::WeightType weight);
      
      HFSTDLL bool is_special_symbol(const std::string & symbol);
      
-     HFSTDLL HfstBasicTransducer &complete();
+     HFSTDLL HfstIterableTransducer &complete();
      
      HFSTDLL StringSet get_flags() const;
      
@@ -970,7 +970,7 @@
         float * max_weight);
      
      HFSTDLL static bool is_possible_transition
-       (const HfstBasicTransition &transition,
+       (const HfstTransition &transition,
         const StringVector &lookup_path,
         const unsigned int &lookup_index,
         const StringSet &alphabet,
@@ -1001,7 +1001,7 @@
      HFSTDLL void check_regexp_state_for_cycle(HfstState s, const std::set<HfstState> & states_visited);
      
      // Returns whether tr is "^]":"^]". If tr is not allowed, throws an error message.
-     HFSTDLL bool check_regexp_transition_end(const HfstBasicTransition & tr, bool input_side);
+     HFSTDLL bool check_regexp_transition_end(const HfstTransition & tr, bool input_side);
      
      // If there is a "^[":"^[" transition leading to state \a s from some state
      // S and state S is included in \a states_visited and \a path and \a full_paths
@@ -1040,7 +1040,7 @@
      // \a graph to state \a state2 with a weight of that state's final weight. Final states of
      // \a graph as well as its initial state are made normal non-final states when copying \a graph.
      // Todo: copy alphabet? harmonize graphs?
-     HFSTDLL void insert_transducer(HfstState state1, HfstState state2, const HfstBasicTransducer & graph);
+     HFSTDLL void insert_transducer(HfstState state1, HfstState state2, const HfstIterableTransducer & graph);
      
      typedef std::pair<HfstState, HfstState> StatePair;
      typedef std::map<StatePair, HfstState> StateMap;
@@ -1050,14 +1050,14 @@
      // \a was_new_state specifies whether a new state was added.
      static HfstState find_target_state
        (HfstState target1, HfstState target2, StateMap & state_map,
-        HfstBasicTransducer & intersection, bool & was_new_state);
+        HfstIterableTransducer & intersection, bool & was_new_state);
      
      // A function used by find_matches.
      // Copy matching transition tr1/tr2 to state \a state in \a intersection and return
      // the target state of that transition. Also make that state final, if needed.
-     HFSTDLL static HfstState handle_match(const HfstBasicTransducer & graph1, const HfstBasicTransition & tr1,
-                                           const HfstBasicTransducer & graph2, const HfstBasicTransition & tr2,
-                                           HfstBasicTransducer & intersection, HfstState state, StateMap & state_map);
+     HFSTDLL static HfstState handle_match(const HfstIterableTransducer & graph1, const HfstTransition & tr1,
+                                           const HfstIterableTransducer & graph2, const HfstTransition & tr2,
+                                           HfstIterableTransducer & intersection, HfstState state, StateMap & state_map);
      
      // A recursive function used by function intersect.
      //
@@ -1073,25 +1073,25 @@
      // @pre \a graph1 and \a graph2 must be arc-sorted (via sort_arcs()) to make transition matching faster.
      // @pre \a graph1 and \a graph2 must be deterministic. (todo: handle equivalent transitions, maybe even epsilons?)
      HFSTDLL static void find_matches
-       (HfstBasicTransducer & graph1, HfstState state1, HfstBasicTransducer & graph2, HfstState state2,
-        HfstBasicTransducer & intersection, HfstState state, StateMap & state_map, std::set<HfstState> & agenda);
+       (HfstIterableTransducer & graph1, HfstState state1, HfstIterableTransducer & graph2, HfstState state2,
+        HfstIterableTransducer & intersection, HfstState state, StateMap & state_map, std::set<HfstState> & agenda);
      
-     HFSTDLL static HfstBasicTransducer intersect
-       (HfstBasicTransducer & graph1, HfstBasicTransducer & graph2);
-     
-     // A function used by find_matches_for_merge
-     // Copy matching transition graph_tr/merger_tr to state \a result_state in \a result and return
-     // the target state of that transition. Also make that state final, if needed.
-     HFSTDLL static HfstState handle_non_list_match(const HfstBasicTransducer & graph, const HfstBasicTransition & graph_transition,
-                                                    const HfstBasicTransducer & merger, HfstState merger_target,
-                                                    HfstBasicTransducer & result, HfstState result_state, StateMap & state_map);
+     HFSTDLL static HfstIterableTransducer intersect
+       (HfstIterableTransducer & graph1, HfstIterableTransducer & graph2);
      
      // A function used by find_matches_for_merge
      // Copy matching transition graph_tr/merger_tr to state \a result_state in \a result and return
      // the target state of that transition. Also make that state final, if needed.
-     HFSTDLL static HfstState handle_list_match(const HfstBasicTransducer & graph, const HfstBasicTransition & graph_transition,
-                                                const HfstBasicTransducer & merger, const HfstBasicTransition & merger_transition,
-                                                HfstBasicTransducer & result, HfstState result_state, StateMap & state_map, std::set<std::string> & markers_added);
+     HFSTDLL static HfstState handle_non_list_match(const HfstIterableTransducer & graph, const HfstTransition & graph_transition,
+                                                    const HfstIterableTransducer & merger, HfstState merger_target,
+                                                    HfstIterableTransducer & result, HfstState result_state, StateMap & state_map);
+     
+     // A function used by find_matches_for_merge
+     // Copy matching transition graph_tr/merger_tr to state \a result_state in \a result and return
+     // the target state of that transition. Also make that state final, if needed.
+     HFSTDLL static HfstState handle_list_match(const HfstIterableTransducer & graph, const HfstTransition & graph_transition,
+                                                const HfstIterableTransducer & merger, const HfstTransition & merger_transition,
+                                                HfstIterableTransducer & result, HfstState result_state, StateMap & state_map, std::set<std::string> & markers_added);
      
      HFSTDLL static bool is_list_symbol(const HfstTropicalTransducerTransitionData & transition_data, const std::map<std::string, std::set<std::string> > & list_symbols);
      
@@ -1109,12 +1109,12 @@
      // @pre \a graph and \a merger must be arc-sorted (via sort_arcs()) to make transition matching faster.
      // @pre \a graph and \a merger must be deterministic. (todo: handle equivalent transitions, maybe even epsilons?)
      HFSTDLL static void find_matches_for_merge
-       (HfstBasicTransducer & graph, HfstState graph_state, HfstBasicTransducer & merger, HfstState merger_state,
-        HfstBasicTransducer & result, HfstState result_state, StateMap & state_map, std::set<HfstState> & agenda,
+       (HfstIterableTransducer & graph, HfstState graph_state, HfstIterableTransducer & merger, HfstState merger_state,
+        HfstIterableTransducer & result, HfstState result_state, StateMap & state_map, std::set<HfstState> & agenda,
         const std::map<std::string, std::set<std::string> > & list_symbols, std::set<std::string> & markers_added);
      
-     HFSTDLL static HfstBasicTransducer merge
-       (HfstBasicTransducer & graph, HfstBasicTransducer & merger, const std::map<std::string, std::set<std::string> > & list_symbols, std::set<std::string> & markers_added);
+     HFSTDLL static HfstIterableTransducer merge
+       (HfstIterableTransducer & graph, HfstIterableTransducer & merger, const std::map<std::string, std::set<std::string> > & list_symbols, std::set<std::string> & markers_added);
      
      // --- Friends ---
      
@@ -1126,4 +1126,4 @@
    
  }
 
-#endif // #ifndef _HFST_BASIC_TRANSDUCER_H_
+#endif // #ifndef _HFST_ITERABLE_TRANSDUCER_H_

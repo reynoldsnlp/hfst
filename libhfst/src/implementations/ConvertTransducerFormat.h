@@ -103,36 +103,36 @@ namespace implementations {
     static NumberVector get_harmonization_vector
       (const StringVector &coding_vector);
 
-    static HfstBasicTransducer * hfst_transducer_to_hfst_basic_transducer
+    static HfstIterableTransducer * hfst_transducer_to_hfst_basic_transducer
       (const hfst::HfstTransducer &t);
 
 #if HAVE_SFST || HAVE_LEAN_SFST
   static void sfst_to_hfst_basic_transducer
     ( SFST::Node *node,
-      HfstBasicTransducer *net,
+      HfstIterableTransducer *net,
       std::vector<unsigned int> &harmonization_vector);
 
-  static HfstBasicTransducer * sfst_to_hfst_basic_transducer
+  static HfstIterableTransducer * sfst_to_hfst_basic_transducer
     (SFST::Transducer * t);
 
   static SFST::Transducer * hfst_basic_transducer_to_sfst
-    (const HfstBasicTransducer * t);
+    (const HfstIterableTransducer * t);
 #endif // HAVE_SFST || HAVE_LEAN_SFST
   
 #if HAVE_FOMA
-  static HfstBasicTransducer * foma_to_hfst_basic_transducer(fsm * t);
+  static HfstIterableTransducer * foma_to_hfst_basic_transducer(fsm * t);
 
   static fsm * hfst_basic_transducer_to_foma
-    (const HfstBasicTransducer * t);
+    (const HfstIterableTransducer * t);
 #endif // HAVE_FOMA
 
 #if HAVE_XFSM
-  static HfstBasicTransducer * xfsm_to_hfst_basic_transducer(NETptr t);
-  static NETptr hfst_basic_transducer_to_xfsm(const HfstBasicTransducer * t);
+  static HfstIterableTransducer * xfsm_to_hfst_basic_transducer(NETptr t);
+  static NETptr hfst_basic_transducer_to_xfsm(const HfstIterableTransducer * t);
 #endif // HAVE_XFSM
 
 #if HAVE_OPENFST
-  static HfstBasicTransducer * tropical_ofst_to_hfst_basic_transducer
+  static HfstIterableTransducer * tropical_ofst_to_hfst_basic_transducer
     (fst::StdVectorFst * t, bool has_hfst_header=true);
   
   static StateId hfst_state_to_state_id
@@ -140,10 +140,10 @@ namespace implementations {
      fst::StdVectorFst * t);
 
   static fst::StdVectorFst * hfst_basic_transducer_to_tropical_ofst
-    (const HfstBasicTransducer * t);
+    (const HfstIterableTransducer * t);
 
 #if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
-  static HfstBasicTransducer * log_ofst_to_hfst_basic_transducer
+  static HfstIterableTransducer * log_ofst_to_hfst_basic_transducer
     (fst::LogFst * t, bool had_hfst_header=true);
   
   static StateId hfst_state_to_state_id
@@ -151,17 +151,17 @@ namespace implementations {
      fst::LogFst * t);
 
   static fst::LogFst * hfst_basic_transducer_to_log_ofst
-    (const HfstBasicTransducer * t);
+    (const HfstIterableTransducer * t);
 #endif
 
 #endif // HAVE_OPENFST || HAVE_LEAN_OPENFST_LOG
   
   
-  static HfstBasicTransducer * hfst_ol_to_hfst_basic_transducer
+  static HfstIterableTransducer * hfst_ol_to_hfst_basic_transducer
     (hfst_ol::Transducer * t);
 
   static hfst_ol::Transducer * hfst_basic_transducer_to_hfst_ol
-      (const HfstBasicTransducer * t, bool weighted,
+      (const HfstIterableTransducer * t, bool weighted,
        std::string options="", HfstTransducer * harmonizer = NULL);
 
   // A way to smuggle a hfst_ol backend into a HfstTransducer wrapper
@@ -170,16 +170,16 @@ namespace implementations {
   // And the reverse
   static hfst_ol::Transducer * hfst_transducer_to_hfst_ol(HfstTransducer * t);
 
-  /* Define here the functions that convert between HfstBasicTransducer and
+  /* Define here the functions that convert between HfstIterableTransducer and
      your transducer class. */
   //#if HAVE_MY_TRANSDUCER_LIBRARY
-  //static HfstBasicTransducer *
+  //static HfstIterableTransducer *
   //  my_transducer_library_transducer_to_hfst_basic_transducer
   //    (my_namespace::MyFst * t);
   //
   //static my_namespace::MyFst *
   //  hfst_basic_transducer_to_my_transducer_library_transducer
-  //    (const HfstBasicTransducer * t);
+  //    (const HfstIterableTransducer * t);
   //#endif // HAVE_MY_TRANSDUCER_LIBRARY
 
     friend class StringVectorInitializer;

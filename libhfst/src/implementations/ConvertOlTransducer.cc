@@ -15,7 +15,7 @@
 
 #include "ConvertTransducerFormat.h"
 #include "optimized-lookup/convert.h"
-#include "HfstBasicTransducer.h"
+#include "HfstIterableTransducer.h"
 //#include "HfstTransducer.h"
 
 #ifndef MAIN_TEST
@@ -24,7 +24,7 @@ namespace hfst { namespace implementations
 
   /* -----------------------------------------------------------
 
-      Conversion functions between HfstBasicTransducer and
+      Conversion functions between HfstIterableTransducer and
       optimized lookup transducers
 
       ---------------------------------------------------------- */
@@ -32,7 +32,7 @@ namespace hfst { namespace implementations
 /* An auxiliary function. */
 unsigned int hfst_ol_to_hfst_basic_add_state
 (hfst_ol::Transducer * t,
- HfstBasicTransducer * basic,
+ HfstIterableTransducer * basic,
  hfst_ol::HfstOlToBasicStateMap & state_map,
  bool weighted,
  hfst_ol::TransitionTableIndex index,
@@ -75,11 +75,11 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 }
 
 
-  /* Create an HfstBasicTransducer equivalent to hfst_ol::Transducer \a t . */
-  HfstBasicTransducer * ConversionFunctions::
+  /* Create an HfstIterableTransducer equivalent to hfst_ol::Transducer \a t . */
+  HfstIterableTransducer * ConversionFunctions::
   hfst_ol_to_hfst_basic_transducer(hfst_ol::Transducer * t)
   {
-      HfstBasicTransducer * basic = new HfstBasicTransducer();
+      HfstIterableTransducer * basic = new HfstIterableTransducer();
       bool weighted = t->get_header().probe_flag(hfst_ol::Weighted);
       const hfst_ol::SymbolTable& symbols
         = t->get_alphabet().get_symbol_table();
@@ -122,7 +122,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
               }
               basic->add_transition
                 (current_state,
-                 HfstBasicTransition
+                 HfstTransition
                  (state_map[transition.get_target()],
                   symbols[transition.get_input_symbol()],
                   symbols[transition.get_output_symbol()],
@@ -140,7 +140,7 @@ using hfst_ol::SymbolNumber;
 using hfst_ol::NO_SYMBOL_NUMBER;
 
 void get_states_and_symbols(
-    const HfstBasicTransducer * t,
+    const HfstIterableTransducer * t,
     std::vector<hfst_ol::StatePlaceholder> & state_placeholders,
     hfst_ol::SymbolTable & symbol_table,
     SymbolNumber & seen_input_symbols,
@@ -172,7 +172,7 @@ void get_states_and_symbols(
     
     unsigned int first_transition = 0;
     unsigned int state_number = 0;
-    for (HfstBasicTransducer::const_iterator it = t->begin();
+    for (HfstIterableTransducer::const_iterator it = t->begin();
          it != t->end(); ++it) {
         hfst_ol::Weight final_w = 0.0;
         if (t->is_final_state(state_number)) {
@@ -184,7 +184,7 @@ void get_states_and_symbols(
                                          first_transition,
                                          final_w));
         ++first_transition; // there's a padding entry between states
-        for (HfstBasicTransitions::const_iterator tr_it
+        for (HfstTransitions::const_iterator tr_it
                  = it->begin();
              tr_it != it->end(); ++tr_it) {
             ++first_transition;
@@ -264,9 +264,9 @@ void get_states_and_symbols(
     // about the states except starting indices
 
     state_number = 0;
-    for (HfstBasicTransducer::const_iterator it = t->begin();
+    for (HfstIterableTransducer::const_iterator it = t->begin();
          it != t->end(); ++it) {
-        for (HfstBasicTransitions::const_iterator tr_it
+        for (HfstTransitions::const_iterator tr_it
                = it->begin();
              tr_it != it->end(); ++tr_it) {
             // add input in case we're seeing it the first time
@@ -286,11 +286,11 @@ void get_states_and_symbols(
     }
 }
 
-  /* Create an hfst_ol::Transducer equivalent to HfstBasicTransducer \a t.
+  /* Create an hfst_ol::Transducer equivalent to HfstIterableTransducer \a t.
      \a weighted defined whether the created transducer is weighted. */
   hfst_ol::Transducer * ConversionFunctions::
   hfst_basic_transducer_to_hfst_ol
-  (const HfstBasicTransducer * t, bool weighted, std::string options,
+  (const HfstIterableTransducer * t, bool weighted, std::string options,
    HfstTransducer * harmonizer)
   {
       const float packing_aggression = (float)0.85; // double -> const float
@@ -488,16 +488,16 @@ int main(int argc, char * argv[])
         return 0;
     }
 
-    hfst::HfstBasicTransducer basic;
+    hfst::HfstIterableTransducer basic;
     basic.add_state(1);
     basic.add_state(2);
-    basic.add_transition(0, hfst::HfstBasicTransition(1, "a", "a", 0));
-    basic.add_transition(1, hfst::HfstBasicTransition(2, "a", "a", 0));
-    basic.add_transition(1, hfst::HfstBasicTransition(2, "a", "b", 0));
-    basic.add_transition(0, hfst::HfstBasicTransition(
+    basic.add_transition(0, hfst::HfstTransition(1, "a", "a", 0));
+    basic.add_transition(1, hfst::HfstTransition(2, "a", "a", 0));
+    basic.add_transition(1, hfst::HfstTransition(2, "a", "b", 0));
+    basic.add_transition(0, hfst::HfstTransition(
                              2, "a", hfst::internal_epsilon, 0));
     basic.set_final_weight(2, 0);
-    hfst::HfstBasicTransducer basic_w(basic);
+    hfst::HfstIterableTransducer basic_w(basic);
     basic_w.set_final_weight(2, 1.0);
     hfst_ol::Transducer * basic_ol =
         hfst::implementations::ConversionFunctions::
@@ -505,10 +505,10 @@ int main(int argc, char * argv[])
     hfst_ol::Transducer * basic_olw =
         hfst::implementations::ConversionFunctions::
         hfst_basic_transducer_to_hfst_ol(& basic_w, true);
-    hfst::HfstBasicTransducer * basic_converted =
+    hfst::HfstIterableTransducer * basic_converted =
         hfst::implementations::ConversionFunctions::
         hfst_ol_to_hfst_basic_transducer(basic_ol);
-    hfst::HfstBasicTransducer * basic_converted_w =
+    hfst::HfstIterableTransducer * basic_converted_w =
         hfst::implementations::ConversionFunctions::
         hfst_ol_to_hfst_basic_transducer(basic_olw);
 

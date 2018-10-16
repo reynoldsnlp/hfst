@@ -46,7 +46,7 @@ namespace hfst {
         The class has two static maps and functions that take care of conversion
         between strings and internal numbers.
         
-        @see HfstTransition HfstBasicTransition */
+        @see HfstTransition HfstTransition */
     class HfstTropicalTransducerTransitionData {
     public:
       /** @brief The input and output symbol type. */
@@ -185,7 +185,7 @@ namespace hfst {
       friend class ComposeIntersectLexicon;
       friend class ComposeIntersectRule;
       friend class ComposeIntersectRulePair;
-      friend class HfstBasicTransducer;
+      friend class HfstIterableTransducer;
 
     };
 

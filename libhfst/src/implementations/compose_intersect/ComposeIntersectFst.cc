@@ -23,7 +23,7 @@ namespace hfst
     ComposeIntersectFst::TransitionSet::comparator =
      ComposeIntersectFst::CompareTransitions();
     
-    ComposeIntersectFst::Transition::Transition(const HfstBasicTransition &t):
+    ComposeIntersectFst::Transition::Transition(const HfstTransition &t):
       ilabel(HfstTropicalTransducerTransitionData::get_number
          (t.transition_data.get_input_symbol())),
       olabel(HfstTropicalTransducerTransitionData::get_number
@@ -73,11 +73,11 @@ namespace hfst
     }
 
     ComposeIntersectFst::ComposeIntersectFst(void):
-      t(HfstBasicTransducer())
+      t(HfstIterableTransducer())
     {}
 
     ComposeIntersectFst::ComposeIntersectFst
-    (const HfstBasicTransducer &t,bool input_keys):
+    (const HfstIterableTransducer &t,bool input_keys):
       t(t)
     {
       this->t.sort_arcs();
@@ -90,7 +90,7 @@ namespace hfst
                 (*it)); }
 
       unsigned int source_state=0;
-      for (HfstBasicTransducer::const_iterator it = this->t.begin();
+      for (HfstIterableTransducer::const_iterator it = this->t.begin();
        it != this->t.end();
        ++it)
     {
@@ -104,7 +104,7 @@ namespace hfst
       SymbolTransitionMap &symbol_transition_map =
         transition_map_vector.back();
       bool identity_found = false;
-      for (std::vector<HfstBasicTransition>::const_iterator jt =
+      for (std::vector<HfstTransition>::const_iterator jt =
          it->begin();
            jt != it->end();
            ++jt)

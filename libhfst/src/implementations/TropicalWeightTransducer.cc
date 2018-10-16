@@ -10,7 +10,7 @@
 #include "TropicalWeightTransducer.h"
 #include "HfstSymbolDefs.h"
 #include "HfstLookupFlagDiacritics.h"
-#include "HfstBasicTransducer.h"
+#include "HfstIterableTransducer.h"
 #include "ConvertTransducerFormat.h"
 
 #ifdef _MSC_VER
@@ -29,7 +29,7 @@
 
 #ifndef MAIN_TEST
 
-#define CHECK_EPSILON_CYCLES(x, y) { hfst::implementations::HfstBasicTransducer * fsm = hfst::implementations::ConversionFunctions::tropical_ofst_to_hfst_basic_transducer( x ); if (fsm->has_negative_epsilon_cycles()) { if (warning_stream != NULL) { *warning_stream << y << ": warning: transducer has epsilon cycles with a negative weight" << std::endl; } } delete fsm; }
+#define CHECK_EPSILON_CYCLES(x, y) { hfst::implementations::HfstIterableTransducer * fsm = hfst::implementations::ConversionFunctions::tropical_ofst_to_hfst_basic_transducer( x ); if (fsm->has_negative_epsilon_cycles()) { if (warning_stream != NULL) { *warning_stream << y << ": warning: transducer has epsilon cycles with a negative weight" << std::endl; } } delete fsm; }
 
 namespace hfst {
   bool get_encode_weights();
@@ -173,11 +173,11 @@ namespace hfst {
 #if defined(USE_FOMA_EPSILON_REMOVAL) && defined(HAVE_FOMA)
       if (!has_weights(t))
       	{
-	  hfst::implementations::HfstBasicTransducer * basic1
+	  hfst::implementations::HfstIterableTransducer * basic1
 	    = hfst::implementations::ConversionFunctions::tropical_ofst_to_hfst_basic_transducer(t);
 	  struct fsm * fst1 = hfst::implementations::ConversionFunctions::hfst_basic_transducer_to_foma(basic1);
 	  struct fsm * fst2 = hfst::implementations::FomaTransducer::remove_epsilons(fst1);
-	  hfst::implementations::HfstBasicTransducer * basic2
+	  hfst::implementations::HfstIterableTransducer * basic2
 	    = hfst::implementations::ConversionFunctions::foma_to_hfst_basic_transducer(fst2);
 	  delete t;
 	  t = hfst::implementations::ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(basic2);

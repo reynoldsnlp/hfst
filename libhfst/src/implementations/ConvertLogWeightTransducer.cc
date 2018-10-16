@@ -16,7 +16,7 @@
 #if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
 
 #include "ConvertTransducerFormat.h"
-#include "HfstBasicTransducer.h"
+#include "HfstIterableTransducer.h"
 #include "LogWeightTransducer.h"
 
 #ifdef _MSC_VER
@@ -41,11 +41,11 @@ namespace fst
 namespace hfst { namespace implementations
 {
 
-  /* --- Conversion between log OpenFst and HfstBasicTransducer --- */
+  /* --- Conversion between log OpenFst and HfstIterableTransducer --- */
   
-  /* Create an HfstBasicTransducer equivalent to an OpenFst log weight
+  /* Create an HfstIterableTransducer equivalent to an OpenFst log weight
      transducer \a t. */
-  HfstBasicTransducer * ConversionFunctions::
+  HfstIterableTransducer * ConversionFunctions::
   log_ofst_to_hfst_basic_transducer
   (LogFst * t, bool has_hfst_header) {
 
@@ -57,7 +57,7 @@ namespace hfst { namespace implementations
       HFST_THROW(MissingOpenFstInputSymbolTableException);
     }
 
-  HfstBasicTransducer * net = new HfstBasicTransducer();
+  HfstIterableTransducer * net = new HfstIterableTransducer();
 
   // An empty transducer
   if (t->Start() == fst::kNoStateId)
@@ -141,7 +141,7 @@ namespace hfst { namespace implementations
             if (arc.olabel == 0)
               ostring = std::string(internal_epsilon);
             net->add_transition(origin,
-                                HfstBasicTransition
+                                HfstTransition
                                 (target,
                                  istring,
                                  ostring,
@@ -187,7 +187,7 @@ namespace hfst { namespace implementations
               if (arc.olabel == 0)
                 ostring = std::string(internal_epsilon);
               net->add_transition(origin,
-                                  HfstBasicTransition
+                                  HfstTransition
                                   (target,
                                    istring,
                                    ostring,
@@ -237,16 +237,16 @@ namespace hfst { namespace implementations
     return it->second;
   }
 
-  /* Create an OpenFst transducer equivalent to HfstBasicTransducer \a net. */
+  /* Create an OpenFst transducer equivalent to HfstIterableTransducer \a net. */
   LogFst * ConversionFunctions::
   hfst_basic_transducer_to_log_ofst
-  (const HfstBasicTransducer * net) {
+  (const HfstIterableTransducer * net) {
     
     LogFst * t = new LogFst();
     StateId start_state = t->AddState();
     t->SetStart(start_state);
     
-    // The mapping between states in HfstBasicTransducer and StdVectorFst
+    // The mapping between states in HfstIterableTransducer and StdVectorFst
     std::map<HfstState, StateId> state_map;
     state_map[0] = start_state;
     
@@ -257,11 +257,11 @@ namespace hfst { namespace implementations
     
     // Go through all states
     unsigned int source_state=0;
-    for (HfstBasicTransducer::const_iterator it = net->begin();
+    for (HfstIterableTransducer::const_iterator it = net->begin();
          it != net->end(); it++)
       {
         // Go through the set of transitions in each state
-        for (HfstBasicTransitions::const_iterator tr_it
+        for (HfstTransitions::const_iterator tr_it
                = it->begin();
              tr_it != it->end(); tr_it++)
           {
@@ -277,7 +277,7 @@ namespace hfst { namespace implementations
       }
     
     // Go through the final states
-    for (HfstBasicTransducer::FinalWeightMap::const_iterator it
+    for (HfstIterableTransducer::FinalWeightMap::const_iterator it
            = net->final_weight_map.begin();
          it != net->final_weight_map.end(); it++)
       {
@@ -286,7 +286,7 @@ namespace hfst { namespace implementations
       }
     
     // Add also symbols that do not occur in transitions
-    for (HfstBasicTransducer::HfstAlphabet::const_iterator it
+    for (HfstIterableTransducer::HfstAlphabet::const_iterator it
            = net->alphabet.begin();
          it != net->alphabet.end(); it++) {
         st.AddSymbol(*it);

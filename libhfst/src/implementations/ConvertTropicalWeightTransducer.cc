@@ -12,7 +12,7 @@
 #endif
 
 #include "ConvertTransducerFormat.h"
-#include "HfstBasicTransducer.h"
+#include "HfstIterableTransducer.h"
 #include "TropicalWeightTransducer.h"
 
 #ifdef _MSC_VER
@@ -42,7 +42,7 @@ namespace hfst { namespace implementations
   /* Handle symbol tables when converting \a t to \a net. \a hfst_hfst_header
      defines whether \a t is an HFST transducer. */
   static void handle_symbol_tables
-  (fst::StdVectorFst * t, HfstBasicTransducer * net, bool has_hfst_header)
+  (fst::StdVectorFst * t, HfstIterableTransducer * net, bool has_hfst_header)
   {
     const fst::SymbolTable *inputsym = t->InputSymbols();
     const fst::SymbolTable *outputsym = t->OutputSymbols();
@@ -94,7 +94,7 @@ namespace hfst { namespace implementations
 
 
   /* Copy alphabet of \a t to \a net. */
-  static void copy_alphabet(fst::StdVectorFst * t, HfstBasicTransducer * net)
+  static void copy_alphabet(fst::StdVectorFst * t, HfstIterableTransducer * net)
   {
     const fst::SymbolTable *inputsym = t->InputSymbols();
     const fst::SymbolTable *outputsym = t->OutputSymbols();
@@ -127,16 +127,16 @@ namespace hfst { namespace implementations
 
   /* ------------------------------------------------------------------------
 
-     Create an HfstBasicTransducer equivalent to an OpenFst tropical weight
+     Create an HfstIterableTransducer equivalent to an OpenFst tropical weight
      transducer \a t.
 
      ------------------------------------------------------------------------ */
 
-  HfstBasicTransducer * ConversionFunctions::
+  HfstIterableTransducer * ConversionFunctions::
   tropical_ofst_to_hfst_basic_transducer
   (fst::StdVectorFst * t, bool has_hfst_header) {
     
-    HfstBasicTransducer * net = new HfstBasicTransducer();
+    HfstIterableTransducer * net = new HfstIterableTransducer();
 
     handle_symbol_tables(t, net, has_hfst_header);
     
@@ -194,7 +194,7 @@ namespace hfst { namespace implementations
               }
 
             net->add_transition(origin,
-                                HfstBasicTransition
+                                HfstTransition
                                 (target,
                                  harmonization_vector[arc.ilabel],
                                  harmonization_vector[arc.olabel],
@@ -220,13 +220,13 @@ namespace hfst { namespace implementations
 
   /* ---------------------------------------------------------------------------
 
-     Create an OpenFst transducer equivalent to HfstBasicTransducer \a net.
+     Create an OpenFst transducer equivalent to HfstIterableTransducer \a net.
 
      --------------------------------------------------------------------------- */
 
   fst::StdVectorFst * ConversionFunctions::
   hfst_basic_transducer_to_tropical_ofst
-  (const HfstBasicTransducer * net) {
+  (const HfstIterableTransducer * net) {
     
     fst::StdVectorFst * t = new fst::StdVectorFst();
     StateId start_state = t->AddState(); // always zero
@@ -245,7 +245,7 @@ namespace hfst { namespace implementations
     st.AddSymbol(internal_identity, 2);
     
     // Copy the alphabet
-    for (HfstBasicTransducer::HfstAlphabet::const_iterator it
+    for (HfstIterableTransducer::HfstAlphabet::const_iterator it
            = net->alphabet.begin();
          it != net->alphabet.end(); it++) {
       assert(! it->empty());
@@ -254,11 +254,11 @@ namespace hfst { namespace implementations
 
     // Go through all states...
     unsigned int source_state=0;
-    for (HfstBasicTransducer::const_iterator it = net->begin();
+    for (HfstIterableTransducer::const_iterator it = net->begin();
          it != net->end(); it++)
       {
         // Go through the set of transitions in each state...
-        for (HfstBasicTransitions::const_iterator tr_it
+        for (HfstTransitions::const_iterator tr_it
                = it->begin();
              tr_it != it->end(); tr_it++)
           {
@@ -279,7 +279,7 @@ namespace hfst { namespace implementations
       } // ... all states gone through
     
     // Go through the final states...
-    for (HfstBasicTransducer::FinalWeightMap::const_iterator it
+    for (HfstIterableTransducer::FinalWeightMap::const_iterator it
            = net->final_weight_map.begin();
          it != net->final_weight_map.end(); it++)
       {

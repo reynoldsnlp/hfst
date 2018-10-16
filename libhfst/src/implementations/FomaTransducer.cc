@@ -430,7 +430,7 @@ namespace hfst { namespace implementations {
                                  strdup(new_symbol.c_str()));
   }
   
-    /* Conversion to HfstBasicTransducer is now used instead. */
+    /* Conversion to HfstIterableTransducer is now used instead. */
   fsm * FomaTransducer::insert_freely(fsm * t, const StringPair &symbol_pair)
   {
     const char * epsilon = internal_epsilon.c_str();
@@ -456,7 +456,7 @@ namespace hfst { namespace implementations {
                 const_cast<char*>(epsilon));
   free(epsilon_marker);
   // marker should be removed from sigma..
-  // (HfstBasicTransducer is now used instead)
+  // (HfstIterableTransducer is now used instead)
   }
   
   fsm * FomaTransducer::compose
