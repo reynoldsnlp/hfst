@@ -65,5 +65,5 @@ sed -i 's/pmatchwrap( )/pmatchwrap(void)/' libhfst/src/parsers/pmatch_lex.cpp
 sed -i 's/hlexcwrap( )/hlexcwrap(void)/' libhfst/src/parsers/lexc-lexer.cpp
 
 # copy windows-scpecific headers
-cp ../../scripts/windows/stdint.h back-ends/foma/stdint.h
-cp ../../scripts/windows/inttypes.h back-ends/foma/inttypes.h
+cp win/stdint.h back-ends/foma/stdint.h
+cp win/inttypes.h back-ends/foma/inttypes.h
