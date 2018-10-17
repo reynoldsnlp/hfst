@@ -635,7 +635,6 @@ AS_IF([test "x$ac_cv_lib_sfst_main" == xno -a "x$ac_cv_lib_sfst1_main" == xno],
 AC_LANG_POP
 AC_LANG_PUSH([C])
 
-AM_COND_IF([GENERATE_FOMA_WRAPPER], [AC_CHECK_LIB([z], [main], [], [AC_MSG_FAILURE([foma test failed because zlib.h was not found (--without-foma to disable)])])])
 AM_COND_IF([GENERATE_LEXC_WRAPPER], [AC_CHECK_LIB([z], [main], [], [AC_MSG_FAILURE([foma test failed because zlib.h was not found (--without-foma to disable)])])])
 
 AM_CONDITIONAL(HAVE_NCURSES,[false])
@@ -775,9 +774,6 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 python/Makefile
 		 python/test/Makefile
 		 scripts/Makefile])
-AC_CONFIG_FILES([scripts/hfst-foma-wrapper.sh], [chmod +x scripts/hfst-foma-wrapper.sh])
-AC_CONFIG_FILES([scripts/hfst-foma], [chmod +x scripts/hfst-foma])
-
 
 
 # output
