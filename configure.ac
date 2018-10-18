@@ -179,7 +179,7 @@ AS_IF([test "x$enable_load_so_entries" != xno], [AC_DEFINE([ENABLE_LOAD_SO_ENTRI
 
 AC_ARG_ENABLE([all_tools],
 			  [AS_HELP_STRING([--enable-all-tools],
-			  [build all tools (excluding legacy programs which must be explicitly enabled with --enable-lexc-wrapper --enable-foma-wrapper --enable-twolc-script and --enable-train-tagger) @<:@default=no@:>@])],
+			  [build all tools @<:@default=no@:>@])],
 			  [enable_all_tools=$enableval],
 			  [enable_all_tools=no])
 
@@ -329,36 +329,18 @@ AC_ARG_ENABLE([invert],
 			  [enable_invert=$enableval],
 			  [if test x$enable_no_tools != xno; then enable_invert=no; else enable_invert=yes; fi])
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
-AC_ARG_ENABLE([lexc-wrapper],
-              [AS_HELP_STRING([--enable-lexc-wrapper],
-                              [build legacy lexc tool @<:@default=no@:>@])],
-              [enable_lexc_wrapper=$enableval],
-              [enable_lexc_wrapper=no])
-AM_CONDITIONAL([WANT_LEXC_WRAPPER], [test "x$enable_lexc_wrapper" != xno])
 AC_ARG_ENABLE([twolc],
               [AS_HELP_STRING([--enable-twolc],
                               [build twolc @<:@default=yes@:>@])],
               [enable_twolc=$enableval],
               [if test x$enable_no_tools != xno; then enable_twolc=no; else enable_twolc=yes; fi])
 AM_CONDITIONAL([WANT_TWOLC], [test "x$enable_twolc" != xno])
-AC_ARG_ENABLE([twolc-script],
-              [AS_HELP_STRING([--enable-twolc-script],
-                              [build script implementation of twolc @<:@default=no@:>@])],
-              [enable_twolc_script=$enableval],
-              [enable_twolc_script=no])
-AM_CONDITIONAL([WANT_TWOLC_SCRIPT], [test "x$enable_twolc_script" != xno])
 AC_ARG_ENABLE([tagger],
               [AS_HELP_STRING([--enable-tagger],
                               [build tagger utilities @<:@default=no@:>@])],
               [enable_tagger=$enableval],
               [enable_tagger=$enable_all_tools])
 AM_CONDITIONAL([WANT_TAGGER], [test "x$enable_tagger" != xno])
-AC_ARG_ENABLE([train-tagger],
-              [AS_HELP_STRING([--enable-train-tagger],
-                              [build tagger training utilities @<:@default=no@:>@])],
-              [enable_train_tagger=$enableval],
-              [enable_train_tagger=no])
-AM_CONDITIONAL([WANT_TRAIN_TAGGER], [test "x$enable_train_tagger" != xno])
 AC_ARG_ENABLE([lexc],
               [AS_HELP_STRING([--enable-lexc],
                               [build lexc tool @<:@default=yes@:>@])],
@@ -533,12 +515,6 @@ AC_ARG_ENABLE([txt2fst],
 			  [enable_txt2fst=$enableval],
 			  [if test x$enable_no_tools != xno; then enable_txt2fst=no; else enable_txt2fst=yes; fi])
 AM_CONDITIONAL([WANT_TXT2FST], [test x$enable_txt2fst != xno])
-AC_ARG_ENABLE([foma_wrapper],
-			  [AS_HELP_STRING([--enable-foma-wrapper],
-							  [build legacy foma wrapper tool @<:@default=no@:>@])],
-			  [enable_foma_wrapper=$enableval],
-			  [enable_foma_wrapper=no])
-AM_CONDITIONAL([WANT_FOMA_WRAPPER], [test x$enable_foma_wrapper != xno])
 AC_ARG_ENABLE([xfst],
 			  [AS_HELP_STRING([--enable-xfst],
 							  [build xfst tool @<:@default=yes@:>@])],
@@ -548,18 +524,6 @@ AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
 
 # Check if zlib is available
 AC_CHECK_LIB([z], [main], [zlib_exists=yes], [zlib_exists=no])
-# Check if foma and lexc wrappers are wanted and possible to generate
-AM_CONDITIONAL([GENERATE_FOMA_WRAPPER], [test "x$enable_foma_wrapper" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"])
-AM_CONDITIONAL([GENERATE_LEXC_WRAPPER], [test "x$enable_lexc_wrapper" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"])
-# The same as variables..
-AS_IF([test "x$enable_foma_wrapper" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"], [generate_foma_wrapper=yes], [generate_foma_wrapper=no])
-AS_IF([test "x$enable_lexc_wrapper" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"], [generate_lexc_wrapper=yes], [generate_lexc_wrapper=no])
-
-# If foma wrapper is not wanted or possible to generate, set these conditionals/variables to 'no'
-AM_COND_IF([GENERATE_FOMA_WRAPPER], [], [AM_CONDITIONAL([WANT_FOMA_WRAPPER], [false])])
-AM_COND_IF([GENERATE_FOMA_WRAPPER], [], [enable_foma_wrapper=no])
-AM_COND_IF([GENERATE_LEXC_WRAPPER], [], [AM_CONDITIONAL([WANT_LEXC_WRAPPER], [false])])
-AM_COND_IF([GENERATE_LEXC_WRAPPER], [], [enable_lexc_wrapper=no])
 
 # Disable stress tests by default
 AC_ARG_ENABLE([stress-tests],
@@ -635,7 +599,6 @@ AS_IF([test "x$ac_cv_lib_sfst_main" == xno -a "x$ac_cv_lib_sfst1_main" == xno],
 AC_LANG_POP
 AC_LANG_PUSH([C])
 
-AM_COND_IF([GENERATE_LEXC_WRAPPER], [AC_CHECK_LIB([z], [main], [], [AC_MSG_FAILURE([foma test failed because zlib.h was not found (--without-foma to disable)])])])
 
 AM_CONDITIONAL(HAVE_NCURSES,[false])
 AM_CONDITIONAL(HAVE_CURSES,[false])
@@ -798,7 +761,6 @@ cat <<EOF
     *                 determinize: $enable_determinize (determinise)
     *                 disjunct: $enable_disjunct (union)
     *                 eliminate-flags: $enable_eliminate_flags
-    *                 foma: $enable_foma_wrapper
     *                 format: $enable_format
     *                 fst2fst: $enable_fst2fst
     *                 fst2strings: $enable_fst2strings (expand)
@@ -809,7 +771,6 @@ cat <<EOF
     *                 head: $enable_head
     *                 invert: $enable_invert
     *                 lexc: $enable_lexc
-    *                 lexc-wrapper: $enable_lexc_wrapper
     *                 lookup: $enable_lookup
     *                 minimize: $enable_minimize (minimise)
     *                 name: $enable_name
@@ -834,9 +795,7 @@ cat <<EOF
     *                 test: $enable_test
     *                 tokenize: $enable_tokenize (tokenise)
     *                 twolc: $enable_twolc
-    *                 twolc-script: $enable_twolc_script
     *                 tagger: $enable_tagger
-    *                 train-tagger: $enable_train_tagger
     *                 txt2fst: $enable_txt2fst
     *                 xfst: $enable_xfst
     * unicode parsed in corpus tools with: $with_unicode_handler

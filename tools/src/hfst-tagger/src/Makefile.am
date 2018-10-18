@@ -1,49 +1,20 @@
 AM_CXXFLAGS= -O3 -g -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors -Wno-sign-compare\
              -I$(top_builddir)/tools/src/inc -I$(top_builddir)/tools/src
 
-if WANT_TRAIN_TAGGER
-bin_PROGRAMS=hfst-build-tagger$(EXEEXT) hfst-open-input-file-for-tagger$(EXEEXT) hfst-tag \
-hfst-reweight-tagger$(EXEEXT) hfst-train-tagger-system$(EXEEXT)
-bin_SCRIPTS=hfst_tagger_compute_data_statistics.py hfst-train-tagger$(EXEEXT) \
-hfst-train-tagger-loc$(EXEEXT)
-else
 bin_PROGRAMS=hfst-tag hfst-reweight-tagger$(EXEEXT)
 bin_SCRIPTS=
-endif
-EXTRA_DIST=hfst-train-tagger.sh hfst-train-tagger.bat hfst_tagger_compute_data_statistics.py
+EXTRA_DIST=
 
 BUILD_MODEL_SRC=$(srcdir)/build_model_src
 USE_MODEL_SRC=$(srcdir)/use_model_src
 AM_CPPFLAGS=-I${top_srcdir}/libhfst/src -Wno-sign-compare -Wno-unused-parameter
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 
-if WANT_TRAIN_TAGGER
-python_PYTHON=$(BUILD_MODEL_SRC)/tagger_aux.py \
-              hfst_tagger_compute_data_statistics.py
-else
-EXTRA_DIST += $(BUILD_MODEL_SRC)/tagger_aux.py \
-              hfst_tagger_compute_data_statistics.py
-endif
+EXTRA_DIST += $(BUILD_MODEL_SRC)/tagger_aux.py
 
 HFST_COMMON_SRC=$(top_srcdir)/tools/src/hfst-program-options.cc \
                 $(top_srcdir)/tools/src/hfst-commandline.cc \
 	        $(top_srcdir)/tools/src/hfst-tool-metadata.cc
-
-AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=hfst_tagger_compute_data_statistics.py \
-                                   hfst-build-tagger \
-                                   hfst-open-input-file-for-tagger \
-                                   hfst-train-tagger hfst-train-tagger-loc \
-				   hfst-train-tagger-system
-
-hfst_build_tagger_SOURCES=hfst-build-tagger.cc \
-			  $(BUILD_MODEL_SRC)/FstBuilder.cc \
-			  $(BUILD_MODEL_SRC)/LexicalModelBuilder.cc \
-			  $(BUILD_MODEL_SRC)/ModelBuilder.cc \
-			  $(BUILD_MODEL_SRC)/SequenceModelBuilder.cc \
-			  $(BUILD_MODEL_SRC)/TaggerBuilder.cc \
-			  $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc\
-			  $(BUILD_MODEL_SRC)/string_handling.cc \
-			  $(HFST_COMMON_SRC)
 
 hfst_tag_SOURCES=hfst-tag.cc \
 	         $(USE_MODEL_SRC)/DelayedSequenceModelComponent.cc \
@@ -60,78 +31,12 @@ hfst_reweight_tagger_SOURCES=hfst-reweight-tagger.cc \
 		             $(HFST_COMMON_SRC)
 
 
-hfst_train_tagger_system_SOURCES=hfst-train-tagger-system.cc
-
-if WANT_TRAIN_TAGGER
-hfst-train-tagger$(EXEEXT): hfst-train-tagger.sh
-	cat $< | sed -e 's|BINDIR|$(bindir)|' > $@
-	chmod ogu+rx $@
-
-hfst-train-tagger-loc$(EXEEXT): hfst-train-tagger.sh
-	cat $< | sed -e 's|BINDIR|$(PWD)|' > $@
-	chmod ogu+rx $@
-
-clean-local:
-	-rm -f hfst-train-tagger$(EXEEXT) hfst-train-tagger-loc$(EXEEXT) hfst-train-tagger-system$(EXEEXT)
-endif
-
 unit_test_aux.o:$(srcdir)/unit_test_aux.cc
 
-hfst_open_input_file_for_tagger_SOURCES=hfst-open-input-file-for-tagger.cc \
-			  $(HFST_COMMON_SRC)
-
-check_PROGRAMS=FstBuilder LexicalModelBuilder ModelBuilder \
-               SequenceModelBuilder TaggerBuilder \
-               WeightedStringVectorCollection \
-               string_handling DelayedSequenceModelComponent \
+check_PROGRAMS=DelayedSequenceModelComponent \
                AcyclicAutomaton NewLexicalModel SentenceTagger \
                SentenceTransducer SequenceModelComponent \
                SequenceModelComponentPair SequenceTagger
-
-FstBuilder_SOURCES=$(BUILD_MODEL_SRC)/FstBuilder.cc
-FstBuilder_LDADD=string_handling.o FstBuilder.o \
-                 $(top_srcdir)/libhfst/src/libhfst.la
-FstBuilder_CXXFLAGS=-DMAIN_TEST -Wno-deprecated
-
-LexicalModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/LexicalModelBuilder.cc
-LexicalModelBuilder_LDADD=string_handling.o FstBuilder.o ModelBuilder.o \
-			  WeightedStringVectorCollection.o \
-	                  LexicalModelBuilder.o \
-                          $(top_srcdir)/libhfst/src/libhfst.la
-LexicalModelBuilder_CXXFLAGS=-DMAIN_TEST -Wno-deprecated
-
-SequenceModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/SequenceModelBuilder.cc
-SequenceModelBuilder_LDADD=string_handling.o FstBuilder.o ModelBuilder.o \
-			  WeightedStringVectorCollection.o \
-	                  SequenceModelBuilder.o \
-                          $(top_srcdir)/libhfst/src/libhfst.la
-SequenceModelBuilder_CXXFLAGS=-DMAIN_TEST -Wno-deprecated
-
-ModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/ModelBuilder.cc
-ModelBuilder_LDADD=string_handling.o FstBuilder.o ModelBuilder.o \
-		   WeightedStringVectorCollection.o \
-                   $(top_srcdir)/libhfst/src/libhfst.la
-ModelBuilder_CXXFLAGS=-DMAIN_TEST -Wno-deprecated
-
-WeightedStringVectorCollection_SOURCES=\
-	$(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc
-WeightedStringVectorCollection_LDADD=string_handling.o \
-	WeightedStringVectorCollection.o \
-	$(top_srcdir)/libhfst/src/libhfst.la
-WeightedStringVectorCollection_CXXFLAGS=-DMAIN_TEST -Wno-deprecated
-
-TaggerBuilder_SOURCES=$(BUILD_MODEL_SRC)/TaggerBuilder.cc
-TaggerBuilder_LDADD=string_handling.o TaggerBuilder.o \
-	LexicalModelBuilder.o SequenceModelBuilder.o \
-	WeightedStringVectorCollection.o ModelBuilder.o FstBuilder.o \
-	$(top_srcdir)/libhfst/src/libhfst.la
-TaggerBuilder_CXXFLAGS=-DMAIN_TEST -Wno-deprecated
-
-string_handling_SOURCES=$(BUILD_MODEL_SRC)/string_handling.cc
-
-string_handling_LDADD=string_handling.o $(top_srcdir)/libhfst/src/libhfst.la \
-		      unit_test_aux.o
-string_handling_CXXFLAGS=-DMAIN_TEST -Wno-deprecated
 
 AcyclicAutomaton_SOURCES=$(USE_MODEL_SRC)/AcyclicAutomaton.cc
 
