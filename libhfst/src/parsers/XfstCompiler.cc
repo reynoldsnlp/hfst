@@ -428,9 +428,9 @@ namespace xfst {
              p != path.end(); p++)
           {
             if (p->second != "@0@" &&
-                p->second != "@_EPSILON_SYMBOL_@" )
+                !hfst::is_epsilon(p->second))
               {
-                if (p->second == "@_UNKNOWN_SYMBOL_@")
+                if (hfst::is_unknown(p->second))
                   new_path.push_back("?");
                 else
                   new_path.push_back(p->second);
@@ -2547,25 +2547,25 @@ namespace xfst {
     if (sv.size() == 2)
       {
         if (sv[0] == "?") {
-          sp.first = "@_UNKNOWN_SYMBOL_@"; }
+          sp.first = hfst::internal_unknown; }
         else if (sv[0] == "0") {
-          sp.first = "@_EPSILON_SYMBOL_@"; }
+          sp.first = hfst::internal_epsilon; }
         else {
           sp.first = sv[0]; }
 
         if (sv[1] == "?") {
-          sp.second = "@_UNKNOWN_SYMBOL_@"; }
+          sp.second = hfst::internal_unknown; }
         else if (sv[1] == "0") {
-          sp.second = "@_EPSILON_SYMBOL_@"; }
+          sp.second = hfst::internal_epsilon; }
         else {
           sp.second = sv[1]; }
       }
     else if (sv.size() == 1)
       {
         if (sv[0] == "?") { // special case "?"
-          sp.first = "@_IDENTITY_SYMBOL_@"; }
+          sp.first = hfst::internal_identity; }
         else if (sv[0] == "0") {
-          sp.first = "@_EPSILON_SYMBOL_@"; }
+          sp.first = hfst::internal_epsilon; }
         else {
           sp.first = sv[0]; }
         sp.second = sp.first;
@@ -2596,9 +2596,9 @@ namespace xfst {
       
       std::string labelstr(label);
       if (labelstr == "?")
-        labelstr = std::string("@_IDENTITY_SYMBOL_@");
+        labelstr = hfst::internal_identity;
       if (labelstr == "0")
-        labelstr = std::string("@_EPSILON_SYMBOL_@");
+        labelstr = hfst::internal_epsilon;
 
       StringSet alpha = top->get_alphabet();
       if (alpha.find(labelstr) == alpha.end())
@@ -2638,7 +2638,7 @@ namespace xfst {
       alpha = it->second->get_alphabet();
       top->substitute(labelpair, *(it->second), false);
 
-      if (labelstr != "@_EPSILON_SYMBOL_@" && labelstr != "@_IDENTITY_SYMBOL_@" &&
+      if (!hfst::is_epsilon(labelstr) && !hfst::is_identity(labelstr) &&
           alpha.find(labelstr) == alpha.end())
         {
           top->remove_from_alphabet(labelstr);
@@ -4609,9 +4609,9 @@ namespace xfst {
       GET_TOP(tmp);
 
       StringSet alpha = tmp->get_alphabet();
-      alpha.erase("@_UNKNOWN_SYMBOL_@");
-      alpha.erase("@_IDENTITY_SYMBOL_@");
-      alpha.erase("@_EPSILON_SYMBOL_@");
+      alpha.erase(hfst::internal_unknown);
+      alpha.erase(hfst::internal_identity);
+      alpha.erase(hfst::internal_epsilon);
       StringPairSet alpha_ = hfst::symbols::to_string_pair_set(alpha);
       HfstTransducer * sigma = new HfstTransducer(alpha_, format_);
       
@@ -5269,7 +5269,7 @@ namespace xfst {
       cr->optimize();
 
       result->subtract(*cr).optimize();
-      result->substitute("@EPSILON_MARKER@", "@_EPSILON_SYMBOL_@");
+      result->substitute("@EPSILON_MARKER@", hfst::internal_epsilon);
       delete cr;
       stack_.pop();
       delete tmp;

@@ -135,7 +135,7 @@ namespace hfst
        ++it)
     {
       if (it->first == HfstTropicalTransducerTransitionData::get_number
-          ("@_EPSILON_SYMBOL_@"))
+          (hfst::internal_epsilon))
         {
           if (allow_lexicon_epsilons)
             {
@@ -159,7 +159,7 @@ namespace hfst
       rule_skip_symbol_compose
         (rules->get_transitions
          (p.second,HfstTropicalTransducerTransitionData::get_number
-          ("@_EPSILON_SYMBOL_@")),p.first,state);
+          (hfst::internal_epsilon)),p.first,state);
     }
 
 

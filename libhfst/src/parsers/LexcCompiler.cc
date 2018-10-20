@@ -121,7 +121,7 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
 #endif
     parseErrors_(false)
 {
-    tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+  tokenizer_.add_multichar_symbol(hfst::internal_epsilon);
     tokenizer_.add_multichar_symbol("@0@");
     tokenizer_.add_multichar_symbol("@ZERO@");
     tokenizer_.add_multichar_symbol("@@ANOTHER_EPSILON@@");
@@ -155,7 +155,7 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
 #endif
     parseErrors_(false)
 {
-    tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    tokenizer_.add_multichar_symbol(hfst::internal_epsilon);
     tokenizer_.add_multichar_symbol("@0@");
     tokenizer_.add_multichar_symbol("@ZERO@");
     tokenizer_.add_multichar_symbol("@@ANOTHER_EPSILON@@");
@@ -170,7 +170,7 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
     void LexcCompiler::reset()
     {
       tokenizer_ = hfst::HfstTokenizer();
-      tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+      tokenizer_.add_multichar_symbol(hfst::internal_epsilon);
       tokenizer_.add_multichar_symbol("@0@");
       tokenizer_.add_multichar_symbol("@ZERO@");
       tokenizer_.add_multichar_symbol("@@ANOTHER_EPSILON@@");
@@ -586,9 +586,9 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 
         for(StringPairVector::iterator it = tmp.begin() ; it < tmp.end(); ++it)
         {
-            if (it->first != "@_EPSILON_SYMBOL_@" )
+	  if (!hfst::is_epsilon(it->first))
                 one.push_back(it->first);
-            if (it->second != "@_EPSILON_SYMBOL_@" )
+	  if (!hfst::is_epsilon(it->second))
                 two.push_back(it->second);
         }
         
@@ -882,8 +882,8 @@ LexcCompiler::compileLexical()
     lexicons.repeat_star().optimize();
 
     HfstSymbolSubstitutions smallSubstitutions;
-    smallSubstitutions.insert(StringPair("@0@", "@_EPSILON_SYMBOL_@"));
-    smallSubstitutions.insert(StringPair("@@ANOTHER_EPSILON@@", "@_EPSILON_SYMBOL_@"));
+    smallSubstitutions.insert(StringPair("@0@", hfst::internal_epsilon));
+    smallSubstitutions.insert(StringPair("@@ANOTHER_EPSILON@@", hfst::internal_epsilon));
     smallSubstitutions.insert(StringPair("@ZERO@", "0"));
 
     lexicons.substitute(smallSubstitutions);
@@ -920,7 +920,7 @@ LexcCompiler::compileLexical()
             StringPairVector newVector(tokenizer_.tokenize(joinerEnc + joinerEnc));
             joinersTrie_.disjunct(newVector, 0);
 
-            allJoinersToEpsilon.insert(StringPair(joinerEnc, "@_EPSILON_SYMBOL_@"));
+            allJoinersToEpsilon.insert(StringPair(joinerEnc, hfst::internal_epsilon));
          }
 
         string rootJoiner = initialLexiconName_;
@@ -928,8 +928,8 @@ LexcCompiler::compileLexical()
         joinerEncode(rootJoiner);
         joinerEncode(hashJoiner);
 
-        allJoinersToEpsilon.insert(StringPair(rootJoiner, "@_EPSILON_SYMBOL_@"));
-        allJoinersToEpsilon.insert(StringPair(hashJoiner, "@_EPSILON_SYMBOL_@"));
+        allJoinersToEpsilon.insert(StringPair(rootJoiner, hfst::internal_epsilon));
+        allJoinersToEpsilon.insert(StringPair(hashJoiner, hfst::internal_epsilon));
 
     }
     else

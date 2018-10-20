@@ -115,7 +115,7 @@ namespace hfst { namespace implementations
     // How numbers are recoded in the conversion
     StringVector symbol_vector = SfstTransducer::get_symbol_vector(t);
     // change SFST's internal "<>" to HFST's "@_EPSILON_SYMBOL_@"
-    symbol_vector.at(0) = "@_EPSILON_SYMBOL_@";
+    symbol_vector.at(0) = hfst::internal_epsilon;
     std::vector<unsigned int> harmonization_vector
       = HfstTropicalTransducerTransitionData::
       get_harmonization_vector(symbol_vector);

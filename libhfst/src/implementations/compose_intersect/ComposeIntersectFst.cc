@@ -109,7 +109,7 @@ namespace hfst
            jt != it->end();
            ++jt)
         {
-          if (jt->get_input_symbol() == "@_IDENTITY_SYMBOL_@")
+          if (hfst::is_identity(jt->get_input_symbol()))
         {
           identity_found = true;
           identity_transition_vector.push_back(*jt);
@@ -128,9 +128,9 @@ namespace hfst
         (Transition
          (0,
           HfstTropicalTransducerTransitionData::get_number
-          ("@_EPSILON_SYMBOL_@"),
+          (hfst::internal_epsilon),
           HfstTropicalTransducerTransitionData::get_number
-          ("@_EPSILON_SYMBOL_@"),
+          (hfst::internal_epsilon),
           0)); }
     }
     }
@@ -191,7 +191,7 @@ namespace hfst
     { HFST_THROW(StateNotDefined); }
       return identity_transition_vector.at(s).ilabel
     == HfstTropicalTransducerTransitionData::get_number
-    ("@_IDENTITY_SYMBOL_@");
+	(hfst::internal_identity);
     }
 
     const ComposeIntersectFst::SymbolSet

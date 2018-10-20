@@ -555,8 +555,8 @@ extend_matcher_with_options()
     if (color_matches)
       {
         verbose_printf("Adding color codes to match boundaries...\n");
-        HfstTransducer colorStart("@_EPSILON_SYMBOL_@", "[31m", format);
-        HfstTransducer colorEnd("@_EPSILON_SYMBOL_@", "[00m", format);
+        HfstTransducer colorStart(hfst::internal_epsilon, "[31m", format);
+        HfstTransducer colorEnd(hfst::internal_epsilon, "[00m", format);
         HfstTransducer coloured =
             colorStart.concatenate(*matcher).concatenate(colorEnd);
         matcher = new HfstTransducer(coloured, format);
@@ -565,8 +565,8 @@ extend_matcher_with_options()
       {
         // bracket matches for now
         verbose_printf("Adding brackets to match boundaries...\n");
-        HfstTransducer colorStart("@_EPSILON_SYMBOL_@", "{{{", format);
-        HfstTransducer colorEnd("@_EPSILON_SYMBOL_@", "}}}", format);
+        HfstTransducer colorStart(hfst::internal_epsilon, "{{{", format);
+        HfstTransducer colorEnd(hfst::internal_epsilon, "}}}", format);
         HfstTransducer coloured =
             colorStart.concatenate(*matcher).concatenate(colorEnd);
         matcher = new HfstTransducer(coloured, format);
@@ -584,8 +584,8 @@ extend_matcher_with_options()
     if (!match_full_line)
       {
         verbose_printf("Extending matcher for repetitions and rest...\n");
-        HfstTransducer leftAny("@_IDENTITY_SYMBOL_@", format);
-        HfstTransducer rightAny("@_IDENTITY_SYMBOL_@", format);
+        HfstTransducer leftAny(hfst::internal_identity, format);
+        HfstTransducer rightAny(hfst::internal_identity, format);
         leftAny.repeat_star();
         rightAny.repeat_star();
         HfstTransducer oneMatch =

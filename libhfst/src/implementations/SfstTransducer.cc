@@ -1301,7 +1301,7 @@ namespace hfst { namespace implementations {
     (Transducer *t,
      const std::string &symbol)
   {
-    if (symbol == "@_EPSILON_SYMBOL_@")
+    if (hfst::is_epsilon(symbol))
       return 0;
     int i = t->alphabet.symbol2code(symbol.c_str());
     if (i == EOF) {

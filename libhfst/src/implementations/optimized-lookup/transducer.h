@@ -382,7 +382,7 @@ protected:
 public:
     TransducerAlphabet()
         {
-            symbol_table.push_back("@_EPSILON_SYMBOL_@");
+	    symbol_table.push_back(hfst::internal_epsilon);
             unknown_symbol = NO_SYMBOL_NUMBER;
             default_symbol = NO_SYMBOL_NUMBER;
             identity_symbol = NO_SYMBOL_NUMBER;

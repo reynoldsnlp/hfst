@@ -255,8 +255,8 @@ HfstState get_target(const std::string &isymbol,
       if (it->get_input_symbol() == isymbol and
       it->get_output_symbol() == osymbol)
     { return it->get_target_state(); }
-      if (it->get_input_symbol() == "@_IDENTITY_SYMBOL_@" and
-      it->get_output_symbol() == "@_IDENTITY_SYMBOL_@")
+      if (hfst::is_identity(it->get_input_symbol()) and
+	  hfst::is_identity(it->get_output_symbol()) )
     { identity_target = it->get_target_state(); }
     }
 

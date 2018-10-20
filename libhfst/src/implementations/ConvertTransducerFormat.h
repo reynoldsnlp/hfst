@@ -193,9 +193,9 @@ namespace implementations {
     public:
       StringVectorInitializer
         (StringVector &vector) {
-        vector.push_back(std::string("@_EPSILON_SYMBOL_@"));
-    vector.push_back(std::string("@_UNKNOWN_SYMBOL_@"));
-        vector.push_back(std::string("@_IDENTITY_SYMBOL_@"));
+        vector.push_back(hfst::internal_epsilon);
+	vector.push_back(hfst::internal_unknown);
+        vector.push_back(hfst::internal_identity);
       }
     };
 
@@ -203,9 +203,9 @@ namespace implementations {
     public:
       String2NumberMapInitializer
         (ConversionFunctions::String2NumberMap &map) {
-        map["@_EPSILON_SYMBOL_@"] = 0;
-        map["@_UNKNOWN_SYMBOL_@"] = 1;
-        map["@_IDENTITY_SYMBOL_@"] = 2;
+        map[hfst::internal_epsilon] = 0;
+        map[hfst::internal_unknown] = 1;
+        map[hfst::internal_identity] = 2;
       }
     };
 

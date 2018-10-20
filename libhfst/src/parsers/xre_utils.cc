@@ -876,15 +876,15 @@ xfst_label_to_transducer(const char* input, const char* output)
   HfstTransducer * contains_twolc(const HfstTransducer * t)
   {
     // marker = [0:M ?]*
-    HfstTransducer marker("@_EPSILON_SYMBOL_@", "M", t->get_type());
-    HfstTransducer id("@_IDENTITY_SYMBOL_@", t->get_type());
+    HfstTransducer marker(hfst::internal_identity, "M", t->get_type());
+    HfstTransducer id(hfst::internal_identity, t->get_type());
     marker.concatenate(id).repeat_star().minimize(); // it should be safe to minimize
 
     // the rule
     HfstTransducer right_context(*t);
-    right_context.insert_freely(StringPair("M", "@_EPSILON_SYMBOL_@")).optimize();
+    right_context.insert_freely(StringPair("M", hfst::internal_identity)).optimize();
     right_context.insert_freely(StringPair("M", "M")).optimize();
-    HfstTransducer left_context("@_EPSILON_SYMBOL_@", t->get_type());
+    HfstTransducer left_context(hfst::internal_identity, t->get_type());
     HfstTransducerPair context(left_context, right_context);
 
     StringPairSet mappings;
@@ -893,8 +893,8 @@ xfst_label_to_transducer(const char* input, const char* output)
     // alphabet list possible mappings: M:M, M:0,
     StringPairSet alphabet;
     alphabet.insert(StringPair("M","M"));
-    alphabet.insert(StringPair("M","@_EPSILON_SYMBOL_@"));
-    alphabet.insert(StringPair("@_IDENTITY_SYMBOL_@","@_IDENTITY_SYMBOL_@"));
+    alphabet.insert(StringPair("M",hfst::internal_identity));
+    alphabet.insert(StringPair(hfst::internal_identity,hfst::internal_identity));
 
     // and identity pairs of symbols that occur in t
     HfstIterableTransducer basic(*t);

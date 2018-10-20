@@ -16,6 +16,7 @@
 #include <iostream>
 #include <vector>
 #include "../HfstExceptionDefs.h"
+#include "../HfstSymbolDefs.h"
 
 #include "../hfstdll.h"
 
@@ -25,17 +26,17 @@ namespace hfst {
 
       HfstTropicalTransducerTransitionData::SymbolType HfstTropicalTransducerTransitionData::get_epsilon()
       {
-        return SymbolType("@_EPSILON_SYMBOL_@");
+        return SymbolType(hfst::internal_epsilon);
       }
 
       HfstTropicalTransducerTransitionData::SymbolType HfstTropicalTransducerTransitionData::get_unknown()
       {
-        return SymbolType("@_UNKNOWN_SYMBOL_@");
+        return SymbolType(hfst::internal_unknown);
       }
 
       HfstTropicalTransducerTransitionData::SymbolType HfstTropicalTransducerTransitionData::get_identity()
       {
-        return SymbolType("@_IDENTITY_SYMBOL_@");
+        return SymbolType(hfst::internal_identity);
       }
 
     HfstTropicalTransducerTransitionData::Number2SymbolVector
@@ -197,13 +198,13 @@ namespace hfst {
 
 
     bool HfstTropicalTransducerTransitionData::is_epsilon(const SymbolType &symbol) {
-      return (symbol.compare("@_EPSILON_SYMBOL_@") == 0);
+      return hfst::is_epsilon(symbol);
     }
     bool HfstTropicalTransducerTransitionData::is_unknown(const SymbolType &symbol) {
-      return (symbol.compare("@_UNKNOWN_SYMBOL_@") == 0);
+      return hfst::is_unknown(symbol);
     }
     bool HfstTropicalTransducerTransitionData::is_identity(const SymbolType &symbol) {
-      return (symbol.compare("@_IDENTITY_SYMBOL_@") == 0);
+      return hfst::is_identity(symbol);
     }
     bool HfstTropicalTransducerTransitionData::is_valid_symbol(const SymbolType &symbol) {
       if (symbol == "")
@@ -251,16 +252,16 @@ namespace hfst {
 
     Number2SymbolVectorInitializer::Number2SymbolVectorInitializer
     (HfstTropicalTransducerTransitionData::Number2SymbolVector &vect) {
-      vect.push_back(std::string("@_EPSILON_SYMBOL_@"));
-      vect.push_back(std::string("@_UNKNOWN_SYMBOL_@"));
-      vect.push_back(std::string("@_IDENTITY_SYMBOL_@"));
+      vect.push_back(hfst::internal_epsilon);
+      vect.push_back(hfst::internal_unknown);
+      vect.push_back(hfst::internal_identity);
     }
 
     Symbol2NumberMapInitializer::Symbol2NumberMapInitializer
     (HfstTropicalTransducerTransitionData::Symbol2NumberMap &map) {
-      map["@_EPSILON_SYMBOL_@"] = 0;
-      map["@_UNKNOWN_SYMBOL_@"] = 1;
-      map["@_IDENTITY_SYMBOL_@"] = 2;
+      map[hfst::internal_epsilon] = 0;
+      map[hfst::internal_unknown] = 1;
+      map[hfst::internal_identity] = 2;
     }
 
   } // namespace implementations
