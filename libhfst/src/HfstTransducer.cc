@@ -2365,7 +2365,7 @@ HfstTransducer &HfstTransducer::negate()
 			 "HfstTransducer::negate()");
     }
   
-  HfstTransducer idstar("@_IDENTITY_SYMBOL_@", this->type);
+  HfstTransducer idstar(hfst::internal_identity, this->type);
   // diacritics will not be harmonized in subtract
   StringSet flags = idstar.insert_missing_diacritics_to_alphabet_from(*this);
   for (StringSet::const_iterator it = flags.begin(); it != flags.end(); it++)
@@ -3849,15 +3849,15 @@ bool substitute_single_identity_with_the_other_symbol
     std::string isymbol = sp.first;
     std::string osymbol = sp.second;
     
-    if (isymbol.compare("@_IDENTITY_SYMBOL_@") == 0 &&
-        (osymbol.compare("@_IDENTITY_SYMBOL_@") != 0)) {
-    isymbol = std::string("@_UNKNOWN_SYMBOL_@");
+    if (hfst::is_identity(isymbol) &&
+        !hfst::is_identity(osymbol)) {
+      isymbol = hfst::internal_unknown;
     sps.insert(StringPair(isymbol, osymbol));
     return true;
     }
-    else if (osymbol.compare("@_IDENTITY_SYMBOL_@") == 0 &&
-             (isymbol.compare("@_IDENTITY_SYMBOL_@") != 0)) {
-    osymbol = std::string("@_UNKNOWN_SYMBOL_@");
+    else if (hfst::is_identity(osymbol) &&
+             !hfst::is_identity(isymbol)) {
+      osymbol = hfst::internal_unknown;
     sps.insert(StringPair(isymbol, osymbol));
     return true;
     }
@@ -3871,10 +3871,10 @@ bool substitute_unknown_identity_pairs
     std::string isymbol = sp.first;
     std::string osymbol = sp.second;
 
-    if (isymbol.compare("@_UNKNOWN_SYMBOL_@") == 0 &&
-        osymbol.compare("@_IDENTITY_SYMBOL_@") == 0) {
-    isymbol = std::string("@_IDENTITY_SYMBOL_@");
-    osymbol = std::string("@_IDENTITY_SYMBOL_@");
+    if (hfst::is_unknown(isymbol) &&
+        hfst::is_identity(osymbol)) {
+      isymbol = hfst::internal_identity;
+      osymbol = hfst::internal_identity;
     sps.insert(StringPair(isymbol, osymbol));
     return true;
     }
@@ -4022,9 +4022,9 @@ HfstTransducer &HfstTransducer::compose
        composition, FOMA and XFSM take care of this by default. */
     if ( (this->type != FOMA_TYPE && this->type != XFSM_TYPE) && unknown_symbols_in_use)
       {
-        this->substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",false,true);
+        this->substitute(hfst::internal_identity,hfst::internal_unknown,false,true);
         const_cast<HfstTransducer*>(another_copy)->substitute
-          ("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",true,false);
+          (hfst::internal_identity,hfst::internal_unknown,true,false);
       }
 
     switch (this->type)
@@ -4341,14 +4341,14 @@ HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another, bo
     automata2.insert_to_alphabet("@_MARK_@");
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-    TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
+    TOK.add_multichar_symbol(hfst::internal_unknown);
     TOK.add_multichar_symbol("@_MARK_@");
 
 
     // EpsilonToMark and MarkToEpsilon are paddings (if strings are not the same size)
-    HfstTransducer UnknownToMark("@_UNKNOWN_SYMBOL_@", "@_MARK_@", TOK, type);
-    HfstTransducer EpsilonToMark("@_EPSILON_SYMBOL_@", "@_MARK_@", TOK, type);
+    HfstTransducer UnknownToMark(hfst::internal_unknown, "@_MARK_@", TOK, type);
+    HfstTransducer EpsilonToMark(hfst::internal_epsilon, "@_MARK_@", TOK, type);
 
     HfstTransducer MarkToUnknown(UnknownToMark);
     MarkToUnknown.invert();
@@ -4371,9 +4371,9 @@ HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another, bo
 
     // Expand ?:? transitions to ?:?|?
     StringPairSet id_or_unk;
-    id_or_unk.insert(StringPair("@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@"));
-    id_or_unk.insert(StringPair("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@"));
-    retval.substitute(StringPair("@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@"), id_or_unk);
+    id_or_unk.insert(StringPair(hfst::internal_unknown, hfst::internal_unknown));
+    id_or_unk.insert(StringPair(hfst::internal_identity, hfst::internal_identity));
+    retval.substitute(StringPair(hfst::internal_unknown, hfst::internal_unknown), id_or_unk);
 
     retval.remove_from_alphabet("@_MARK_@");
 
@@ -5585,10 +5585,10 @@ HfstTransducer HfstTransducer::universal_pair( ImplementationType type )
 {
         using namespace implementations;
         HfstIterableTransducer bt;
-        bt.add_transition(0, HfstTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
-        bt.add_transition(0, HfstTransition(1, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
-        bt.add_transition(0, HfstTransition(1, "@_UNKNOWN_SYMBOL_@", "@_EPSILON_SYMBOL_@", 0) );
-        bt.add_transition(0, HfstTransition(1, "@_EPSILON_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
+        bt.add_transition(0, HfstTransition(1, hfst::internal_identity, hfst::internal_identity, 0) );
+        bt.add_transition(0, HfstTransition(1, hfst::internal_unknown, hfst::internal_unknown, 0) );
+        bt.add_transition(0, HfstTransition(1, hfst::internal_unknown, hfst::internal_epsilon, 0) );
+        bt.add_transition(0, HfstTransition(1, hfst::internal_epsilon, hfst::internal_unknown, 0) );
         bt.set_final_weight(1, 0);
 
         HfstTransducer Retval(bt, type);
@@ -5600,7 +5600,7 @@ HfstTransducer HfstTransducer::identity_pair( ImplementationType type )
 {
         using namespace implementations;
         HfstIterableTransducer bt;
-        bt.add_transition(0, HfstTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+        bt.add_transition(0, HfstTransition(1, hfst::internal_identity, hfst::internal_identity, 0) );
         bt.set_final_weight(1, 0);
 
         HfstTransducer Retval(bt, type);
@@ -5884,7 +5884,7 @@ void cross_product_subtest1( ImplementationType type )
 void cross_product_subtest2( ImplementationType type )
 {
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_unknown);
 
         HfstTransducer input1( HfstTransducer::identity_pair(type) );
 
@@ -5895,7 +5895,7 @@ void cross_product_subtest2( ImplementationType type )
 
 
         HfstTransducer r1("a", TOK, type);
-        HfstTransducer r2("@_UNKNOWN_SYMBOL_@", "a", TOK, type);
+        HfstTransducer r2(hfst::internal_unknown, "a", TOK, type);
         HfstTransducer result(r1);
         result.disjunct(r2).minimize();
         assert(cp.compare(result));
@@ -5904,8 +5904,8 @@ void cross_product_subtest2( ImplementationType type )
 void cross_product_subtest3( ImplementationType type )
 {
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_unknown);
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
 
         HfstTransducer input1( HfstTransducer::identity_pair(type) );
         input1.repeat_star().minimize();
@@ -5917,10 +5917,10 @@ void cross_product_subtest3( ImplementationType type )
 
 
         HfstTransducer r1("a", TOK, type);
-        HfstTransducer r2("@_UNKNOWN_SYMBOL_@", "a", TOK, type);
-        HfstTransducer r3("a", "@_EPSILON_SYMBOL_@", TOK, type);
-        HfstTransducer r4("@_UNKNOWN_SYMBOL_@", "@_EPSILON_SYMBOL_@", TOK, type);
-        HfstTransducer r5("@_EPSILON_SYMBOL_@", "a", TOK, type);
+        HfstTransducer r2(hfst::internal_unknown, "a", TOK, type);
+        HfstTransducer r3("a", hfst::internal_epsilon, TOK, type);
+        HfstTransducer r4(hfst::internal_unknown, hfst::internal_epsilon, TOK, type);
+        HfstTransducer r5(hfst::internal_epsilon, "a", TOK, type);
         r3.disjunct(r4).minimize().repeat_star();
         r1.disjunct(r2).concatenate(r3).minimize();
 
@@ -5932,7 +5932,7 @@ void cross_product_subtest4( ImplementationType type )
 {
 
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
 
         HfstTransducer input1("b", TOK, type);
         HfstTransducer input2("a", TOK, type);
@@ -5942,10 +5942,10 @@ void cross_product_subtest4( ImplementationType type )
         cp.cross_product(input2);
 
         HfstTransducer r1("b", "a", TOK, type);
-        HfstTransducer r2("@_EPSILON_SYMBOL_@", "a", TOK, type);
+        HfstTransducer r2(hfst::internal_epsilon, "a", TOK, type);
         r2.repeat_star().minimize();
         r1.concatenate(r2);
-        HfstTransducer result("b", "@_EPSILON_SYMBOL_@", TOK, type);
+        HfstTransducer result("b", hfst::internal_epsilon, TOK, type);
         result.disjunct(r1).minimize();
 
         assert(cp.compare(result));
@@ -5956,7 +5956,7 @@ void cross_product_subtest4( ImplementationType type )
 void priority_union_test ( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     HfstTransducer input1("a", "X", TOK, type);
     HfstTransducer input2("b", "X", TOK, type);
@@ -6003,18 +6003,18 @@ void priority_union_test ( ImplementationType type )
     // First test transducer
     bt1.add_transition(0, HfstTransition(1, "a", "a", 1) );
     bt1.add_transition(0, HfstTransition(1, "b", "b", 2) );
-    bt1.add_transition(1, HfstTransition(2, "@_EPSILON_SYMBOL_@", "1", 3) );
+    bt1.add_transition(1, HfstTransition(2, hfst::internal_epsilon, "1", 3) );
     bt1.set_final_weight(2, 5);
 
     // Second test transducer
     bt2.add_transition(0, HfstTransition(1, "c", "C", 10) );
     bt2.add_transition(0, HfstTransition(1, "b", "B", 20) );
-    bt2.add_transition(1, HfstTransition(2, "@_EPSILON_SYMBOL_@", "1", 30) );
+    bt2.add_transition(1, HfstTransition(2, hfst::internal_epsilon, "1", 30) );
     bt2.set_final_weight(2, 50);
 
     // Second test transducer without priority string
     bt2withoutPriority.add_transition(0, HfstTransition(1, "c", "C", 10) );
-    bt2withoutPriority.add_transition(1, HfstTransition(2, "@_EPSILON_SYMBOL_@", "1", 30) );
+    bt2withoutPriority.add_transition(1, HfstTransition(2, hfst::internal_epsilon, "1", 30) );
     bt2withoutPriority.set_final_weight(2, 50);
 
     // Third test transducer
@@ -6023,22 +6023,22 @@ void priority_union_test ( ImplementationType type )
     bt3.set_final_weight(1, 75);
 
     // Identity to Identity
-    btIdentity.add_transition(0, HfstTransition(0, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 100) );
+    btIdentity.add_transition(0, HfstTransition(0, hfst::internal_identity, hfst::internal_identity, 100) );
     btIdentity.set_final_weight(0, 100);
 
     // Unknown to unknown
-    btUnknown.add_transition(0, HfstTransition(0, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 200) );
+    btUnknown.add_transition(0, HfstTransition(0, hfst::internal_unknown, hfst::internal_unknown, 200) );
     btUnknown.set_final_weight(0, 200);
 
     // Epsilon
-    btEpsilon.add_transition(0, HfstTransition(0, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@", 300) );
+    btEpsilon.add_transition(0, HfstTransition(0, hfst::internal_epsilon, hfst::internal_epsilon, 300) );
     btEpsilon.set_final_weight(0, 300);
 
     // Result 1 ... tr1 .P. emptyString
     //                        ...        emptyString .p. tr1
     btResult1.add_transition(0, HfstTransition(1, "a", "a", 1) );
     btResult1.add_transition(0, HfstTransition(1, "b", "b", 2) );
-    btResult1.add_transition(1, HfstTransition(2, "@_EPSILON_SYMBOL_@", "1", 3) );
+    btResult1.add_transition(1, HfstTransition(2, hfst::internal_epsilon, "1", 3) );
     btResult1.set_final_weight(2, 5);
     btResult1.set_final_weight(0, 3);
 
@@ -6046,8 +6046,8 @@ void priority_union_test ( ImplementationType type )
       btResult2.add_transition(0, HfstTransition(1, "c", "C", 10) );
     btResult2.add_transition(0, HfstTransition(1, "b", "b", 20) );
     btResult2.add_transition(0, HfstTransition(2, "a", "a", 1) );
-    btResult2.add_transition(1, HfstTransition(3, "@_EPSILON_SYMBOL_@", "1", 30) );
-    btResult2.add_transition(2, HfstTransition(4, "@_EPSILON_SYMBOL_@", "1", 3) );
+    btResult2.add_transition(1, HfstTransition(3, hfst::internal_epsilon, "1", 30) );
+    btResult2.add_transition(2, HfstTransition(4, hfst::internal_epsilon, "1", 3) );
     btResult2.set_final_weight(3, 50);
     btResult2.set_final_weight(4, 5);
 
@@ -6055,13 +6055,13 @@ void priority_union_test ( ImplementationType type )
     btResult3.add_transition(0, HfstTransition(1, "c", "C", 10) );
     btResult3.add_transition(0, HfstTransition(2, "b", "b", 2) );
     btResult3.add_transition(0, HfstTransition(2, "a", "a", 1) );
-    btResult3.add_transition(1, HfstTransition(3, "@_EPSILON_SYMBOL_@", "1", 30) );
-    btResult3.add_transition(2, HfstTransition(4, "@_EPSILON_SYMBOL_@", "1", 3) );
+    btResult3.add_transition(1, HfstTransition(3, hfst::internal_epsilon, "1", 30) );
+    btResult3.add_transition(2, HfstTransition(4, hfst::internal_epsilon, "1", 3) );
     btResult3.set_final_weight(3, 50);
     btResult3.set_final_weight(4, 5);
 
     // Result 4 ... tr1 .P. trIdentity
-    btResult4.add_transition(0, HfstTransition(0, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 100) );
+    btResult4.add_transition(0, HfstTransition(0, hfst::internal_identity, hfst::internal_identity, 100) );
     btResult4.add_transition(0, HfstTransition(0, "b", "b", 100) );
     btResult4.add_transition(0, HfstTransition(0, "a", "a", 100) );
     btResult4.add_transition(0, HfstTransition(0, "1", "1", 100) );
@@ -6070,29 +6070,29 @@ void priority_union_test ( ImplementationType type )
     // Result 5 ... trIdentity .P. tr3
     btResult5.add_transition(0, HfstTransition(1, "a", "b", 130) );
     btResult5.add_transition(0, HfstTransition(2, "b", "b", 140) );
-    btResult5.add_transition(0, HfstTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 200) );
+    btResult5.add_transition(0, HfstTransition(3, hfst::internal_identity, hfst::internal_identity, 200) );
     btResult5.add_transition(0, HfstTransition(4, "a", "a", 300) );
     btResult5.add_transition(2, HfstTransition(3, "b", "b", 160) );
     btResult5.add_transition(2, HfstTransition(3, "a", "a", 160) );
-    btResult5.add_transition(2, HfstTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 160) );
+    btResult5.add_transition(2, HfstTransition(3, hfst::internal_identity, hfst::internal_identity, 160) );
     btResult5.add_transition(3, HfstTransition(3, "b", "b", 100) );
     btResult5.add_transition(3, HfstTransition(3, "a", "a", 100) );
-    btResult5.add_transition(3, HfstTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 100) );
+    btResult5.add_transition(3, HfstTransition(3, hfst::internal_identity, hfst::internal_identity, 100) );
     btResult5.add_transition(4, HfstTransition(3, "b", "b", 0) );
     btResult5.add_transition(4, HfstTransition(3, "a", "a", 0) );
-    btResult5.add_transition(4, HfstTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+    btResult5.add_transition(4, HfstTransition(3, hfst::internal_identity, hfst::internal_identity, 0) );
     btResult5.set_final_weight(0, 100);
     btResult5.set_final_weight(1, 0);
     btResult5.set_final_weight(2, 0);
     btResult5.set_final_weight(3, 0);
 
     // Result 6 ... tr3 .P. trUnknown
-    btResult6.add_transition(0, HfstTransition(0, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 200) );
-    btResult6.add_transition(0, HfstTransition(0, "@_UNKNOWN_SYMBOL_@", "b", 200) );
-    btResult6.add_transition(0, HfstTransition(0, "b", "@_UNKNOWN_SYMBOL_@", 200) );
+    btResult6.add_transition(0, HfstTransition(0, hfst::internal_unknown, hfst::internal_unknown, 200) );
+    btResult6.add_transition(0, HfstTransition(0, hfst::internal_unknown, "b", 200) );
+    btResult6.add_transition(0, HfstTransition(0, "b", hfst::internal_unknown, 200) );
     btResult6.add_transition(0, HfstTransition(0, "b", "a", 200) );
-    btResult6.add_transition(0, HfstTransition(0, "@_UNKNOWN_SYMBOL_@", "a", 200) );
-    btResult6.add_transition(0, HfstTransition(0, "a", "@_UNKNOWN_SYMBOL_@", 200) );
+    btResult6.add_transition(0, HfstTransition(0, hfst::internal_unknown, "a", 200) );
+    btResult6.add_transition(0, HfstTransition(0, "a", hfst::internal_unknown, 200) );
     btResult6.add_transition(0, HfstTransition(0, "a", "b", 200) );
     btResult6.set_final_weight(0, 200);
 
@@ -6100,32 +6100,32 @@ void priority_union_test ( ImplementationType type )
     btResult7.add_transition(0, HfstTransition(1, "a", "b", 130) );
     btResult7.add_transition(0, HfstTransition(2, "b", "b", 140) );
     btResult7.add_transition(0, HfstTransition(3, "b", "a", 600) );
-    btResult7.add_transition(0, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 400) );
-    btResult7.add_transition(0, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 400) );
-    btResult7.add_transition(0, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 400) );
-    btResult7.add_transition(0, HfstTransition(3, "b", "@_UNKNOWN_SYMBOL_@", 600) );
-    btResult7.add_transition(0, HfstTransition(3, "a", "@_UNKNOWN_SYMBOL_@", 600) );
+    btResult7.add_transition(0, HfstTransition(4, hfst::internal_unknown, "a", 400) );
+    btResult7.add_transition(0, HfstTransition(4, hfst::internal_unknown, "b", 400) );
+    btResult7.add_transition(0, HfstTransition(4, hfst::internal_unknown, hfst::internal_unknown, 400) );
+    btResult7.add_transition(0, HfstTransition(3, "b", hfst::internal_unknown, 600) );
+    btResult7.add_transition(0, HfstTransition(3, "a", hfst::internal_unknown, 600) );
     btResult7.add_transition(1, HfstTransition(4, "a", "b", 470) );
     btResult7.add_transition(1, HfstTransition(4, "b", "a", 470) );
-    btResult7.add_transition(1, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 470) );
-    btResult7.add_transition(1, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 470) );
-    btResult7.add_transition(1, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 470) );
-    btResult7.add_transition(1, HfstTransition(4, "b", "@_UNKNOWN_SYMBOL_@", 470) );
-    btResult7.add_transition(1, HfstTransition(4, "a", "@_UNKNOWN_SYMBOL_@", 470) );
+    btResult7.add_transition(1, HfstTransition(4, hfst::internal_unknown, "a", 470) );
+    btResult7.add_transition(1, HfstTransition(4, hfst::internal_unknown, "b", 470) );
+    btResult7.add_transition(1, HfstTransition(4, hfst::internal_unknown, hfst::internal_unknown, 470) );
+    btResult7.add_transition(1, HfstTransition(4, "b", hfst::internal_unknown, 470) );
+    btResult7.add_transition(1, HfstTransition(4, "a", hfst::internal_unknown, 470) );
     btResult7.add_transition(3, HfstTransition(4, "a", "b", 0) );
     btResult7.add_transition(3, HfstTransition(4, "b", "a", 0) );
-    btResult7.add_transition(3, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 0) );
-    btResult7.add_transition(3, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 0) );
-    btResult7.add_transition(3, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
-    btResult7.add_transition(3, HfstTransition(4, "b", "@_UNKNOWN_SYMBOL_@", 0) );
-    btResult7.add_transition(3, HfstTransition(4, "a", "@_UNKNOWN_SYMBOL_@", 0) );
+    btResult7.add_transition(3, HfstTransition(4, hfst::internal_unknown, "a", 0) );
+    btResult7.add_transition(3, HfstTransition(4, hfst::internal_unknown, "b", 0) );
+    btResult7.add_transition(3, HfstTransition(4, hfst::internal_unknown, hfst::internal_unknown, 0) );
+    btResult7.add_transition(3, HfstTransition(4, "b", hfst::internal_unknown, 0) );
+    btResult7.add_transition(3, HfstTransition(4, "a", hfst::internal_unknown, 0) );
     btResult7.add_transition(4, HfstTransition(4, "a", "b", 200) );
     btResult7.add_transition(4, HfstTransition(4, "b", "a", 200) );
-    btResult7.add_transition(4, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 200) );
-    btResult7.add_transition(4, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 200) );
-    btResult7.add_transition(4, HfstTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 200) );
-    btResult7.add_transition(4, HfstTransition(4, "b", "@_UNKNOWN_SYMBOL_@", 200) );
-    btResult7.add_transition(4, HfstTransition(4, "a", "@_UNKNOWN_SYMBOL_@", 200) );
+    btResult7.add_transition(4, HfstTransition(4, hfst::internal_unknown, "a", 200) );
+    btResult7.add_transition(4, HfstTransition(4, hfst::internal_unknown, "b", 200) );
+    btResult7.add_transition(4, HfstTransition(4, hfst::internal_unknown, hfst::internal_unknown, 200) );
+    btResult7.add_transition(4, HfstTransition(4, "b", hfst::internal_unknown, 200) );
+    btResult7.add_transition(4, HfstTransition(4, "a", hfst::internal_unknown, 200) );
     btResult7.set_final_weight(0, 200);
     btResult7.set_final_weight(1, 0);
     btResult7.set_final_weight(2, 0);
@@ -6227,25 +6227,25 @@ void universal_pair_test ( ImplementationType type )
 
     // Result 1 ( a:a .o. universal pair )
     btResult1.add_transition(0, HfstTransition(1, "a", "a", 0) );
-    btResult1.add_transition(0, HfstTransition(1, "a", "@_UNKNOWN_SYMBOL_@", 0) );
-    btResult1.add_transition(0, HfstTransition(1, "a", "@_EPSILON_SYMBOL_@",  0) );
+    btResult1.add_transition(0, HfstTransition(1, "a", hfst::internal_unknown, 0) );
+    btResult1.add_transition(0, HfstTransition(1, "a", hfst::internal_epsilon,  0) );
     btResult1.set_final_weight(1, 0);
     // Result 2 ( universal pair .o. a:a )
     btResult2.add_transition(0, HfstTransition(1, "a", "a", 0) );
-    btResult2.add_transition(0, HfstTransition(1, "@_UNKNOWN_SYMBOL_@", "a", 0) );
-    btResult2.add_transition(0, HfstTransition(1, "@_EPSILON_SYMBOL_@", "a", 0) );
+    btResult2.add_transition(0, HfstTransition(1, hfst::internal_unknown, "a", 0) );
+    btResult2.add_transition(0, HfstTransition(1, hfst::internal_epsilon, "a", 0) );
     btResult2.set_final_weight(1, 0);
     // Result 3 ( a:b .o. universal pair )
     btResult3.add_transition(0, HfstTransition(1, "a", "b", 0) );
     btResult3.add_transition(0, HfstTransition(1, "a", "a", 0) );
-    btResult3.add_transition(0, HfstTransition(1, "a", "@_UNKNOWN_SYMBOL_@", 0) );
-    btResult3.add_transition(0, HfstTransition(1, "a", "@_EPSILON_SYMBOL_@", 0) );
+    btResult3.add_transition(0, HfstTransition(1, "a", hfst::internal_unknown, 0) );
+    btResult3.add_transition(0, HfstTransition(1, "a", hfst::internal_epsilon, 0) );
     btResult3.set_final_weight(1, 0);
     // Result 4 ( universal pair .o. a:b )
     btResult4.add_transition(0, HfstTransition(1, "a", "b", 0) );
     btResult4.add_transition(0, HfstTransition(1, "b", "b", 0) );
-    btResult4.add_transition(0, HfstTransition(1, "@_UNKNOWN_SYMBOL_@", "b", 0) );
-    btResult4.add_transition(0, HfstTransition(1, "@_EPSILON_SYMBOL_@", "b", 0) );
+    btResult4.add_transition(0, HfstTransition(1, hfst::internal_unknown, "b", 0) );
+    btResult4.add_transition(0, HfstTransition(1, hfst::internal_epsilon, "b", 0) );
     btResult4.set_final_weight(1, 0);
 
     HfstTransducer tr1(bt, type);

@@ -739,7 +739,7 @@ using namespace hfst::rules;
 void right_arrow_test1( ImplementationType type )
 {
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
 
         // Set mapping
         HfstTransducer mapping("ca", "d", TOK, type);
@@ -860,13 +860,13 @@ void right_arrow_test1( ImplementationType type )
 void right_arrow_test2( ImplementationType type )
 {
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
 
         // Both contexts are epsilon transducers
 
         // Set context
-        HfstTransducer leftEpsilon("@_EPSILON_SYMBOL_@", type);
-        HfstTransducer rightEpsilon("@_EPSILON_SYMBOL_@", type);
+        HfstTransducer leftEpsilon(hfst::internal_epsilon, type);
+        HfstTransducer rightEpsilon(hfst::internal_epsilon, type);
 
         HfstTransducerPair contextEpsilon = HfstTransducerPair( leftEpsilon, rightEpsilon );
 
@@ -940,10 +940,10 @@ void right_arrow_test2( ImplementationType type )
 void right_arrow_test3( ImplementationType type )
 {
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
 
         // Set context
-        HfstTransducer leftEpsilon("@_EPSILON_SYMBOL_@", type);
+        HfstTransducer leftEpsilon(hfst::internal_epsilon, type);
         HfstTransducer right("d", type);
         HfstTransducerPair contextEpsilon = HfstTransducerPair( leftEpsilon, right );
 
@@ -1022,11 +1022,11 @@ void right_arrow_test3( ImplementationType type )
 void right_arrow_test4( ImplementationType type )
 {
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
 
         // Set context
         HfstTransducer left("d", type);
-        HfstTransducer rightEpsilon("@_EPSILON_SYMBOL_@", type);
+        HfstTransducer rightEpsilon(hfst::internal_epsilon, type);
         HfstTransducerPair contextEpsilon = HfstTransducerPair( left, rightEpsilon );
 
         // Set mapping
@@ -1104,7 +1104,7 @@ void right_arrow_test4( ImplementationType type )
 void left_arrow_test1( ImplementationType type )
 {
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
 
         // Set mapping
         HfstTransducer mapping("ca", "d", TOK, type);
@@ -1235,13 +1235,13 @@ void left_arrow_test1( ImplementationType type )
 void left_arrow_test2( ImplementationType type )
 {
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
 
         // Both contexts are epsilon transducers
 
         // Set context
-        HfstTransducer leftEpsilon("@_EPSILON_SYMBOL_@", type);
-        HfstTransducer rightEpsilon("@_EPSILON_SYMBOL_@", type);
+        HfstTransducer leftEpsilon(hfst::internal_epsilon, type);
+        HfstTransducer rightEpsilon(hfst::internal_epsilon, type);
         HfstTransducerPair contextEpsilon = HfstTransducerPair( leftEpsilon, rightEpsilon );
 
         // Set mapping
@@ -1313,10 +1313,10 @@ void left_arrow_test2( ImplementationType type )
 void left_arrow_test3( ImplementationType type )
 {
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
 
         // Set context
-        HfstTransducer leftEpsilon("@_EPSILON_SYMBOL_@", type);
+        HfstTransducer leftEpsilon(hfst::internal_epsilon, type);
         HfstTransducer right("d", type);
         HfstTransducerPair contextEpsilon = HfstTransducerPair( leftEpsilon, right );
 
@@ -1395,11 +1395,11 @@ void left_arrow_test3( ImplementationType type )
 void left_arrow_test4( ImplementationType type )
 {
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
 
         // Set context
         HfstTransducer left("d", type);
-        HfstTransducer rightEpsilon("@_EPSILON_SYMBOL_@", type);
+        HfstTransducer rightEpsilon(hfst::internal_epsilon, type);
         HfstTransducerPair contextEpsilon = HfstTransducerPair( left, rightEpsilon );
 
         // Set mapping

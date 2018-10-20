@@ -144,7 +144,7 @@ void restriction_test1( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
     // Mapping
     HfstTransducer center("a", TOK, type);
 
@@ -197,7 +197,7 @@ void restriction_test1a( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
     // Mapping
     HfstTransducer center("a", TOK, type);
 
@@ -248,7 +248,7 @@ void restriction_test1b( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
     // Mapping
     HfstTransducer center("a", TOK, type);
 
@@ -300,7 +300,7 @@ void restriction_test2( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
     // Mapping
     HfstTransducer center("ak", TOK, type);
 
@@ -355,7 +355,7 @@ void restriction_test3( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
     // Mapping
     HfstTransducer center("b", TOK, type);
 
@@ -408,10 +408,10 @@ void restriction_test3a( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
     // Mapping
     HfstTransducer center("a", TOK, type);
-    HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
 
     // Context
     HfstTransducerPair Context(HfstTransducer("a", TOK, type), epsilon);
@@ -463,10 +463,10 @@ void restriction_test3b( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
     // Mapping
     HfstTransducer center("ab", TOK, type);
-    HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
 
     // Context
     HfstTransducerPair Context(HfstTransducer("ab", TOK, type), epsilon);
@@ -518,10 +518,10 @@ void restriction_test3c( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
     // Mapping
     HfstTransducer center("ab", TOK, type);
-    HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
 
     // Context
     HfstTransducerPair Context(epsilon, HfstTransducer("ab", TOK, type));
@@ -572,7 +572,7 @@ void restriction_test4( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
     // Mapping
     HfstTransducer center("a", TOK, type);
 
@@ -635,10 +635,10 @@ void restriction_test5( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
     // Mapping
     HfstTransducer center("a", TOK, type);
-    HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
 
     // Context
     HfstTransducerPair Context1(HfstTransducer("b", TOK, type), epsilon);
@@ -698,10 +698,10 @@ void restriction_test5a( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
     // Mapping
     HfstTransducer center("a", TOK, type);
-    HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
 
     // Context
     HfstTransducerPair Context1(HfstTransducer("a", TOK, type), epsilon);
@@ -762,10 +762,10 @@ void restriction_test6( ImplementationType type )
     //printf("\n -- test 6 ------\n\n");
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
     // Mapping
     HfstTransducer center("ab", TOK, type);
-    HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
 
     // Context
     HfstTransducerPair Context1(HfstTransducer("ab", TOK, type), epsilon);
@@ -831,7 +831,7 @@ void restriction_test6( ImplementationType type )
 void restriction_test7( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     // Identity (normal)
     HfstTransducer identityPair = HfstTransducer::identity_pair( type );
@@ -856,7 +856,7 @@ void restriction_test7( ImplementationType type )
     //center.write_in_att_format(stdout, 1);
 
 
-    HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
 
     // Context
     HfstTransducerPair Context1(HfstTransducer("b", TOK, type), HfstTransducer("c", TOK, type));
@@ -924,12 +924,12 @@ void restriction_test8( ImplementationType type )
     //printf("\n -- test 6 ------\n\n");
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
     // Mapping
     HfstTransducer tmp("xxyy", TOK, type);
     HfstTransducer center("xy", TOK, type);
     center.disjunct(tmp).minimize();
-    HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
 
     // Context
     HfstTransducerPair Context1(HfstTransducer("a", TOK, type), HfstTransducer("b", TOK, type));
@@ -1064,7 +1064,7 @@ void test10b( ImplementationType type )
 void test9a( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     // Mapping
     HfstTransducerPair mappingPair(HfstTransducer("d@_EPSILON_SYMBOL_@", TOK, type), HfstTransducer("ca", TOK, type));
@@ -1102,7 +1102,7 @@ void test9a( ImplementationType type )
 void test9b( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
 
     // Mapping
@@ -1149,7 +1149,7 @@ void test1( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     // Mapping
     HfstTransducer leftMapping("ab", TOK, type);
@@ -1210,7 +1210,7 @@ void test1b( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     // Mapping
     HfstTransducer leftMapping("a", TOK, type);
@@ -1221,7 +1221,7 @@ void test1b( ImplementationType type )
     mappingPairVector.push_back(mappingPair);
 
     // Context
-    HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
+    HfstTransducerPair Context(HfstTransducer(hfst::internal_epsilon, TOK, type), HfstTransducer(hfst::internal_epsilon, TOK, type));
 
     HfstTransducerPairVector ContextVector;
     ContextVector.push_back(Context);
@@ -1305,12 +1305,12 @@ void test1c( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-    TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
-    TOK.add_multichar_symbol("@_IDENTITY_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
+    TOK.add_multichar_symbol(hfst::internal_unknown);
+    TOK.add_multichar_symbol(hfst::internal_identity);
 
     // Mapping
-    HfstTransducer leftMapping("@_IDENTITY_SYMBOL_@", TOK, type);
+    HfstTransducer leftMapping(hfst::internal_identity, TOK, type);
     HfstTransducer rightMapping("x", TOK, type);
     HfstTransducerPair mappingPair(leftMapping, rightMapping);
 
@@ -1397,9 +1397,9 @@ void test2a( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-    TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
-    TOK.add_multichar_symbol("@_IDENTITY_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
+    TOK.add_multichar_symbol(hfst::internal_unknown);
+    TOK.add_multichar_symbol(hfst::internal_identity);
 
     String LeftMarker("@_LM_@");
     String RightMarker("@_RM_@");
@@ -1611,7 +1611,7 @@ void test2a( ImplementationType type )
 void test2b( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     String LeftMarker("@_LM_@");
     String RightMarker("@_RM_@");
@@ -1695,7 +1695,7 @@ void test2b( ImplementationType type )
     HfstTransducer input2("aabbaax", TOK, type);
     HfstTransducer result5("aabbaax", "x@_EPSILON_SYMBOL_@@_EPSILON_SYMBOL_@x@_EPSILON_SYMBOL_@@_EPSILON_SYMBOL_@x",TOK, type);
     // Context
-    HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type), HfstTransducer("x", TOK, type));
+    HfstTransducerPair Context(HfstTransducer(hfst::internal_epsilon, TOK, type), HfstTransducer("x", TOK, type));
     HfstTransducerPairVector ContextVector;
     ContextVector.push_back(Context);
 
@@ -1719,9 +1719,9 @@ void test2c( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-    TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
-    TOK.add_multichar_symbol("@_IDENTITY_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
+    TOK.add_multichar_symbol(hfst::internal_unknown);
+    TOK.add_multichar_symbol(hfst::internal_identity);
 
     String LeftMarker("@_LM_@");
     String RightMarker("@_RM_@");
@@ -1738,7 +1738,7 @@ void test2c( ImplementationType type )
     mappingPairVector.push_back(mappingPair);
 
     // Context
-    HfstTransducerPair Context(HfstTransducer("c", TOK, type), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
+    HfstTransducerPair Context(HfstTransducer("c", TOK, type), HfstTransducer(hfst::internal_epsilon, TOK, type));
 
     HfstTransducerPairVector ContextVector;
     ContextVector.push_back(Context);
@@ -1769,7 +1769,7 @@ void test3a( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     String LeftMarker("@_LM_@");
     String RightMarker("@_RM_@");
@@ -1822,7 +1822,7 @@ void test3b( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     String LeftMarker("@_LM_@");
     String RightMarker("@_RM_@");
@@ -1879,7 +1879,7 @@ void test3c( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     String LeftMarker("@_LM_@");
     String RightMarker("@_RM_@");
@@ -1935,7 +1935,7 @@ void test3d( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     String LeftMarker("@_LM_@");
     String RightMarker("@_RM_@");
@@ -1951,8 +1951,8 @@ void test3d( ImplementationType type )
     mappingPairVector.push_back(mappingPair);
 
     // Context
-    HfstTransducerPair Context( HfstTransducer("@_EPSILON_SYMBOL_@",TOK, type),
-                                HfstTransducer("@_EPSILON_SYMBOL_@",TOK, type));
+    HfstTransducerPair Context( HfstTransducer(hfst::internal_epsilon,TOK, type),
+                                HfstTransducer(hfst::internal_epsilon,TOK, type));
 
 
     HfstTransducerPairVector ContextVector;
@@ -1993,7 +1993,7 @@ void test4a( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     String LeftMarker("@_LM_@");
     String RightMarker("@_RM_@");
@@ -2009,7 +2009,7 @@ void test4a( ImplementationType type )
     mappingPairVector.push_back(mappingPair);
 
     // Context
-    HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type), HfstTransducer("a", TOK, type));
+    HfstTransducerPair Context(HfstTransducer(hfst::internal_epsilon, TOK, type), HfstTransducer("a", TOK, type));
 
     HfstTransducerPairVector ContextVector;
     ContextVector.push_back(Context);
@@ -2122,7 +2122,7 @@ void test4b( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     String LeftMarker("@_LM_@");
     String RightMarker("@_RM_@");
@@ -2138,7 +2138,7 @@ void test4b( ImplementationType type )
     mappingPairVector.push_back(mappingPair);
 
     // Context
-    HfstTransducerPair Context(HfstTransducer("a", TOK, type), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type) );
+    HfstTransducerPair Context(HfstTransducer("a", TOK, type), HfstTransducer(hfst::internal_epsilon, TOK, type) );
 
     HfstTransducerPairVector ContextVector;
     ContextVector.push_back(Context);
@@ -2243,7 +2243,7 @@ void test4c( ImplementationType type )
 {
 
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     // Mapping
     HfstTransducer leftMapping("ab", TOK, type);
@@ -2363,7 +2363,7 @@ void test4c( ImplementationType type )
 // void test5( ImplementationType type )
 // {
     // HfstTokenizer TOK;
-    // TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    // TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     // // Mapping
     // HfstTransducer lmtmp("b", TOK, type);
@@ -2382,7 +2382,7 @@ void test4c( ImplementationType type )
 
 
     // // Context
-    // HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
+    // HfstTransducerPair Context(HfstTransducer(hfst::internal_epsilon, TOK, type), HfstTransducer(hfst::internal_epsilon, TOK, type));
 
 // //    HfstTransducerPair Context(HfstTransducer("m", TOK, type), HfstTransducer("k", TOK, type));
 
@@ -2414,7 +2414,7 @@ void test4c( ImplementationType type )
 void test6a( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     String LeftMarker("@_LM_@");
     String RightMarker("@_RM_@");
@@ -2423,7 +2423,7 @@ void test6a( ImplementationType type )
 
     // Mapping
 
-    HfstTransducer leftMapping("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer leftMapping(hfst::internal_epsilon, TOK, type);
 
     HfstTransducer rightMapping("p", TOK, type);
     HfstTransducerPair mappingPair(leftMapping, rightMapping);
@@ -2476,7 +2476,7 @@ void test6a( ImplementationType type )
 void test6b( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     String LeftMarker("@_LM_@");
     String RightMarker("@_RM_@");
@@ -2498,8 +2498,8 @@ void test6b( ImplementationType type )
 
 
     // Context
-    HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type),
-                               HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
+    HfstTransducerPair Context(HfstTransducer(hfst::internal_epsilon, TOK, type),
+                               HfstTransducer(hfst::internal_epsilon, TOK, type));
 
     HfstTransducerPairVector ContextVector;
     ContextVector.push_back(Context);
@@ -2532,7 +2532,7 @@ void test6b( ImplementationType type )
 void test6c( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     String LeftMarker("@_LM_@");
     String RightMarker("@_RM_@");
@@ -2541,7 +2541,7 @@ void test6c( ImplementationType type )
 
     // Mapping
 
-    HfstTransducer leftMapping("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer leftMapping(hfst::internal_epsilon, TOK, type);
 
     HfstTransducer rightMapping("b", TOK, type);
     HfstTransducerPair mappingPair(leftMapping, rightMapping);
@@ -2550,7 +2550,7 @@ void test6c( ImplementationType type )
 
 
     // Context
-    HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type), HfstTransducer("aa", TOK, type));
+    HfstTransducerPair Context(HfstTransducer(hfst::internal_epsilon, TOK, type), HfstTransducer("aa", TOK, type));
 
     HfstTransducerPairVector ContextVector;
     ContextVector.push_back(Context);
@@ -2585,7 +2585,7 @@ void test6c( ImplementationType type )
 void test7a( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     // Mapping
 
@@ -2641,11 +2641,11 @@ void test7a( ImplementationType type )
 void test7b( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     // Mapping
 
-    HfstTransducer leftMapping1("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer leftMapping1(hfst::internal_epsilon, TOK, type);
     HfstTransducer rightMapping1("b", TOK, type);
     HfstTransducerPair mappingPair1(leftMapping1, rightMapping1);
 
@@ -2699,7 +2699,7 @@ void test7b( ImplementationType type )
 void test7c( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
 
     // Mapping
@@ -2790,8 +2790,8 @@ void test7c( ImplementationType type )
 
 
 
-    HfstTransducerPair Context1(HfstTransducer("m", TOK, type), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
-    HfstTransducerPair Context2(HfstTransducer("x", TOK, type), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
+    HfstTransducerPair Context1(HfstTransducer("m", TOK, type), HfstTransducer(hfst::internal_epsilon, TOK, type));
+    HfstTransducerPair Context2(HfstTransducer("x", TOK, type), HfstTransducer(hfst::internal_epsilon, TOK, type));
 
     HfstTransducerPairVector ContextVector1;
     ContextVector1.push_back(Context1);
@@ -2852,17 +2852,17 @@ void test7c( ImplementationType type )
 void test7d( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
 
     // Mapping
 
-    HfstTransducer leftMapping1("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer leftMapping1(hfst::internal_epsilon, TOK, type);
     //HfstTransducer leftMapping1("x", TOK, type);
     HfstTransducer rightMapping1("a", TOK, type);
     HfstTransducerPair mappingPair1(leftMapping1, rightMapping1);
 
-    HfstTransducer leftMapping2("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer leftMapping2(hfst::internal_epsilon, TOK, type);
     //HfstTransducer leftMapping2("x", TOK, type);
     HfstTransducer rightMapping2("b", TOK, type);
     HfstTransducerPair mappingPair2(leftMapping2, rightMapping2);
@@ -2877,8 +2877,8 @@ void test7d( ImplementationType type )
 
 
     // Context
-    HfstTransducerPair Context1a(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type), HfstTransducer("ba", TOK, type));
-    HfstTransducerPair Context1b(HfstTransducer("ab", TOK, type), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
+    HfstTransducerPair Context1a(HfstTransducer(hfst::internal_epsilon, TOK, type), HfstTransducer("ba", TOK, type));
+    HfstTransducerPair Context1b(HfstTransducer("ab", TOK, type), HfstTransducer(hfst::internal_epsilon, TOK, type));
 
     HfstTransducerPairVector ContextVector1;
     ContextVector1.push_back(Context1a);
@@ -2901,7 +2901,7 @@ void test7d( ImplementationType type )
     ruleVector.push_back(rule2);
 
 
-    HfstTransducer input1("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer input1(hfst::internal_epsilon, TOK, type);
     //HfstTransducer input1("xxx", TOK, type);
 
     //HfstTransducer result1("aabbaa", "x@_EPSILON_SYMBOL_@@_EPSILON_SYMBOL_@@_EPSILON_SYMBOL_@aa",TOK, type);
@@ -2926,12 +2926,12 @@ void test7d( ImplementationType type )
 void test7e( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-    TOK.add_multichar_symbol("@_IDENTITY_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
+    TOK.add_multichar_symbol(hfst::internal_identity);
 
     // Mapping
 
-    HfstTransducer leftMapping1("@_IDENTITY_SYMBOL_@", TOK, type);
+    HfstTransducer leftMapping1(hfst::internal_identity, TOK, type);
     HfstTransducer rightMapping1("x", TOK, type);
     HfstTransducerPair mappingPair1(leftMapping1, rightMapping1);
 
@@ -2983,7 +2983,7 @@ void test7e( ImplementationType type )
 void test7e( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
 
     // Mapping
@@ -3035,7 +3035,7 @@ void test7e( ImplementationType type )
 void test7f( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     // Mapping
 
@@ -3088,7 +3088,7 @@ void test7f( ImplementationType type )
 void test7g( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
 
     // Mapping
 
@@ -3140,12 +3140,12 @@ void test7g( ImplementationType type )
 void test7h( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-    TOK.add_multichar_symbol("@_IDENTITY_SYMBOL_@");
+    TOK.add_multichar_symbol(hfst::internal_epsilon);
+    TOK.add_multichar_symbol(hfst::internal_identity);
 
     // Mapping
 
-    HfstTransducer leftMapping1("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer leftMapping1(hfst::internal_epsilon, TOK, type);
     HfstTransducer rightMapping1("a", TOK, type);
     HfstTransducerPair mappingPair1(leftMapping1, rightMapping1);
 
@@ -3172,8 +3172,8 @@ void test7h( ImplementationType type )
      */
 
     HfstIterableTransducer bt;
-    bt.add_transition(0, HfstTransition(1, "@_EPSILON_SYMBOL_@", "a", 0) );
-    bt.add_transition(1, HfstTransition(0, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+    bt.add_transition(0, HfstTransition(1, hfst::internal_epsilon, "a", 0) );
+    bt.add_transition(1, HfstTransition(0, hfst::internal_identity, hfst::internal_identity, 0) );
     bt.add_transition(1, HfstTransition(0, "a", "a", 0) );
     bt.set_final_weight(1, 0);
 

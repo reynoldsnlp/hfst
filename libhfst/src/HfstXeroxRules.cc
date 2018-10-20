@@ -18,7 +18,7 @@ namespace hfst
       Rule::Rule ( const HfstTransducerPairVector &mappingPairVector )
       {
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
 
         ImplementationType type = mappingPairVector[0].first.get_type();
         // Check if all transducer types are the same
@@ -31,8 +31,8 @@ namespace hfst
             }
         }
 
-        HfstTransducerPair contextPair(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type),
-                                       HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
+        HfstTransducerPair contextPair(HfstTransducer(hfst::internal_epsilon, TOK, type),
+                                       HfstTransducer(hfst::internal_epsilon, TOK, type));
         HfstTransducerPairVector epsilonContext;
         epsilonContext.push_back(contextPair);
 
@@ -93,10 +93,10 @@ namespace hfst
       Rule::Rule()
       {
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
         hfst::ImplementationType type = TROPICAL_OPENFST_TYPE;
-        HfstTransducerPair contextPair(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type),
-                                       HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
+        HfstTransducerPair contextPair(HfstTransducer(hfst::internal_epsilon, TOK, type),
+                                       HfstTransducer(hfst::internal_epsilon, TOK, type));
         HfstTransducerPairVector epsilonContext;
         epsilonContext.push_back(contextPair);
         context = epsilonContext;
@@ -307,8 +307,8 @@ namespace hfst
         String leftMarker("@LM@");
         String rightMarker("@RM@");
 
-        retval.substitute(StringPair(leftMarker, leftMarker), StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@")).optimize();
-        retval.substitute(StringPair(rightMarker, rightMarker), StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@")).optimize();
+        retval.substitute(StringPair(leftMarker, leftMarker), StringPair(hfst::internal_epsilon, hfst::internal_epsilon)).optimize();
+        retval.substitute(StringPair(rightMarker, rightMarker), StringPair(hfst::internal_epsilon, hfst::internal_epsilon)).optimize();
 
 
         retval.remove_from_alphabet(leftMarker);
@@ -370,7 +370,7 @@ namespace hfst
       void insertFreelyAllTheBrackets( HfstTransducer &t, bool optional )
       {
           HfstTokenizer TOK;
-          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+          TOK.add_multichar_symbol(hfst::internal_epsilon);
           String leftMarker("@LM@");
           String rightMarker("@RM@");
           String leftMarker2("@LM2@");
@@ -410,8 +410,8 @@ namespace hfst
           HfstTransducer unionContextReplace(type);
 
           HfstTokenizer TOK;
-         // TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-         // HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+         // TOK.add_multichar_symbol(hfst::internal_epsilon);
+         // HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
 
 
           for ( unsigned int i = 0; i < ContextVector.size(); i++ )
@@ -592,8 +592,8 @@ namespace hfst
         //printf("bracketedReplace function..... \n");
 
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-        TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
+        TOK.add_multichar_symbol(hfst::internal_unknown);
         String leftMarker("@LM@");
         String rightMarker("@RM@");
         String tmpMarker("@TMPM@");
@@ -625,7 +625,7 @@ namespace hfst
         identity.repeat_star().optimize();
 
 
-        HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+        HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
         HfstTransducer mapping(type);
         for ( unsigned int i = 0; i < mappingPairVector.size(); i++ )
         {
@@ -779,7 +779,7 @@ namespace hfst
         // when there aren't any contexts, result is identityExpanded
         if ( ContextVector.size() == 1 )
         {
-          HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+          HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
           if ( ContextVector[0].first.compare(epsilon) && ContextVector[0].second.compare(epsilon) )
           {
               identityExpanded.remove_from_alphabet(tmpMarker);
@@ -827,7 +827,7 @@ namespace hfst
 
         // remove tmpMaprker
         replaceWithoutContexts.substitute(StringPair(tmpMarker, tmpMarker),
-                        StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@")).optimize();
+                        StringPair(hfst::internal_epsilon, hfst::internal_epsilon)).optimize();
         replaceWithoutContexts.remove_from_alphabet(tmpMarker);
         replaceWithoutContexts.optimize();
 
@@ -887,7 +887,7 @@ namespace hfst
         }
 
         HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
         String leftMarker("@LM@");
         String rightMarker("@RM@");
 
@@ -996,7 +996,7 @@ namespace hfst
           // when there aren't any contexts, result is identityExpanded
           if ( contextVector.size() == 1 )
             {
-              HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+              HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
               if ( !(contextVector[0].first.compare(epsilon) && 
                      contextVector[0].second.compare(epsilon)) )
                 {
@@ -1232,7 +1232,7 @@ namespace hfst
         // remove tmpMaprker
         replaceWithoutContexts.substitute
           (StringPair(tmpMarker, tmpMarker),
-           StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@")).optimize();
+           StringPair(hfst::internal_epsilon, hfst::internal_epsilon)).optimize();
         replaceWithoutContexts.remove_from_alphabet(tmpMarker);
         replaceWithoutContexts.optimize();
 
@@ -1268,7 +1268,7 @@ namespace hfst
       HfstTransducer constraintsRightPart( ImplementationType type )
       {
           HfstTokenizer TOK;
-          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+          TOK.add_multichar_symbol(hfst::internal_epsilon);
 
           String leftMarker("@LM@");
           String rightMarker("@RM@");
@@ -1286,9 +1286,9 @@ namespace hfst
           HfstTransducer B(leftBracket);
           B.disjunct(rightBracket).optimize();
 
-          HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
-          HfstTransducer epsilonToLeftMark("@_EPSILON_SYMBOL_@", leftMarker, TOK, type);
-          HfstTransducer LeftMarkToEpsilon(leftMarker, "@_EPSILON_SYMBOL_@", TOK, type);
+          HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
+          HfstTransducer epsilonToLeftMark(hfst::internal_epsilon, leftMarker, TOK, type);
+          HfstTransducer LeftMarkToEpsilon(leftMarker, hfst::internal_epsilon, TOK, type);
 
           HfstTransducer epsilonToBrackets(epsilon);
           epsilonToBrackets.cross_product(B);
@@ -1311,7 +1311,7 @@ namespace hfst
         {
             ImplementationType type = uncondidtionalTr.get_type();
             HfstTokenizer TOK;
-            TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+            TOK.add_multichar_symbol(hfst::internal_epsilon);
             TOK.add_multichar_symbol(".#.");
 
             String leftMarker("@LM@");
@@ -1324,8 +1324,8 @@ namespace hfst
             HfstTransducer identity (identityPair);
             identity.repeat_star().optimize();
 
-            HfstTransducer leftBracketToZero(leftMarker, "@_EPSILON_SYMBOL_@", TOK, type);
-            HfstTransducer rightBracketToZero(rightMarker, "@_EPSILON_SYMBOL_@", TOK, type);
+            HfstTransducer leftBracketToZero(leftMarker, hfst::internal_epsilon, TOK, type);
+            HfstTransducer rightBracketToZero(rightMarker, hfst::internal_epsilon, TOK, type);
 
 
             HfstTransducer boundary(".#.", TOK, type);
@@ -1358,8 +1358,8 @@ namespace hfst
       HfstTransducer leftMostConstraint( const HfstTransducer &uncondidtionalTr )
       {
           HfstTokenizer TOK;
-          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-          TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
+          TOK.add_multichar_symbol(hfst::internal_epsilon);
+          TOK.add_multichar_symbol(hfst::internal_unknown);
           TOK.add_multichar_symbol(".#.");
 
           String leftMarker("@LM@");
@@ -1385,7 +1385,7 @@ namespace hfst
 
 
           // epsilon
-          HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+          HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
           // B
           HfstTransducer B(leftBracket);
           B.disjunct(rightBracket).optimize();
@@ -1403,11 +1403,11 @@ namespace hfst
           identityPairMinusBracketsPlus.repeat_plus().optimize();
 
           /*
-          HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+          HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
           HfstTransducer identityPairMinusBracketsOrEpsilon(identityPairMinusBrackets);
           identityPairMinusBracketsOrEpsilon.disjunct(epsilon).optimize();
           */
-          HfstTransducer LeftBracketToEpsilon(leftMarker, "@_EPSILON_SYMBOL_@", TOK, type);
+          HfstTransducer LeftBracketToEpsilon(leftMarker, hfst::internal_epsilon, TOK, type);
 
 
           HfstTransducer boundary(".#.", TOK, type);
@@ -1445,8 +1445,8 @@ namespace hfst
       HfstTransducer rightMostConstraint( const HfstTransducer &uncondidtionalTr )
       {
           HfstTokenizer TOK;
-          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-          TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
+          TOK.add_multichar_symbol(hfst::internal_epsilon);
+          TOK.add_multichar_symbol(hfst::internal_unknown);
 
           String leftMarker("@LM@");
           String rightMarker("@RM@");
@@ -1471,7 +1471,7 @@ namespace hfst
 
 
           // epsilon
-          HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+          HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
           // B
           HfstTransducer B(leftBracket);
           B.disjunct(rightBracket).optimize();
@@ -1490,7 +1490,7 @@ namespace hfst
           identityPairMinusBracketsStar.repeat_star().optimize();
 
 
-          HfstTransducer RightBracketToEpsilon(rightMarker, "@_EPSILON_SYMBOL_@", TOK, type);
+          HfstTransducer RightBracketToEpsilon(rightMarker, hfst::internal_epsilon, TOK, type);
 
           HfstTransducer Constraint(rightPart);
           // [ B:0 | 0:B | ?-B ]* [I-B]+  >:0 [ ?-B ]*
@@ -1522,7 +1522,7 @@ namespace hfst
       {
 
           HfstTokenizer TOK;
-          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+          TOK.add_multichar_symbol(hfst::internal_epsilon);
 
           String leftMarker("@LM@");
           String rightMarker("@RM@");
@@ -1540,7 +1540,7 @@ namespace hfst
           identity.repeat_star().optimize();
 
           // epsilon
-          HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+          HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
           // B
           HfstTransducer B(leftBracket);
           B.disjunct(rightBracket).optimize();
@@ -1561,10 +1561,10 @@ namespace hfst
           HfstTransducer rightPart(type);
           rightPart = constraintsRightPart(type);
 
-          HfstTransducer RightBracketToEpsilon(rightMarker, "@_EPSILON_SYMBOL_@", TOK, type);
-          HfstTransducer epsilonToRightBracket("@_EPSILON_SYMBOL_@", rightMarker, TOK, type);
-          HfstTransducer LeftBracketToEpsilon(leftMarker, "@_EPSILON_SYMBOL_@", TOK, type);
-          HfstTransducer epsilonToLeftBracket("@_EPSILON_SYMBOL_@", leftMarker, TOK, type);
+          HfstTransducer RightBracketToEpsilon(rightMarker, hfst::internal_epsilon, TOK, type);
+          HfstTransducer epsilonToRightBracket(hfst::internal_epsilon, rightMarker, TOK, type);
+          HfstTransducer LeftBracketToEpsilon(leftMarker, hfst::internal_epsilon, TOK, type);
+          HfstTransducer epsilonToLeftBracket(hfst::internal_epsilon, leftMarker, TOK, type);
 
           //[ ? | 0:< | <:0 | 0:> | B ]
      //     HfstTransducer nonClosingBracketInsertion(identityPair);
@@ -1612,7 +1612,7 @@ namespace hfst
       HfstTransducer longestMatchRightMostConstraint(const HfstTransducer &uncondidtionalTr )
       {
           HfstTokenizer TOK;
-          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+          TOK.add_multichar_symbol(hfst::internal_epsilon);
 
           String leftMarker("@LM@");
           String rightMarker("@RM@");
@@ -1630,7 +1630,7 @@ namespace hfst
           identity.repeat_star().optimize();
 
           // epsilon
-          HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+          HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
           // B
           HfstTransducer B(leftBracket);
           B.disjunct(rightBracket).optimize();
@@ -1653,11 +1653,11 @@ namespace hfst
 
 
 
-          HfstTransducer RightBracketToEpsilon(rightMarker, "@_EPSILON_SYMBOL_@", TOK, type);
+          HfstTransducer RightBracketToEpsilon(rightMarker, hfst::internal_epsilon, TOK, type);
 
-          HfstTransducer epsilonToRightBracket("@_EPSILON_SYMBOL_@", rightMarker, TOK, type);
-          HfstTransducer LeftBracketToEpsilon(leftMarker, "@_EPSILON_SYMBOL_@", TOK, type);
-          HfstTransducer epsilonToLeftBracket("@_EPSILON_SYMBOL_@", leftMarker, TOK, type);
+          HfstTransducer epsilonToRightBracket(hfst::internal_epsilon, rightMarker, TOK, type);
+          HfstTransducer LeftBracketToEpsilon(leftMarker, hfst::internal_epsilon, TOK, type);
+          HfstTransducer epsilonToLeftBracket(hfst::internal_epsilon, leftMarker, TOK, type);
 
 
           //[ ? | 0:< | >:0 | 0:> | B ]
@@ -1700,7 +1700,7 @@ namespace hfst
       {
 
           HfstTokenizer TOK;
-          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+          TOK.add_multichar_symbol(hfst::internal_epsilon);
 
           String leftMarker("@LM@");
           String rightMarker("@RM@");
@@ -1731,10 +1731,10 @@ namespace hfst
           identityPairMinusBracketsPlus.repeat_plus().optimize();
 
 
-          HfstTransducer RightBracketToEpsilon(rightMarker, "@_EPSILON_SYMBOL_@", TOK, type);
-          HfstTransducer epsilonToRightBracket("@_EPSILON_SYMBOL_@", rightMarker, TOK, type);
-          HfstTransducer LeftBracketToEpsilon(leftMarker, "@_EPSILON_SYMBOL_@", TOK, type);
-          HfstTransducer epsilonToLeftBracket("@_EPSILON_SYMBOL_@", leftMarker, TOK, type);
+          HfstTransducer RightBracketToEpsilon(rightMarker, hfst::internal_epsilon, TOK, type);
+          HfstTransducer epsilonToRightBracket(hfst::internal_epsilon, rightMarker, TOK, type);
+          HfstTransducer LeftBracketToEpsilon(leftMarker, hfst::internal_epsilon, TOK, type);
+          HfstTransducer epsilonToLeftBracket(hfst::internal_epsilon, leftMarker, TOK, type);
 
 
           // [ 0:< | <:0 | >:0 | B ][?-B]+
@@ -1787,7 +1787,7 @@ namespace hfst
       {
 
           HfstTokenizer TOK;
-          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+          TOK.add_multichar_symbol(hfst::internal_epsilon);
 
           String leftMarker("@LM@");
           String rightMarker("@RM@");
@@ -1819,10 +1819,10 @@ namespace hfst
 
 
 
-          HfstTransducer RightBracketToEpsilon(rightMarker, "@_EPSILON_SYMBOL_@", TOK, type);
-          HfstTransducer epsilonToRightBracket("@_EPSILON_SYMBOL_@", rightMarker, TOK, type);
-          HfstTransducer LeftBracketToEpsilon(leftMarker, "@_EPSILON_SYMBOL_@", TOK, type);
-          HfstTransducer epsilonToLeftBracket("@_EPSILON_SYMBOL_@", leftMarker, TOK, type);
+          HfstTransducer RightBracketToEpsilon(rightMarker, hfst::internal_epsilon, TOK, type);
+          HfstTransducer epsilonToRightBracket(hfst::internal_epsilon, rightMarker, TOK, type);
+          HfstTransducer LeftBracketToEpsilon(leftMarker, hfst::internal_epsilon, TOK, type);
+          HfstTransducer epsilonToLeftBracket(hfst::internal_epsilon, leftMarker, TOK, type);
 
 
           // [?-B]+ [ 0:> | >:0 | <:0 | B ]
@@ -1867,7 +1867,7 @@ namespace hfst
       HfstTransducer mostBracketsPlusConstraint( const HfstTransducer &uncondidtionalTr )
       {
           HfstTokenizer TOK;
-          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+          TOK.add_multichar_symbol(hfst::internal_epsilon);
 
           String leftMarker("@LM@");
           String rightMarker("@RM@");
@@ -1898,7 +1898,7 @@ namespace hfst
           identityStar.repeat_star().optimize();
 
           // epsilon
-          String epsilon("@_EPSILON_SYMBOL_@");
+          String epsilon(hfst::internal_epsilon);
 
           // BL:0 ( <1 : 0, <2 : 0)
           HfstTransducer leftBracketToEpsilon(leftMarker, epsilon, TOK, type );
@@ -1960,7 +1960,7 @@ namespace hfst
       HfstTransducer mostBracketsStarConstraint( const HfstTransducer &uncondidtionalTr )
       {
           HfstTokenizer TOK;
-          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+          TOK.add_multichar_symbol(hfst::internal_epsilon);
 
           String leftMarker("@LM@");
           String rightMarker("@RM@");
@@ -1994,7 +1994,7 @@ namespace hfst
 
 
           // epsilon
-          String epsilon("@_EPSILON_SYMBOL_@");
+          String epsilon(hfst::internal_epsilon);
 
           // BL:0 ( <1 : 0, <2 : 0)
           HfstTransducer leftBracketToEpsilon(leftMarker, epsilon, TOK, type );
@@ -2050,7 +2050,7 @@ namespace hfst
       HfstTransducer removeB2Constraint( const HfstTransducer &t )
       {
           HfstTokenizer TOK;
-          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+          TOK.add_multichar_symbol(hfst::internal_epsilon);
 
           String leftMarker2("@LM2@");
           String rightMarker2("@RM2@");
@@ -2100,7 +2100,7 @@ namespace hfst
       HfstTransducer noRepetitionConstraint( const HfstTransducer &t )
       {
           HfstTokenizer TOK;
-          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+          TOK.add_multichar_symbol(hfst::internal_epsilon);
 
           String leftMarker("@LM@");
           String rightMarker("@RM@");
@@ -2202,8 +2202,8 @@ namespace hfst
         HfstTransducer applyBoundaryMark( const HfstTransducer &t )
         {
             HfstTokenizer TOK;
-            TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-            TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
+            TOK.add_multichar_symbol(hfst::internal_epsilon);
+            TOK.add_multichar_symbol(hfst::internal_unknown);
             TOK.add_multichar_symbol("@TMP_UNKNOWN@");
             ImplementationType type = t.get_type();
 
@@ -2228,7 +2228,7 @@ namespace hfst
                                     .optimize();
 
             // [0:.#. | ? - .#.]*
-            HfstTransducer zeroToBoundary("@_EPSILON_SYMBOL_@", boundaryMarker, TOK, type);
+            HfstTransducer zeroToBoundary(hfst::internal_epsilon, boundaryMarker, TOK, type);
             HfstTransducer retval(zeroToBoundary);
             retval.disjunct(identityMinusBoundary)
                   .optimize()
@@ -2238,7 +2238,7 @@ namespace hfst
             //printf("retval .o. t: \n");
             //retval.write_in_att_format(stdout, 1);
             // [.#.:0 | ? - .#.]*
-            HfstTransducer boundaryToZero(boundaryMarker, "@_EPSILON_SYMBOL_@", TOK, type);
+            HfstTransducer boundaryToZero(boundaryMarker, hfst::internal_epsilon, TOK, type);
             HfstTransducer removeBoundary(boundaryToZero);
             removeBoundary.disjunct(identityMinusBoundary)
                .optimize()
@@ -2252,7 +2252,7 @@ namespace hfst
             //tr.insert_to_alphabet(boundaryMarker);
             // substitutute unknowns with tmp symbol
             // this is necessary because of first composition
-            tr.substitute("@_UNKNOWN_SYMBOL_@", "@TMP_UNKNOWN@");
+            tr.substitute(hfst::internal_unknown, "@TMP_UNKNOWN@");
 
             //printf("----first: ----\n");
             //tr.write_in_att_format(stdout, 1);
@@ -2277,7 +2277,7 @@ namespace hfst
 //            retval.write_in_att_format(stdout, 1);
 
             // bring back unknown symbols
-            retval.substitute("@TMP_UNKNOWN@", "@_UNKNOWN_SYMBOL_@");
+            retval.substitute("@TMP_UNKNOWN@", hfst::internal_unknown);
             retval.remove_from_alphabet("@TMP_UNKNOWN@");
 
             // remove boundary from alphabet
@@ -2297,16 +2297,16 @@ namespace hfst
                                                           const HfstTransducerPair &marks )
         {
             HfstTokenizer TOK;
-            String epsilon = "@_EPSILON_SYMBOL_@";
+            String epsilon = hfst::internal_epsilon;
             TOK.add_multichar_symbol(epsilon);
-            TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+            TOK.add_multichar_symbol(hfst::internal_epsilon);
 
             ImplementationType type = mappingPair.first.get_type();
 
             HfstTransducer leftMark(marks.first);
             HfstTransducer rightMark(marks.second);
 
-            HfstTransducer epsilonToLeftMark("@_EPSILON_SYMBOL_@", TOK, type);
+            HfstTransducer epsilonToLeftMark(hfst::internal_epsilon, TOK, type);
             epsilonToLeftMark.cross_product(leftMark).optimize();
 
             HfstTransducer epsilonToRightMark(epsilon, TOK, type);
@@ -2845,10 +2845,10 @@ namespace hfst
 
         HfstTokenizer TOK;
         TOK.add_multichar_symbol(restrictionMark);
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol(hfst::internal_epsilon);
 
         HfstTransducer mark(restrictionMark, TOK, type);
-        HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+        HfstTransducer epsilon(hfst::internal_epsilon, TOK, type);
 
         // Identity
         HfstTransducer identityPair = HfstTransducer::identity_pair( type );
@@ -2861,11 +2861,11 @@ namespace hfst
         universalWithoutDStar.repeat_star().optimize();
 
         // NODU
-        HfstTransducer noDUpper("@_EPSILON_SYMBOL_@", restrictionMark, TOK, type );
+        HfstTransducer noDUpper(hfst::internal_epsilon, restrictionMark, TOK, type );
         noDUpper.disjunct(universalWithoutD).repeat_star().optimize();
 
         // NODL
-        HfstTransducer noDLower(restrictionMark, "@_EPSILON_SYMBOL_@", TOK, type );
+        HfstTransducer noDLower(restrictionMark, hfst::internal_epsilon, TOK, type );
         noDLower.disjunct(universalWithoutD).repeat_star().optimize();
 
         // 1. Surround center with marks

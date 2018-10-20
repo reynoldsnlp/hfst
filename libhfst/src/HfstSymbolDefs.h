@@ -20,7 +20,7 @@
     \brief Typedefs and functions for symbols, symbol pairs and
     sets of symbols. */
 
-/* Macros that can be used instead of hfsT::internal_epsilon etc
+/* Macros that can be used instead of hfst::internal_epsilon etc
    if there are problems with variable initialization. */
 #define INTERNAL_EPSILON "@_EPSILON_SYMBOL_@"
 #define INTERNAL_UNKNOWN "@_UNKNOWN_SYMBOL_@"

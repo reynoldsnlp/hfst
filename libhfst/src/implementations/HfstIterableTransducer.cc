@@ -293,8 +293,8 @@
 
            // Whether unknown or identity symbols are used
            bool unknowns_or_identities_used =
-             ( (symbols_found.find("@_UNKNOWN_SYMBOL_@") != symbols_found.end()) ||
-               (symbols_found.find("@_IDENTITY_SYMBOL_@") != symbols_found.end()) );
+             ( (symbols_found.find(hfst::internal_unknown) != symbols_found.end()) ||
+               (symbols_found.find(hfst::internal_identity) != symbols_found.end()) );
 
            // We cannot prune the transducer because unknowns or identities
            // are used in its transitions.
@@ -302,9 +302,9 @@
              return;
 
            // Special symbols are always known
-           symbols_found.insert("@_EPSILON_SYMBOL_@");
-           symbols_found.insert("@_UNKNOWN_SYMBOL_@");
-           symbols_found.insert("@_IDENTITY_SYMBOL_@");
+           symbols_found.insert(hfst::internal_epsilon);
+           symbols_found.insert(hfst::internal_unknown);
+           symbols_found.insert(hfst::internal_identity);
 
            // Which symbols in the graph's alphabet did not occur in
            // the graph
@@ -684,9 +684,9 @@
          void HfstIterableTransducer::xfstize_symbol(std::string & symbol)
          {
            xfstize(symbol);
-           replace_all(symbol, "@_EPSILON_SYMBOL_@", "0");
-           replace_all(symbol, "@_UNKNOWN_SYMBOL_@", "?");
-           replace_all(symbol, "@_IDENTITY_SYMBOL_@", "?");
+           replace_all(symbol, hfst::internal_epsilon, "0");
+           replace_all(symbol, hfst::internal_unknown, "?");
+           replace_all(symbol, hfst::internal_identity, "?");
            replace_all(symbol, "\t", "@_TAB_@");
          }
 
@@ -717,7 +717,7 @@
            os << s;
            if (data.get_input_symbol() !=
                data.get_output_symbol() ||
-               data.get_output_symbol() == "@_UNKNOWN_SYMBOL_@")
+               hfst::is_unknown(data.get_output_symbol()))
              {
                s = data.get_output_symbol();
                xfstize_symbol(s);
@@ -744,7 +744,7 @@
 
            if (data.get_input_symbol() !=
                data.get_output_symbol() ||
-               data.get_output_symbol() == "@_UNKNOWN_SYMBOL_@")
+               hfst::is_unknown(data.get_output_symbol()))
              {
                s = data.get_output_symbol();
                xfstize_symbol(s);
@@ -803,11 +803,11 @@
              return "%0";
            if (symbol == "?")
              return "%?";
-           if (symbol == "@_EPSILON_SYMBOL_@")
+           if (hfst::is_epsilon(symbol))
              return "0";
-           if (symbol == "@_UNKNOWN_SYMBOL_@")
+           if (hfst::is_unknown(symbol))
              return "?";
-           if(symbol == "@_IDENTITY_SYMBOL_@")
+           if(hfst::is_identity(symbol))
              return "?";
            // prepend a backslash to a double quote and to a backslash
            std::string retval(symbol);
@@ -824,9 +824,9 @@
            if (symbol == "%?")
              return "?";
            if (symbol == "0")
-             return "@_EPSILON_SYMBOL_@";
+             return hfst::internal_epsilon;
            if (symbol == "?")
-             return "@_UNKNOWN_SYMBOL_@";
+             return hfst::internal_unknown;
            // remove the escaping backslash in front of a double quote and
            // a double quote
            std::string retval(symbol);
@@ -842,7 +842,7 @@
 
            if (data.get_input_symbol() !=
                data.get_output_symbol() ||
-               data.get_input_symbol() == "@_UNKNOWN_SYMBOL_@")
+               hfst::is_unknown(data.get_input_symbol()))
              {
                symbol = prologize_symbol(data.get_output_symbol());
                fprintf(file, ":\"%s\"", symbol.c_str());
@@ -856,7 +856,7 @@
 
            if (data.get_input_symbol() !=
                data.get_output_symbol() ||
-               data.get_input_symbol() == "@_UNKNOWN_SYMBOL_@")
+               hfst::is_unknown(data.get_input_symbol()))
              {
                symbol = prologize_symbol(data.get_output_symbol());
                os << ":\"" << symbol << "\"";
@@ -1095,8 +1095,8 @@
                // "foo" -> foo
                std::string symbol(str, quote_positions[0]+1, quote_positions[1]-quote_positions[0]-1);
                isymbol = deprologize_symbol(symbol);
-               if (isymbol == "@_UNKNOWN_SYMBOL_@") // single unknown -> identity
-                 isymbol = "@_IDENTITY_SYMBOL_@";
+               if (hfst::is_unknown(isymbol)) // single unknown -> identity
+                 isymbol = hfst::internal_identity;
                osymbol = isymbol;
              }
            // "foo":"bar"
@@ -1433,12 +1433,12 @@
 
                    std::string isymbol = data.get_input_symbol();
                    replace_all(isymbol, " ", "@_SPACE_@");
-                   replace_all(isymbol, "@_EPSILON_SYMBOL_@", "@0@");
+                   replace_all(isymbol, hfst::internal_epsilon, "@0@");
                    replace_all(isymbol, "\t", "@_TAB_@");
 
                    std::string osymbol = data.get_output_symbol();
                    replace_all(osymbol, " ", "@_SPACE_@");
-                   replace_all(osymbol, "@_EPSILON_SYMBOL_@", "@0@");
+                   replace_all(osymbol, hfst::internal_epsilon, "@0@");
                    replace_all(osymbol, "\t", "@_TAB_@");
 
                    os <<  source_state << "\t"
@@ -1480,12 +1480,12 @@
 
                    std::string isymbol = data.get_input_symbol();
                    replace_all(isymbol, " ", "@_SPACE_@");
-                   replace_all(isymbol, "@_EPSILON_SYMBOL_@", "@0@");
+                   replace_all(isymbol, hfst::internal_epsilon, "@0@");
                    replace_all(isymbol, "\t", "@_TAB_@");
 
                    std::string osymbol = data.get_output_symbol();
                    replace_all(osymbol, " ", "@_SPACE_@");
-                   replace_all(osymbol, "@_EPSILON_SYMBOL_@", "@0@");
+                   replace_all(osymbol, hfst::internal_epsilon, "@0@");
                    replace_all(osymbol, "\t", "@_TAB_@");
 
                    fprintf(file, "%i\t%i\t%s\t%s",
@@ -1528,12 +1528,12 @@
 
                    std::string isymbol = data.get_input_symbol();
                    replace_all(isymbol, " ", "@_SPACE_@");
-                   replace_all(isymbol, "@_EPSILON_SYMBOL_@", "@0@");
+                   replace_all(isymbol, hfst::internal_epsilon, "@0@");
                    replace_all(isymbol, "\t", "@_TAB_@");
 
                    std::string osymbol = data.get_output_symbol();
                    replace_all(osymbol, " ", "@_SPACE_@");
-                   replace_all(osymbol, "@_EPSILON_SYMBOL_@", "@0@");
+                   replace_all(osymbol, hfst::internal_epsilon, "@0@");
                    replace_all(osymbol, "\t", "@_TAB_@");
 
                    cw = sprintf(ptr + cwt, "%i\t%i\t%s\t%s",
@@ -1637,19 +1637,19 @@
              // replace "@_SPACE_@"s with " " and "@0@"s with
              // "@_EPSILON_SYMBOL_@"
              replace_all(input_symbol, "@_SPACE_@", " ");
-             replace_all(input_symbol, "@0@", "@_EPSILON_SYMBOL_@");
+             replace_all(input_symbol, "@0@", hfst::internal_epsilon);
              replace_all(input_symbol, "@_TAB_@", "\t");
              replace_all(input_symbol, "@_COLON_@", ":");
              
              replace_all(output_symbol, "@_SPACE_@", " ");
-             replace_all(output_symbol, "@0@", "@_EPSILON_SYMBOL_@");
+             replace_all(output_symbol, "@0@", hfst::internal_epsilon);
              replace_all(output_symbol, "@_TAB_@", "\t");
              replace_all(output_symbol, "@_COLON_@", ":");
              
              if (epsilon_symbol.compare(input_symbol) == 0)
-               input_symbol="@_EPSILON_SYMBOL_@";
+               input_symbol=hfst::internal_epsilon;
              if (epsilon_symbol.compare(output_symbol) == 0)
-               output_symbol="@_EPSILON_SYMBOL_@";
+               output_symbol=hfst::internal_epsilon;
              
              HfstTransition tr( atoi(a2), input_symbol,
                                 output_symbol, weight );
@@ -2683,7 +2683,7 @@
            for (StringSet::const_iterator sym_it = substitutions_performed_for_symbols.begin();
                 sym_it != substitutions_performed_for_symbols.end(); sym_it++)
              {
-               if (*sym_it != "@_EPSILON_SYMBOL_@" && *sym_it != "@_UNKNOWN_SYMBOL_@" && *sym_it != "@_IDENTITY_SYMBOL_@")
+               if (!hfst::is_epsilon(*sym_it) && !hfst::is_unknown(*sym_it) && !hfst::is_identity(*sym_it))
                  this->remove_symbol_from_alphabet(*sym_it);
              }
 
@@ -3139,8 +3139,8 @@
                      {
                        // change the current transition
                        HfstTransition tr
-                         (tr_it.get_target_state(), "@_EPSILON_SYMBOL_@",
-                          "@_EPSILON_SYMBOL_@", tr_it.get_weight());
+                         (tr_it.get_target_state(), hfst::internal_epsilon,
+                          hfst::internal_epsilon, tr_it.get_weight());
                        it->operator[](i) = tr;
                      }
                  }
@@ -3473,8 +3473,8 @@
                    bool continu = false;
                    if (it->get_input_symbol().compare(s.second.at(index)) == 0)
                      continu = true;
-                   else if (((it->get_input_symbol().compare("@_UNKNOWN_SYMBOL_@") == 0) ||
-                             (it->get_input_symbol().compare("@_IDENTITY_SYMBOL_@") == 0))
+                   else if ((hfst::is_unknown(it->get_input_symbol()) ||
+			     hfst::is_identity(it->get_input_symbol()))
                             &&
                             (alphabet.find(s.second.at(index)) == alphabet.end()))
                      {
