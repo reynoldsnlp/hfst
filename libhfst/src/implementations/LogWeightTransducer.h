@@ -27,9 +27,8 @@
 #include <iosfwd>
 #include <fstream>
 
-#ifdef OPENFST_VERSION_1_5_4
-  #include "back-ends/openfst/src/include/fst/fst-decl.h"
-#else
+#include "back-ends/openfst/src/include/fst/fst-decl.h"
+/*#else
 namespace fst
 {
   template <class W> class TropicalWeightTpl;
@@ -48,7 +47,7 @@ namespace fst
 
   class SymbolTable;
 }
-#endif
+#endif*/
 
 #include <stdint.h>
 #ifdef _MSC_VER
@@ -69,9 +68,9 @@ namespace implementations
   typedef unsigned int StateId;
   typedef VectorFst<LogArc> LogFst;
 
-  typedef std::vector<LogArc> LogArcVector;
-  struct LogArcLessThan {
-    bool operator() (const LogArc &arc1,const LogArc &arc2) const; };
+  //typedef std::vector<LogArc> LogArcVector;
+  //struct LogArcLessThan {
+  //  bool operator() (const LogArc &arc1,const LogArc &arc2) const; };
 
   using std::ostream;
   using std::ostringstream;

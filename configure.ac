@@ -88,9 +88,9 @@ AM_CONDITIONAL([WANT_OPENFST], [test x$with_openfst != xno])
 
 AC_ARG_WITH([openfst-log],
             [AS_HELP_STRING([--with-openfst-log],
-                            [enable logarithmic weights @<:@default=yes@:>@])],
+                            [enable logarithmic weights @<:@default=no@:>@])],
             [],
-            [with_openfst_log=yes])
+            [with_openfst_log=no])
 AS_IF([test "x$with_openfst_log" != xno], [AC_DEFINE([HAVE_OPENFST_LOG], [1],
                                               [Define to compile OpenFst with log weight support in HFST])])
 AS_IF([test "x$with_openfst_log" == xlean], [AC_DEFINE([HAVE_OPENFST_LOG], [0], [Define not to compile OpenFst with full log weight support in HFST])

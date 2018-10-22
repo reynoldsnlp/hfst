@@ -13,10 +13,10 @@
 #include "transducer.h"
 #include "pmatch.h"
 
-#ifdef OPENFST_VERSION_1_5_4
-  #include "back-ends/openfst/src/include/fst/fst-decl.h"
-  namespace fst { template <class F> class ArcIterator; }
-#endif
+
+#include "back-ends/openfst/src/include/fst/fst-decl.h"
+namespace fst { template <class F> class ArcIterator; }
+
 
 namespace hfst_ol {
     

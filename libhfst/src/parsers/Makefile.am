@@ -121,6 +121,7 @@ htwolc3pre-lexer.ll: htwolcpre3-parser.$(HEADER)
 libhfstparsers_la_SOURCES=$(XRE_SRCS) $(PMATCH_SRCS) $(LEXC_SRCS) $(XFST_SRCS) $(SFST_SRCS) $(TWOLC_SRCS)
 
 AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src \
+		-I${top_srcdir}/back-ends/openfst/src/include \
 		-Wno-deprecated
 
 if WANT_MINGW

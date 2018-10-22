@@ -19,7 +19,9 @@ SUBDIRS=test
 
 hfst_xfst_SOURCES = hfst-xfst.cc $(HFST_COMMON_SRC)
 
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/tools/src $(GLIB_CPPFLAGS) -Wno-deprecated
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/tools/src \
+	      -I${top_srcdir}/back-ends/openfst/src/include \
+	      $(GLIB_CPPFLAGS) -Wno-deprecated
 
 if WANT_XFST
 MAYBE_XFST=hfst-xfst

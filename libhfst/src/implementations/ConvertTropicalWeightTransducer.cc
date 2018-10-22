@@ -22,14 +22,14 @@
 #endif // _MSC_VER
 
 #ifndef _MSC_VER
-namespace fst
+/*namespace fst
 {
   extern template class TropicalWeightTpl<float>;
   extern template class ArcTpl<TropicalWeight>;
   extern template class VectorFst<StdArc>;
   extern template class ArcIterator<StdVectorFst>;
   extern template class StateIterator<StdVectorFst>;
-}
+  }*/
 #endif // _MSC_VER
 
 #ifndef MAIN_TEST

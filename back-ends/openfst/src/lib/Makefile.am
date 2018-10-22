@@ -12,5 +12,6 @@
 AUTOMAKE_OPTIONS=subdir-objects
 AM_CPPFLAGS = -I $(srcdir)/../include $(ICU_CPPFLAGS)
 noinst_LTLIBRARIES = libfst.la
+# fst-types.cc mapped-file.cc
 libfst_la_SOURCES = compat.cc flags.cc fst.cc properties.cc \
-	symbol-table.cc symbol-table-ops.cc util.cc
+	symbol-table.cc symbol-table-ops.cc util.cc weight.cc
