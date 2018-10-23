@@ -1195,6 +1195,19 @@ class HfstIterableTransducer {
     void disjunct(const StringPairVector &spv, float weight) { self->disjunct(spv, weight); }
     void harmonize(HfstIterableTransducer &another) { self->harmonize(another); }
 
+    static hfst::implementations::HfstIterableTransducer read_binary_sfst_transducer(const std::string & filename)
+    {
+      try
+	{
+	  return hfst::hfst_read_binary_sfst_transducer(filename);
+	}
+      catch (const char * msg)
+	{
+	  std::cerr << std::string(msg) << std::endl;
+	  return hfst::implementations::HfstIterableTransducer();
+	}
+    }
+    
   HfstTwoLevelPaths _lookup(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight, bool obey_flags) throw(TransducerIsCyclicException)
   {
     hfst::HfstTwoLevelPaths results;

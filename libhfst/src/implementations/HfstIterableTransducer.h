@@ -1115,6 +1115,8 @@
      
      HFSTDLL static HfstIterableTransducer merge
        (HfstIterableTransducer & graph, HfstIterableTransducer & merger, const std::map<std::string, std::set<std::string> > & list_symbols, std::set<std::string> & markers_added);
+
+     HFSTDLL static HfstIterableTransducer read_binary_sfst_transducer( FILE *file );
      
      // --- Friends ---
      

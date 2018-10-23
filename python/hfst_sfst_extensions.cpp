@@ -53,4 +53,16 @@ hfst::HfstTransducer * hfst_compile_sfst(const std::string & filename, const std
     }
 }
 
+  //HFSTDLL static HfstIterableTransducer read_binary_sfst_transducer( FILE *file );
+  
+  hfst::implementations::HfstIterableTransducer hfst_read_binary_sfst_transducer(const std::string & filename)
+  {
+    FILE * inputfile = fopen(filename.c_str(), "rb");
+    if (inputfile == NULL)
+      return NULL;
+    hfst::implementations::HfstIterableTransducer result = hfst::implementations::HfstIterableTransducer::read_binary_sfst_transducer(inputfile);
+    fclose(inputfile);
+    return result;
+  }
+  
 }
