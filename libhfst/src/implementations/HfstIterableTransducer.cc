@@ -4462,9 +4462,8 @@
 	    { biggest_number = uc; }
 	}
       }
-      
+
      HfstIterableTransducer HfstIterableTransducer::read_binary_sfst_transducer( FILE *file )
-	
       {
 	if (fgetc(file) != 'a')
 	  {
@@ -4507,7 +4506,97 @@
 	  }	
 	return result;
       }
+
+     void HfstIterableTransducer::store_sfst_node_info( FILE *file, unsigned int node )
+     {
+       // write final flag
+       char c = is_final_state(node) ? 0 : 1;
+       fwrite(&c,sizeof(c),1,file);
+
+       // write the number of arcs
+       size_t nn = state_vector[node].size();
+       if (nn > 65535)
+	 throw "Error: in function store_sfst_node\n";
+       unsigned short n=(unsigned short)nn;
+       fwrite(&n,sizeof(n),1,file);
+     }
+
+     void HfstIterableTransducer::store_sfst_arc_label( FILE *file, HfstTropicalTransducerTransitionData & data )
+     {
+       unsigned short inum = data.get_input_number();
+       unsigned short onum = data.get_output_number();
+       fwrite(&inum,sizeof(inum),1,file);
+       fwrite(&onum,sizeof(onum),1,file);
+     }
+
+     void HfstIterableTransducer::store_sfst_node( FILE *file, unsigned int node, std::vector<bool> & visited)
+     {
+       if (!visited[node]) {
+	 store_sfst_node_info( file, node );
+	 visited[node] = true;
+	 HfstTransitions & tr = state_vector[node];
+	 for (HfstTransitions::iterator tr_it
+		= tr.begin();
+	      tr_it != tr.end(); tr_it++)
+	   {
+	     HfstTropicalTransducerTransitionData data = tr_it->get_transition_data();
+	     store_sfst_arc_label( file, data );
+	     unsigned int t = (unsigned int)tr_it->get_target_state();
+	     fwrite(&t,sizeof(t),1,file);
+	     store_sfst_node(file, tr_it->get_target_state(), visited );
+	   }
+       }
+     }
+
+     void HfstIterableTransducer::store_sfst_alphabet( FILE *file )
+     {
+       fputc(char(0), file); // UTF-8
+
+       // write the symbol mapping
+       unsigned short n = (unsigned short)alphabet.size();
+       //Character n=(Character)cm.size();
+       fwrite(&n, sizeof(n), 1, file);
+       //for( CharMap::const_iterator it=cm.begin(); it!=cm.end(); it++ ) {
+       //Character c=it->first;
+       //char *s=it->second;
+       for (HfstAlphabet::const_iterator it = alphabet.begin(); it != alphabet.end(); it++)
+	 {
+	   unsigned short c = (unsigned short)HfstTropicalTransducerTransitionData::get_number(*it);
+	   std::string symbol = (*it == hfst::internal_epsilon) ? std::string("<>") : std::string(*it);
+	   std::cerr << "writing alphabet '" << symbol << "' as number " << c << std::endl; // DEBUG
+	   fwrite(&c, sizeof(c), 1, file);
+	   const char * s = symbol.c_str();
+	   fwrite(s, sizeof(char), strlen(s)+1, file);
+	 }
+
+       // write the character pairs ?
+       /*StringPairSet pairs = get_transition_pairs();
+       n = (unsigned int)pairs.size();
+       fwrite(&n, sizeof(n), 1, file);
+       for (StringPairSet::const_iterator it = pairs.begin(); it != pairs.end(); it++)
+	 {
+	   unsigned short c = (unsigned short)HfstTropicalTransducerTransitionData::get_number(it->first);
+	   fwrite(&c, sizeof(c), 1, file);
+	   c = (unsigned short)HfstTropicalTransducerTransitionData::get_number(it->second);
+	   fwrite(&c, sizeof(c), 1, file);
+	   }*/
+
+       if (ferror(file))
+	 {
+	   throw "Error encountered while writing alphabet to file\n";
+	 }
+     }
      
+     void HfstIterableTransducer::write_binary_sfst_transducer( FILE *file )
+     {
+       fputc('a',file);
+       unsigned int n = (unsigned int)state_vector.size();
+       fwrite(&n,sizeof(n),1,file);
+       std::vector<bool> visited(n+1, false);
+       store_sfst_node( file, 0 /*initial node*/, visited );
+       store_sfst_alphabet(file);
+     }
+
    };
 
  };
@@ -4559,5 +4648,3 @@ int main(int argc, char * argv[])
 }
 
 #endif // MAIN_TEST
-
-

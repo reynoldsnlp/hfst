@@ -1117,6 +1117,12 @@
        (HfstIterableTransducer & graph, HfstIterableTransducer & merger, const std::map<std::string, std::set<std::string> > & list_symbols, std::set<std::string> & markers_added);
 
      HFSTDLL static HfstIterableTransducer read_binary_sfst_transducer( FILE *file );
+
+     HFSTDLL void store_sfst_node_info( FILE *file, unsigned int node );
+     HFSTDLL void store_sfst_arc_label( FILE *file, HfstTropicalTransducerTransitionData & data );
+     HFSTDLL void store_sfst_node( FILE *file, unsigned int node, std::vector<bool> & visited);
+     HFSTDLL void store_sfst_alphabet( FILE *file );
+     HFSTDLL void write_binary_sfst_transducer( FILE *file );
      
      // --- Friends ---
      

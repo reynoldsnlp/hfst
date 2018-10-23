@@ -1207,6 +1207,18 @@ class HfstIterableTransducer {
 	  return hfst::implementations::HfstIterableTransducer();
 	}
     }
+
+    void write_binary_sfst_transducer(const std::string & filename)
+    {
+      try
+	{
+	  hfst::hfst_write_binary_sfst_transducer(*self, filename);
+	}
+      catch (const char * msg)
+	{
+	  std::cerr << std::string(msg) << std::endl;
+	}
+    }
     
   HfstTwoLevelPaths _lookup(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight, bool obey_flags) throw(TransducerIsCyclicException)
   {

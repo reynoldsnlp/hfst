@@ -52,8 +52,6 @@ hfst::HfstTransducer * hfst_compile_sfst(const std::string & filename, const std
       return NULL;
     }
 }
-
-  //HFSTDLL static HfstIterableTransducer read_binary_sfst_transducer( FILE *file );
   
   hfst::implementations::HfstIterableTransducer hfst_read_binary_sfst_transducer(const std::string & filename)
   {
@@ -64,5 +62,13 @@ hfst::HfstTransducer * hfst_compile_sfst(const std::string & filename, const std
     fclose(inputfile);
     return result;
   }
-  
+
+  void hfst_write_binary_sfst_transducer(hfst::implementations::HfstIterableTransducer & fsm, const std::string & filename)
+  {
+    FILE * outputfile = fopen(filename.c_str(), "wb");
+    if (outputfile == NULL)
+      throw("hfst_write_binary_sfst_transducer failed to open file");
+    fsm.write_binary_sfst_transducer(outputfile);
+    fclose(outputfile);
+  }
 }
