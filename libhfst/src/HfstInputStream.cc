@@ -349,10 +349,12 @@ namespace hfst
 	    {
 	      t.implementation.tropical_ofst = ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(net);
 	    }
+#if HAVE_FOMA
 	  if (t.get_type() == ImplementationType::FOMA_TYPE)
 	    {
 	      t.implementation.foma = ConversionFunctions::hfst_basic_transducer_to_foma(net);
 	    }
+#endif
 	  delete net;
 #endif
         break;
@@ -511,10 +513,12 @@ namespace hfst
 	  {
 	    t.implementation.tropical_ofst = ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(net);
 	  }
+#if HAVE_FOMA
 	if (t.get_type() == ImplementationType::FOMA_TYPE)
 	  {
 	    t.implementation.foma = ConversionFunctions::hfst_basic_transducer_to_foma(net);
 	  }
+#endif
 	delete net;
 #endif
 	break;
