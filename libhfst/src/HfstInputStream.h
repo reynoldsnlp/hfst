@@ -32,9 +32,9 @@ namespace hfst
     class TropicalWeightInputStream;
 #endif
 #endif
-#if HAVE_SFST || HAVE_LEAN_SFST
+
     class SfstInputStream;
-#endif
+
 #if HAVE_FOMA
     class FomaInputStream;
 #endif
@@ -100,9 +100,9 @@ For documentation on the HFST binary transducer format, see
 
     union StreamImplementation
     {
-#if HAVE_SFST || HAVE_LEAN_SFST
+
       hfst::implementations::SfstInputStream * sfst;
-#endif
+
 #if HAVE_OPENFST
       hfst::implementations::TropicalWeightInputStream * tropical_ofst;
 #if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG

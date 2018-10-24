@@ -56,8 +56,12 @@ namespace fst
 #include "../HfstExceptionDefs.h"
 #include "optimized-lookup/transducer.h"
 
+#if HAVE_SFST
 namespace SFST { class Node; class Transducer; }
+#endif
+#if HAVE_FOMA
 struct fsm;
+#endif
 
 #include "../HfstDataTypes.h"
 

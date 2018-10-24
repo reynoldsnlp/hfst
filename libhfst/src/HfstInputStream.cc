@@ -37,11 +37,9 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         this->implementation.sfst->ignore(n);
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         this->implementation.tropical_ofst->ignore(n);
@@ -79,11 +77,9 @@ namespace hfst
       return c = input_stream->get();
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         return c = this->implementation.sfst->stream_get();
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         return c = this->implementation.tropical_ofst->stream_get();
@@ -125,11 +121,9 @@ namespace hfst
       }
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         return i = this->implementation.sfst->stream_get_short();
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         return i = this->implementation.tropical_ofst->stream_get_short();
@@ -177,11 +171,9 @@ namespace hfst
       return (char) input_stream->get();
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         return this->implementation.sfst->stream_get();
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         return this->implementation.tropical_ofst->stream_get();
@@ -222,11 +214,9 @@ namespace hfst
     }
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         this->implementation.sfst->stream_unget(c);
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         this->implementation.tropical_ofst->stream_unget(c);
@@ -330,9 +320,9 @@ namespace hfst
 
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         {
+#if HAVE_SFST
         t.implementation.sfst =
           this->implementation.sfst->read_transducer();
 
@@ -353,9 +343,21 @@ namespace hfst
                   hfst_basic_transducer_to_sfst(net);
               delete net;
             }
+#else
+	  HfstIterableTransducer * net = this->implementation.sfst->read_transducer();
+	  if (t.get_type() == ImplementationType::TROPICAL_OPENFST_TYPE)
+	    {
+	      t.implementation.tropical_ofst = ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(net);
+	    }
+	  if (t.get_type() == ImplementationType::FOMA_TYPE)
+	    {
+	      t.implementation.foma = ConversionFunctions::hfst_basic_transducer_to_foma(net);
+	    }
+	  delete net;
+#endif
         break;
         }
-#endif
+	//#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         {
@@ -954,11 +956,9 @@ namespace hfst
 
     switch (type)
     {
-#if HAVE_SFST || HAVE_LEAN_SFST
     case SFST_TYPE:
       implementation.sfst = new hfst::implementations::SfstInputStream;
       break;
-#endif
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
       implementation.tropical_ofst =
@@ -1032,12 +1032,10 @@ namespace hfst
     
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         implementation.sfst
           = new hfst::implementations::SfstInputStream(filename);
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         if (strcmp(filename.c_str(),"") == 0) {
@@ -1106,12 +1104,10 @@ namespace hfst
 
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         HFST_THROW_MESSAGE(FunctionNotImplementedException, "Hfst::InputStream(std::istream) of SFST_TYPE");
         // implementation.sfst = new hfst::implementations::SfstInputStream(is);
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst = new hfst::implementations::TropicalWeightInputStream(is);
@@ -1158,11 +1154,9 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         delete implementation.sfst;
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         delete implementation.tropical_ofst;
@@ -1203,11 +1197,9 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         implementation.sfst->close();
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst->close();
@@ -1246,11 +1238,9 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         return implementation.sfst->is_eof();
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         return implementation.tropical_ofst->is_eof();
@@ -1289,11 +1279,9 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         return implementation.sfst->is_bad();
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         return implementation.tropical_ofst->is_bad();
@@ -1333,11 +1321,9 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         return implementation.sfst->is_good();
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         return implementation.tropical_ofst->is_good();

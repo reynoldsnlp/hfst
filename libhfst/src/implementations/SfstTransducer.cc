@@ -14,14 +14,20 @@
 #endif
 
 #if HAVE_SFST || HAVE_LEAN_SFST
-
 #include "back-ends/sfst/interface.h"
 #include "back-ends/sfst/fst.h"
+#else
+#include <string.h>
+#include "HfstIterableTransducer.h"
+#endif
+
 #include "SfstTransducer.h"
 #include "HfstSymbolDefs.h"
 #include <time.h>
 
+#if HAVE_SFST
 using namespace SFST;
+#endif
 
 namespace hfst { namespace implementations {
 
@@ -107,7 +113,7 @@ namespace hfst { namespace implementations {
     return s.good() && (s.peek() == (int)'a');
   }
 
-  void SfstInputStream::add_symbol(StringNumberMap &string_number_map,
+    /*void SfstInputStream::add_symbol(StringNumberMap &string_number_map,
                                    Character c,
                                    Alphabet &alphabet)
   {
@@ -120,13 +126,14 @@ namespace hfst { namespace implementations {
         HFST_THROW_MESSAGE
           (HfstFatalException,
            "SfstInputStream: symbol redefined"); }
-  }
+	   }*/
 
     void SfstInputStream::ignore(unsigned int n)
     {
       for (unsigned int i=0; i<n; i++)
         fgetc(input_file);
     }
+
 
     bool SfstInputStream::set_implementation_specific_header_data
     (StringPairVector &header_data, unsigned int index)
@@ -147,36 +154,60 @@ namespace hfst { namespace implementations {
       return true;
     }
 
+#if HAVE_SFST
         Transducer * SfstInputStream::read_transducer()
+	{
+	  if (is_eof())
+	    {
+	      HFST_THROW(StreamIsClosedException); }
+	  Transducer * t = NULL;
+	  try
+	    {
+	      // DEBUGGING
+	      assert (stream_get() == 'a');
+	      stream_unget('a');
+	      
+	      Transducer * t = new Transducer(input_file,true);
+	      
+	      if (not is_minimal) {
+		t->minimised = false;
+		t->deterministic = false;
+	      }
+	      return t;
+	    }
+	  catch (const char * p)
+	    {
+	      delete t;
+	      fprintf(stderr, "caught message: \"%s\"\n", p);
+	      HFST_THROW(TransducerHasWrongTypeException);
+	    }
+	  return NULL;
+	}
+#else
+  HfstIterableTransducer * SfstInputStream::read_transducer()
   {
     if (is_eof())
       {
-        HFST_THROW(StreamIsClosedException); }
-    Transducer * t = NULL;
+        HFST_THROW(StreamIsClosedException);
+      }
+    assert (stream_get() == 'a');
+    stream_unget('a');
     try
       {
-        // DEBUGGING
-        assert (stream_get() == 'a');
-        stream_unget('a');
-
-        Transducer * t = new Transducer(input_file,true);
-
-        if (not is_minimal) {
-          t->minimised = false;
-          t->deterministic = false;
-        }
-        return t;
+	HfstIterableTransducer result = HfstIterableTransducer::read_binary_sfst_transducer(input_file);
+	return new HfstIterableTransducer(result);
       }
     catch (const char * p)
       {
-        delete t;
         fprintf(stderr, "caught message: \"%s\"\n", p);
         HFST_THROW(TransducerHasWrongTypeException);
       }
     return NULL;
   }
+#endif
     
   // ---------- SfstOutputStream functions ----------
+
 
   SfstOutputStream::SfstOutputStream(void)
   { ofile = stdout; }
@@ -199,6 +230,7 @@ namespace hfst { namespace implementations {
       { fclose(ofile); }
   }
 
+#if HAVE_SFST    
     void SfstOutputStream::append_implementation_specific_header_data
     (std::vector<char> &header, Transducer *t)
     {
@@ -217,12 +249,14 @@ namespace hfst { namespace implementations {
         header.push_back(min_value[i]);
       header.push_back('\0');
     }
+#endif
 
     void SfstOutputStream::write(const char &c)
     {
       fputc(c,ofile);
     }
 
+#if HAVE_SFST
     void SfstOutputStream::write_transducer(Transducer * transducer)
   {
     transducer->store(ofile);
@@ -231,6 +265,16 @@ namespace hfst { namespace implementations {
                          "An error happened when writing an SfstTransducer.");
     }
   }
+#else
+    void SfstOutputStream::write_transducer(HfstIterableTransducer & transducer)
+  {
+    transducer.write_binary_sfst_transducer(ofile);
+    if (fflush(ofile) != 0) {
+    HFST_THROW_MESSAGE(HfstFatalException,
+      "An error happened when writing an HfstIterableTransducer in binary sfst format.");
+    }
+  }    
+#endif
 
 #if HAVE_SFST
     
@@ -1276,8 +1320,6 @@ namespace hfst { namespace implementations {
     expand2(t, t->root_node(), new_symbols, visited_nodes);
   }
 
-#endif // HAVE_SFST
-
     // These functions are needed in transducer type conversions
 
     void SfstTransducer::delete_transducer(Transducer * t)
@@ -1351,10 +1393,9 @@ namespace hfst { namespace implementations {
       return symbol_map;
     }
 
-} }
-
 #endif // HAVE_SFST || HAVE_LEAN_SFST
-
+  } } // namespace hfst::implementations
+    
 #else // MAIN_TEST was defined
 
 #include <iostream>

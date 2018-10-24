@@ -20,9 +20,7 @@
 #include "HfstSymbolDefs.h"
 #include "parsers/LexcCompiler.h"
 
-#if HAVE_SFST || HAVE_LEAN_SFST
 #include "implementations/SfstTransducer.h"
-#endif
 
 #if HAVE_OPENFST
 #include "implementations/TropicalWeightTransducer.h"

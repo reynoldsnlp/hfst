@@ -13,6 +13,9 @@ using std::string;
 
 #include "HfstTransducer.h"
 #include "HfstOutputStream.h"
+#include "implementations/ConvertTransducerFormat.h"
+using hfst::implementations::HfstIterableTransducer;
+using hfst::implementations::ConversionFunctions;
 
 #ifndef MAIN_TEST
 
@@ -27,12 +30,10 @@ namespace hfst
 
     switch(type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         implementation.sfst =
           new hfst::implementations::SfstOutputStream();
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst =
@@ -90,12 +91,10 @@ namespace hfst
 
     switch(type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         implementation.sfst =
           new hfst::implementations::SfstOutputStream(filename);
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         // FIXME: this should be done in TropicalWeight layer
@@ -154,11 +153,9 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         delete implementation.sfst;
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         delete implementation.tropical_ofst;
@@ -216,11 +213,9 @@ namespace hfst
   {
     switch(type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         implementation.sfst->write(c);
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst->write(c);
@@ -267,11 +262,9 @@ namespace hfst
 
     switch(type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         type_value=std::string("SFST");
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         type_value=std::string("TROPICAL_OPENFST");
@@ -447,12 +440,26 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
+	{
+#if HAVE_SFST || HAVE_LEAN_SFST
         implementation.sfst->write_transducer
           (transducer.implementation.sfst);
-        return *this;
+#else
+	HfstIterableTransducer * fsm = NULL;
+	if (transducer.get_type() == ImplementationType::TROPICAL_OPENFST_TYPE)
+	  {
+	    fsm = ConversionFunctions::tropical_ofst_to_hfst_basic_transducer(transducer.implementation.tropical_ofst);
+	  }
+	if (transducer.get_type() == ImplementationType::FOMA_TYPE)
+	  {
+	    fsm = ConversionFunctions::foma_to_hfst_basic_transducer(transducer.implementation.foma);
+	  }
+	implementation.sfst->write_transducer(*fsm);
+	delete fsm;
 #endif
+	return *this;
+	}
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst->write_transducer
@@ -497,11 +504,9 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
   void HfstOutputStream::close(void) {
     switch (type)
       {
-#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         implementation.sfst->close();
         break;
-#endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst->close();

@@ -15,7 +15,9 @@
 #include "HfstSymbolDefs.h"
 #include "HfstExtractStrings.h"
 
+#if HAVE_SFST
 namespace SFST { class Transducer; typedef short unsigned int Character; class Alphabet; class Label; }
+#endif
 
 #include <cstdio>
 #include <string>
@@ -29,7 +31,9 @@ namespace SFST { class Transducer; typedef short unsigned int Character; class A
 namespace hfst {
 namespace implementations
 {
+#if HAVE_SFST
   typedef SFST::Transducer Transducer;
+#endif
   using std::ostream;
   using std::ostringstream;
 
@@ -39,11 +43,7 @@ namespace implementations
     std::string filename;
     FILE * input_file;
     bool is_minimal;  // whether the next transducer in the stream is minimal
-                      // this can be said in the header
-    void add_symbol(StringNumberMap &string_number_map,
-                    SFST::Character c,
-                    SFST::Alphabet &alphabet);
-
+                      // this might be expressed in the header
   public:
     SfstInputStream(void);
     SfstInputStream(const std::string &filename);
@@ -60,8 +60,11 @@ namespace implementations
 
     bool set_implementation_specific_header_data
       (StringPairVector &data, unsigned int index);
+#if HAVE_SFST
     SFST::Transducer * read_transducer();
-    
+#else
+    HfstIterableTransducer * read_transducer();
+#endif
     static bool is_fst(FILE * f);
     static bool is_fst(std::istream &s);
   };
@@ -76,17 +79,20 @@ namespace implementations
     SfstOutputStream(const std::string &filename);
     void close(void);
     void write(const char &c);
+#if HAVE_SFST
     void append_implementation_specific_header_data
       (std::vector<char> &header, SFST::Transducer *t);
     void write_transducer(SFST::Transducer * transducer);
+#else
+    void write_transducer(HfstIterableTransducer & transducer);
+#endif
   };  
 
   void sfst_set_hopcroft(bool);
 
-
+#if HAVE_SFST
   class SfstTransducer
     {
-#if HAVE_SFST
     public:
       static SFST::Transducer * create_empty_transducer(void);
       static SFST::Transducer * create_epsilon_transducer(void);
@@ -179,7 +185,6 @@ namespace implementations
           hfst::StringSet &new_symbols, std::set<SFST::Node*> &visited_nodes );
       static void expand(SFST::Transducer *t, hfst::StringSet &new_symbols);
 
-#endif
       // needed in transducer format conversions
     public:
       static void delete_transducer(SFST::Transducer * t);
@@ -190,6 +195,6 @@ namespace implementations
       static StringVector get_symbol_vector(SFST::Transducer * t);
       static std::map<std::string, unsigned int> get_symbol_map(SFST::Transducer * t);      
     };
-
+#endif
 } }
 #endif
