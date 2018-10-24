@@ -145,7 +145,7 @@ namespace implementations {
   static fst::StdVectorFst * hfst_basic_transducer_to_tropical_ofst
     (const HfstIterableTransducer * t);
 
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
   static HfstIterableTransducer * log_ofst_to_hfst_basic_transducer
     (fst::LogFst * t, bool had_hfst_header=true);
   
@@ -157,7 +157,7 @@ namespace implementations {
     (const HfstIterableTransducer * t);
 #endif
 
-#endif // HAVE_OPENFST || HAVE_LEAN_OPENFST_LOG
+#endif // HAVE_OPENFST
   
   
   static HfstIterableTransducer * hfst_ol_to_hfst_basic_transducer

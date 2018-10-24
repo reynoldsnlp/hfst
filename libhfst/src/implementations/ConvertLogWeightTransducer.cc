@@ -13,7 +13,7 @@
 #  include <config.h>
 #endif
 
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
 
 #include "ConvertTransducerFormat.h"
 #include "HfstIterableTransducer.h"
@@ -26,7 +26,7 @@
 #endif // _MSC_VER
 
 #ifndef _MSC_VER
-#if HAVE_OPENFST_LOG // if HAVE_LEAN_OPENFST_LOG is requested, these are not defined elsewhere (?)
+#if HAVE_OPENFST_LOG
 namespace fst
 {
   extern template class LogWeightTpl<float>;
@@ -298,7 +298,7 @@ namespace hfst { namespace implementations
 
   }}
 
-#endif // HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#endif // HAVE_OPENFST_LOG
 
 #else // MAIN_TEST was defined
 #include <iostream>

@@ -14,7 +14,7 @@
   #include "../../../config.h"
 #endif
 
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
 
 #include "HfstSymbolDefs.h"
 #include "HfstExceptionDefs.h"
@@ -293,6 +293,6 @@ namespace implementations
 
 } }
 
-#endif // #if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#endif // #if HAVE_OPENFST_LOG
 
 #endif

@@ -13,7 +13,7 @@
 #  include <config.h>
 #endif
 
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
 
 #include "LogWeightTransducer.h"
 #include "HfstSymbolDefs.h"
@@ -2259,7 +2259,7 @@ namespace hfst { namespace implementations
 #endif // #if HAVE_OPENFST_LOG
   }
 }
-#endif // HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#endif // HAVE_OPENFST_LOG
 
 #else // MAIN_TEST was defined
 #include <cassert>

@@ -44,7 +44,7 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         this->implementation.tropical_ofst->ignore(n);
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         this->implementation.log_ofst->ignore(n);
         break;
@@ -84,7 +84,7 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         return c = this->implementation.tropical_ofst->stream_get();
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         return c = this->implementation.log_ofst->stream_get();
         break;
@@ -128,7 +128,7 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         return i = this->implementation.tropical_ofst->stream_get_short();
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         return i = this->implementation.log_ofst->stream_get_short();
         break;
@@ -178,7 +178,7 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         return this->implementation.tropical_ofst->stream_get();
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         return this->implementation.log_ofst->stream_get();
         break;
@@ -221,7 +221,7 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         this->implementation.tropical_ofst->stream_unget(c);
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         this->implementation.log_ofst->stream_unget(c);
         break;
@@ -474,7 +474,7 @@ namespace hfst
             }
         break;
         }
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         {
         t.implementation.log_ofst =
@@ -964,7 +964,7 @@ namespace hfst
       implementation.tropical_ofst =
         new hfst::implementations::TropicalWeightInputStream;
       break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
     case LOG_OPENFST_TYPE:
       implementation.log_ofst =
         new hfst::implementations::LogWeightInputStream;
@@ -1047,7 +1047,7 @@ namespace hfst
           implementation.tropical_ofst =
             new hfst::implementations::TropicalWeightInputStream(filename);
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         implementation.log_ofst =
           new hfst::implementations::LogWeightInputStream(filename);
@@ -1112,7 +1112,7 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst = new hfst::implementations::TropicalWeightInputStream(is);
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         implementation.log_ofst = new hfst::implementations::LogWeightInputStream(is);
         break;
@@ -1161,7 +1161,7 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         delete implementation.tropical_ofst;
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         delete implementation.log_ofst;
         break;
@@ -1204,7 +1204,7 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst->close();
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         implementation.log_ofst->close();
         break;
@@ -1245,7 +1245,7 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         return implementation.tropical_ofst->is_eof();
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         return implementation.log_ofst->is_eof();
         break;
@@ -1286,7 +1286,7 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         return implementation.tropical_ofst->is_bad();
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         return implementation.log_ofst->is_bad();
         break;
@@ -1328,7 +1328,7 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         return implementation.tropical_ofst->is_good();
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         return implementation.log_ofst->is_good();
         break;

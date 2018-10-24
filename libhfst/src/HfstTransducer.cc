@@ -44,7 +44,7 @@ namespace hfst
 #if HAVE_OPENFST
   hfst::implementations::TropicalWeightTransducer
   HfstTransducer::tropical_ofst_interface;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
   hfst::implementations::LogWeightTransducer
   HfstTransducer::log_ofst_interface;
 #endif
@@ -1253,7 +1253,7 @@ HfstTransducer::HfstTransducer
         implementation.tropical_ofst =
       ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(&net);
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
     case LOG_OPENFST_TYPE:
         implementation.log_ofst =
         ConversionFunctions::hfst_basic_transducer_to_log_ofst(&net);
@@ -1305,7 +1305,7 @@ HfstTransducer::~HfstTransducer(void)
     case TROPICAL_OPENFST_TYPE:
         tropical_ofst_interface.delete_transducer(implementation.tropical_ofst);
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
     case LOG_OPENFST_TYPE:
         log_ofst_interface.delete_transducer(implementation.log_ofst);
         break;
@@ -4927,7 +4927,7 @@ get_basic_transducer() const
       (implementation.tropical_ofst);
     return net;
       }
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
     if (this->type == LOG_OPENFST_TYPE)
       {
         hfst::implementations::HfstIterableTransducer * net =
@@ -4975,7 +4975,7 @@ convert_to_basic_transducer()
         tropical_ofst_interface.delete_transducer(implementation.tropical_ofst);
     return net;
       }
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
     if (this->type == LOG_OPENFST_TYPE)
       {
         hfst::implementations::HfstIterableTransducer * net =
@@ -5025,7 +5025,7 @@ convert_to_hfst_transducer(implementations::HfstIterableTransducer *t)
         delete t;
     return *this;
       }
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
     if (this->type == LOG_OPENFST_TYPE)
       {
         implementation.log_ofst =
@@ -5122,10 +5122,8 @@ bool HfstTransducer::is_lean_implementation_type_available
       return false;
 #endif
 #if !HAVE_OPENFST_LOG
-#if !HAVE_LEAN_OPENFST_LOG
     if (type == LOG_OPENFST_TYPE)
       return false;
-#endif
 #endif
 #if !HAVE_XFSM
     if (type == XFSM_TYPE)
@@ -5199,7 +5197,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
       assert(internal != NULL);
       tropical_ofst_interface.delete_transducer(implementation.tropical_ofst);
       break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
     case LOG_OPENFST_TYPE:
         internal =
         ConversionFunctions::log_ofst_to_hfst_basic_transducer
@@ -5248,7 +5246,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
         (internal);
       delete internal;
       break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
     case LOG_OPENFST_TYPE:
       implementation.log_ofst =
         ConversionFunctions::hfst_basic_transducer_to_log_ofst(internal);
@@ -5415,7 +5413,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
         = ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(&net);
           
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
     case LOG_OPENFST_TYPE:
         implementation.log_ofst
         = ConversionFunctions::hfst_basic_transducer_to_log_ofst(&net);
@@ -5490,7 +5488,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
         implementation.tropical_ofst
         = ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(&net);
         break;
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+#if HAVE_OPENFST_LOG
     case LOG_OPENFST_TYPE:
         implementation.log_ofst
         = ConversionFunctions::hfst_basic_transducer_to_log_ofst(&net);
