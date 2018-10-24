@@ -4492,6 +4492,11 @@
 	unsigned int state = 0;
 	for (iterator it = fsm.begin(); it != fsm.end(); it++)
 	  {
+	    result.add_state(state);
+	    if (fsm.is_final_state(state))
+	      {
+		result.set_final_weight(state, 0.0);
+	      }
 	    for (HfstTransitions::iterator tr_it
 		   = it->begin();
 		 tr_it != it->end(); tr_it++)
@@ -4554,16 +4559,11 @@
 
        // write the symbol mapping
        unsigned short n = (unsigned short)alphabet.size();
-       //Character n=(Character)cm.size();
        fwrite(&n, sizeof(n), 1, file);
-       //for( CharMap::const_iterator it=cm.begin(); it!=cm.end(); it++ ) {
-       //Character c=it->first;
-       //char *s=it->second;
        for (HfstAlphabet::const_iterator it = alphabet.begin(); it != alphabet.end(); it++)
 	 {
 	   unsigned short c = (unsigned short)HfstTropicalTransducerTransitionData::get_number(*it);
 	   std::string symbol = (*it == hfst::internal_epsilon) ? std::string("<>") : std::string(*it);
-	   std::cerr << "writing alphabet '" << symbol << "' as number " << c << std::endl; // DEBUG
 	   fwrite(&c, sizeof(c), 1, file);
 	   const char * s = symbol.c_str();
 	   fwrite(s, sizeof(char), strlen(s)+1, file);
