@@ -216,11 +216,9 @@ int main (int argc, char * argv[])
         {
           verbose_printf("Requiring SFST support from library");
 #if !HAVE_SFST
-#if !HAVE_LEAN_SFST
           error(EXIT_FAILURE, 0, "Required SFST support not present");
 #else
           error(EXIT_FAILURE, 0, "Required SFST support present only in limited form");
-#endif
 #endif
         }
       else if ((*f == "foma") || (*f == "FOMA") || (*f == "HAVE_FOMA"))

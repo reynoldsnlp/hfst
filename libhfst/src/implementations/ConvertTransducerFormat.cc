@@ -69,13 +69,13 @@ namespace hfst { namespace implementations
   HfstIterableTransducer * ConversionFunctions::
   hfst_transducer_to_hfst_basic_transducer
   (const hfst::HfstTransducer &t) {
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
     if (t.type == SFST_TYPE) {
       HfstIterableTransducer * retval = sfst_to_hfst_basic_transducer(t.implementation.sfst);
       retval->name = t.get_name();
       return retval;
     }
-#endif // HAVE_SFST || HAVE_LEAN_SFST
+#endif // HAVE_SFST
 
 #if HAVE_OPENFST
     if (t.type == TROPICAL_OPENFST_TYPE) {

@@ -279,7 +279,7 @@ namespace hfst
   bool HfstInputStream::set_implementation_specific_header_data
   (StringPairVector& /* data */, unsigned int /* index*/)
   {
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
     switch (type)
       {
       case SFST_TYPE:

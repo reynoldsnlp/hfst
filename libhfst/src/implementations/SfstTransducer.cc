@@ -13,7 +13,7 @@
 #  include <config.h>
 #endif
 
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
 #include "back-ends/sfst/interface.h"
 #include "back-ends/sfst/fst.h"
 #else
@@ -1393,7 +1393,7 @@ namespace hfst { namespace implementations {
       return symbol_map;
     }
 
-#endif // HAVE_SFST || HAVE_LEAN_SFST
+#endif // HAVE_SFST
   } } // namespace hfst::implementations
     
 #else // MAIN_TEST was defined

@@ -270,7 +270,7 @@ An example:
     /* The union of possible backend implementations. */
     union TransducerImplementation
     {
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
       hfst::implementations::Transducer * sfst;
 #endif
 #if HAVE_OPENFST
@@ -299,7 +299,7 @@ An example:
     TransducerImplementation implementation;
 
     /* Interfaces through which the backend implementations can be accessed */
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
     static hfst::implementations::SfstTransducer sfst_interface;
 #endif
 #if HAVE_OPENFST

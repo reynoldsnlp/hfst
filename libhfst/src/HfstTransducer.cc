@@ -1242,7 +1242,7 @@ HfstTransducer::HfstTransducer
 
     switch (type)
     {
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
     case SFST_TYPE:
         implementation.sfst =
         ConversionFunctions::hfst_basic_transducer_to_sfst(&net);
@@ -1296,7 +1296,7 @@ HfstTransducer::~HfstTransducer(void)
 
     switch (type)
     {
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
     case SFST_TYPE:
         sfst_interface.delete_transducer(implementation.sfst);
         break;
@@ -4910,7 +4910,7 @@ HfstTransducer &HfstTransducer::subtract
 implementations::HfstIterableTransducer * HfstTransducer::
 get_basic_transducer() const
 {
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
     if (this->type == SFST_TYPE)
       {
         hfst::implementations::HfstIterableTransducer * net =
@@ -4956,7 +4956,7 @@ get_basic_transducer() const
 implementations::HfstIterableTransducer * HfstTransducer::
 convert_to_basic_transducer()
 {
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
     if (this->type == SFST_TYPE)
       {
         hfst::implementations::HfstIterableTransducer * net =
@@ -5006,7 +5006,7 @@ convert_to_basic_transducer()
 HfstTransducer &HfstTransducer::
 convert_to_hfst_transducer(implementations::HfstIterableTransducer *t)
 {
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
     if (this->type == SFST_TYPE)
       {
         implementation.sfst =
@@ -5114,10 +5114,8 @@ bool HfstTransducer::is_lean_implementation_type_available
       return false;
 #endif
 #if !HAVE_SFST
-#if !HAVE_LEAN_SFST
     if (type == SFST_TYPE)
       return false;
-#endif
 #endif
 #if !HAVE_OPENFST
     if (type == TROPICAL_OPENFST_TYPE || type == LOG_OPENFST_TYPE)
@@ -5185,7 +5183,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
             //delete(implementation.my_transducer_library);
             //break;
             //#endif
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
     case SFST_TYPE:
       internal =
         ConversionFunctions::sfst_to_hfst_basic_transducer
@@ -5226,7 +5224,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
     this->type = type;
     switch (this->type)
     {
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
     case SFST_TYPE:
       implementation.sfst =
         ConversionFunctions::hfst_basic_transducer_to_sfst(internal);
@@ -5405,7 +5403,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
     // Conversion is done here.
     switch (type)
     {
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
     case SFST_TYPE:
         implementation.sfst =
         ConversionFunctions::hfst_basic_transducer_to_sfst(&net);
@@ -5481,7 +5479,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
     // Conversion is done here.
     switch (type)
     {
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
     case SFST_TYPE:
         implementation.sfst =
         ConversionFunctions::hfst_basic_transducer_to_sfst(&net);

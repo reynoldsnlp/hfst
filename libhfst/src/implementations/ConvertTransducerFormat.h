@@ -109,7 +109,7 @@ namespace implementations {
     static HfstIterableTransducer * hfst_transducer_to_hfst_basic_transducer
       (const hfst::HfstTransducer &t);
 
-#if HAVE_SFST || HAVE_LEAN_SFST
+#if HAVE_SFST
   static void sfst_to_hfst_basic_transducer
     ( SFST::Node *node,
       HfstIterableTransducer *net,
@@ -120,7 +120,7 @@ namespace implementations {
 
   static SFST::Transducer * hfst_basic_transducer_to_sfst
     (const HfstIterableTransducer * t);
-#endif // HAVE_SFST || HAVE_LEAN_SFST
+#endif // HAVE_SFST
   
 #if HAVE_FOMA
   static HfstIterableTransducer * foma_to_hfst_basic_transducer(fsm * t);
