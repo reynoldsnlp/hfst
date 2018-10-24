@@ -13,10 +13,9 @@
 #  include <config.h>
 #endif
 
-#if HAVE_OPENFST_LOG
-
 #include "LogWeightTransducer.h"
 #include "HfstSymbolDefs.h"
+#include "ConvertTransducerFormat.h"
 
 #ifdef _MSC_VER
 #include "back-ends/openfstwin/src/include/fst/fstlib.h"
@@ -122,7 +121,11 @@ namespace hfst { namespace implementations
   void LogWeightInputStream::ignore(unsigned int n)
   { input_stream.ignore(n); }
 
+#if HAVE_OPENFST_LOG
   LogFst * LogWeightInputStream::read_transducer()
+#else
+  HfstIterableTransducer * LogWeightInputStream::read_transducer()
+#endif
   {
     if (is_eof())
       { //throw StreamIsClosedException();
@@ -157,13 +160,19 @@ namespace hfst { namespace implementations
 
     try
       {
+#if HAVE_OPENFST_LOG
         return t;
+#else
+	HfstIterableTransducer * fsm = ConversionFunctions::log_ofst_to_hfst_basic_transducer(t);
+	delete t;
+	return fsm;
+#endif
       }
-    //catch (HfstInterfaceException e)
     catch (const HfstException e)
       { throw e; }
   }
 
+#if HAVE_OPENFST_LOG
     LogWeightOutputStream::LogWeightOutputStream(void):
     filename(std::string()), output_stream(std::cout)
   {
@@ -201,8 +210,6 @@ namespace hfst { namespace implementations
   {
     delete t;
   }
-
-#if HAVE_OPENFST_LOG
 
   float log_seconds_in_harmonize=0;
 
@@ -2259,7 +2266,7 @@ namespace hfst { namespace implementations
 #endif // #if HAVE_OPENFST_LOG
   }
 }
-#endif // HAVE_OPENFST_LOG
+
 
 #else // MAIN_TEST was defined
 #include <cassert>

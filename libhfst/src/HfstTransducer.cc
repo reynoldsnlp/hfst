@@ -1166,8 +1166,10 @@ HfstTransducer::HfstTransducer(HfstInputStream &in):
   if (! is_lean_implementation_type_available(type)) {
       throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
     }
-
-    in.read_transducer(*this);
+  if (! is_implementation_type_available(type)) {
+    this->type = TROPICAL_OPENFST_TYPE;
+  }
+  in.read_transducer(*this);
 }
 
 HfstTransducer::HfstTransducer(const HfstTransducer &another):
@@ -5113,18 +5115,18 @@ bool HfstTransducer::is_lean_implementation_type_available
     if (type == FOMA_TYPE)
       return false;
 #endif
-#if !HAVE_SFST
-    if (type == SFST_TYPE)
-      return false;
-#endif
+    //#if !HAVE_SFST
+    //if (type == SFST_TYPE)
+    //  return false;
+    //#endif
 #if !HAVE_OPENFST
     if (type == TROPICAL_OPENFST_TYPE || type == LOG_OPENFST_TYPE)
       return false;
 #endif
-#if !HAVE_OPENFST_LOG
-    if (type == LOG_OPENFST_TYPE)
-      return false;
-#endif
+    //#if !HAVE_OPENFST_LOG
+    //if (type == LOG_OPENFST_TYPE)
+    //  return false;
+    //#endif
 #if !HAVE_XFSM
     if (type == XFSM_TYPE)
       return false;

@@ -145,17 +145,17 @@ namespace implementations {
   static fst::StdVectorFst * hfst_basic_transducer_to_tropical_ofst
     (const HfstIterableTransducer * t);
 
-#if HAVE_OPENFST_LOG
+  //#if HAVE_OPENFST_LOG
   static HfstIterableTransducer * log_ofst_to_hfst_basic_transducer
     (fst::LogFst * t, bool had_hfst_header=true);
-  
+
   static StateId hfst_state_to_state_id
     (HfstState s, std::map<HfstState, StateId> &state_map,
      fst::LogFst * t);
 
   static fst::LogFst * hfst_basic_transducer_to_log_ofst
     (const HfstIterableTransducer * t);
-#endif
+  //#endif
 
 #endif // HAVE_OPENFST
   

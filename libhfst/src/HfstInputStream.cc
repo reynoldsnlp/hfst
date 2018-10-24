@@ -44,11 +44,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         this->implementation.tropical_ofst->ignore(n);
         break;
-#if HAVE_OPENFST_LOG
+	//#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         this->implementation.log_ofst->ignore(n);
         break;
-#endif
+	//#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -84,11 +84,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         return c = this->implementation.tropical_ofst->stream_get();
         break;
-#if HAVE_OPENFST_LOG
+	//#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         return c = this->implementation.log_ofst->stream_get();
         break;
-#endif
+	//#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -128,11 +128,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         return i = this->implementation.tropical_ofst->stream_get_short();
         break;
-#if HAVE_OPENFST_LOG
+	//#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         return i = this->implementation.log_ofst->stream_get_short();
         break;
-#endif
+	//#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -178,11 +178,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         return this->implementation.tropical_ofst->stream_get();
         break;
-#if HAVE_OPENFST_LOG
+	//#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         return this->implementation.log_ofst->stream_get();
         break;
-#endif
+	//#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -221,11 +221,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         this->implementation.tropical_ofst->stream_unget(c);
         break;
-#if HAVE_OPENFST_LOG
+	//#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         this->implementation.log_ofst->stream_unget(c);
         break;
-#endif
+	//#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -474,9 +474,9 @@ namespace hfst
             }
         break;
         }
-#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         {
+#if HAVE_OPENFST_LOG
         t.implementation.log_ofst =
           this->implementation.log_ofst->read_transducer();
 
@@ -505,9 +505,20 @@ namespace hfst
             //exit(1);
             HFST_THROW_MESSAGE(HfstFatalException, "not transducer stream");
           }
-        break;
-        }
+#else
+	HfstIterableTransducer * net = this->implementation.log_ofst->read_transducer();
+	if (t.get_type() == ImplementationType::TROPICAL_OPENFST_TYPE)
+	  {
+	    t.implementation.tropical_ofst = ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(net);
+	  }
+	if (t.get_type() == ImplementationType::FOMA_TYPE)
+	  {
+	    t.implementation.foma = ConversionFunctions::hfst_basic_transducer_to_foma(net);
+	  }
+	delete net;
 #endif
+	break;
+        }
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -964,12 +975,12 @@ namespace hfst
       implementation.tropical_ofst =
         new hfst::implementations::TropicalWeightInputStream;
       break;
-#if HAVE_OPENFST_LOG
+      //#if HAVE_OPENFST_LOG
     case LOG_OPENFST_TYPE:
       implementation.log_ofst =
         new hfst::implementations::LogWeightInputStream;
       break;
-#endif
+      //#endif
 #endif
 #if HAVE_FOMA
     case FOMA_TYPE:
@@ -1047,12 +1058,12 @@ namespace hfst
           implementation.tropical_ofst =
             new hfst::implementations::TropicalWeightInputStream(filename);
         break;
-#if HAVE_OPENFST_LOG
+	//#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         implementation.log_ofst =
           new hfst::implementations::LogWeightInputStream(filename);
         break;
-#endif
+	//#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -1112,11 +1123,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst = new hfst::implementations::TropicalWeightInputStream(is);
         break;
-#if HAVE_OPENFST_LOG
+	//#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         implementation.log_ofst = new hfst::implementations::LogWeightInputStream(is);
         break;
-#endif
+	//#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -1161,11 +1172,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         delete implementation.tropical_ofst;
         break;
-#if HAVE_OPENFST_LOG
+	//#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         delete implementation.log_ofst;
         break;
-#endif
+	//#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -1204,11 +1215,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst->close();
         break;
-#if HAVE_OPENFST_LOG
+	//#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         implementation.log_ofst->close();
         break;
-#endif
+	//#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -1245,11 +1256,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         return implementation.tropical_ofst->is_eof();
         break;
-#if HAVE_OPENFST_LOG
+	//#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         return implementation.log_ofst->is_eof();
         break;
-#endif
+	//#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -1286,11 +1297,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         return implementation.tropical_ofst->is_bad();
         break;
-#if HAVE_OPENFST_LOG
+	//#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         return implementation.log_ofst->is_bad();
         break;
-#endif
+	//#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -1328,11 +1339,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         return implementation.tropical_ofst->is_good();
         break;
-#if HAVE_OPENFST_LOG
+	//#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         return implementation.log_ofst->is_good();
         break;
-#endif
+	//#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:

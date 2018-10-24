@@ -39,12 +39,8 @@ endif
 
 
 MAYBE_SFST=SfstTransducer.cc
-MAYBE_OPENFST=
 if WANT_OPENFST
-MAYBE_OPENFST += TropicalWeightTransducer.cc
-endif
-if WANT_OPENFST_LOG
-MAYBE_OPENFST += LogWeightTransducer.cc
+MAYBE_OPENFST=TropicalWeightTransducer.cc LogWeightTransducer.cc
 endif
 if WANT_FOMA
 MAYBE_FOMA=FomaTransducer.cc

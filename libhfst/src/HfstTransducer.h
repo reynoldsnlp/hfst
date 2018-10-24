@@ -24,11 +24,11 @@
 
 #if HAVE_OPENFST
 #include "implementations/TropicalWeightTransducer.h"
+//#if HAVE_OPENFST_LOG
+#include "implementations/LogWeightTransducer.h"
+//#endif
 #endif
 
-#if HAVE_OPENFST_LOG
-#include "implementations/LogWeightTransducer.h"
-#endif
 
 #if HAVE_FOMA
 #include "implementations/FomaTransducer.h"

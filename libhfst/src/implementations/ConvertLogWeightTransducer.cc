@@ -13,7 +13,7 @@
 #  include <config.h>
 #endif
 
-#if HAVE_OPENFST_LOG
+//#if HAVE_OPENFST_LOG
 
 #include "ConvertTransducerFormat.h"
 #include "HfstIterableTransducer.h"
@@ -27,14 +27,14 @@
 
 #ifndef _MSC_VER
 #if HAVE_OPENFST_LOG
-namespace fst
+/*namespace fst
 {
   extern template class LogWeightTpl<float>;
   extern template class ArcTpl<LogWeight>;
   extern template class VectorFst<LogArc>;
   extern template class ArcIterator<LogFst>;
   extern template class StateIterator<LogFst>;
-}
+  }*/
 #endif
 #endif // #ifndef _MSC_VER
 
@@ -298,7 +298,7 @@ namespace hfst { namespace implementations
 
   }}
 
-#endif // HAVE_OPENFST_LOG
+//#endif // HAVE_OPENFST_LOG
 
 #else // MAIN_TEST was defined
 #include <iostream>

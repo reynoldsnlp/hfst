@@ -14,8 +14,6 @@
   #include "../../../config.h"
 #endif
 
-#if HAVE_OPENFST_LOG
-
 #include "HfstSymbolDefs.h"
 #include "HfstExceptionDefs.h"
 #include "HfstFlagDiacritics.h"
@@ -60,13 +58,14 @@ typedef int64_t int64;
     \brief Declarations of functions and datatypes that form a bridge between
     HFST API and OpenFst's transducers with logarithmic weights. */
 
+typedef fst::LogWeightTpl<float> LogWeight;
+typedef fst::ArcTpl<LogWeight> LogArc;
+typedef fst::VectorFst<LogArc> LogFst;
+
 namespace hfst {
 namespace implementations
 {
   using namespace fst;
-  ;
-  typedef unsigned int StateId;
-  typedef VectorFst<LogArc> LogFst;
 
   //typedef std::vector<LogArc> LogArcVector;
   //struct LogArcLessThan {
@@ -97,8 +96,11 @@ namespace implementations
     bool is_fst(void) const;
     bool operator() (void) const;
     void ignore(unsigned int);
+#if HAVE_OPENFST_LOG
     LogFst * read_transducer();
-
+#else
+    HfstIterableTransducer * read_transducer();
+#endif
     char stream_get();
     short stream_get_short();
     void stream_unget(char c);
@@ -107,6 +109,7 @@ namespace implementations
     static bool is_fst(std::istream &s);
   };
 
+#if HAVE_OPENFST_LOG
   class LogWeightOutputStream
   {
   private:
@@ -123,7 +126,6 @@ namespace implementations
 
   class LogWeightTransducer
     {
-#if HAVE_OPENFST_LOG
     public:
       static LogFst * create_empty_transducer(void);
       static LogFst * create_epsilon_transducer(void);
@@ -284,15 +286,16 @@ namespace implementations
       static StateId get_initial_state(LogFst *t);
       static void represent_empty_transducer_as_having_one_state(LogFst *t);
 
-#endif // HAVE_OPENFST_LOG
       // needed in lean implementation
     public:
       void delete_transducer(LogFst * t);
 
     };
 
+#endif // #if HAVE_OPENFST_LOG
+  
 } }
 
-#endif // #if HAVE_OPENFST_LOG
+
 
 #endif
