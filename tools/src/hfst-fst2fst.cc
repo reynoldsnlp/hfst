@@ -223,9 +223,16 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           verbose_printf("Converting %s..." SIZE_T_SPECIFIER "\n",
                          inputname, transducer_n);
         }
-        try {
-            orig.convert(output_type, options);
-        } HFST_CATCH(HfstException)
+	if (output_type == hfst::SFST_TYPE && !hfst::HfstTransducer::is_implementation_type_available(hfst::SFST_TYPE))
+	  {
+	    ; // do not convert, HfstOutputStream handles this
+	  }
+	else
+	  {
+	    try {
+	      orig.convert(output_type, options);
+	    } HFST_CATCH(HfstException)
+	  }
         hfst_set_name(orig, orig, "convert");
         hfst_set_formula(orig, orig, "Id");
         outstream << orig;
