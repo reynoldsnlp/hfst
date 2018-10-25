@@ -66,9 +66,9 @@ AC_DEFINE_UNQUOTED([HFST_STRING], ["$PACKAGE_STRING"],
 # allow backends to be removed
 AC_ARG_WITH([sfst],
             [AS_HELP_STRING([--with-sfst],
-                            [process unweighted fsts with SFST @<:@default=yes@:>@])],
+                            [process unweighted fsts with SFST @<:@default=no@:>@])],
             [],
-            [with_sfst=yes])
+            [with_sfst=no])
 AS_IF([test "x$with_sfst" != xno], [AC_DEFINE([HAVE_SFST], [1],
                                               [Define to compile SFST support in HFST])])
 
