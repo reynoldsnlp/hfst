@@ -8,4 +8,5 @@ EXTRA_DIST = README test.sh \
 	test_streams_1.py test_streams_2.py test_streams_3.py streets.txt \
 	test_streams_all_1.py test_streams_all_2.py test_streams_all_3.py \
 	test_xerox_rules.py test_twolc.py test_lookup.py \
+	test_sfst_and_log_openfst_streams.py \
 	test1.twolc test2.twolc test3.twolc
