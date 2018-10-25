@@ -4515,7 +4515,7 @@
      void HfstIterableTransducer::store_sfst_node_info( FILE *file, unsigned int node )
      {
        // write final flag
-       char c = is_final_state(node) ? 0 : 1;
+       char c = is_final_state(node) ? 1 : 0;
        fwrite(&c,sizeof(c),1,file);
 
        // write the number of arcs
