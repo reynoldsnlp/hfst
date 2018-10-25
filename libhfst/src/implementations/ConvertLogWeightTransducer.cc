@@ -274,6 +274,7 @@ namespace hfst { namespace implementations
                          hfst_state_to_state_id
                           (tr_it->get_target_state(), state_map, t)) );
           }
+	source_state++;
       }
     
     // Go through the final states
