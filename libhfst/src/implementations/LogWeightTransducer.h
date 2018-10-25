@@ -58,6 +58,7 @@ typedef int64_t int64;
     \brief Declarations of functions and datatypes that form a bridge between
     HFST API and OpenFst's transducers with logarithmic weights. */
 
+
 typedef fst::LogWeightTpl<float> LogWeight;
 typedef fst::ArcTpl<LogWeight> LogArc;
 typedef fst::VectorFst<LogArc> LogFst;
@@ -66,6 +67,8 @@ namespace hfst {
 namespace implementations
 {
   using namespace fst;
+
+  typedef unsigned int StateId;
 
   //typedef std::vector<LogArc> LogArcVector;
   //struct LogArcLessThan {
