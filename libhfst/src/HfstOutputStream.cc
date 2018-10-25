@@ -351,8 +351,8 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
     if (! this->is_open) {
       HFST_THROW(StreamIsClosedException);
     }
-      
 
+#if HAVE_SFST
     if (type != transducer.type)
       {
         HFST_THROW_MESSAGE(TransducerTypeMismatchException,
@@ -360,6 +360,16 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
                            "HfstOutputStream and HfstTransducer do not "
                            "have the same type");
       }
+#else // HAVE_SFST
+    // if SFST is disabled, allow writing in SFST format
+    if (type != transducer.type && this->type != SFST_TYPE)
+      {
+        HFST_THROW_MESSAGE(TransducerTypeMismatchException,
+                           "operator<<: "
+                           "HfstOutputStream and HfstTransducer do not "
+                           "have the same type");
+      }
+#endif // HAVE_SFST
 
     /* Write the HFST header. The header has the following structure:
        
@@ -445,19 +455,21 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 #if HAVE_SFST
         implementation.sfst->write_transducer
           (transducer.implementation.sfst);
-#else
+#else // HAVE_SFST
 	HfstIterableTransducer * fsm = NULL;
 	if (transducer.get_type() == ImplementationType::TROPICAL_OPENFST_TYPE)
 	  {
 	    fsm = ConversionFunctions::tropical_ofst_to_hfst_basic_transducer(transducer.implementation.tropical_ofst);
 	  }
+#if HAVE_FOMA
 	if (transducer.get_type() == ImplementationType::FOMA_TYPE)
 	  {
 	    fsm = ConversionFunctions::foma_to_hfst_basic_transducer(transducer.implementation.foma);
 	  }
+#endif // HAVE_FOMA
 	implementation.sfst->write_transducer(*fsm);
 	delete fsm;
-#endif
+#endif // HAVE_SFST
 	return *this;
 	}
 #if HAVE_OPENFST
