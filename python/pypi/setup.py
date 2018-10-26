@@ -50,11 +50,10 @@ def hfst_specific_option(option):
 
 # ----- C++ STANDARD  -----
 
-# Use C++ standard C++11 unless compiling for Python 2.7 for Windows (requires msvc 2008 which does not support C++11)
-# or for OS X (C++11 requires libc++ instead of libstdc++ and minimum version requirement 10.7 instead of 10.6).
+# Use C++ standard C++11 unless compiling for Python 2.7 for Windows (requires msvc 2008 which does not support C++11).
 CPP_STD_11=True
 from sys import version_info
-if (platform == "darwin") or (platform == "win32" and version_info[0] == 2):
+if platform == "win32" and version_info[0] == 2:
     CPP_STD_11=False
 # Override default behaviour, if requested.
 if hfst_specific_option('--with-c++11'):
@@ -86,7 +85,7 @@ ext_swig_opts = ["-c++", "-I" + swig_include_dir, "-Wall"]
 if platform == "win32" and version_info[0] == 3 and (version_info[1] == 3 or version_info[1] == 4):
     ext_swig_opts.extend(["-IC:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Include"])
 # By default, we have a pre-swig-generated wrapper
-ext_source = ["libhfst_wrap.cpp"]
+ext_source = ["libhfst_dev_wrap.cpp"]
 if hfst_specific_option('--generate-wrapper'):
     ext_source = ["libhfst.i"]
 
@@ -209,8 +208,8 @@ libhfst_source_files = ["libhfst/src/parsers/XfstCompiler" + cpp,
                         "libhfst/src/HfstPrintPCKimmo" + cpp,
                         "libhfst/src/hfst-string-conversions" + cpp,
                         "libhfst/src/string-utils" + cpp,
-                        "libhfst/src/implementations/HfstBasicTransducer" + cpp,
-                        "libhfst/src/implementations/HfstBasicTransition" + cpp,
+                        "libhfst/src/implementations/HfstIterableTransducer" + cpp,
+                        "libhfst/src/implementations/HfstTransition" + cpp,
                         "libhfst/src/implementations/ConvertTransducerFormat" + cpp,
                         "libhfst/src/implementations/HfstTropicalTransducerTransitionData" + cpp,
                         "libhfst/src/implementations/ConvertTropicalWeightTransducer" + cpp,
@@ -220,6 +219,7 @@ libhfst_source_files = ["libhfst/src/parsers/XfstCompiler" + cpp,
                         "libhfst/src/implementations/TropicalWeightTransducer" + cpp,
                         "libhfst/src/implementations/LogWeightTransducer" + cpp,
                         "libhfst/src/implementations/FomaTransducer" + cpp,
+                        "libhfst/src/implementations/SfstTransducer" + cpp,
                         "libhfst/src/implementations/HfstOlTransducer" + cpp,
                         "libhfst/src/implementations/compose_intersect/ComposeIntersectRulePair" + cpp,
                         "libhfst/src/implementations/compose_intersect/ComposeIntersectLexicon" + cpp,
@@ -310,7 +310,8 @@ openfst_source_files =  [ "back-ends/" + openfstdir + "/src/lib/compat" + cpp,
                           "back-ends/" + openfstdir + "/src/lib/properties" + cpp,
                           "back-ends/" + openfstdir + "/src/lib/symbol-table" + cpp,
                           "back-ends/" + openfstdir + "/src/lib/symbol-table-ops" + cpp,
-                          "back-ends/" + openfstdir + "/src/lib/util" + cpp ]
+                          "back-ends/" + openfstdir + "/src/lib/util" + cpp,
+                          "back-ends/" + openfstdir + "/src/lib/weight" + cpp]
 
 libhfst_source_files = libhfst_source_files + openfst_source_files
 
@@ -338,7 +339,7 @@ if (platform == "win32"):
 
 # ----- The HFST C++ EXTENSION -----
 
-libhfst_module = Extension('_libhfst',
+libhfst_module = Extension('_libhfst_dev',
                            language = "c++",
                            sources = ext_source + libhfst_source_files,
                            swig_opts = ext_swig_opts,
@@ -348,7 +349,7 @@ libhfst_module = Extension('_libhfst',
                            extra_compile_args = ext_extra_compile_args
                            )
 
-setup(name = 'hfst',
+setup(name = 'hfst_dev',
       version = '3.15.0.0_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
@@ -357,8 +358,8 @@ setup(name = 'hfst',
       long_description = readme(),
       license = 'GNU GPL3',
       ext_modules = [libhfst_module],
-      py_modules = ["libhfst"],
-      packages = ["hfst", "hfst.exceptions", "hfst.sfst_rules", "hfst.xerox_rules"],
+      py_modules = ["libhfst_dev"],
+      packages = ["hfst_dev", "hfst_dev.exceptions", "hfst_dev.sfst_rules", "hfst_dev.xerox_rules"],
       package_data = ext_package_data,
       data_files = []
       )
