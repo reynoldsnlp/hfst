@@ -2,7 +2,7 @@
 // File: classhfst_1_1AttReader.xml
 
 
-%feature("docstring") hfst::AttReader
+%feature("docstring") hfst_dev::AttReader
 """
 
 A class for reading input in AT&T text format and converting it into
@@ -22,7 +22,7 @@ input is printed and reading is stopped.
              print(e.what())
 """
 
-%feature("docstring") hfst::AttReader::__init__
+%feature("docstring") hfst_dev::AttReader::__init__
 """
 
 Create an AttReader that reads input from file *f* where the epsilon is
@@ -37,7 +37,7 @@ Parameters
     and \"@0@\" are both recognized.
 """
 
-%feature("docstring") hfst::AttReader::__next__
+%feature("docstring") hfst_dev::AttReader::__next__
 """
 
 Return next element (for python version 3).
@@ -52,7 +52,7 @@ Exceptions
 * `StopIteration` :
 """
 
-%feature("docstring") hfst::AttReader::read
+%feature("docstring") hfst_dev::AttReader::read
 """
 
 Read next transducer.
@@ -66,7 +66,7 @@ Exceptions
 * `hfst.exceptions.EndOfStreamException` :
 """
 
-%feature("docstring") hfst::AttReader::__iter__
+%feature("docstring") hfst_dev::AttReader::__iter__
 """
 
 An iterator to the reader.
@@ -77,7 +77,7 @@ Needed for 'for ... in' statement.
          print(transducer)
 """
 
-%feature("docstring") hfst::AttReader::next
+%feature("docstring") hfst_dev::AttReader::next
 """
 
 Return next element (for python version 2).
@@ -96,7 +96,7 @@ Exceptions
 // File: classhfst_1_1HfstBasicTransducer.xml
 
 
-%feature("docstring") hfst::implementations::HfstBasicTransducer
+%feature("docstring") hfst_dev::implementations::HfstBasicTransducer
 """
 
 A simple transducer class with tropical weights.
@@ -134,7 +134,7 @@ transducer when printing them in AT&T format to standard output:
 See also: hfst.HfstBasicTransition
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::states_and_transitions
+%feature("docstring") hfst_dev::HfstBasicTransducer::states_and_transitions
 """
 
 The states and transitions of the transducer.
@@ -146,7 +146,7 @@ A tuple of tuples of HfstBasicTransitions.
 See also: hfst.HfstBasicTransducer.__enumerate__
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::get_final_weight
+%feature("docstring") hfst_dev::HfstBasicTransducer::get_final_weight
 """
 
 Get the final weight of state *state* in this transducer.
@@ -162,7 +162,7 @@ Exceptions
 * `hfst.exceptions.StateIsNotFinalException.` :
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::__init__
+%feature("docstring") hfst_dev::HfstBasicTransducer::__init__
 """
 
 Create a transducer with one initial state that has state number zero and is not
@@ -173,7 +173,7 @@ create an empty transducer.
      tr = hfst.HfstBasicTransducer()
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::__init__
+%feature("docstring") hfst_dev::HfstBasicTransducer::__init__
 """
 
 Create a transducer equivalent to *transducer*.
@@ -189,13 +189,13 @@ Parameters
      TR2 = hfst.HfstBasicTransducer(TR)
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::symbols_used
+%feature("docstring") hfst_dev::HfstBasicTransducer::symbols_used
 """
 
 Get a list of all symbols used in the transitions of this transducer.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::remove_symbol_from_alphabet
+%feature("docstring") hfst_dev::HfstBasicTransducer::remove_symbol_from_alphabet
 """
 
 Remove symbol *symbol* from the alphabet of the graph.
@@ -209,14 +209,14 @@ Parameters
     The string to be removed.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::get_transition_pairs
+%feature("docstring") hfst_dev::HfstBasicTransducer::get_transition_pairs
 """
 
 Get a list of all input/output symbol pairs used in the transitions of this
 transducer.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::is_infinitely_ambiguous
+%feature("docstring") hfst_dev::HfstBasicTransducer::is_infinitely_ambiguous
 """
 
 Whether the transducer is infinitely ambiguous.
@@ -226,7 +226,7 @@ infinitely many results, i.e. there are input epsilon loops that are traversed
 with that input.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::harmonize
+%feature("docstring") hfst_dev::HfstBasicTransducer::harmonize
 """
 
 Harmonize this transducer and *another*.
@@ -250,7 +250,7 @@ note: This function is always called for all transducer arguments of functions
     that take two or more graphs as their arguments, unless otherwise said.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::sort_arcs
+%feature("docstring") hfst_dev::HfstBasicTransducer::sort_arcs
 """
 
 Sort the arcs of this transducer according to input and output symbols.
@@ -260,7 +260,7 @@ Returns
 This transducer.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::states
+%feature("docstring") hfst_dev::HfstBasicTransducer::states
 """
 
 The states of the transducer.
@@ -275,7 +275,7 @@ fsm.is_final_state(state): print('i f' % (state, fsm.get_final_weight(state)) )
 /endverbatim
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::get_max_state
+%feature("docstring") hfst_dev::HfstBasicTransducer::get_max_state
 """
 
 Get the biggest state number in use.
@@ -285,7 +285,7 @@ Returns
 The biggest state number in use.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::add_state
+%feature("docstring") hfst_dev::HfstBasicTransducer::add_state
 """
 
 Add a new state to this transducer and return its number.
@@ -295,7 +295,7 @@ Returns
 The next (smallest) free state number.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::add_state
+%feature("docstring") hfst_dev::HfstBasicTransducer::add_state
 """
 
 Add a state *s* to this graph.
@@ -313,14 +313,14 @@ If the state already exists, it is not added again. All states with state number
 smaller than *s* are also added to the transducer if they did not exist before.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::write_att
+%feature("docstring") hfst_dev::HfstBasicTransducer::write_att
 """
 
 Write this transducer in AT&T format to file *f*, *write_weights* defines
 whether weights are written.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::remove_symbols_from_alphabet
+%feature("docstring") hfst_dev::HfstBasicTransducer::remove_symbols_from_alphabet
 """
 
 Remove symbols *symbols* from the alphabet of the graph.
@@ -334,7 +334,7 @@ Parameters
     A tuple of strings to be removed.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::__enumerate__
+%feature("docstring") hfst_dev::HfstBasicTransducer::__enumerate__
 """
 
 Return an enumeration of the states and transitions of the transducer.
@@ -347,7 +347,7 @@ Return an enumeration of the states and transitions of the transducer.
          print('%i %f' % (state, fsm.get_final_weight(state)) )
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::longest_path_size
+%feature("docstring") hfst_dev::HfstBasicTransducer::longest_path_size
 """
 
 The length of the longest path in transducer.
@@ -355,7 +355,7 @@ The length of the longest path in transducer.
 Length of a path means number of arcs on that path.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::get_alphabet
+%feature("docstring") hfst_dev::HfstBasicTransducer::get_alphabet
 """
 
 The symbols in the alphabet of the transducer.
@@ -368,7 +368,7 @@ Returns
 A tuple of strings.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::substitute
+%feature("docstring") hfst_dev::HfstBasicTransducer::substitute
 """
 
 Substitute symbols or transitions in the transducer.
@@ -424,7 +424,7 @@ non-final and an epsilon transition leading to TARGET is attached to it. The
 final weight is copied to the epsilon transition.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::remove_transition
+%feature("docstring") hfst_dev::HfstBasicTransducer::remove_transition
 """
 Remove all transitions equivalent to *transition* from state *s*.
 
@@ -444,7 +444,7 @@ Note: Removing transitions during iteration (e.g. with 'transitions') will
 invalidate the iteration. Iteration of states (e.g. with 'states') is possible.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::add_transition
+%feature("docstring") hfst_dev::HfstBasicTransducer::add_transition
 """
 
 Add a transition *transition* to state *state*, *add_symbols_to_alphabet*
@@ -465,7 +465,7 @@ Note: Adding transitions during iteration (e.g. with 'transitions') will
 invalidate the iteration. Iteration of states (e.g. with 'states') is possible.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::add_transition
+%feature("docstring") hfst_dev::HfstBasicTransducer::add_transition
 """
 
 Add a transition from state *source* to state *target* with input symbol
@@ -490,7 +490,7 @@ Note: Adding transitions during iteration (e.g. with 'transitions') will
 invalidate the iteration. Iteration of states (e.g. with 'states') is possible.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::read_prolog
+%feature("docstring") hfst_dev::HfstBasicTransducer::read_prolog
 """
 
 Read a transducer from prolog file *f*.
@@ -503,7 +503,7 @@ A transducer constructed by reading from file *file*. This function is a static
 one.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::lookup_fd
+%feature("docstring") hfst_dev::HfstBasicTransducer::lookup_fd
 """
 
 Lookup tokenized input *input* in the transducer minding flag diacritics.
@@ -520,7 +520,7 @@ Parameters
     Defaults to None, i.e. infinity.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::prune_alphabet
+%feature("docstring") hfst_dev::HfstBasicTransducer::prune_alphabet
 """
 
 Remove all symbols that do not occur in transitions of the transducer from its
@@ -529,7 +529,7 @@ alphabet.
 Epsilon, unknown and identity symbols are always included in the alphabet.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::write_prolog
+%feature("docstring") hfst_dev::HfstBasicTransducer::write_prolog
 """
 
 Write the transducer in prolog format to file *f*.
@@ -537,7 +537,7 @@ Write the transducer in prolog format to file *f*.
 Name the transducer *name*.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::disjunct
+%feature("docstring") hfst_dev::HfstBasicTransducer::disjunct
 """
 
 Disjunct this transducer with a one-path transducer defined by consecutive
@@ -556,7 +556,7 @@ is probably limited to fast construction of a lexicon. Here is an example:
      lexicon.disjunct(tok.tokenize('elephant'), 1.6)
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::read_att
+%feature("docstring") hfst_dev::HfstBasicTransducer::read_att
 """
 
 Read a transducer in AT&T format from file *f*.
@@ -570,7 +570,7 @@ A transducer constructed by reading from file *file*. This function is a static
 one.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::add_symbol_to_alphabet
+%feature("docstring") hfst_dev::HfstBasicTransducer::add_symbol_to_alphabet
 """
 
 Explicitly add *symbol* to the alphabet of the graph.
@@ -580,7 +580,7 @@ note: Usually the user does not have to take care of the alphabet of a graph.
     to be added.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::__str__
+%feature("docstring") hfst_dev::HfstBasicTransducer::__str__
 """
 
 Return a string representation of the transducer.
@@ -588,7 +588,7 @@ Return a string representation of the transducer.
      print(fsm)
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::set_final_weight
+%feature("docstring") hfst_dev::HfstBasicTransducer::set_final_weight
 """
 
 Set the final weight of state *state* in this transducer to *weight*.
@@ -596,13 +596,13 @@ Set the final weight of state *state* in this transducer to *weight*.
 If the state does not exist, it is created.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::remove_final_weight
+%feature("docstring") hfst_dev::HfstBasicTransducer::remove_final_weight
 """
 
 Remove the final weight of state *state* in this transducer, i.e. make the state non-final.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::add_symbols_to_alphabet
+%feature("docstring") hfst_dev::HfstBasicTransducer::add_symbols_to_alphabet
 """
 
 Explicitly add *symbols* to the alphabet of the graph.
@@ -616,7 +616,7 @@ Parameters
     A tuple of strings to be added.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::transitions
+%feature("docstring") hfst_dev::HfstBasicTransducer::transitions
 """
 
 Get the transitions of state *state* in this transducer.
@@ -635,7 +635,7 @@ A tuple of HfstBasicTransitions.
         print('%i %f' % (state, fsm.get_final_weight(state)) )
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::insert_freely
+%feature("docstring") hfst_dev::HfstBasicTransducer::insert_freely
 """
 
 Insert freely any number of *symbol_pair* in the transducer with weight
@@ -649,7 +649,7 @@ Parameters
     The weight of the inserted symbol pair.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::insert_freely
+%feature("docstring") hfst_dev::HfstBasicTransducer::insert_freely
 """
 
 Insert freely any number of *transducer* in this transducer.
@@ -657,13 +657,13 @@ Insert freely any number of *transducer* in this transducer.
 param transducer An HfstBasicTransducer to be inserted.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::write_xfst
+%feature("docstring") hfst_dev::HfstBasicTransducer::write_xfst
 """
 
 Write the transducer in xfst format to file *f*.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::is_final_state
+%feature("docstring") hfst_dev::HfstBasicTransducer::is_final_state
 """
 
 Whether state *state* is final.
@@ -674,7 +674,7 @@ Parameters
     The state whose finality is returned.
 """
 
-%feature("docstring") hfst::HfstBasicTransducer::is_lookup_infinitely_ambiguous
+%feature("docstring") hfst_dev::HfstBasicTransducer::is_lookup_infinitely_ambiguous
 """
 
 Whether the transducer is infinitely ambiguous with input *str*.
@@ -693,7 +693,7 @@ with the input.
 // File: classhfst_1_1HfstBasicTransition.xml
 
 
-%feature("docstring") hfst::HfstBasicTransition
+%feature("docstring") hfst_dev::HfstBasicTransition
 """
 
 A transition class that consists of a target state, input and output symbols and
@@ -702,19 +702,19 @@ a a tropical weight.
 See also: hfst.HfstBasicTransducer
 """
 
-%feature("docstring") hfst::HfstBasicTransition::get_input_symbol
+%feature("docstring") hfst_dev::HfstBasicTransition::get_input_symbol
 """
 
 Get the input symbol of the transition.
 """
 
-%feature("docstring") hfst::HfstBasicTransition::get_weight
+%feature("docstring") hfst_dev::HfstBasicTransition::get_weight
 """
 
 Get the weight of the transition.
 """
 
-%feature("docstring") hfst::HfstBasicTransition::set_weight
+%feature("docstring") hfst_dev::HfstBasicTransition::set_weight
 """
 
 Set the weight of the transition.
@@ -725,19 +725,19 @@ Parameters
     Weight of the transition.
 """
 
-%feature("docstring") hfst::HfstBasicTransition::get_output_symbol
+%feature("docstring") hfst_dev::HfstBasicTransition::get_output_symbol
 """
 
 Get the output symbol of the transition.
 """
 
-%feature("docstring") hfst::HfstBasicTransition::get_target_state
+%feature("docstring") hfst_dev::HfstBasicTransition::get_target_state
 """
 
 Get number of the target state of the transition.
 """
 
-%feature("docstring") hfst::HfstBasicTransition::__init__
+%feature("docstring") hfst_dev::HfstBasicTransition::__init__
 """
 
 Create an HfstBasicTransition leading to target state *state* with input symbol
@@ -764,7 +764,7 @@ Exceptions
 // File: classhfst_1_1HfstInputStream.xml
 
 
-%feature("docstring") hfst::HfstInputStream
+%feature("docstring") hfst_dev::HfstInputStream
 """
 
 A stream for reading HFST binary transducers.
@@ -781,19 +781,19 @@ An example:
 For documentation on the HFST binary transducer format, see here.
 """
 
-%feature("docstring") hfst::HfstInputStream::is_bad
+%feature("docstring") hfst_dev::HfstInputStream::is_bad
 """
 
 Whether badbit is set.
 """
 
-%feature("docstring") hfst::HfstInputStream::is_eof
+%feature("docstring") hfst_dev::HfstInputStream::is_eof
 """
 
 Whether the stream is at end.
 """
 
-%feature("docstring") hfst::HfstInputStream::__init__
+%feature("docstring") hfst_dev::HfstInputStream::__init__
 """
 
 Create a stream for reading binary transducers.
@@ -813,7 +813,7 @@ Exceptions
          istr_to_file = hfst.HfstInputStream(filename='transducer.hfst')
 """
 
-%feature("docstring") hfst::HfstInputStream::read
+%feature("docstring") hfst_dev::HfstInputStream::read
 """
 
 Return next transducer.
@@ -823,7 +823,7 @@ Exceptions
 * `EndOfStreamException` :
 """
 
-%feature("docstring") hfst::HfstInputStream::close
+%feature("docstring") hfst_dev::HfstInputStream::close
 """
 
 Close the stream.
@@ -831,7 +831,7 @@ Close the stream.
 If the stream points to standard input, nothing is done.
 """
 
-%feature("docstring") hfst::HfstInputStream::get_type
+%feature("docstring") hfst_dev::HfstInputStream::get_type
 """
 
 The type of the first transducer in the stream.
@@ -841,7 +841,7 @@ TransducerTypeMismatchException is thrown when reading the first transducer that
 has a different type than the previous ones.
 """
 
-%feature("docstring") hfst::HfstInputStream::is_good
+%feature("docstring") hfst_dev::HfstInputStream::is_good
 """
 
 Whether the state of the stream is good for input operations.
@@ -851,7 +851,7 @@ Whether the state of the stream is good for input operations.
 // File: classhfst_1_1HfstOutputStream.xml
 
 
-%feature("docstring") hfst::HfstOutputStream
+%feature("docstring") hfst_dev::HfstOutputStream
 """
 
 A stream for writing binary transducers.
@@ -868,7 +868,7 @@ An example:
 For more information on HFST transducer structure, see this page.
 """
 
-%feature("docstring") hfst::HfstOutputStream::close
+%feature("docstring") hfst_dev::HfstOutputStream::close
 """
 
 Close the stream.
@@ -876,7 +876,7 @@ Close the stream.
 If the stream points to standard output, nothing is done.
 """
 
-%feature("docstring") hfst::HfstOutputStream::__init__
+%feature("docstring") hfst_dev::HfstOutputStream::__init__
 """
 
 Open a stream for writing binary transducers.
@@ -915,13 +915,13 @@ their back-end format to a file
      ostr.close()
 """
 
-%feature("docstring") hfst::HfstOutputStream::flush
+%feature("docstring") hfst_dev::HfstOutputStream::flush
 """
 
 Flush the stream.
 """
 
-%feature("docstring") hfst::HfstOutputStream::write
+%feature("docstring") hfst_dev::HfstOutputStream::write
 """
 
 Write the transducer *transducer* in binary format to the stream.
@@ -938,14 +938,14 @@ Exceptions
 // File: classhfst_1_1HfstTransducer.xml
 
 
-%feature("docstring") hfst::HfstTransducer
+%feature("docstring") hfst_dev::HfstTransducer
 """
 
 A synchronous finite-state transducer.
 
 """
 
-%feature("docstring") hfst::HfstTransducer::get_type
+%feature("docstring") hfst_dev::HfstTransducer::get_type
 """
 
 The implementation type of the transducer.
@@ -955,7 +955,7 @@ Returns
 hfst.ImplementationType
 """
 
-%feature("docstring") hfst::HfstTransducer::get_name
+%feature("docstring") hfst_dev::HfstTransducer::get_name
 """
 
 Get the name of the transducer.
@@ -963,13 +963,13 @@ Get the name of the transducer.
 See also: set_name
 """
 
-%feature("docstring") hfst::HfstTransducer::repeat_plus
+%feature("docstring") hfst_dev::HfstTransducer::repeat_plus
 """
 
 A concatenation of N transducers where N is any number from one to infinity.
 """
 
-%feature("docstring") hfst::HfstTransducer::output_project
+%feature("docstring") hfst_dev::HfstTransducer::output_project
 """
 
 Extract the output language of the transducer.
@@ -977,13 +977,13 @@ Extract the output language of the transducer.
 All transition symbol pairs *isymbol:osymbol* are changed to *osymbol:osymbol*.
 """
 
-%feature("docstring") hfst::HfstTransducer::number_of_states
+%feature("docstring") hfst_dev::HfstTransducer::number_of_states
 """
 
 The number of states in the transducer.
 """
 
-%feature("docstring") hfst::HfstTransducer::minus
+%feature("docstring") hfst_dev::HfstTransducer::minus
 """
 
 Alias for subtract.
@@ -991,7 +991,7 @@ Alias for subtract.
 See also: hfst.HfstTransducer.subtract
 """
 
-%feature("docstring") hfst::HfstTransducer::is_infinitely_ambiguous
+%feature("docstring") hfst_dev::HfstTransducer::is_infinitely_ambiguous
 """
 
 Whether the transducer is infinitely ambiguous.
@@ -1001,7 +1001,7 @@ infinitely many results, i.e. there are input epsilon loops that are traversed
 with that input.
 """
 
-%feature("docstring") hfst::HfstTransducer::eliminate_flags
+%feature("docstring") hfst_dev::HfstTransducer::eliminate_flags
 """
 
 Eliminate flag diacritics listed in *symbols* from the transducer.
@@ -1014,13 +1014,13 @@ Parameters
 An equivalent transducer with no flags listed in *symbols*.
 """
 
-%feature("docstring") hfst::HfstTransducer::longest_path_size
+%feature("docstring") hfst_dev::HfstTransducer::longest_path_size
 """
 
 Get length of longest path of the transducer.
 """
 
-%feature("docstring") hfst::HfstTransducer::get_properties
+%feature("docstring") hfst_dev::HfstTransducer::get_properties
 """
 
 Get all properties from the transducer.
@@ -1031,26 +1031,26 @@ A dictionary whose keys are properties and whose values are the values of those
 properties.
 """
 
-%feature("docstring") hfst::HfstTransducer::optionalize
+%feature("docstring") hfst_dev::HfstTransducer::optionalize
 """
 
 Disjunct the transducer with an epsilon transducer.
 """
 
-%feature("docstring") hfst::HfstTransducer::intersect
+%feature("docstring") hfst_dev::HfstTransducer::intersect
 """
 
 Intersect this transducer with *another*.
 """
 
-%feature("docstring") hfst::HfstTransducer::repeat_n_plus
+%feature("docstring") hfst_dev::HfstTransducer::repeat_n_plus
 """
 
 A concatenation of N transducers where N is any number from *n* to infinity,
 inclusive.
 """
 
-%feature("docstring") hfst::HfstTransducer::compare
+%feature("docstring") hfst_dev::HfstTransducer::compare
 """
 
 Whether this transducer and *another* are equivalent.
@@ -1069,7 +1069,7 @@ note: For weighted transducers, the function often returns false negatives due
     to weight precision issues.
 """
 
-%feature("docstring") hfst::HfstTransducer::remove_from_alphabet
+%feature("docstring") hfst_dev::HfstTransducer::remove_from_alphabet
 """
 
 Remove *symbol* from the alphabet of the transducer.
@@ -1085,7 +1085,7 @@ note: Use with care, removing a symbol that occurs in a transition of the
     transducer can have unexpected results.
 """
 
-%feature("docstring") hfst::HfstTransducer::substitute
+%feature("docstring") hfst_dev::HfstTransducer::substitute
 """
 
 Substitute symbols or transitions in the transducer.
@@ -1116,7 +1116,7 @@ hfst.HfstTransducer instead of hfst.HfstBasicTransducer.
 See also: hfst.HfstBasicTransducer.substitute
 """
 
-%feature("docstring") hfst::HfstTransducer::compose
+%feature("docstring") hfst_dev::HfstTransducer::compose
 """
 
 Compose this transducer with *another*.
@@ -1127,7 +1127,7 @@ Parameters
     The second argument in the composition. Not modified.
 """
 
-%feature("docstring") hfst::HfstTransducer::write_prolog
+%feature("docstring") hfst_dev::HfstTransducer::write_prolog
 """
 
 Write the transducer in prolog format with name *name* to file *f*,
@@ -1143,14 +1143,14 @@ Parameters
     Whether weights are written.
 """
 
-%feature("docstring") hfst::HfstTransducer::repeat_n_to_k
+%feature("docstring") hfst_dev::HfstTransducer::repeat_n_to_k
 """
 
 A concatenation of N transducers where N is any number from *n* to *k*,
 inclusive.
 """
 
-%feature("docstring") hfst::HfstTransducer::conjunct
+%feature("docstring") hfst_dev::HfstTransducer::conjunct
 """
 
 Alias for intersect.
@@ -1158,20 +1158,20 @@ Alias for intersect.
 See also: hfst.HfstTransducer.intersect
 """
 
-%feature("docstring") hfst::HfstTransducer::repeat_n_minus
+%feature("docstring") hfst_dev::HfstTransducer::repeat_n_minus
 """
 
 A concatenation of N transducers where N is any number from zero to *n*,
 inclusive.
 """
 
-%feature("docstring") hfst::HfstTransducer::disjunct
+%feature("docstring") hfst_dev::HfstTransducer::disjunct
 """
 
 Disjunct this transducer with *another*.
 """
 
-%feature("docstring") hfst::HfstTransducer::lookup_optimize
+%feature("docstring") hfst_dev::HfstTransducer::lookup_optimize
 """
 
 Optimize the transducer for lookup.
@@ -1179,7 +1179,7 @@ Optimize the transducer for lookup.
 This effectively converts the transducer into hfst.ImplementationType.HFST_OL_TYPE.
 """
 
-%feature("docstring") hfst::HfstTransducer::extract_longest_paths
+%feature("docstring") hfst_dev::HfstTransducer::extract_longest_paths
 """
 
 Extract longest paths of the transducer.
@@ -1189,7 +1189,7 @@ Returns
 A dictionary.
 """
 
-%feature("docstring") hfst::HfstTransducer::n_best
+%feature("docstring") hfst_dev::HfstTransducer::n_best
 """
 
 Extract *n* best paths of the transducer.
@@ -1208,20 +1208,20 @@ OpenFst library, an hfst.exceptions.ImplementationTypeNotAvailableException is
 thrown.
 """
 
-%feature("docstring") hfst::HfstTransducer::is_implementation_type_available
+%feature("docstring") hfst_dev::HfstTransducer::is_implementation_type_available
 """
 
 Whether HFST is linked to the transducer library needed by implementation type
 *type*.
 """
 
-%feature("docstring") hfst::HfstTransducer::invert
+%feature("docstring") hfst_dev::HfstTransducer::invert
 """
 
 Swap the input and output symbols of each transition in the transducer.
 """
 
-%feature("docstring") hfst::HfstTransducer::extract_paths
+%feature("docstring") hfst_dev::HfstTransducer::extract_paths
 """
 
 Extract paths that are recognized by the transducer.
@@ -1303,7 +1303,7 @@ Todo
 a link to flag diacritics
 """
 
-%feature("docstring") hfst::HfstTransducer::__str__
+%feature("docstring") hfst_dev::HfstTransducer::__str__
 """
 
 An AT&T representation of the transducer.
@@ -1317,19 +1317,19 @@ Defined for print command. An example:
 Works only for small transducers.
 """
 
-%feature("docstring") hfst::HfstTransducer::is_cyclic
+%feature("docstring") hfst_dev::HfstTransducer::is_cyclic
 """
 
 Whether the transducer is cyclic.
 """
 
-%feature("docstring") hfst::HfstTransducer::has_flag_diacritics
+%feature("docstring") hfst_dev::HfstTransducer::has_flag_diacritics
 """
 
 Whether the transducer has flag diacritics in its transitions.
 """
 
-%feature("docstring") hfst::HfstTransducer::eliminate_flag
+%feature("docstring") hfst_dev::HfstTransducer::eliminate_flag
 """
 
 Eliminate flag diacritic *symbol* from the transducer.
@@ -1342,7 +1342,7 @@ Parameters
 An equivalent transducer with no flags *symbol*.
 """
 
-%feature("docstring") hfst::HfstTransducer::is_lookup_infinitely_ambiguous
+%feature("docstring") hfst_dev::HfstTransducer::is_lookup_infinitely_ambiguous
 """
 
 Whether lookup of path *input* will have infinite results.
@@ -1355,7 +1355,7 @@ Todo
 Do not ignore the argument *input*
 """
 
-%feature("docstring") hfst::HfstTransducer::set_name
+%feature("docstring") hfst_dev::HfstTransducer::set_name
 """
 
 Rename the transducer *name*.
@@ -1368,7 +1368,7 @@ Parameters
 See also: get_name
 """
 
-%feature("docstring") hfst::HfstTransducer::priority_union
+%feature("docstring") hfst_dev::HfstTransducer::priority_union
 """
 
 Make priority union of this transducer with *another*.
@@ -1393,7 +1393,7 @@ Example
      c : C For more information, read fsmbook.
 """
 
-%feature("docstring") hfst::HfstTransducer::insert_freely
+%feature("docstring") hfst_dev::HfstTransducer::insert_freely
 """
 
 Freely insert a transition or a transducer into the transducer.
@@ -1417,7 +1417,7 @@ transducer. The weights of the final states in *ins* are copied to the epsilon
 transitions leading to state S.
 """
 
-%feature("docstring") hfst::HfstTransducer::input_project
+%feature("docstring") hfst_dev::HfstTransducer::input_project
 """
 
 Extract the input language of the transducer.
@@ -1425,7 +1425,7 @@ Extract the input language of the transducer.
 All transition symbol pairs *isymbol:osymbol* are changed to *isymbol:isymbol*.
 """
 
-%feature("docstring") hfst::HfstTransducer::reverse
+%feature("docstring") hfst_dev::HfstTransducer::reverse
 """
 
 Reverse the transducer.
@@ -1434,7 +1434,7 @@ A reverted transducer accepts the string 'n(0) n(1) ... n(N)' iff the original
 transducer accepts the string 'n(N) n(N-1) ... n(0)'
 """
 
-%feature("docstring") hfst::HfstTransducer::compose_intersect
+%feature("docstring") hfst_dev::HfstTransducer::compose_intersect
 """
 
 Compose this transducer with the intersection of transducers in *v*.
@@ -1456,7 +1456,7 @@ Parameters
     transducer.
 """
 
-%feature("docstring") hfst::HfstTransducer::copy
+%feature("docstring") hfst_dev::HfstTransducer::copy
 """
 
 Return a deep copy of the transducer.
@@ -1466,7 +1466,7 @@ Return a deep copy of the transducer.
      assert(tr.compare(TR))
 """
 
-%feature("docstring") hfst::HfstTransducer::shuffle
+%feature("docstring") hfst_dev::HfstTransducer::shuffle
 """
 
 Shuffle this transducer with transducer *another*.
@@ -1478,7 +1478,7 @@ transducer that results from shuffling A and B accepts all strings
 pre: Both transducers must be automata, i.e. map strings onto themselves.
 """
 
-%feature("docstring") hfst::HfstTransducer::prune
+%feature("docstring") hfst_dev::HfstTransducer::prune
 """
 
 Make transducer coaccessible.
@@ -1487,7 +1487,7 @@ A transducer is coaccessible iff there is a path from every state to a final
 state.
 """
 
-%feature("docstring") hfst::HfstTransducer::extract_shortest_paths
+%feature("docstring") hfst_dev::HfstTransducer::extract_shortest_paths
 """
 
 Extract shortest paths of the transducer.
@@ -1497,7 +1497,7 @@ Returns
 A dictionary.
 """
 
-%feature("docstring") hfst::HfstTransducer::set_final_weights
+%feature("docstring") hfst_dev::HfstTransducer::set_final_weights
 """
 
 Set the weights of all final states to *weight*.
@@ -1506,7 +1506,7 @@ If the HfstTransducer is of unweighted type (hfst.ImplementationType.SFST_TYPE o
 hfst.ImplementationType.FOMA_TYPE), nothing is done.
 """
 
-%feature("docstring") hfst::HfstTransducer::push_weights_to_end
+%feature("docstring") hfst_dev::HfstTransducer::push_weights_to_end
 """
 
 Push weights towards final state(s).
@@ -1529,7 +1529,7 @@ An example:
 See also: hfst.HfstTransducer.push_weights_to_start
 """
 
-%feature("docstring") hfst::HfstTransducer::push_weights_to_start
+%feature("docstring") hfst_dev::HfstTransducer::push_weights_to_start
 """
 
 Push weights towards initial state.
@@ -1552,19 +1552,19 @@ An example:
 See also: hfst.HfstTransducer.push_weights_to_end
 """
 
-%feature("docstring") hfst::HfstTransducer::subtract
+%feature("docstring") hfst_dev::HfstTransducer::subtract
 """
 
 Subtract transducer *another* from this transducer.
 """
 
-%feature("docstring") hfst::HfstTransducer::repeat_star
+%feature("docstring") hfst_dev::HfstTransducer::repeat_star
 """
 
 A concatenation of N transducers where N is any number from zero to infinity.
 """
 
-%feature("docstring") hfst::HfstTransducer::write_att
+%feature("docstring") hfst_dev::HfstTransducer::write_att
 """
 
 Write the transducer in AT&T format to file *f*, *write_weights* defined whether
@@ -1578,7 +1578,7 @@ Parameters
     Whether weights are written.
 """
 
-%feature("docstring") hfst::HfstTransducer::write_att
+%feature("docstring") hfst_dev::HfstTransducer::write_att
 """
 
 Write the transducer in AT&T format to file *ofile*, *write_weights* defines
@@ -1633,7 +1633,7 @@ See also: hfst.HfstOutputStream.write
 See also: hfst.HfstTransducer.__init__
 """
 
-%feature("docstring") hfst::HfstTransducer::write_att
+%feature("docstring") hfst_dev::HfstTransducer::write_att
 """
 
 Write the transducer in AT&T format to file named *filename*.
@@ -1644,7 +1644,7 @@ If the file exists, it is overwritten. If the file does not exist, it is
 created.
 """
 
-%feature("docstring") hfst::HfstTransducer::lookup
+%feature("docstring") hfst_dev::HfstTransducer::lookup
 """
 
 Lookup string *input*.
@@ -1673,7 +1673,7 @@ note: This function is implemented only for optimized lookup format
     Conversion to HfstBasicTransducer is quick but lookup is slower.
 """
 
-%feature("docstring") hfst::HfstTransducer::__init__
+%feature("docstring") hfst_dev::HfstTransducer::__init__
 """
 
 Create an empty transducer.
@@ -1682,7 +1682,7 @@ Create an empty transducer.
      assert(tr.compare(hfst.empty_fst()))
 """
 
-%feature("docstring") hfst::HfstTransducer::__init__
+%feature("docstring") hfst_dev::HfstTransducer::__init__
 """
 
 Create a deep copy of HfstTransducer *another* or a transducer equivalent to
@@ -1701,7 +1701,7 @@ An example:
      tr1.concatenate(tr2)
 """
 
-%feature("docstring") hfst::HfstTransducer::__init__
+%feature("docstring") hfst_dev::HfstTransducer::__init__
 """
 
 Create an HFST transducer equivalent to HfstBasicTransducer *t*.
@@ -1717,7 +1717,7 @@ Parameters
     you can just call hfst.HfstTransducer(fsm)
 """
 
-%feature("docstring") hfst::HfstTransducer::insert_to_alphabet
+%feature("docstring") hfst_dev::HfstTransducer::insert_to_alphabet
 """
 
 Explicitly insert *symbol* to the alphabet of the transducer.
@@ -1731,13 +1731,13 @@ note: Usually this function is not needed since new symbols are added to the
     alphabet by default.
 """
 
-%feature("docstring") hfst::HfstTransducer::concatenate
+%feature("docstring") hfst_dev::HfstTransducer::concatenate
 """
 
 Concatenate this transducer with *another*.
 """
 
-%feature("docstring") hfst::HfstTransducer::determinize
+%feature("docstring") hfst_dev::HfstTransducer::determinize
 """
 
 Determinize the transducer.
@@ -1746,7 +1746,7 @@ Determinizing a transducer yields an equivalent transducer that has no state
 with two or more transitions whose input:output symbol pairs are the same.
 """
 
-%feature("docstring") hfst::HfstTransducer::is_automaton
+%feature("docstring") hfst_dev::HfstTransducer::is_automaton
 """
 
 Whether each transition in the transducer has equivalent input and output
@@ -1759,7 +1759,7 @@ note: Transition with hfst.IDENTITY on both sides IS a transition with
     equivalent input and output symbols.
 """
 
-%feature("docstring") hfst::HfstTransducer::minimize
+%feature("docstring") hfst_dev::HfstTransducer::minimize
 """
 
 Minimize the transducer.
@@ -1772,7 +1772,7 @@ OpenFst's minimization algorithm seems to add epsilon transitions to weighted
 transducers?
 """
 
-%feature("docstring") hfst::HfstTransducer::set_property
+%feature("docstring") hfst_dev::HfstTransducer::set_property
 """
 
 Set arbitrary string property *property* to *value*.
@@ -1793,7 +1793,7 @@ note: While this function is capable of creating endless amounts of arbitrary
     convention may affect the behavior of transducer in future releases.
 """
 
-%feature("docstring") hfst::HfstTransducer::convert
+%feature("docstring") hfst_dev::HfstTransducer::convert
 """
 
 Convert the transducer into an equivalent transducer in format *type*.
@@ -1811,26 +1811,26 @@ note: For conversion between HfstBasicTransducer and HfstTransducer, see
     hfst.HfstTransducer.__init__ and hfst.HfstBasicTransducer.__init__
 """
 
-%feature("docstring") hfst::HfstTransducer::remove_epsilons
+%feature("docstring") hfst_dev::HfstTransducer::remove_epsilons
 """
 
 Remove all *epsilon:epsilon* transitions from the transducer so that the
 resulting transducer is equivalent to the original one.
 """
 
-%feature("docstring") hfst::HfstTransducer::repeat_n
+%feature("docstring") hfst_dev::HfstTransducer::repeat_n
 """
 
 A concatenation of *n* transducers.
 """
 
-%feature("docstring") hfst::HfstTransducer::number_of_arcs
+%feature("docstring") hfst_dev::HfstTransducer::number_of_arcs
 """
 
 The number of transitions in the transducer.
 """
 
-%feature("docstring") hfst::HfstTransducer::cross_product
+%feature("docstring") hfst_dev::HfstTransducer::cross_product
 """
 
 Make cross product of this transducer with *another*.
@@ -1841,7 +1841,7 @@ the same length, epsilon padding will be added in the end of the shorter string.
 pre: Both transducers must be automata, i.e. map strings onto themselves.
 """
 
-%feature("docstring") hfst::HfstTransducer::write
+%feature("docstring") hfst_dev::HfstTransducer::write
 """
 
 Write the transducer in binary format to *ostr*.
@@ -1852,7 +1852,7 @@ Parameters
     A hfst.HfstOutputStream where the transducer is written.
 """
 
-%feature("docstring") hfst::HfstTransducer::lenient_composition
+%feature("docstring") hfst_dev::HfstTransducer::lenient_composition
 """
 
 Perform a lenient composition on this transducer and *another*.
@@ -1860,7 +1860,7 @@ Perform a lenient composition on this transducer and *another*.
 TODO: explain more.
 """
 
-%feature("docstring") hfst::HfstTransducer::remove_optimization
+%feature("docstring") hfst_dev::HfstTransducer::remove_optimization
 """
 
 Remove lookup optimization.
@@ -1868,7 +1868,7 @@ Remove lookup optimization.
 This effectively converts transducer (back) into default fst type.
 """
 
-%feature("docstring") hfst::HfstTransducer::get_property
+%feature("docstring") hfst_dev::HfstTransducer::get_property
 """
 
 Get arbitrary string propert *property*.
@@ -1880,7 +1880,7 @@ Parameters
     like get_name().
 """
 
-%feature("docstring") hfst::HfstTransducer::get_alphabet
+%feature("docstring") hfst_dev::HfstTransducer::get_alphabet
 """
 
 Get the alphabet of the transducer.
@@ -1896,19 +1896,19 @@ A tuple of strings.
 // File: classhfst_1_1MultiCharSymbolTrie.xml
 
 
-%feature("docstring") hfst::MultiCharSymbolTrie
+%feature("docstring") hfst_dev::MultiCharSymbolTrie
 """
 
 TODO: documentation ???
 """
 
-%feature("docstring") hfst::MultiCharSymbolTrie::__init__
+%feature("docstring") hfst_dev::MultiCharSymbolTrie::__init__
 """
 
 TODO: documentation.
 """
 
-%feature("docstring") hfst::MultiCharSymbolTrie::add
+%feature("docstring") hfst_dev::MultiCharSymbolTrie::add
 """
 
 TODO: documentation.
@@ -2016,7 +2016,7 @@ todo
 // File: classhfst_1_1PrologReader.xml
 
 
-%feature("docstring") hfst::PrologReader
+%feature("docstring") hfst_dev::PrologReader
 """
 
 A class for reading input in prolog text format and converting it into
@@ -2036,7 +2036,7 @@ stopped.
              print(e.what())
 """
 
-%feature("docstring") hfst::PrologReader::next
+%feature("docstring") hfst_dev::PrologReader::next
 """
 
 Return next element (for python version 2).
@@ -2051,7 +2051,7 @@ Exceptions
 * `StopIteration` :
 """
 
-%feature("docstring") hfst::PrologReader::__iter__
+%feature("docstring") hfst_dev::PrologReader::__iter__
 """
 
 An iterator to the reader.
@@ -2062,7 +2062,7 @@ Needed for 'for ... in' statement.
          print(transducer)
 """
 
-%feature("docstring") hfst::PrologReader::__next__
+%feature("docstring") hfst_dev::PrologReader::__next__
 """
 
 Return next element (for python version 3).
@@ -2077,7 +2077,7 @@ Exceptions
 * `StopIteration` :
 """
 
-%feature("docstring") hfst::PrologReader::__init__
+%feature("docstring") hfst_dev::PrologReader::__init__
 """
 
 Create a PrologReader that reads input from file *f*.
@@ -2088,7 +2088,7 @@ Parameters
     A python file.
 """
 
-%feature("docstring") hfst::PrologReader::read
+%feature("docstring") hfst_dev::PrologReader::read
 """
 
 Read next transducer.
@@ -2106,43 +2106,43 @@ Exceptions
 // File: classhfst_1_1XreCompiler.xml
 
 
-%feature("docstring") hfst::XreCompiler
+%feature("docstring") hfst_dev::XreCompiler
 """
 
 A regular expression compiler.
 """
 
-%feature("docstring") hfst::XreCompiler::__init__
+%feature("docstring") hfst_dev::XreCompiler::__init__
 """
 
 Construct compiler for OpenFst format (the default) transducers.
 """
 
-%feature("docstring") hfst::XreCompiler::__init__
+%feature("docstring") hfst_dev::XreCompiler::__init__
 """
 
 Create compiler for *impl* format transducers.
 """
 
-%feature("docstring") hfst::XreCompiler::define_list
+%feature("docstring") hfst_dev::XreCompiler::define_list
 """
 
 todo
 """
 
-%feature("docstring") hfst::XreCompiler::is_function_definition
+%feature("docstring") hfst_dev::XreCompiler::is_function_definition
 """
 
 Whether *name* is a function definition.
 """
 
-%feature("docstring") hfst::XreCompiler::is_definition
+%feature("docstring") hfst_dev::XreCompiler::is_definition
 """
 
 Whether *name* is a definition.
 """
 
-%feature("docstring") hfst::XreCompiler::set_verbosity
+%feature("docstring") hfst_dev::XreCompiler::set_verbosity
 """
 
 Set the verbosity of the compiler.
@@ -2150,13 +2150,13 @@ Set the verbosity of the compiler.
 *   v True or False
 """
 
-%feature("docstring") hfst::XreCompiler::undefine
+%feature("docstring") hfst_dev::XreCompiler::undefine
 """
 
 todo
 """
 
-%feature("docstring") hfst::XreCompiler::setOutputToConsole
+%feature("docstring") hfst_dev::XreCompiler::setOutputToConsole
 """
 
 (Windows-specific) Whether output is printed to console instead of standard
@@ -2165,7 +2165,7 @@ output.
 *   v True or False
 """
 
-%feature("docstring") hfst::XreCompiler::compile
+%feature("docstring") hfst_dev::XreCompiler::compile
 """
 
 Compile a transducer defined by *xre*.
@@ -2178,7 +2178,7 @@ Returns
 An HfstTransducer pointer.
 """
 
-%feature("docstring") hfst::XreCompiler::set_expand_definitions
+%feature("docstring") hfst_dev::XreCompiler::set_expand_definitions
 """
 
 Whether definitions are expanded.
@@ -2186,7 +2186,7 @@ Whether definitions are expanded.
 *   v True or False
 """
 
-%feature("docstring") hfst::XreCompiler::define_xre
+%feature("docstring") hfst_dev::XreCompiler::define_xre
 """
 
 Add a definition macro.
@@ -2196,7 +2196,7 @@ expression *xre* in later phases of compilation (if set_expand_definitions(True)
 has been called).
 """
 
-%feature("docstring") hfst::XreCompiler::define_transducer
+%feature("docstring") hfst_dev::XreCompiler::define_transducer
 """
 
 Add a definition macro.
@@ -2205,13 +2205,13 @@ Compilers will replace arcs labeled *name*, with a transducer *transducer* in
 later phases of compilation (if set_expand_definitions(True) has been called).
 """
 
-%feature("docstring") hfst::XreCompiler::define_function
+%feature("docstring") hfst_dev::XreCompiler::define_function
 """
 
 todo
 """
 
-%feature("docstring") hfst::XreCompiler::getOutputToConsole
+%feature("docstring") hfst_dev::XreCompiler::getOutputToConsole
 """
 
 (Windows-specific) Whether output is printed to console instead of standard
@@ -2230,65 +2230,65 @@ output.
 
 // File: namespacehfst_1_1rules.xml
 
-%feature("docstring") hfst::xeroxRules::Rule
+%feature("docstring") hfst_dev::xeroxRules::Rule
 """
 todo
 """
 
-%feature("docstring") hfst::xeroxRules::replace
+%feature("docstring") hfst_dev::xeroxRules::replace
 """
 todo
 """
 
 // note: this function is offered as 'replace_left' in package hfst.xerox_rules
-%feature("docstring") hfst::xeroxRules::xerox_replace_left
+%feature("docstring") hfst_dev::xeroxRules::xerox_replace_left
 """
 todo
 """
 
-%feature("docstring") hfst::xeroxRules::replace_leftmost_longest_match
+%feature("docstring") hfst_dev::xeroxRules::replace_leftmost_longest_match
 """
 todo
 """
 
-%feature("docstring") hfst::xeroxRules::replace_rightmost_longest_match
+%feature("docstring") hfst_dev::xeroxRules::replace_rightmost_longest_match
 """
 todo
 """
 
-%feature("docstring") hfst::xeroxRules::replace_leftmost_shortest_match
+%feature("docstring") hfst_dev::xeroxRules::replace_leftmost_shortest_match
 """
 todo
 """
 
-%feature("docstring") hfst::xeroxRules::replace_rightmost_shortest_match
+%feature("docstring") hfst_dev::xeroxRules::replace_rightmost_shortest_match
 """
 todo
 """
 
-%feature("docstring") hfst::xeroxRules::replace_epenthesis
+%feature("docstring") hfst_dev::xeroxRules::replace_epenthesis
 """
 todo
 """
 
 // note: this function is offered as 'restriction' in package hfst.xerox_rules
-%feature("docstring") hfst::xeroxRules::xerox_restriction
+%feature("docstring") hfst_dev::xeroxRules::xerox_restriction
 """
 todo
 """
 
-%feature("docstring") hfst::xeroxRules::before
+%feature("docstring") hfst_dev::xeroxRules::before
 """
 todo
 """
 
-%feature("docstring") hfst::xeroxRules::after
+%feature("docstring") hfst_dev::xeroxRules::after
 """
 todo
 """
 
 
-%feature("docstring") hfst::rules::two_level_if
+%feature("docstring") hfst_dev::rules::two_level_if
 """
 
 A transducer that obligatorily performs the mappings defined by *mappings* in
@@ -2318,7 +2318,7 @@ that the alphabet must contain the pair a:b here.
 See also: SFST manual
 """
 
-%feature("docstring") hfst::rules::replace_down
+%feature("docstring") hfst_dev::rules::replace_down
 """
 
 The same as replace_up, but matching is done on the output side of *mapping*.
@@ -2326,7 +2326,7 @@ The same as replace_up, but matching is done on the output side of *mapping*.
 See also: replace_up SFST manual.
 """
 
-%feature("docstring") hfst::rules::replace_down
+%feature("docstring") hfst_dev::rules::replace_down
 """
 
 The same as replace_down(context, mapping, optional, alphabet) but *mapping* is
@@ -2335,7 +2335,7 @@ performed in every context.
 See also: replace_up
 """
 
-%feature("docstring") hfst::rules::deep_restriction_and_coercion
+%feature("docstring") hfst_dev::rules::deep_restriction_and_coercion
 """
 
 A transducer that is equivalent to the intersection of deep_restriction and
@@ -2353,7 +2353,7 @@ Parameters
     A tuple of string pairs.
 """
 
-%feature("docstring") hfst::rules::surface_restriction_and_coercion
+%feature("docstring") hfst_dev::rules::surface_restriction_and_coercion
 """
 
 A transducer that is equivalent to the intersection of surface_restriction and
@@ -2371,7 +2371,7 @@ Parameters
     A tuple of string pairs.
 """
 
-%feature("docstring") hfst::rules::left_replace_down_karttunen
+%feature("docstring") hfst_dev::rules::left_replace_down_karttunen
 """
 
 Inversion of the replace_up and the result needs to be composed on the upper
@@ -2382,7 +2382,7 @@ However, matching is done on the output side of *mapping*.
 See also: replace_up
 """
 
-%feature("docstring") hfst::rules::coercion
+%feature("docstring") hfst_dev::rules::coercion
 """
 
 A transducer that requires that one of the mappings defined by *mapping* must
@@ -2403,7 +2403,7 @@ Parameters
     A tuple of string pairs.
 """
 
-%feature("docstring") hfst::rules::left_replace_down
+%feature("docstring") hfst_dev::rules::left_replace_down
 """
 
 Inversion of the replace_up and the result needs to be composed on the upper
@@ -2414,7 +2414,7 @@ However, matching is done on the output side of *mapping*.
 See also: replace_up
 """
 
-%feature("docstring") hfst::rules::surface_coercion
+%feature("docstring") hfst_dev::rules::surface_coercion
 """
 
 A transducer that specifies that a string from the input language of the
@@ -2437,7 +2437,7 @@ Parameters
     A tuple of string pairs.
 """
 
-%feature("docstring") hfst::rules::deep_coercion
+%feature("docstring") hfst_dev::rules::deep_coercion
 """
 
 A transducer that specifies that a string from the output language of the
@@ -2460,13 +2460,13 @@ Parameters
     A tuple of string pairs.
 """
 
-%feature("docstring") hfst::rules::replace_down_karttunen
+%feature("docstring") hfst_dev::rules::replace_down_karttunen
 """
 
 TODO: document.
 """
 
-%feature("docstring") hfst::rules::replace_left
+%feature("docstring") hfst_dev::rules::replace_left
 """
 
 The same as replace_up, but left context matching is done on the output side of
@@ -2475,7 +2475,7 @@ The same as replace_up, but left context matching is done on the output side of
 See also: replace_up
 """
 
-%feature("docstring") hfst::rules::two_level_if_and_only_if
+%feature("docstring") hfst_dev::rules::two_level_if_and_only_if
 """
 
 A transducer that always performs the mappings defined by *mappings* in the
@@ -2492,7 +2492,7 @@ The expression is equivalent to ![.* [c|d] [a:. & !a:b] [e] .*] & ![ [ ![.*
 See also: two_level_if
 """
 
-%feature("docstring") hfst::rules::surface_restriction
+%feature("docstring") hfst_dev::rules::surface_restriction
 """
 
 A transducer that specifies that a string from the input language of the
@@ -2514,7 +2514,7 @@ Parameters
     A tuple of string pairs.
 """
 
-%feature("docstring") hfst::rules::left_replace_left
+%feature("docstring") hfst_dev::rules::left_replace_left
 """
 
 Inversion of the replace_up and the result needs to be composed on the upper
@@ -2526,7 +2526,7 @@ context on the output side of *mapping*.
 See also: replace_up */
 """
 
-%feature("docstring") hfst::rules::deep_restriction
+%feature("docstring") hfst_dev::rules::deep_restriction
 """
 
 A transducer that specifies that a string from the output language of the
@@ -2547,7 +2547,7 @@ Parameters
     A tuple of string pairs.
 """
 
-%feature("docstring") hfst::rules::left_replace_up
+%feature("docstring") hfst_dev::rules::left_replace_up
 """
 
 Inversion of the replace_up and the result needs to be composed on the upper
@@ -2558,7 +2558,7 @@ B <- A is the inversion of A -> B. *mapping* is performed in every context.
 See also: replace_up
 """
 
-%feature("docstring") hfst::rules::left_replace_up
+%feature("docstring") hfst_dev::rules::left_replace_up
 """
 
 Inversion of the replace_up and the result needs to be composed on the upper
@@ -2569,7 +2569,7 @@ B <- A is the inversion of A -> B.
 See also: replace_up
 """
 
-%feature("docstring") hfst::rules::left_replace_right
+%feature("docstring") hfst_dev::rules::left_replace_right
 """
 
 Inversion of the replace_up and the result needs to be composed on the upper
@@ -2581,7 +2581,7 @@ context on the input side of *mapping*.
 See also: replace_up
 """
 
-%feature("docstring") hfst::rules::replace_up
+%feature("docstring") hfst_dev::rules::replace_up
 """
 
 A transducer that performs an upward mapping *mapping* in the context *context*
@@ -2630,7 +2630,7 @@ Exceptions
 See also: SFST manual
 """
 
-%feature("docstring") hfst::rules::replace_up
+%feature("docstring") hfst_dev::rules::replace_up
 """
 
 The same as replace_up but *mapping* is performed in every context.
@@ -2638,7 +2638,7 @@ The same as replace_up but *mapping* is performed in every context.
 See also: replace_up
 """
 
-%feature("docstring") hfst::rules::two_level_only_if
+%feature("docstring") hfst_dev::rules::two_level_only_if
 """
 
 A transducer that allows the mappings defined by *mappings* only in the context
@@ -2655,7 +2655,7 @@ The expression is equivalent to ![ [ ![.* [c|d]] a:b .* ] | [ .* a:b ![[e] .*] ]
 See also: two_level_if
 """
 
-%feature("docstring") hfst::rules::restriction_and_coercion
+%feature("docstring") hfst_dev::rules::restriction_and_coercion
 """
 
 A transducer that is equivalent to the intersection of restriction and coercion
@@ -2677,7 +2677,7 @@ Parameters
     A tuple of string pairs.
 """
 
-%feature("docstring") hfst::rules::restriction
+%feature("docstring") hfst_dev::rules::restriction
 """
 
 A transducer that allows any (substring) mapping defined by *mapping* only if it
@@ -2702,7 +2702,7 @@ Parameters
     A tuple of string pairs.
 """
 
-%feature("docstring") hfst::rules::replace_right
+%feature("docstring") hfst_dev::rules::replace_right
 """
 
 The same as replace_up, but left context matching is done on the input side of
@@ -3068,7 +3068,7 @@ create a transducer as defined in it.
 // File: classhfst_1_1exceptions_1_1ContextTransducersAreNotAutomataException.xml
 
 
-%feature("docstring") hfst::exceptions::ContextTransducersAreNotAutomataException
+%feature("docstring") hfst_dev::exceptions::ContextTransducersAreNotAutomataException
 """
 
 Transducers given as rule context are not automata.
@@ -3080,7 +3080,7 @@ See also: hfst.HfstTransducer.is_automaton()
 // File: classhfst_1_1exceptions_1_1EmptySetOfContextsException.xml
 
 
-%feature("docstring") hfst::exceptions::EmptySetOfContextsException
+%feature("docstring") hfst_dev::exceptions::EmptySetOfContextsException
 """
 
 The set of transducer pairs is empty.
@@ -3092,7 +3092,7 @@ Thrown by rule functions.
 // File: classhfst_1_1exceptions_1_1EmptyStringException.xml
 
 
-%feature("docstring") hfst::exceptions::EmptyStringException
+%feature("docstring") hfst_dev::exceptions::EmptyStringException
 """
 
 An argument string is an empty string.
@@ -3104,7 +3104,7 @@ A transition symbol cannot be an empty string.
 // File: classhfst_1_1exceptions_1_1EndOfStreamException.xml
 
 
-%feature("docstring") hfst::exceptions::EndOfStreamException
+%feature("docstring") hfst_dev::exceptions::EndOfStreamException
 """
 
 The stream is at end.
@@ -3116,7 +3116,7 @@ Thrown by hfst.HfstTransducer hfst.HfstInputStream.__init__
 // File: classhfst_1_1exceptions_1_1FlagDiacriticsAreNotIdentitiesException.xml
 
 
-%feature("docstring") hfst::exceptions::FlagDiacriticsAreNotIdentitiesException
+%feature("docstring") hfst_dev::exceptions::FlagDiacriticsAreNotIdentitiesException
 """
 
 Flag diacritics encountered on one but not the other side of a transition.
@@ -3126,7 +3126,7 @@ Flag diacritics encountered on one but not the other side of a transition.
 // File: classhfst_1_1exceptions_1_1FunctionNotImplementedException.xml
 
 
-%feature("docstring") hfst::exceptions::FunctionNotImplementedException
+%feature("docstring") hfst_dev::exceptions::FunctionNotImplementedException
 """
 
 Function has not been implemented (yet).
@@ -3136,7 +3136,7 @@ Function has not been implemented (yet).
 // File: classhfst_1_1exceptions_1_1HfstException.xml
 
 
-%feature("docstring") hfst::exceptions::HfstException
+%feature("docstring") hfst_dev::exceptions::HfstException
 """
 
 Base class for HfstExceptions.
@@ -3144,7 +3144,7 @@ Base class for HfstExceptions.
 Holds its own name and the file and line number where it was thrown.
 """
 
-%feature("docstring") hfst::exceptions::HfstException::what
+%feature("docstring") hfst_dev::exceptions::HfstException::what
 """
 
 A message describing the error in more detail.
@@ -3154,7 +3154,7 @@ A message describing the error in more detail.
 // File: classhfst_1_1exceptions_1_1HfstFatalException.xml
 
 
-%feature("docstring") hfst::exceptions::HfstFatalException
+%feature("docstring") hfst_dev::exceptions::HfstFatalException
 """
 
 An error happened probably due to a bug in the HFST code.
@@ -3164,7 +3164,7 @@ An error happened probably due to a bug in the HFST code.
 // File: classhfst_1_1exceptions_1_1HfstTransducerTypeMismatchException.xml
 
 
-%feature("docstring") hfst::exceptions::HfstTransducerTypeMismatchException
+%feature("docstring") hfst_dev::exceptions::HfstTransducerTypeMismatchException
 """
 
 Two or more HfstTransducers are not of the same type.
@@ -3176,7 +3176,7 @@ Same as HfstTransducerTypeMismatchException ???
 // File: classhfst_1_1exceptions_1_1ImplementationTypeNotAvailableException.xml
 
 
-%feature("docstring") hfst::exceptions::ImplementationTypeNotAvailableException
+%feature("docstring") hfst_dev::exceptions::ImplementationTypeNotAvailableException
 """
 
 The library required by the implementation type requested is not linked to HFST.
@@ -3186,7 +3186,7 @@ The library required by the implementation type requested is not linked to HFST.
 // File: classhfst_1_1exceptions_1_1IncorrectUtf8CodingException.xml
 
 
-%feature("docstring") hfst::exceptions::IncorrectUtf8CodingException
+%feature("docstring") hfst_dev::exceptions::IncorrectUtf8CodingException
 """
 
 String is not valid utf-8.
@@ -3198,7 +3198,7 @@ This exception suggests that an input string is not valid utf8.
 // File: classhfst_1_1exceptions_1_1MetadataException.xml
 
 
-%feature("docstring") hfst::exceptions::MetadataException
+%feature("docstring") hfst_dev::exceptions::MetadataException
 """
 
 A piece of metadata in an HFST header is not supported.
@@ -3208,7 +3208,7 @@ A piece of metadata in an HFST header is not supported.
 // File: classhfst_1_1exceptions_1_1MissingOpenFstInputSymbolTableException.xml
 
 
-%feature("docstring") hfst::exceptions::MissingOpenFstInputSymbolTableException
+%feature("docstring") hfst_dev::exceptions::MissingOpenFstInputSymbolTableException
 """
 
 An OpenFst transducer does not have an input symbol table.
@@ -3224,7 +3224,7 @@ Thrown by hfst.HfstTransducer.__init__
 // File: classhfst_1_1exceptions_1_1NotTransducerStreamException.xml
 
 
-%feature("docstring") hfst::exceptions::NotTransducerStreamException
+%feature("docstring") hfst_dev::exceptions::NotTransducerStreamException
 """
 
 The stream does not contain transducers.
@@ -3250,7 +3250,7 @@ transducers.\")
 // File: classhfst_1_1exceptions_1_1NotValidAttFormatException.xml
 
 
-%feature("docstring") hfst::exceptions::NotValidAttFormatException
+%feature("docstring") hfst_dev::exceptions::NotValidAttFormatException
 """
 
 The stream is not in valid AT&T format.
@@ -3274,7 +3274,7 @@ An example:
 // File: classhfst_1_1exceptions_1_1NotValidLexcFormatException.xml
 
 
-%feature("docstring") hfst::exceptions::NotValidLexcFormatException
+%feature("docstring") hfst_dev::exceptions::NotValidLexcFormatException
 """
 
 The input is not in valid LexC format.
@@ -3284,7 +3284,7 @@ The input is not in valid LexC format.
 // File: classhfst_1_1exceptions_1_1NotValidPrologFormatException.xml
 
 
-%feature("docstring") hfst::exceptions::NotValidPrologFormatException
+%feature("docstring") hfst_dev::exceptions::NotValidPrologFormatException
 """
 
 The input is not in valid prolog format.
@@ -3294,7 +3294,7 @@ The input is not in valid prolog format.
 // File: classhfst_1_1exceptions_1_1SpecifiedTypeRequiredException.xml
 
 
-%feature("docstring") hfst::exceptions::SpecifiedTypeRequiredException
+%feature("docstring") hfst_dev::exceptions::SpecifiedTypeRequiredException
 """
 
 The type of a transducer is not specified.
@@ -3307,7 +3307,7 @@ hfst.ImplementationType.ERROR_TYPE.
 // File: classhfst_1_1exceptions_1_1StateIndexOutOfBoundsException.xml
 
 
-%feature("docstring") hfst::exceptions::StateIndexOutOfBoundsException
+%feature("docstring") hfst_dev::exceptions::StateIndexOutOfBoundsException
 """
 
 The state number argument is not valid.
@@ -3326,7 +3326,7 @@ An example :
 // File: classhfst_1_1exceptions_1_1StateIsNotFinalException.xml
 
 
-%feature("docstring") hfst::exceptions::StateIsNotFinalException
+%feature("docstring") hfst_dev::exceptions::StateIsNotFinalException
 """
 
 State is not final (and cannot have a final weight).
@@ -3351,7 +3351,7 @@ Thrown by hfst.HfstBasicTransducer get_final_weight.
 // File: classhfst_1_1exceptions_1_1StreamCannotBeWrittenException.xml
 
 
-%feature("docstring") hfst::exceptions::StreamCannotBeWrittenException
+%feature("docstring") hfst_dev::exceptions::StreamCannotBeWrittenException
 """
 
 Stream cannot be written.
@@ -3363,7 +3363,7 @@ Thrown by hfst.HfstOutputStream.write and hfst.HfstTransducer.write_att
 // File: classhfst_1_1exceptions_1_1StreamIsClosedException.xml
 
 
-%feature("docstring") hfst::exceptions::StreamIsClosedException
+%feature("docstring") hfst_dev::exceptions::StreamIsClosedException
 """
 
 Stream is closed.
@@ -3385,7 +3385,7 @@ An example:
 // File: classhfst_1_1exceptions_1_1StreamNotReadableException.xml
 
 
-%feature("docstring") hfst::exceptions::StreamNotReadableException
+%feature("docstring") hfst_dev::exceptions::StreamNotReadableException
 """
 
 Stream cannot be read.
@@ -3395,7 +3395,7 @@ Stream cannot be read.
 // File: classhfst_1_1exceptions_1_1SymbolNotFoundException.xml
 
 
-%feature("docstring") hfst::exceptions::SymbolNotFoundException
+%feature("docstring") hfst_dev::exceptions::SymbolNotFoundException
 """
 
 A bug in the HFST code.
@@ -3405,7 +3405,7 @@ A bug in the HFST code.
 // File: classhfst_1_1exceptions_1_1TransducerHasWrongTypeException.xml
 
 
-%feature("docstring") hfst::exceptions::TransducerHasWrongTypeException
+%feature("docstring") hfst_dev::exceptions::TransducerHasWrongTypeException
 """
 
 Transducer has wrong type.
@@ -3421,7 +3421,7 @@ See also: hfst.HfstTransducer.__init__
 // File: classhfst_1_1exceptions_1_1TransducerHeaderException.xml
 
 
-%feature("docstring") hfst::exceptions::TransducerHeaderException
+%feature("docstring") hfst_dev::exceptions::TransducerHeaderException
 """
 
 Transducer has a malformed HFST header.
@@ -3433,7 +3433,7 @@ Thrown by hfst.HfstTransducer.__init__ hfst.HfstInputStream
 // File: classhfst_1_1exceptions_1_1TransducerIsCyclicException.xml
 
 
-%feature("docstring") hfst::exceptions::TransducerIsCyclicException
+%feature("docstring") hfst_dev::exceptions::TransducerIsCyclicException
 """
 
 Transducer is cyclic.
@@ -3456,7 +3456,7 @@ Some of them:\")
 // File: classhfst_1_1exceptions_1_1TransducerTypeMismatchException.xml
 
 
-%feature("docstring") hfst::exceptions::TransducerTypeMismatchException
+%feature("docstring") hfst_dev::exceptions::TransducerTypeMismatchException
 """
 
 Two or more transducers do not have the same type.
@@ -3482,7 +3482,7 @@ An example:
 // File: classhfst_1_1exceptions_1_1TransducersAreNotAutomataException.xml
 
 
-%feature("docstring") hfst::exceptions::TransducersAreNotAutomataException
+%feature("docstring") hfst_dev::exceptions::TransducersAreNotAutomataException
 """
 
 Transducers are not automata.

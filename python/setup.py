@@ -26,7 +26,7 @@ if platform == "darwin":
 
 # If you wish to link to the local HFST library:
 if local_hfst:
-        extra_link_arguments.extend(["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"])
+	extra_link_arguments.extend(["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"])
 
 extra_compile_arguments = ['-std=c++0x']
 if platform == "darwin":
@@ -37,9 +37,9 @@ if platform == "darwin":
 # libraries = []
 # extra_objects = absolute_libhfst_src_path + "/.libs/libhfst.a"
 
-libhfst_module = Extension('_libhfst',
+libhfst_module = Extension('_libhfst_dev',
                            language = "c++",
-                           sources = ["libhfst.i"],
+                           sources = ["libhfst_dev.i"],
                            swig_opts = ["-c++",
                                         "-I" + absolute_libhfst_src_path, "-Wall"],
                            include_dirs = [absolute_libhfst_src_path],
@@ -49,14 +49,14 @@ libhfst_module = Extension('_libhfst',
                            extra_link_args = extra_link_arguments
                            )
 
-setup(name = 'libhfst_swig',
+setup(name = 'libhfst_dev',
       version = '3.15.0_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',
       description = 'SWIG-bound hfst interface',
       ext_modules = [libhfst_module],
-      py_modules = ["libhfst"],
-      packages = ["hfst", "hfst.exceptions", "hfst.sfst_rules", "hfst.xerox_rules"],
+      py_modules = ["libhfst_dev"],
+      packages = ["hfst_dev", "hfst_dev.exceptions", "hfst_dev.sfst_rules", "hfst_dev.xerox_rules"],
       data_files = []
       )

@@ -12,7 +12,7 @@
 // package 'hfst' and its subpackages 'hfst.exceptions' and 'hfst.rules' (see
 // folder 'hfst' in the current directory).
 
-%module libhfst
+%module libhfst_dev
 // Needed for type conversions between c++ and python.
 %include "std_string.i"
 %include "std_vector.i"
@@ -1043,7 +1043,7 @@ def __init__(self, **kwargs):
     """
     filename = ""
     hfst_format = True
-    type = _libhfst.get_default_fst_type()
+    type = _libhfst_dev.get_default_fst_type()
     for k,v in kwargs.items():
         if k == 'filename':
             filename = v
@@ -1052,9 +1052,9 @@ def __init__(self, **kwargs):
         if k == 'type':
             type = v
     if filename == "":
-        self.this = _libhfst.create_hfst_output_stream("", type, hfst_format)
+        self.this = _libhfst_dev.create_hfst_output_stream("", type, hfst_format)
     else:
-        self.this = _libhfst.create_hfst_output_stream(filename, type, hfst_format)
+        self.this = _libhfst_dev.create_hfst_output_stream(filename, type, hfst_format)
 %}
 
 }
@@ -1869,16 +1869,16 @@ class ImplementationType:
         ERROR_TYPE:              (something went wrong)
 
     """
-    SFST_TYPE = _libhfst.SFST_TYPE
-    TROPICAL_OPENFST_TYPE = _libhfst.TROPICAL_OPENFST_TYPE    
-    LOG_OPENFST_TYPE = _libhfst.LOG_OPENFST_TYPE
-    FOMA_TYPE = _libhfst.FOMA_TYPE
-    XFSM_TYPE = _libhfst.XFSM_TYPE
-    HFST_OL_TYPE = _libhfst.HFST_OL_TYPE
-    HFST_OLW_TYPE = _libhfst.HFST_OLW_TYPE
-    HFST2_TYPE = _libhfst.HFST2_TYPE
-    UNSPECIFIED_TYPE = _libhfst.UNSPECIFIED_TYPE
-    ERROR_TYPE = _libhfst.ERROR_TYPE
+    SFST_TYPE = _libhfst_dev.SFST_TYPE
+    TROPICAL_OPENFST_TYPE = _libhfst_dev.TROPICAL_OPENFST_TYPE
+    LOG_OPENFST_TYPE = _libhfst_dev.LOG_OPENFST_TYPE
+    FOMA_TYPE = _libhfst_dev.FOMA_TYPE
+    XFSM_TYPE = _libhfst_dev.XFSM_TYPE
+    HFST_OL_TYPE = _libhfst_dev.HFST_OL_TYPE
+    HFST_OLW_TYPE = _libhfst_dev.HFST_OLW_TYPE
+    HFST2_TYPE = _libhfst_dev.HFST2_TYPE
+    UNSPECIFIED_TYPE = _libhfst_dev.UNSPECIFIED_TYPE
+    ERROR_TYPE = _libhfst_dev.ERROR_TYPE
 
 class ReplaceType:
     """
@@ -1892,9 +1892,9 @@ class ReplaceType:
         REPL_LEFT:    Match left contexts on output level and right contexts on input level
 
     """
-    REPL_UP = _libhfst.REPL_UP
-    REPL_DOWN = _libhfst.REPL_DOWN
-    REPL_RIGHT = _libhfst.REPL_RIGHT
-    REPL_LEFT = _libhfst.REPL_LEFT
+    REPL_UP = _libhfst_dev.REPL_UP
+    REPL_DOWN = _libhfst_dev.REPL_DOWN
+    REPL_RIGHT = _libhfst_dev.REPL_RIGHT
+    REPL_LEFT = _libhfst_dev.REPL_LEFT
 
 %}

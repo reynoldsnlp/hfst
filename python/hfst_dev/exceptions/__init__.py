@@ -35,7 +35,7 @@ CLASSES:
 
 """
 
-from libhfst import HfstException,\
+from libhfst_dev import HfstException,\
 HfstTransducerTypeMismatchException,\
 ImplementationTypeNotAvailableException,\
 FunctionNotImplementedException,\
