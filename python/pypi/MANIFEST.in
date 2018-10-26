@@ -3,6 +3,7 @@ include hfst_file_extensions.cpp
 include hfst_lexc_extensions.cpp
 include hfst_lookup_extensions.cpp
 include hfst_pmatch_extensions.cpp
+include hfst_pmatch_tokenize_extensions.cpp
 include hfst_prolog_extensions.cpp
 include hfst_regex_extensions.cpp
 include hfst_rules_extensions.cpp
