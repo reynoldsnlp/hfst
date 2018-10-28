@@ -349,7 +349,7 @@ libhfst_module = Extension('_libhfst_dev',
                            extra_compile_args = ext_extra_compile_args
                            )
 
-setup(name = 'hfst_dev',
+setup(name = 'hfst-dev',
       version = '3.15.0.0_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
