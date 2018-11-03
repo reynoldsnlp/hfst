@@ -244,7 +244,28 @@ void print_cg_subreading(size_t const & indent,
     }
 
     if (s.print_weights) {
-        outstream << " <" << wtag << ":" << weight << ">";
+        std::ostringstream w;
+        w << std::fixed << std::setprecision(9) << weight;
+        std::string rounded = w.str();
+        bool seendot = false;
+        bool inzeroes = true;
+        size_t firstzero = rounded.length();
+        for(size_t i = rounded.length(); i > 0; --i) {
+            if(inzeroes && rounded[i-1] == '0') {
+                firstzero = i;  // not i-1, keep one zero
+            }
+            else {
+                inzeroes = false;
+            }
+            if(rounded[i-1] == '.') {
+                seendot = true;
+                break;
+            }
+        }
+        if(seendot) {
+            rounded = rounded.substr(0, firstzero);
+        }
+        outstream << " <" << wtag << ":" << rounded << ">";
     }
     if (in_beg != in_end) {
         std::ostringstream form;

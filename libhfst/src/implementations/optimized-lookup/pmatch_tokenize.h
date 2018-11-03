@@ -10,6 +10,7 @@
 #define _HFST_OL_TRANSDUCER_PMATCH_TOKENIZE_H_
 
 #include <iostream>
+#include <iomanip>
 #include <iterator>
 
 #include "pmatch.h"
