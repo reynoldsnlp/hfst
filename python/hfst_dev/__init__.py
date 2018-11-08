@@ -94,7 +94,7 @@ def start_xfst(**kwargs):
         Whether the compiler exits on any error, defaults to False.
     * `type` :
         Implementation type of the compiler, defaults to
-        hfst.get_default_fst_type().
+        hfst_dev.get_default_fst_type().
     """
     import sys
     idle = 'idlelib' in sys.modules
@@ -386,7 +386,7 @@ def read_att_string(att):
     for line in lines:
         linecount = linecount + 1
         if not _parse_att_line(line, fsm):
-           raise hfst.exceptions.NotValidAttFormatException(line, "", linecount)
+           raise hfst_dev.exceptions.NotValidAttFormatException(line, "", linecount)
     return HfstTransducer(fsm, get_default_fst_type())
 
 def read_att_input():
@@ -402,7 +402,7 @@ def read_att_input():
            break
         linecount = linecount + 1
         if not _parse_att_line(line, fsm):
-           raise hfst.exceptions.NotValidAttFormatException(line, "", linecount)
+           raise hfst_dev.exceptions.NotValidAttFormatException(line, "", linecount)
     return HfstTransducer(fsm, get_default_fst_type())
 
 def read_att_transducer(f, epsilonstr=EPSILON, linecount=[0]):
@@ -417,7 +417,7 @@ def read_att_transducer(f, epsilonstr=EPSILON, linecount=[0]):
         line = f.readline()
         if line == "":
            if linecount_ == 0:
-              raise hfst.exceptions.EndOfStreamException("","",0)
+              raise hfst_dev.exceptions.EndOfStreamException("","",0)
            else:
               linecount_ = linecount_ + 1
               break
@@ -425,7 +425,7 @@ def read_att_transducer(f, epsilonstr=EPSILON, linecount=[0]):
         if line[0] == '-':
            break
         if not _parse_att_line(line, fsm, epsilonstr):
-           raise hfst.exceptions.NotValidAttFormatException(line, "", linecount[0] + linecount_)
+           raise hfst_dev.exceptions.NotValidAttFormatException(line, "", linecount[0] + linecount_)
     linecount[0] = linecount[0] + linecount_
     return HfstTransducer(fsm, get_default_fst_type())
 
@@ -441,10 +441,10 @@ class AttReader:
 
       with open('testfile.att', 'r') as f:
            try:
-                r = hfst.AttReader(f, \"<eps>\")
+                r = hfst_dev.AttReader(f, \"<eps>\")
                 for tr in r:
                     print(tr)
-           except hfst.exceptions.NotValidAttFormatException as e:
+           except hfst_dev.exceptions.NotValidAttFormatException as e:
                 print(e.what())
       """
       def __init__(self, f, epsilonstr=EPSILON):
@@ -473,8 +473,8 @@ class AttReader:
 
           Exceptions
           ----------
-          * `hfst.exceptions.NotValidAttFormatException` :
-          * `hfst.exceptions.EndOfStreamException` :
+          * `hfst_dev.exceptions.NotValidAttFormatException` :
+          * `hfst_dev.exceptions.EndOfStreamException` :
           """
           return read_att_transducer(self.file, self.epsilonstr, self.linecount)
 
@@ -504,7 +504,7 @@ class AttReader:
           """
           try:
              return self.read()
-          except hfst.exceptions.EndOfStreamException as e:
+          except hfst_dev.exceptions.EndOfStreamException as e:
              raise StopIteration
 
       def __next__(self):
@@ -535,7 +535,7 @@ def read_prolog_transducer(f, linecount=[0]):
         line = f.readline()
         linecount_ = linecount_ + 1
         if line == "":
-            raise hfst.exceptions.EndOfStreamException("","",linecount[0] + linecount_)
+            raise hfst_dev.exceptions.EndOfStreamException("","",linecount[0] + linecount_)
         line = line.rstrip()
         if line == "":
             pass # allow extra prolog separator(s)
@@ -545,7 +545,7 @@ def read_prolog_transducer(f, linecount=[0]):
             break
 
     if not libhfst_dev.parse_prolog_network_line(line, fsm):
-        raise hfst.exceptions.NotValidPrologFormatException(line,"",linecount[0] + linecount_)
+        raise hfst_dev.exceptions.NotValidPrologFormatException(line,"",linecount[0] + linecount_)
 
     while(True):
         line = f.readline()
@@ -568,7 +568,7 @@ def read_prolog_transducer(f, linecount=[0]):
         elif libhfst_dev.parse_prolog_symbol_line(line, fsm):
             pass
         else:
-            raise hfst.exceptions.NotValidPrologFormatException(line,"",linecount[0] + linecount_)
+            raise hfst_dev.exceptions.NotValidPrologFormatException(line,"",linecount[0] + linecount_)
 
 class PrologReader:
       """
@@ -582,10 +582,10 @@ class PrologReader:
 
           with open('testfile.prolog', 'r') as f:
               try:
-                 r = hfst.PrologReader(f)
+                 r = hfst_dev.PrologReader(f)
                  for tr in r:
                      print(tr)
-              except hfst.exceptions.NotValidPrologFormatException as e:
+              except hfst_dev.exceptions.NotValidPrologFormatException as e:
                   print(e.what())
       """
       def __init__(self, f):
@@ -610,8 +610,8 @@ class PrologReader:
 
           Exceptions
           ----------
-          * `hfst.exceptions.NotValidPrologFormatException` :
-          * `hfst.exceptions.EndOfStreamException` :
+          * `hfst_dev.exceptions.NotValidPrologFormatException` :
+          * `hfst_dev.exceptions.EndOfStreamException` :
           """
           return read_prolog_transducer(self.file, self.linecount)
 
@@ -641,7 +641,7 @@ class PrologReader:
           """
           try:
              return self.read()
-          except hfst.exceptions.EndOfStreamException as e:
+          except hfst_dev.exceptions.EndOfStreamException as e:
              raise StopIteration
 
       def __next__(self):
@@ -679,7 +679,7 @@ def compile_xfst_file(filename, **kwargs):
         StringIO, sys.stderr being the default?
     * `type` :
         Implementation type of the compiler, defaults to
-        hfst.get_default_fst_type().
+        hfst_dev.get_default_fst_type().
 
     Returns
     -------
@@ -688,7 +688,7 @@ def compile_xfst_file(filename, **kwargs):
     if int(version[0]) > 2:
       pass
     else:
-      raise RuntimeError('hfst.compile_xfst_file not supported for python version 2')
+      raise RuntimeError('hfst_dev.compile_xfst_file not supported for python version 2')
     verbosity=0
     quit_on_fail='ON'
     type = get_default_fst_type()
@@ -777,7 +777,7 @@ def compile_twolc_file(inputfilename, outputfilename, **kwargs):
     * `resolve_left_conflicts` :
         Whether left arrow conflicts are resolved, defaults to False.
     * `type` :
-        Implementation type of the compiler, defaults to hfst.get_default_fst_type().
+        Implementation type of the compiler, defaults to hfst_dev.get_default_fst_type().
 
     Returns
     -------
@@ -823,8 +823,8 @@ def compile_pmatch_file(filename):
 
     we can run:
 
-    defs = hfst.compile_pmatch_file('streets.txt')
-    const = hfst.PmatchContainer(defs)
+    defs = hfst_dev.compile_pmatch_file('streets.txt')
+    const = hfst_dev.PmatchContainer(defs)
     assert cont.match("Je marche seul dans l'avenue desTernes.") ==
       "Je marche seul dans l'<FrenchStreetName>avenue des Ternes</FrenchStreetName>."
     """
@@ -1065,7 +1065,7 @@ def fst_to_fsa(fst, separator=''):
     Encode a transducer into an automaton, i.e. create a transducer where each
     transition <in:out> of *fst* is replaced with a transition <inSout:inSout>
     where 'S' is *separator*, except if the transition symbol on both sides is
-    hfst.EPSILON, hfst.IDENTITY or hfst.UNKNOWN.
+    hfst_dev.EPSILON, hfst_dev.IDENTITY or hfst_dev.UNKNOWN.
 
     All states and weights of transitions and end states are copied otherwise
     as such. The alphabet is copied, and new symbols which are created when
@@ -1081,27 +1081,27 @@ def fst_to_fsa(fst, separator=''):
     Examples:
 
         import hfst
-        foo2bar = hfst.fst({'foo':'bar'})
+        foo2bar = hfst_dev.fst({'foo':'bar'})
 
     creates a transducer [f:b o:a o:r]. Calling
 
-        foobar = hfst.fst_to_fsa(foo2bar)
+        foobar = hfst_dev.fst_to_fsa(foo2bar)
         
     will create the transducer [fb:fb oa:oa or:or] and
 
-        foobar = hfst.fst_to_fsa(foo2bar, '^')
+        foobar = hfst_dev.fst_to_fsa(foo2bar, '^')
 
     the transducer [f^b:f^b o^a:o^a o^r:o^r].
 
     """
     encoded_symbols = libhfst_dev.StringSet()
-    retval = hfst.HfstIterableTransducer(fst)
+    retval = hfst_dev.HfstIterableTransducer(fst)
     for state in retval.states():
         arcs = retval.transitions(state)
         for arc in arcs:
             input = arc.get_input_symbol()
             output = arc.get_output_symbol()
-            if (input == output) and ((input == hfst.EPSILON) or (input == hfst.UNKNOWN) or (input == hfst.IDENTITY)):
+            if (input == output) and ((input == hfst_dev.EPSILON) or (input == hfst_dev.UNKNOWN) or (input == hfst_dev.IDENTITY)):
                 continue
             symbol = input + separator + output
             arc.set_input_symbol(symbol)
@@ -1109,7 +1109,7 @@ def fst_to_fsa(fst, separator=''):
             encoded_symbols.insert(symbol)
     retval.add_symbols_to_alphabet(encoded_symbols)
     if 'HfstTransducer' in str(type(fst)):
-        return hfst.HfstTransducer(retval)
+        return hfst_dev.HfstTransducer(retval)
     else:
         return retval
 
@@ -1146,16 +1146,16 @@ def fsa_to_fst(fsa, separator=''):
     Examples:
 
         import hfst
-        foo2bar = hfst.fst({'foo':'bar'})  # creates transducer [f:b o:a o:r]
-        foobar = hfst.fst_to_fsa(foo2bar, '^')
+        foo2bar = hfst_dev.fst({'foo':'bar'})  # creates transducer [f:b o:a o:r]
+        foobar = hfst_dev.fst_to_fsa(foo2bar, '^')
 
     creates the transducer [f^b:f^b o^a:o^a o^r:o^r]. Then calling
 
-        foo2bar = hfst.fsa_to_fst(foobar, '^')
+        foo2bar = hfst_dev.fsa_to_fst(foobar, '^')
 
     will create again the original transducer [f:b o:a o:r].
     """
-    retval = hfst.HfstIterableTransducer(fsa)
+    retval = hfst_dev.HfstIterableTransducer(fsa)
     encoded_symbols = libhfst_dev.StringSet()
     for state in retval.states():
         arcs = retval.transitions(state)
@@ -1191,7 +1191,7 @@ def fsa_to_fst(fsa, separator=''):
                 encoded_symbols.insert(input)
     retval.remove_symbols_from_alphabet(encoded_symbols)
     if 'HfstTransducer' in str(type(fsa)):
-        return hfst.HfstTransducer(retval)
+        return hfst_dev.HfstTransducer(retval)
     else:
         return retval
 
@@ -1208,10 +1208,10 @@ def tokenized_fst(arg, weight=0):
     Example
 
        import hfst
-       tok = hfst.HfstTokenizer()
+       tok = hfst_dev.HfstTokenizer()
        tok.add_multichar_symbol('foo')
        tok.add_multichar_symbol('bar')
-       tr = hfst.tokenized_fst(tok.tokenize('foobar', 'foobaz'))
+       tr = hfst_dev.tokenized_fst(tok.tokenize('foobar', 'foobaz'))
 
     will create the transducer [foo:foo bar:b 0:a 0:z].
     """

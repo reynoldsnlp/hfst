@@ -2,7 +2,7 @@
 import sys
 if len(sys.argv) > 1:
     sys.path.insert(0, sys.argv[1])
-import hfst.exceptions
+import hfst_dev.exceptions
 
 diritems = \
 ['ContextTransducersAreNotAutomataException', 'EmptySetOfContextsException', 'EmptyStringException', \
@@ -16,7 +16,7 @@ diritems = \
  'TransducerHasWrongTypeException', 'TransducerHeaderException', 'TransducerIsCyclicException', \
  'TransducerTypeMismatchException', 'TransducersAreNotAutomataException']
 
-dirhfstexceptions = dir(hfst.exceptions)
+dirhfstexceptions = dir(hfst_dev.exceptions)
 
 for item in diritems:
     assert item in dirhfstexceptions

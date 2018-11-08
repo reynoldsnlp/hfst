@@ -2,23 +2,23 @@
 import sys
 if len(sys.argv) > 1:
     sys.path.insert(0, sys.argv[1])
-import hfst
+import hfst_dev
 
 types = []
-if hfst.HfstTransducer.is_implementation_type_available(hfst.ImplementationType.SFST_TYPE):
-    types.append(hfst.ImplementationType.SFST_TYPE)
-if hfst.HfstTransducer.is_implementation_type_available(hfst.ImplementationType.TROPICAL_OPENFST_TYPE):
-    types.append(hfst.ImplementationType.TROPICAL_OPENFST_TYPE)
-if hfst.HfstTransducer.is_implementation_type_available(hfst.ImplementationType.FOMA_TYPE):
-    types.append(hfst.ImplementationType.FOMA_TYPE)
+if hfst_dev.HfstTransducer.is_implementation_type_available(hfst_dev.ImplementationType.SFST_TYPE):
+    types.append(hfst_dev.ImplementationType.SFST_TYPE)
+if hfst_dev.HfstTransducer.is_implementation_type_available(hfst_dev.ImplementationType.TROPICAL_OPENFST_TYPE):
+    types.append(hfst_dev.ImplementationType.TROPICAL_OPENFST_TYPE)
+if hfst_dev.HfstTransducer.is_implementation_type_available(hfst_dev.ImplementationType.FOMA_TYPE):
+    types.append(hfst_dev.ImplementationType.FOMA_TYPE)
 
-from hfst.xerox_rules import *
-from hfst import regex
+from hfst_dev.xerox_rules import *
+from hfst_dev import regex
 
 for type in types:
-    if hfst.HfstTransducer.is_implementation_type_available(type):
+    if hfst_dev.HfstTransducer.is_implementation_type_available(type):
 
-        hfst.set_default_fst_type(type)
+        hfst_dev.set_default_fst_type(type)
 
         rule = Rule() # just testing the default constructor
 
