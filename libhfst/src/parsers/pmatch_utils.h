@@ -420,7 +420,7 @@ struct PmatchObject {
     HfstTransducer * cache;
     bool parent_is_context;
     PmatchObject();
-    virtual ~PmatchObject() = default;
+    virtual ~PmatchObject() throw() = default;
     void start_timing()
         {
             if (verbose && name != "") {
@@ -663,7 +663,7 @@ struct PmatchTransducerContainer: public PmatchObject{
     HfstTransducer * t;
     PmatchTransducerContainer(HfstTransducer * target):
         t(target) {}
-    ~PmatchTransducerContainer() { delete t; }
+    ~PmatchTransducerContainer() throw() { delete t; }
     HfstTransducer * evaluate() {
         if (t->get_type() != format) {
             t->convert(format);
