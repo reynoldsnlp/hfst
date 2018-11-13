@@ -21,7 +21,7 @@ fi
 
 if ! [ -d "back-ends" ]; then mkdir back-ends; fi
 if ! [ -d "libhfst" ]; then mkdir libhfst; fi
-if ! [ -d "hfst" ]; then mkdir hfst; fi
+if ! [ -d "hfst_dev" ]; then mkdir hfst_dev; fi
 if ! [ -d "test" ]; then mkdir test; fi
 
 cp -R ../../back-ends/* back-ends/
