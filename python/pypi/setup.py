@@ -87,7 +87,7 @@ if platform == "win32" and version_info[0] == 3 and (version_info[1] == 3 or ver
 # By default, we have a pre-swig-generated wrapper
 ext_source = ["libhfst_dev_wrap.cpp"]
 if hfst_specific_option('--generate-wrapper'):
-    ext_source = ["libhfst.i"]
+    ext_source = ["libhfst_dev.i"]
 
 # ----- LINKER ARGUMENTS -----
 
