@@ -310,8 +310,11 @@ openfst_source_files =  [ "back-ends/" + openfstdir + "/src/lib/compat" + cpp,
                           "back-ends/" + openfstdir + "/src/lib/properties" + cpp,
                           "back-ends/" + openfstdir + "/src/lib/symbol-table" + cpp,
                           "back-ends/" + openfstdir + "/src/lib/symbol-table-ops" + cpp,
-                          "back-ends/" + openfstdir + "/src/lib/util" + cpp,
-                          "back-ends/" + openfstdir + "/src/lib/weight" + cpp]
+                          "back-ends/" + openfstdir + "/src/lib/util" + cpp]
+# the file weight.cpp exists only in newer version of openfst that does not compile with msvc,
+# so we use the old version
+if (platform != "win32"):
+    openfst_source_files = openfst_source_files + ["back-ends/" + openfstdir + "/src/lib/weight" + cpp]
 
 libhfst_source_files = libhfst_source_files + openfst_source_files
 

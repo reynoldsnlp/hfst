@@ -29,6 +29,9 @@
 using namespace SFST;
 #endif
 
+// needed for msvc compiler
+#include <iso646.h>
+
 namespace hfst { namespace implementations {
 
     /** Create an SfstInputStream that reads from stdin. */
