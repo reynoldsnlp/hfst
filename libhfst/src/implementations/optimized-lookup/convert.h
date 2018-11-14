@@ -13,8 +13,11 @@
 #include "transducer.h"
 #include "pmatch.h"
 
-
+#ifndef _MSC_VER
 #include "back-ends/openfst/src/include/fst/fst-decl.h"
+#else
+#include "back-ends/openfstwin/src/include/fst/fst-decl.h"
+#endif // #ifndef _MSC_VER
 namespace fst { template <class F> class ArcIterator; }
 
 
