@@ -22,7 +22,8 @@
 
 #ifdef _MSC_VER //AddedPD
 #include <BaseTsd.h>
-typedef SSIZE_T ssize_t;
+__if_not_exists( ssize_t ) { typedef SSIZE_T ssize_t; }; // HFST addition
+//typedef SSIZE_T ssize_t;
 #if _MSC_VER < 1900
 #define snprintf _snprintf
 #endif
