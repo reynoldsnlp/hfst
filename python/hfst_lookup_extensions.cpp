@@ -1,13 +1,15 @@
 namespace hfst {
 
-std::string one_level_paths_to_string(const hfst::HfstOneLevelPaths & paths)
+std::string one_level_paths_to_string(const hfst::HfstOneLevelPaths & paths, bool show_flags)
 {
     std::ostringstream oss;
     for(hfst::HfstOneLevelPaths::const_iterator it = paths.begin(); it != paths.end(); it++)
     {
       for (hfst::StringVector::const_iterator svit = it->second.begin(); svit != it->second.end(); svit++)
       {
-        oss << *svit;
+	if (is_epsilon(*svit)) {}
+	else if (!show_flags && is_diacritic(*svit)) {}
+	else { oss << *svit; }
       }
       oss << "\t" << it->first << std::endl;
     }
@@ -38,10 +40,16 @@ std::string two_level_paths_to_string(const hfst::HfstTwoLevelPaths & paths)
       std::string output("");
       for (hfst::StringPairVector::const_iterator svit = it->second.begin(); svit != it->second.end(); svit++)
       {
-        input += svit->first;
-        output += svit->second;
+	if (!is_epsilon(svit->first))
+	  {
+	    input += svit->first;
+	  }
+	if (!is_epsilon(svit->second))
+	  {
+	    output += svit->second;
+	  }
       }
-      oss << input << ":" << output << "\t" << it->first << std::endl;
+      oss << input << "\t" << output << "\t" << it->first << std::endl;
     }
     return oss.str();
 }

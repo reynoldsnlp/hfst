@@ -263,6 +263,7 @@ enum ImplementationType
 // *** Some other functions *** //
 
 bool is_diacritic(const std::string & symbol);
+bool is_epsilon(const std::string & symbol);
 hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch) throw(HfstException);
 
 // internal functions
@@ -311,12 +312,15 @@ hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch)
               retval[input] = [(output, tlp[0])]
       return retval
 
-  def _one_level_paths_to_tuple(olps):
+  def _one_level_paths_to_tuple(olps, show_special_symbols):
       retval = []
       for olp in olps:
           path = ""
           for s in olp[1]:
-              path += s
+              if not show_special_symbols and (is_diacritic(s) or is_epsilon(s)):
+                  pass
+	      else:
+                  path += s
           retval.append((path, olp[0]))
       return tuple(retval)
 %}
@@ -507,6 +511,15 @@ public:
       istr.close()
       return tr
 
+  def read_all_from_file(filename_):
+      """
+      Read all binary transducers from file *filename_*.
+      """
+      istr = HfstInputStream(filename_)
+      tr = istr.read_all()
+      istr.close()
+      return tr
+
   def write_prolog(self, f, write_weights=True):
       """
       Write the transducer in prolog format with name *name* to file *f*,
@@ -571,6 +584,8 @@ public:
           max_number=-1, time_cutoff=0.0, output='tuple'
       * `obey_flags` :
           Whether flag diacritics are obeyed. Always True for HFST_OL(W)_TYPE transducers.
+      * `show_flags` :
+          Whether flag diacritics are shown when output is 'text' or 'tuple'. Defaults to False.
       * `max_number` :
           Maximum number of results returned, defaults to -1, i.e. infinity.
       * `time_cutoff` :
@@ -587,6 +602,7 @@ public:
       lookup is fast. Conversion to HfstIterableTransducer is quick but lookup is slower.
       """
       obey_flags=True
+      show_flags=False
       max_number=-1
       time_cutoff=0.0
       output='tuple' # 'tuple' (default), 'text', 'raw'
@@ -597,6 +613,14 @@ public:
                 pass
              elif v == False:
                 obey_flags=False
+             else:
+                print('Warning: ignoring argument %s as it has value %s.' % (k, v))
+                print("Possible values are True and False.")
+          if k == 'show_flags':
+             if v == False:
+                pass
+             elif v == True:
+                show_flags=True
              else:
                 print('Warning: ignoring argument %s as it has value %s.' % (k, v))
                 print("Possible values are True and False.")
@@ -637,11 +661,10 @@ public:
                 retval=self._lookup_string(str(input), max_number, time_cutoff)
          except:
             raise RuntimeError('Input argument must be string or tuple.')
-
       if output == 'text':
-         return one_level_paths_to_string(retval)
+         return one_level_paths_to_string(retval, show_flags)
       elif output == 'tuple':
-         return _one_level_paths_to_tuple(retval)
+         return _one_level_paths_to_tuple(retval, show_flags)
       else:
          return retval
 
@@ -1637,7 +1660,7 @@ hfst::HfstTransducer * hfst::hfst_compile_lexc(hfst::lexc::LexcCompiler & comp, 
 std::string hfst::get_hfst_sfst_output();
 hfst::HfstTransducer * hfst::hfst_compile_sfst(const std::string & filename, const std::string & error_stream, bool verbose, bool output_to_console);
 
-std::string hfst::one_level_paths_to_string(const HfstOneLevelPaths &);
+std::string hfst::one_level_paths_to_string(const HfstOneLevelPaths &, bool show_flags);
 std::string hfst::two_level_paths_to_string(const HfstTwoLevelPaths &);
 
 bool parse_prolog_network_line(const std::string & line, hfst::implementations::HfstIterableTransducer * graph);
