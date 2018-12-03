@@ -8,6 +8,7 @@ FUNCTIONS:
     compile_pmatch_expression
     compile_pmatch_file
     compile_xfst_file
+    compile_xfst_script
     concatenate
     disjunct
     empty_fst
@@ -661,7 +662,7 @@ class PrologReader:
 
 def compile_xfst_file(filename, **kwargs):
     """
-    Compile (run) xfst file *filename*.
+    Compile (run) xfst.
 
     Parameters
     ----------
@@ -669,6 +670,64 @@ def compile_xfst_file(filename, **kwargs):
         The name of the xfst file.
     * `kwargs` :
         Arguments recognized are: verbosity, quit_on_fail, output, type.
+    * `verbosity` :
+        The verbosity of the compiler, defaults to 0 (silent). Possible values are:
+        0, 1, 2.
+    * `quit_on_fail` :
+        Whether the script is exited on any error, defaults to True.
+    * `output` :
+        Where output is printed. Possible values are sys.stdout, sys.stderr, a
+        StringIO, sys.stderr being the default?
+    * `type` :
+        Implementation type of the compiler, defaults to
+        hfst_dev.get_default_fst_type().
+
+    Returns
+    -------
+    On success 0, else an integer greater than 0.
+    """
+    return _compile_xfst(filename=filename, **kwargs)
+
+def compile_xfst_script(script, **kwargs):
+    """
+    Compile (run) xfst.
+
+    Parameters
+    ----------
+    * `script` :
+        The xfst script to be compiled (a string).
+    * `kwargs` :
+        Arguments recognized are: verbosity, quit_on_fail, output, type.
+    * `verbosity` :
+        The verbosity of the compiler, defaults to 0 (silent). Possible values are:
+        0, 1, 2.
+    * `quit_on_fail` :
+        Whether the script is exited on any error, defaults to True.
+    * `output` :
+        Where output is printed. Possible values are sys.stdout, sys.stderr, a
+        StringIO, sys.stderr being the default?
+    * `type` :
+        Implementation type of the compiler, defaults to
+        hfst_dev.get_default_fst_type().
+
+    Returns
+    -------
+    On success 0, else an integer greater than 0.
+    """
+    return _compile_xfst(script=script, **kwargs)
+
+def _compile_xfst(**kwargs):
+    """
+    Compile (run) xfst.
+
+    Parameters
+    ----------
+    * `kwargs` :
+        Arguments recognized are: filename, data, verbosity, quit_on_fail, output, type.
+    * `filename` :
+        The name of the xfst file.
+    * `script` :
+        The xfst script to be compiled (a string).
     * `verbosity` :
         The verbosity of the compiler, defaults to 0 (silent). Possible values are:
         0, 1, 2.
@@ -695,6 +754,8 @@ def compile_xfst_file(filename, **kwargs):
     output=None
     error=None
     to_console=get_output_to_console()
+    filename=None
+    script=None
 
     for k,v in kwargs.items():
       if k == 'verbosity':
@@ -708,6 +769,10 @@ def compile_xfst_file(filename, **kwargs):
           error=v
       elif k == 'output_to_console':
           to_console=v
+      elif k == 'filename':
+          filename=v
+      elif k == 'script':
+          script=v
       else:
         print('Warning: ignoring unknown argument %s.' % (k))
 
@@ -717,13 +782,16 @@ def compile_xfst_file(filename, **kwargs):
     xfstcomp.setOutputToConsole(to_console)
     xfstcomp.setVerbosity(verbosity > 0)
     xfstcomp.set('quit-on-fail', quit_on_fail)
-    if verbosity > 1:
-      print('Opening xfst file %s...' % filename)
-    f = open(filename, 'r', encoding='utf-8')
-    data = f.read()
-    f.close()
-    if verbosity > 1:
-      print('File closed...')
+    if filename == None:
+      data = script
+    else:
+      if verbosity > 1:
+        print('Opening xfst file %s...' % filename)
+      f = open(filename, 'r', encoding='utf-8')
+      data = f.read()
+      f.close()
+      if verbosity > 1:
+        print('File closed...')
 
     retval=-1
     import sys
