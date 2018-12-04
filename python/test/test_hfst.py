@@ -107,12 +107,28 @@ for type in types:
     if not (transducer.compare(TR1)):
         raise RuntimeError(get_linenumber())
 
-    # Read lexc
+    # Read lexc from file
     tr = hfst_dev.compile_lexc_file('test.lexc')
     tr.insert_freely(tr1)
     tr.minimize()
     tr.insert_freely(('A','B'))
     tr.minimize()
+
+    # Read lexc from string
+    lexcstr = """
+LEXICON Root
+foo BAR ;
+foo BAZ ;
+
+LEXICON BAR
+bar # ;
+
+LEXICON BAZ
+baz # ;
+    """
+    tr = hfst_dev.compile_lexc_script(lexcstr)
+    res = hfst_dev.regex('[f o o b a r] | [f o o b a z]')
+    assert(tr.compare(res))
 
     # Read sfst
     tr = hfst_dev.compile_sfst_file('test.sfstpl')
