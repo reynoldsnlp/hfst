@@ -272,7 +272,7 @@ hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch)
       if isinstance(s, str):
          return True
       else:
-        return False
+         return False
   def _is_string_pair(sp):
       if not isinstance(sp, tuple):
          return False
@@ -287,41 +287,41 @@ hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch)
       if not isinstance(sv, tuple):
          return False
       for s in sv:
-          if not _is_string(s):
-             return False
+         if not _is_string(s):
+            return False
       return True
   def _is_string_pair_vector(spv):
       if not isinstance(spv, tuple):
          return False
       for sp in spv:
-          if not _is_string_pair(sp):
-             return False
+         if not _is_string_pair(sp):
+            return False
       return True
 
   def _two_level_paths_to_dict(tlps):
       retval = {}
       for tlp in tlps:
-          input = ""
-          output = ""
-          for sp in tlp[1]:
-              input += sp[0]
-              output += sp[1]
-          if input in retval:
-              retval[input].append((output, tlp[0]))
-          else:
-              retval[input] = [(output, tlp[0])]
+         input = ""
+         output = ""
+         for sp in tlp[1]:
+            input += sp[0]
+            output += sp[1]
+         if input in retval:
+            retval[input].append((output, tlp[0]))
+         else:
+            retval[input] = [(output, tlp[0])]
       return retval
 
   def _one_level_paths_to_tuple(olps, show_special_symbols):
       retval = []
       for olp in olps:
-          path = ""
-          for s in olp[1]:
-              if not show_special_symbols and (is_diacritic(s) or is_epsilon(s)):
-                  pass
-	      else:
-                  path += s
-          retval.append((path, olp[0]))
+         path = ""
+         for s in olp[1]:
+            if not show_special_symbols and (is_diacritic(s) or is_epsilon(s)):
+               pass
+            else:
+               path += s
+         retval.append((path, olp[0]))
       return tuple(retval)
 %}
 
@@ -1655,7 +1655,8 @@ int hfst::hfst_compile_xfst_to_string_one(hfst::xfst::XfstCompiler & comp, std::
 int hfst::hfst_compile_xfst(hfst::xfst::XfstCompiler & comp, std::string input, const std::string & output_stream, const std::string & error_stream);
 
 std::string hfst::get_hfst_lexc_output();
-hfst::HfstTransducer * hfst::hfst_compile_lexc(hfst::lexc::LexcCompiler & comp, const std::string & filename, const std::string & error_stream);
+hfst::HfstTransducer * hfst::hfst_compile_lexc_file(hfst::lexc::LexcCompiler & comp, const std::string & filename, const std::string & error_stream);
+hfst::HfstTransducer * hfst::hfst_compile_lexc_script(hfst::lexc::LexcCompiler & comp, std::string script, const std::string & error_stream);
 
 std::string hfst::get_hfst_sfst_output();
 hfst::HfstTransducer * hfst::hfst_compile_sfst(const std::string & filename, const std::string & error_stream, bool verbose, bool output_to_console);

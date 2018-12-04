@@ -5,6 +5,7 @@ Python bindings for HFST finite-state transducer library written in C++.
 FUNCTIONS:
 
     compile_lexc_file
+    compile_lexc_script
     compile_pmatch_expression
     compile_pmatch_file
     compile_xfst_file
@@ -951,6 +952,91 @@ def compile_sfst_file(filename, **kwargs):
 
     return retval
 
+def _compile_lexc(**kwargs):
+    """
+    Compile lexc file *filename* into a transducer.
+
+    Parameters
+    ----------
+    * `kwargs` :
+        Arguments recognized are: filename, script, verbosity, with_flags, output.
+    * `filename` :
+        The name of the lexc file.
+    * `script` :
+        The lexc script to be compiled (a string).
+    * `verbosity` :
+        The verbosity of the compiler, defaults to 0 (silent). Possible values are:
+        0, 1, 2.
+    * `with_flags` :
+        Whether lexc flags are used when compiling, defaults to False.
+    * `output` :
+        Where output is printed. Possible values are sys.stdout, sys.stderr, a
+        StringIO, sys.stderr being the default.
+
+    Returns
+    -------
+    On success the resulting transducer, else None.
+    """
+    verbosity=0
+    withflags=False
+    alignstrings=False
+    type = get_default_fst_type()
+    output=None
+    to_console=get_output_to_console()
+    filename=None
+    script=None
+
+    for k,v in kwargs.items():
+      if k == 'verbosity':
+        verbosity=v
+      elif k == 'with_flags':
+        if v == True:
+          withflags = v
+      elif k == 'align_strings':
+          alignstrings = v
+      elif k == 'output':
+          output=v
+      elif k == 'output_to_console':
+          to_console=v
+      elif k == 'filename':
+          filename=v
+      elif k == 'script':
+          script=v
+
+      else:
+        print('Warning: ignoring unknown argument %s.' % (k))
+
+    lexccomp = LexcCompiler(type, withflags, alignstrings)
+    lexccomp.setVerbosity(verbosity)
+    lexccomp.setOutputToConsole(to_console)
+
+    retval=-1
+    import sys
+    if output == None:
+       if filename == None:
+          retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "")
+       else:
+          retval = libhfst_dev.hfst_compile_lexc_file(lexccomp, filename, "")
+    elif output == sys.stdout:
+       if filename == None:
+          retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "cout")
+       else:
+          retval = libhfst_dev.hfst_compile_lexc_file(lexccomp, filename, "cout")
+    elif output == sys.stderr:
+       if filename == None:
+          retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "cerr")
+       else:
+          retval = libhfst_dev.hfst_compile_lexc_file(lexccomp, filename, "cerr")
+    else:
+       if filename == None:
+          retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "")
+          output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
+       else:
+          retval = libhfst_dev.hfst_compile_lexc_file(lexccomp, filename, "")
+          output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
+
+    return retval
+
 def compile_lexc_file(filename, **kwargs):
     """
     Compile lexc file *filename* into a transducer.
@@ -974,45 +1060,32 @@ def compile_lexc_file(filename, **kwargs):
     -------
     On success the resulting transducer, else None.
     """
-    verbosity=0
-    withflags=False
-    alignstrings=False
-    type = get_default_fst_type()
-    output=None
-    to_console=get_output_to_console()
+    return _compile_lexc(filename=filename, **kwargs)
 
-    for k,v in kwargs.items():
-      if k == 'verbosity':
-        verbosity=v
-      elif k == 'with_flags':
-        if v == True:
-          withflags = v
-      elif k == 'align_strings':
-          alignstrings = v
-      elif k == 'output':
-          output=v
-      elif k == 'output_to_console':
-          to_console=v
-      else:
-        print('Warning: ignoring unknown argument %s.' % (k))
+def compile_lexc_script(script, **kwargs):
+    """
+    Compile lexc script *script* into a transducer.
 
-    lexccomp = LexcCompiler(type, withflags, alignstrings)
-    lexccomp.setVerbosity(verbosity)
-    lexccomp.setOutputToConsole(to_console)
+    Parameters
+    ----------
+    * `script` :
+        The lexc script to be compiled (a string).
+    * `kwargs` :
+        Arguments recognized are: verbosity, with_flags, output.
+    * `verbosity` :
+        The verbosity of the compiler, defaults to 0 (silent). Possible values are:
+        0, 1, 2.
+    * `with_flags` :
+        Whether lexc flags are used when compiling, defaults to False.
+    * `output` :
+        Where output is printed. Possible values are sys.stdout, sys.stderr, a
+        StringIO, sys.stderr being the default.
 
-    retval=-1
-    import sys
-    if output == None:
-       retval = libhfst_dev.hfst_compile_lexc(lexccomp, filename, "")
-    elif output == sys.stdout:
-       retval = libhfst_dev.hfst_compile_lexc(lexccomp, filename, "cout")
-    elif output == sys.stderr:
-       retval = libhfst_dev.hfst_compile_lexc(lexccomp, filename, "cerr")
-    else:
-       retval = libhfst_dev.hfst_compile_lexc(lexccomp, filename, "")
-       output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
-
-    return retval
+    Returns
+    -------
+    On success the resulting transducer, else None.
+    """
+    return _compile_lexc(script=script, **kwargs)
 
 def _is_weighted_word(arg):
     if isinstance(arg, tuple) and len(arg) == 2 and isinstance(arg[0], str) and isinstance(arg[1], (int, float)):

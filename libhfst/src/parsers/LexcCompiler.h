@@ -63,6 +63,8 @@ class LexcCompiler
   //!        compiler.
   LexcCompiler& parse(const char* filename);
 
+  LexcCompiler& parse_line(std::string line);
+
   //! @brief set verbosity options.
   //! 0 means quiet, 1 the default and 2 (or bigger) the verbose mode.
   //! When verbose is 2, LexcCompiler will output the messages that Xerox

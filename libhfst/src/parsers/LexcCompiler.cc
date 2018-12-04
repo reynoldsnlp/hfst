@@ -64,6 +64,11 @@ extern int hlexcparse();
 extern int hlexcnerrs;
 extern int hlexclex_destroy();
 
+struct yy_buffer_state;
+typedef yy_buffer_state *YY_BUFFER_STATE;
+extern YY_BUFFER_STATE hlexc_scan_string(const char*);
+extern void hlexc_delete_buffer(YY_BUFFER_STATE);
+
 #ifndef DEBUG_MAIN
 
 namespace hfst { namespace lexc {
@@ -282,6 +287,25 @@ LexcCompiler& LexcCompiler::parse(const char* filename)
         parseErrors_ = true;
       }
     return *this;
+}
+
+LexcCompiler& LexcCompiler::parse_line(std::string line)
+{
+  lexc_ = this;
+  hlexclex_destroy();
+  hfst::lexc::set_infile_name("<unnamed>");
+  hlexcin = NULL;
+  char * line_ = strdup(line.c_str());
+  YY_BUFFER_STATE bs = hlexc_scan_string(line_);
+  hlexcparse();
+  xre_.remove_defined_multichar_symbols();
+  if (hlexcnerrs > 0)
+    {
+      parseErrors_ = true;
+    }
+  hlexc_delete_buffer(bs);
+  free(line_);
+  return *this;
 }
 
 bool LexcCompiler::isQuiet()
