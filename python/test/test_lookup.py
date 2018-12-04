@@ -15,7 +15,7 @@ for type in [hfst_dev.ImplementationType.SFST_TYPE, hfst_dev.ImplementationType.
         tr = hfst_dev.regex('[f:0 o:0 o:foo]')
         result = tr.lookup('foo')
         assert(len(result) == 1)
-        assert(result[0][0] == '@_EPSILON_SYMBOL_@@_EPSILON_SYMBOL_@foo')
+        assert(result[0][0] == 'foo')
         tr = hfst_dev.regex('[foo:bar]|[f:B o:A o:R]')
         result = tr.lookup('foo')
         assert(len(result) == 1)
