@@ -1149,6 +1149,7 @@ def __next__(self):
      HfstTokenizer();
      void add_skip_symbol(const std::string &symbol);
      void add_multichar_symbol(const std::string& symbol);
+     void add_multichar_symbols(const StringSet& symbols);
      StringPairVector tokenize(const std::string &input_string) const;
      StringVector tokenize_one_level(const std::string &input_string) const;
      static StringPairVector tokenize_space_separated(const std::string & str);

@@ -110,6 +110,8 @@ namespace hfst
         "fobaro" will be tokenized "f" "o" "o", not "foo". */
     HFSTDLL void add_multichar_symbol(const std::string& symbol);
 
+    HFSTDLL void add_multichar_symbols(const StringSet& symbols);
+
     /** \brief Tokenize the string \a input_string. */
     HFSTDLL StringPairVector tokenize(const std::string &input_string) const;
 
