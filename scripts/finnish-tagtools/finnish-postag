@@ -1,5 +1,7 @@
 #! /bin/bash
 
+export PYTHONIOENCODING=utf8
+
 TAG=tag
 
 TOKENIZE="hfst-tokenize -x $TAG/omorfi_tokenize.pmatch"

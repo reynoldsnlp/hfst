@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PYTHONIOENCODING=utf8
+
 TAG=tag
 
 PMATCH=hfst-pmatch
