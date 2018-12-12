@@ -49,7 +49,7 @@ CLASSES:
 
 """
 
-__version__ = "3.15.0.0"
+__version__ = "3.15.0.1"
 
 import hfst_dev.exceptions
 import hfst_dev.sfst_rules
@@ -94,6 +94,9 @@ def start_xfst(**kwargs):
         Arguments recognized are: type, quit_on_fail.
     * `quit_on_fail` :
         Whether the compiler exits on any error, defaults to False.
+    * `output_to_python` :
+        Whether the compiler prints output via python, defaults to False.
+        (TODO: the other way round)
     * `type` :
         Implementation type of the compiler, defaults to
         hfst_dev.get_default_fst_type().
@@ -108,11 +111,14 @@ def start_xfst(**kwargs):
     type = get_default_fst_type()
     quit_on_fail = 'OFF'
     to_console=get_output_to_console()
+    output_to_python=False
     for k,v in kwargs.items():
       if k == 'type':
         type = v
       elif k == 'output_to_console':
         to_console=v
+      elif k == 'output_to_python':
+        output_to_python=v
       elif k == 'quit_on_fail':
         if v == True:
           quit_on_fail='ON'
@@ -148,7 +154,7 @@ def start_xfst(**kwargs):
            expression = expression[:-2] + '\n'
            continue
         retval = -1
-        if idle:
+        if idle or output_to_python:
             retval = libhfst_dev.hfst_compile_xfst_to_string_one(comp, expression)
             stdout.write(libhfst_dev.get_hfst_xfst_string_one())
         else:
