@@ -5533,7 +5533,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
                                ImplementationType type,
                                const std::string &epsilon_symbol,
                                unsigned int & linecount,
-			       std::map<unsigned int, std::string> & state_numbers):
+			       std::map<std::string, unsigned int> & state_names):
     type(type),anonymous(false),is_trie(false), name("")
 {
 #if HAVE_XFSM
@@ -5550,7 +5550,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
     hfst::implementations::HfstIterableTransducer net =
       /*hfst::implementations::HfstTransitionGraph<hfst::implementations::
         HfstTropicalTransducerTransitionData>::*/
-      HfstIterableTransducer::read_in_att_format(ifile, std::string(epsilon_symbol), linecount, state_numbers);
+      HfstIterableTransducer::read_in_att_format(ifile, std::string(epsilon_symbol), linecount, state_names);
 
     // Conversion is done here.
     switch (type)

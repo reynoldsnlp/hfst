@@ -526,7 +526,7 @@
          \a write_weights defines whether weights are printed. */
      HFSTDLL void write_in_att_format_number(FILE *file, bool write_weights=true);
      
-     bool add_att_line(char * line, const std::string & epsilon_symbol);
+     bool add_att_line(char * line, const std::string & epsilon_symbol, std::map<std::string, unsigned int> * state_names = NULL);
      
      /* Create an HfstTransitionGraph as defined in AT&T format
         in istream \a is or FILE \a file. \a epsilon_symbol defines
@@ -542,7 +542,7 @@
         FILE *file,
         std::string epsilon_symbol,
         unsigned int & linecount,
-	std::map<unsigned int, std::string> * state_names=NULL);
+	std::map<std::string, unsigned int> * state_names=NULL);
      
      /** @brief Create an HfstTransitionGraph as defined in AT&T
          transducer format in istream \a is. \a epsilon_symbol
@@ -559,7 +559,7 @@
        (std::istream &is,
         std::string epsilon_symbol,
         unsigned int & linecount,
-	std::map<unsigned int, std::string> & state_names);
+	std::map<std::string, unsigned int> & state_names);
      
      /** @brief Create an HfstTransitionGraph as defined
          in AT&T transducer format in FILE \a file.
@@ -576,7 +576,7 @@
        (FILE *file,
         std::string epsilon_symbol,
         unsigned int & linecount,
-	std::map<unsigned int, std::string> & state_names);
+	std::map<std::string, unsigned int> & state_names);
      
      // ----------------------------------------------
      // -----       Substitution functions       -----

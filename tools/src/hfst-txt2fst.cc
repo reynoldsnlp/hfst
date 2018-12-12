@@ -59,6 +59,7 @@ static bool read_prolog_format=false;
 static bool use_numbers=false; // not used
 // named states in ATT format
 static bool named_states=false;
+static char * initial_state=NULL;
 static char *states_filename=NULL;
 // printname for epsilon
 static char *epsilonname=NULL;
@@ -79,7 +80,8 @@ print_usage()
     fprintf(message_out, "Text and format options:\n"
             "  -f, --format=FMT        Write result using FMT as backend format\n"
             "  -e, --epsilon=EPS       Interpret string EPS as epsilon in att format\n"
-	    "  -n, --named-states      Allow named states in att format\n"
+	    "  -n, --named-states=IS   Allow named states in att format,\n"
+	    "                          IS being the name of the initial state\n"
 	    "  -N, --states-file=FILE  Write state numbers and names to file FILE\n"
             "  -p, --prolog            Read prolog format instead of att\n");
     fprintf(message_out, "Other options:\n"
@@ -115,7 +117,7 @@ parse_options(int argc, char** argv)
         HFST_GETOPT_UNARY_LONG,
           // add tool-specific options here
             {"epsilon", required_argument, 0, 'e'},
-            {"named-states", no_argument, 0, 'N'},
+            {"named-states", required_argument, 0, 'N'},
 	    {"states-file", required_argument, 0, 'F'},
             {"format", required_argument, 0, 'f'},
             {"prolog", no_argument, 0, 'p'},
@@ -125,7 +127,7 @@ parse_options(int argc, char** argv)
         int option_index = 0;
         // add tool-specific options here
         int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "e:nf:pCNF:",
+                             HFST_GETOPT_UNARY_SHORT "e:nf:pCN:F:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -145,6 +147,7 @@ break;
             break;
 	case 'N':
             named_states = true;
+	    initial_state = hfst_strdup(optarg);
             break;
         case 'F':
 	    states_filename = hfst_strdup(optarg);
@@ -257,7 +260,7 @@ process_stream(HfstOutputStream& outstream)
       else
         {
           try {
-	    std::map<unsigned int, std::string> state_names;
+	    std::map<std::string, unsigned int> state_names;
 	    HfstTransducer * t = NULL;
 	    if (!named_states)
 	      {
@@ -268,6 +271,7 @@ process_stream(HfstOutputStream& outstream)
 	      }
 	    else
 	      {
+		state_names[std::string(initial_state)] = 0;
 		t = new HfstTransducer(inputfile,
 				       output_format,
 				       std::string(epsilonname),
@@ -296,10 +300,10 @@ process_stream(HfstOutputStream& outstream)
 	    if (states_filename != NULL)
 	      {
 		FILE * f = fopen(states_filename, "w");
-		for (std::map<unsigned int, std::string>::const_iterator it = state_names.begin();
+		for (std::map<std::string, unsigned int>::const_iterator it = state_names.begin();
 		     it != state_names.end(); it++)
 		  {
-		    fprintf(f, "%u\t%s\n", it->first, it->second.c_str());
+		    fprintf(f, "%s\t%u\n", it->first.c_str(), it->second);
 		  }
 		fclose(f);
 	      }

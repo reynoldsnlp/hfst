@@ -1606,7 +1606,32 @@
          }
 
 
-         bool HfstIterableTransducer::add_att_line(char * line, const std::string & epsilon_symbol)
+     static unsigned int get_state_number(const char * state, HfstIterableTransducer * tr, std::map<std::string, unsigned int> * state_names)
+     {
+       // states given as numbers
+       if (state_names == NULL)
+	 {
+	   return atoi(state);
+	 }
+       // states have names
+       else
+	 {
+	   std::string S(state);
+	   std::map<std::string, unsigned int>::const_iterator it = state_names->find(S);
+	   if (it == state_names->end())
+	     {
+	       unsigned int newstate = tr->add_state();
+	       state_names->operator[](S) = newstate;
+	       return newstate;
+	     }
+	   else
+	     {
+	       return it->second;
+	     }
+	 }
+     }
+
+     bool HfstIterableTransducer::add_att_line(char * line, const std::string & epsilon_symbol, std::map<std::string, unsigned int> * state_names/*=NULL*/)
          {
            // scan one line that can have a maximum of five fields
            char a1 [100]; char a2 [100]; char a3 [100];
@@ -1627,9 +1652,9 @@
            
            if (n == 1 || n == 2)  // a final state line
              {
-               set_final_weight( atoi(a1), weight );
-             }
-           
+	       set_final_weight( get_state_number(a1, this, state_names), weight );
+	     }
+
            else if (n == 4 || n == 5) { // a transition line
              std::string input_symbol=std::string(a3);
              std::string output_symbol=std::string(a4);
@@ -1651,9 +1676,9 @@
              if (epsilon_symbol.compare(output_symbol) == 0)
                output_symbol=hfst::internal_epsilon;
              
-             HfstTransition tr( atoi(a2), input_symbol,
+             HfstTransition tr( get_state_number(a2, this, state_names), input_symbol,
                                 output_symbol, weight );
-             add_transition( atoi(a1), tr );
+             add_transition( get_state_number(a1, this, state_names), tr );
            }
            
            else  {  // line could not be parsed
@@ -1676,7 +1701,7 @@
             FILE *file,
             std::string epsilon_symbol,
             unsigned int & linecount,
-	    std::map<unsigned int, std::string> * state_names/*=NULL*/)
+	    std::map<std::string, unsigned int> * state_names/*=NULL*/)
 	 {
 
            if (file == NULL) {
@@ -1726,7 +1751,7 @@
              if (*line == '-') // transducer separator line is "--"
                return retval;
 
-             if (! retval.add_att_line(line, epsilon_symbol))
+             if (! retval.add_att_line(line, epsilon_symbol, state_names))
                {
                  std::string message(line);
                  HFST_THROW_MESSAGE
@@ -1758,7 +1783,7 @@
            (std::istream &is,
             std::string epsilon_symbol,
             unsigned int & linecount,
-	    std::map<unsigned int, std::string> & state_names)
+	    std::map<std::string, unsigned int> & state_names)
          {
            return read_in_att_format
              (is, NULL /* a dummy variable */,
@@ -1785,7 +1810,7 @@
            (FILE *file,
             std::string epsilon_symbol,
             unsigned int & linecount,
-	    std::map<unsigned int, std::string> & state_names)
+	    std::map<std::string, unsigned int> & state_names)
          {
            return read_in_att_format
              (std::cin /* a dummy variable */,
