@@ -73,7 +73,7 @@ trim_to_valid_utf8(char* inp)
           }
       }
   }
-
+  
 void
 print_dot(FILE* out, HfstTransducer& t, std::map<unsigned int, std::string> * state_names/*= NULL*/)
   {
@@ -108,7 +108,7 @@ print_dot(FILE* out, HfstTransducer& t, std::map<unsigned int, std::string> * st
 		  }
 		else
 		  {
-		    fprintf(out, "%s [shape=doublecircle,"
+		    fprintf(out, "\"%s\" [shape=doublecircle,"
 			    "label=\"%s/\\n%.2f\"] \n",
 			    state_names->operator[](s).c_str(), state_names->operator[](s).c_str(), mutt->get_final_weight(s));
 		  }
@@ -123,7 +123,7 @@ print_dot(FILE* out, HfstTransducer& t, std::map<unsigned int, std::string> * st
 		  }
 		else
 		  {
-		    fprintf(out, "%s [shape=doublecircle,"
+		    fprintf(out, "\"%s\" [shape=doublecircle,"
 			    "label=\"%s\"] \n",
 			    state_names->operator[](s).c_str(), state_names->operator[](s).c_str());
 		  }
@@ -138,7 +138,7 @@ print_dot(FILE* out, HfstTransducer& t, std::map<unsigned int, std::string> * st
 	      }
 	    else
 	      {
-		fprintf(out, "%s [label=\"%s\"] \n",
+		fprintf(out, "\"%s\" [label=\"%s\"] \n",
 			state_names->operator[](s).c_str(), state_names->operator[](s).c_str());
 	      }
           }
@@ -298,7 +298,7 @@ print_dot(FILE* out, HfstTransducer& t, std::map<unsigned int, std::string> * st
 	      }
 	    else
 	      {
-		fprintf(out, "%s -> %s ", state_names->operator[](s).c_str(), state_names->operator[](tl->first).c_str());
+		fprintf(out, "\"%s\" -> \"%s\" ", state_names->operator[](s).c_str(), state_names->operator[](tl->first).c_str());
 	      }
 	    fprintf(out, "[label=\"%s \"];\n", tl->second.c_str());
           }
