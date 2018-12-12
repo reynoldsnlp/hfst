@@ -57,6 +57,9 @@ static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 static bool read_prolog_format=false;
 // whether numbers are used instead of symbol names
 static bool use_numbers=false; // not used
+// named states in ATT format
+static bool named_states=false;
+static char *states_filename=NULL;
 // printname for epsilon
 static char *epsilonname=NULL;
 static const unsigned int EPSILON_KEY=0;
@@ -74,9 +77,11 @@ print_usage()
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out);
     fprintf(message_out, "Text and format options:\n"
-            "  -f, --format=FMT    Write result using FMT as backend format\n"
-            "  -e, --epsilon=EPS   Interpret string EPS as epsilon in att format\n"
-            "  -p, --prolog        Read prolog format instead of att\n");
+            "  -f, --format=FMT        Write result using FMT as backend format\n"
+            "  -e, --epsilon=EPS       Interpret string EPS as epsilon in att format\n"
+	    "  -n, --named-states      Allow named states in att format\n"
+	    "  -N, --states-file=FILE  Write state numbers and names to file FILE\n"
+            "  -p, --prolog            Read prolog format instead of att\n");
     fprintf(message_out, "Other options:\n"
             "  -C, --check-negative-epsilon-cycles  Issue a warning if there are epsilon cycles\n"
             "                                       with a negative weight in the transducer\n");
@@ -110,7 +115,8 @@ parse_options(int argc, char** argv)
         HFST_GETOPT_UNARY_LONG,
           // add tool-specific options here
             {"epsilon", required_argument, 0, 'e'},
-            {"number", no_argument, 0, 'n'},
+            {"named-states", no_argument, 0, 'N'},
+	    {"states-file", required_argument, 0, 'F'},
             {"format", required_argument, 0, 'f'},
             {"prolog", no_argument, 0, 'p'},
             {"check-negative-epsilon-cycles", no_argument, 0, 'C'},
@@ -119,7 +125,7 @@ parse_options(int argc, char** argv)
         int option_index = 0;
         // add tool-specific options here
         int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "e:nf:pC",
+                             HFST_GETOPT_UNARY_SHORT "e:nf:pCNF:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -136,6 +142,12 @@ break;
             break;
         case 'n':
             use_numbers = true;
+            break;
+	case 'N':
+            named_states = true;
+            break;
+        case 'F':
+	    states_filename = hfst_strdup(optarg);
             break;
         case 'p':
             read_prolog_format = true;
@@ -245,16 +257,29 @@ process_stream(HfstOutputStream& outstream)
       else
         {
           try {
-            HfstTransducer t(inputfile,
-                             output_format,
-                             std::string(epsilonname),
-                             linecount);
-            hfst_set_name(t, inputfilename, "text");
-            hfst_set_formula(t, inputfilename, "T");
+	    std::map<unsigned int, std::string> state_names;
+	    HfstTransducer * t = NULL;
+	    if (!named_states)
+	      {
+		t = new HfstTransducer(inputfile,
+				       output_format,
+				       std::string(epsilonname),
+				       linecount);
+	      }
+	    else
+	      {
+		t = new HfstTransducer(inputfile,
+				       output_format,
+				       std::string(epsilonname),
+				       linecount,
+				       state_names);
+	      }
+            hfst_set_name(*t, inputfilename, "text");
+            hfst_set_formula(*t, inputfilename, "T");
             if (check_negative_epsilon_cycles)
               {
                 verbose_printf("Checking if the transducer has epsilon cycles with a negative weight...\n");
-                hfst::implementations::HfstIterableTransducer fsm(t);
+                hfst::implementations::HfstIterableTransducer fsm(*t);
                 if (fsm.has_negative_epsilon_cycles())
                   {
                     if (!silent)
@@ -267,7 +292,18 @@ process_stream(HfstOutputStream& outstream)
                     verbose_printf("No epsilon cycles with a negative weight detected...\n");
                   }
               }
-            outstream << t;
+            outstream << *t;
+	    if (states_filename != NULL)
+	      {
+		FILE * f = fopen(states_filename, "w");
+		for (std::map<unsigned int, std::string>::const_iterator it = state_names.begin();
+		     it != state_names.end(); it++)
+		  {
+		    fprintf(f, "%u\t%s\n", it->first, it->second.c_str());
+		  }
+		fclose(f);
+	      }
+	    delete t;
           }
           catch (NotValidAttFormatException e) {
             error(EXIT_FAILURE, 0, "Error in processing transducer text file (att) on line %u\n", linecount);

@@ -5529,7 +5529,81 @@ HfstTransducer::HfstTransducer(FILE * ifile,
     }
 }
 
+HfstTransducer::HfstTransducer(FILE * ifile,
+                               ImplementationType type,
+                               const std::string &epsilon_symbol,
+                               unsigned int & linecount,
+			       std::map<unsigned int, std::string> & state_numbers):
+    type(type),anonymous(false),is_trie(false), name("")
+{
+#if HAVE_XFSM
+  if (this->type == XFSM_TYPE)
+    HFST_THROW(FunctionNotImplementedException);
+#endif
 
+    if (! is_lean_implementation_type_available(type))
+      throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
+
+    HfstTokenizer::check_utf8_correctness(epsilon_symbol);
+
+    // Implemented only for internal transducer format.
+    hfst::implementations::HfstIterableTransducer net =
+      /*hfst::implementations::HfstTransitionGraph<hfst::implementations::
+        HfstTropicalTransducerTransitionData>::*/
+      HfstIterableTransducer::read_in_att_format(ifile, std::string(epsilon_symbol), linecount, state_numbers);
+
+    // Conversion is done here.
+    switch (type)
+    {
+#if HAVE_SFST
+    case SFST_TYPE:
+        implementation.sfst =
+        ConversionFunctions::hfst_basic_transducer_to_sfst(&net);
+        break;
+#endif
+#if HAVE_OPENFST
+    case TROPICAL_OPENFST_TYPE:
+        implementation.tropical_ofst
+        = ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(&net);
+        break;
+#if HAVE_OPENFST_LOG
+    case LOG_OPENFST_TYPE:
+        implementation.log_ofst
+        = ConversionFunctions::hfst_basic_transducer_to_log_ofst(&net);
+        break;
+#endif
+#endif
+#if HAVE_FOMA
+    case FOMA_TYPE:
+        implementation.foma =
+        ConversionFunctions::hfst_basic_transducer_to_foma(&net);
+        break;
+#endif
+#if HAVE_HFSTOL
+    case HFST_OL_TYPE:
+    implementation.hfst_ol
+            = ConversionFunctions::hfst_basic_transducer_to_hfst_ol
+            (&net, false);
+    break;
+    case HFST_OLW_TYPE:
+    implementation.hfst_ol
+            = ConversionFunctions::hfst_basic_transducer_to_hfst_ol(&net, true);
+    break;
+#endif
+    /* Add here your implementation. */
+        //#if HAVE_MY_TRANSDUCER_LIBRARY
+        //case MY_TRANSDUCER_LIBRARY_TYPE:
+        //implementation.my_transducer_library =
+        //  ConversionFunctions::
+        //    hfst_basic_transducer_to_my_transducer_library_transducer(&net);
+        //break;
+        //#endif
+    case ERROR_TYPE:
+        HFST_THROW(SpecifiedTypeRequiredException);
+    default:
+        HFST_THROW(TransducerHasWrongTypeException);
+    }
+}
 
 HfstTransducer &HfstTransducer::read_in_att_format
 (const std::string &filename, ImplementationType type,

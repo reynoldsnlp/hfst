@@ -541,7 +541,8 @@
        (std::istream &is,
         FILE *file,
         std::string epsilon_symbol,
-        unsigned int & linecount);
+        unsigned int & linecount,
+	std::map<unsigned int, std::string> * state_names=NULL);
      
      /** @brief Create an HfstTransitionGraph as defined in AT&T
          transducer format in istream \a is. \a epsilon_symbol
@@ -554,6 +555,12 @@
         std::string epsilon_symbol,
         unsigned int & linecount);
      
+     HFSTDLL static HfstIterableTransducer read_in_att_format
+       (std::istream &is,
+        std::string epsilon_symbol,
+        unsigned int & linecount,
+	std::map<unsigned int, std::string> & state_names);
+     
      /** @brief Create an HfstTransitionGraph as defined
          in AT&T transducer format in FILE \a file.
          \a epsilon_symbol defines how epsilon is represented.
@@ -564,6 +571,12 @@
        (FILE *file,
         std::string epsilon_symbol,
         unsigned int & linecount);
+
+     HFSTDLL static HfstIterableTransducer read_in_att_format
+       (FILE *file,
+        std::string epsilon_symbol,
+        unsigned int & linecount,
+	std::map<unsigned int, std::string> & state_names);
      
      // ----------------------------------------------
      // -----       Substitution functions       -----

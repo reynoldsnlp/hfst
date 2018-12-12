@@ -666,6 +666,9 @@ in \a ifile.
     HFSTDLL HfstTransducer(FILE * ifile, ImplementationType type,
                    const std::string &epsilon_symbol);
 
+    HFSTDLL HfstTransducer(FILE * ifile, ImplementationType type,
+			   const std::string &epsilon_symbol, unsigned int & linecount,
+			   std::map<unsigned int, std::string> &state_names);
 
     /** \brief Destructor. **/
     HFSTDLL virtual ~HfstTransducer(void);
