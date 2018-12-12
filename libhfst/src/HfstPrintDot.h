@@ -12,6 +12,8 @@
 
 namespace hfst
 {
-  void print_dot(FILE* out, HfstTransducer& t);
-  void print_dot(std::ostream & oss, HfstTransducer& t);
+  //void print_dot(FILE* out, HfstTransducer& t);
+  //void print_dot(std::ostream & oss, HfstTransducer& t);
+  void print_dot(FILE* out, HfstTransducer& t, std::map<unsigned int, std::string> * state_names = NULL);
+  void print_dot(std::ostream & oss, HfstTransducer& t, std::map<unsigned int, std::string> * state_names = NULL);
 }

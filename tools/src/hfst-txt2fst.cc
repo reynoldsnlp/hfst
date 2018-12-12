@@ -80,9 +80,9 @@ print_usage()
     fprintf(message_out, "Text and format options:\n"
             "  -f, --format=FMT        Write result using FMT as backend format\n"
             "  -e, --epsilon=EPS       Interpret string EPS as epsilon in att format\n"
-	    "  -n, --named-states=IS   Allow named states in att format,\n"
+	    "  -N, --named-states=IS   Allow named states in att format,\n"
 	    "                          IS being the name of the initial state\n"
-	    "  -N, --states-file=FILE  Write state numbers and names to file FILE\n"
+	    "  -S, --states-file=FILE  Write state numbers and names to file FILE\n"
             "  -p, --prolog            Read prolog format instead of att\n");
     fprintf(message_out, "Other options:\n"
             "  -C, --check-negative-epsilon-cycles  Issue a warning if there are epsilon cycles\n"
@@ -118,7 +118,7 @@ parse_options(int argc, char** argv)
           // add tool-specific options here
             {"epsilon", required_argument, 0, 'e'},
             {"named-states", required_argument, 0, 'N'},
-	    {"states-file", required_argument, 0, 'F'},
+	    {"states-file", required_argument, 0, 'S'},
             {"format", required_argument, 0, 'f'},
             {"prolog", no_argument, 0, 'p'},
             {"check-negative-epsilon-cycles", no_argument, 0, 'C'},
@@ -127,7 +127,7 @@ parse_options(int argc, char** argv)
         int option_index = 0;
         // add tool-specific options here
         int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "e:nf:pCN:F:",
+                             HFST_GETOPT_UNARY_SHORT "e:nf:pCN:S:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -149,7 +149,7 @@ break;
             named_states = true;
 	    initial_state = hfst_strdup(optarg);
             break;
-        case 'F':
+        case 'S':
 	    states_filename = hfst_strdup(optarg);
             break;
         case 'p':

@@ -75,7 +75,7 @@ trim_to_valid_utf8(char* inp)
   }
 
 void
-print_dot(FILE* out, HfstTransducer& t)
+print_dot(FILE* out, HfstTransducer& t, std::map<unsigned int, std::string> * state_names/*= NULL*/)
   {
     //fprintf(out, "// This graph generated with hfst-fst2txt\n");
     if (t.get_name() != "")
@@ -100,21 +100,47 @@ print_dot(FILE* out, HfstTransducer& t)
           {
             if (mutt->get_final_weight(s) > 0)
               {
-                fprintf(out, "q%d [shape=doublecircle,"
-                       "label=\"q%d/\\n%.2f\"] \n",
-                        s, s, mutt->get_final_weight(s));
+		if (state_names == NULL)
+		  {
+		    fprintf(out, "q%d [shape=doublecircle,"
+			    "label=\"q%d/\\n%.2f\"] \n",
+			    s, s, mutt->get_final_weight(s));
+		  }
+		else
+		  {
+		    fprintf(out, "%s [shape=doublecircle,"
+			    "label=\"%s/\\n%.2f\"] \n",
+			    state_names->operator[](s).c_str(), state_names->operator[](s).c_str(), mutt->get_final_weight(s));
+		  }
               }
             else
               {
-                fprintf(out, "q%d [shape=doublecircle,"
-                       "label=\"q%d\"] \n",
-                        s, s);
+		if (state_names == NULL)
+		  {
+		    fprintf(out, "q%d [shape=doublecircle,"
+			    "label=\"q%d\"] \n",
+			    s, s);
+		  }
+		else
+		  {
+		    fprintf(out, "%s [shape=doublecircle,"
+			    "label=\"%s\"] \n",
+			    state_names->operator[](s).c_str(), state_names->operator[](s).c_str());
+		  }
               }
           }
         else
           {
-            fprintf(out, "q%d [label=\"q%d\"] \n",
-                    s, s);
+	    if (state_names == NULL)
+	      {
+		fprintf(out, "q%d [label=\"q%d\"] \n",
+			s, s);
+	      }
+	    else
+	      {
+		fprintf(out, "%s [label=\"%s\"] \n",
+			state_names->operator[](s).c_str(), state_names->operator[](s).c_str());
+	      }
           }
         ++s;
       } // each state
@@ -266,8 +292,15 @@ print_dot(FILE* out, HfstTransducer& t)
              tl != target_labels.end();
              ++tl)
           {
-            fprintf(out, "q%d -> q%d ", s, tl->first);
-            fprintf(out, "[label=\"%s \"];\n", tl->second.c_str());
+	    if (state_names == NULL)
+	      {
+		fprintf(out, "q%d -> q%d ", s, tl->first);
+	      }
+	    else
+	      {
+		fprintf(out, "%s -> %s ", state_names->operator[](s).c_str(), state_names->operator[](tl->first).c_str());
+	      }
+	    fprintf(out, "[label=\"%s \"];\n", tl->second.c_str());
           }
         ++s;
       } // each state
@@ -275,7 +308,7 @@ print_dot(FILE* out, HfstTransducer& t)
   }
 
 void
-print_dot(std::ostream & out, HfstTransducer& t)
+print_dot(std::ostream & out, HfstTransducer& t, std::map<unsigned int, std::string> * state_names/*=NULL*/)
   {
     out.precision(2);
 

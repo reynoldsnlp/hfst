@@ -60,6 +60,8 @@ using hfst::implementations::HfstState;
 static bool use_numbers=false;
 static bool print_weights=false;
 static bool do_not_print_weights=false;
+static bool state_names=false;
+static char * state_filename=NULL;
 
 enum fst_text_format {
     ATT_TEXT, // AT&T / OpenFst compatible TSV
@@ -85,7 +87,9 @@ print_usage()
         "  -D, --do-not-print-weights   If weights are not printed in any "
         "case\n"
         "  -f, --format=TFMT            Print output in TFMT format "
-            "[default=att]\n");
+            "[default=att]\n"
+	"  -S, --state-names            Use states names instead of numbers\n"
+	"                               (in dot format)\n");
     fprintf(message_out, "\n");
     fprintf(message_out,
           "If OUTFILE or INFILE is missing or -, "
@@ -115,6 +119,7 @@ parse_options(int argc, char** argv)
           // add tool-specific options here
             {"print-weights",        no_argument,       0, 'w'},
             {"do-not-print-weights", no_argument,       0, 'D'},
+	    {"state-names",          required_argument,  0, 'S'},
             {"use-numbers",          no_argument,       0, 'n'},
             {"format",               required_argument, 0, 'f'},
             {0,0,0,0}
@@ -122,7 +127,7 @@ parse_options(int argc, char** argv)
         int option_index = 0;
         // add tool-specific options here
         int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "wDnf:",
+                             HFST_GETOPT_UNARY_SHORT "wDnf:S:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -142,6 +147,10 @@ parse_options(int argc, char** argv)
         break;
     case 'n':
         use_numbers = true;
+        break;
+    case 'S':
+        state_names = true;
+        state_filename = hfst_strdup(optarg);
         break;
     case 'f':
         if ((strcmp(optarg, "att") == 0) || (strcmp(optarg, "AT&T") == 0) ||
@@ -247,9 +256,35 @@ process_stream(HfstInputStream& instream, FILE* outf)
         }
         break;
       case DOT_TEXT: // xfsm case checked earlier
-        fprintf(outf, "// This graph generated with hfst-fst2txt\n");
-        hfst::print_dot(outf, *t);
-        break;
+	if (state_names)
+	  {
+	    std::map<unsigned int, std::string> state_names;
+	    FILE * f = fopen(state_filename, "r");
+	    char* line = NULL;
+	    size_t len = 0;
+	    verbose_printf("reading state names from %s...\n", state_filename);
+	    while (hfst_getline(&line, &len, f) != -1)
+	      {
+		char name[100];
+		char number[100];
+		int n = sscanf(line, "%s%s", name, number);
+		if (n != 2)
+		  {
+		    error(EXIT_FAILURE, 0, "Error encountered when reading state names from file: %s", state_filename);
+		  }
+		// DEBUG std::cerr << "state_names[" << atoi(number) << "] = " << name << ";" << std::endl;
+		state_names[atoi(number)] = std::string(name);
+	      }
+	    fclose(f);
+	    fprintf(outf, "// This graph generated with hfst-fst2txt\n");
+	    hfst::print_dot(outf, *t, &state_names);
+	  }
+	else
+	  {
+	    fprintf(outf, "// This graph generated with hfst-fst2txt\n");
+	    hfst::print_dot(outf, *t);
+	  }
+	break;
       case PCKIMMO_TEXT: // xfsm case checked earlier
         hfst::print_pckimmo(outf, *t);
         break;
