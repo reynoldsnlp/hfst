@@ -1636,6 +1636,7 @@ namespace xfst {
       XfstCompiler& setReadInteractiveTextFromStdin(bool Value);
       XfstCompiler& setReadline(bool value);
       XfstCompiler& setVerbosity(bool verbosity);
+      XfstCompiler& setInspectNetSupported(bool value);
       XfstCompiler& set(const char* name, const char* text);
       char * get_prompt() const;
       XfstCompiler& apply_up(const char* indata);

@@ -94,31 +94,16 @@ def start_xfst(**kwargs):
         Arguments recognized are: type, quit_on_fail.
     * `quit_on_fail` :
         Whether the compiler exits on any error, defaults to False.
-    * `output_to_python` :
-        Whether the compiler prints output via python, defaults to False.
-        (TODO: the other way round)
     * `type` :
         Implementation type of the compiler, defaults to
         hfst_dev.get_default_fst_type().
     """
-    import sys
-    idle = 'idlelib' in sys.modules
-    if idle:
-        print('It seems that you are running python in in IDLE. Note that all output from xfst will be buffered.')
-        print('This means that all warnings, e.g. about time-consuming operations, will be printed only after the operation is carried out.')
-        print('Consider running python from shell, for example command prompt, if you wish to see output with no delays.')
-
     type = get_default_fst_type()
     quit_on_fail = 'OFF'
     to_console=get_output_to_console()
-    output_to_python=False
     for k,v in kwargs.items():
       if k == 'type':
         type = v
-      elif k == 'output_to_console':
-        to_console=v
-      elif k == 'output_to_python':
-        output_to_python=v
       elif k == 'quit_on_fail':
         if v == True:
           quit_on_fail='ON'
@@ -126,9 +111,12 @@ def start_xfst(**kwargs):
         print('Warning: ignoring unknown argument %s.' % (k))
 
     comp = XfstCompiler(type)
-    comp.setReadInteractiveTextFromStdin(True)
+    comp.setReadInteractiveTextFromStdin(True) # ?
     comp.setReadline(False) # do not mix python and c++ readline
 
+    # Windows-specific...
+    import sys
+    idle = 'idlelib' in sys.modules
     if to_console and idle:
         print('Cannot output to console when running libhfst from IDLE.')
         to_console=False
@@ -144,7 +132,6 @@ def start_xfst(**kwargs):
     except ImportError:
       pass
 
-    import sys
     expression=""
     while True:
         expression += input(comp.get_prompt()).rstrip().lstrip()
@@ -154,13 +141,20 @@ def start_xfst(**kwargs):
            expression = expression[:-2] + '\n'
            continue
         retval = -1
-        if idle or output_to_python:
-            retval = libhfst_dev.hfst_compile_xfst_to_string_one(comp, expression)
-            stdout.write(libhfst_dev.get_hfst_xfst_string_one())
+        if True:
+            if (expression == "apply down" or expression == "apply up" or expression == "inspect" or expression == "inspect net"):
+               stdout.write(expression + ' not supported\n')
+               retval = 0
+            else:
+               retval = libhfst_dev.hfst_compile_xfst_to_string_one(comp, expression)
+               stdout.write(libhfst_dev.get_hfst_xfst_string_one())
+        # at the moment, interactive commands are not supported
         else:
             # interactive command
-            if (expression == "apply down" or expression == "apply up") and rl_found:
-               rl_length_2 = readline.get_current_history_length()
+            if (expression == "apply down" or expression == "apply up"):
+               rl_length_2=0
+               if rl_found:
+                  rl_length_2 = readline.get_current_history_length()
                while True:
                   try:
                      line = input().rstrip().lstrip()
@@ -170,8 +164,9 @@ def start_xfst(**kwargs):
                      comp.apply_down(line)
                   elif expression == "apply up":
                      comp.apply_up(line)
-               for foo in range(readline.get_current_history_length() - rl_length_2):
-                  readline.remove_history_item(rl_length_2)
+               if rl_found:
+                  for foo in range(readline.get_current_history_length() - rl_length_2):
+                     readline.remove_history_item(rl_length_2)
                retval = 0
             elif expression == "inspect" or expression == "inspect net":
                print('inspect net not supported')
@@ -179,7 +174,7 @@ def start_xfst(**kwargs):
             else:
                retval = comp.parse_line(expression + "\n")
         if retval != 0:
-           print("expression '%s' could not be parsed" % expression)
+           stdout.write("expression '%s' could not be parsed" % expression)
            if comp.get("quit-on-fail") == "ON":
               return
         if comp.quit_requested():
@@ -676,7 +671,7 @@ def compile_xfst_file(filename, **kwargs):
     * `filename` :
         The name of the xfst file.
     * `kwargs` :
-        Arguments recognized are: verbosity, quit_on_fail, output, type.
+        Arguments recognized are: verbosity, quit_on_fail, output, error, use_c_streams, type.
     * `verbosity` :
         The verbosity of the compiler, defaults to 0 (silent). Possible values are:
         0, 1, 2.
@@ -684,7 +679,10 @@ def compile_xfst_file(filename, **kwargs):
         Whether the script is exited on any error, defaults to True.
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
-        StringIO, sys.stderr being the default?
+        StringIO, sys.stdout being the default.
+    * `use_c_streams` :
+        Whether output is printed to C stdout and warnings and error messages to C stderr.
+        Defaults to False.
     * `type` :
         Implementation type of the compiler, defaults to
         hfst_dev.get_default_fst_type().
@@ -704,7 +702,7 @@ def compile_xfst_script(script, **kwargs):
     * `script` :
         The xfst script to be compiled (a string).
     * `kwargs` :
-        Arguments recognized are: verbosity, quit_on_fail, output, type.
+        Arguments recognized are: verbosity, quit_on_fail, output, error, use_c_streams, type.
     * `verbosity` :
         The verbosity of the compiler, defaults to 0 (silent). Possible values are:
         0, 1, 2.
@@ -712,7 +710,10 @@ def compile_xfst_script(script, **kwargs):
         Whether the script is exited on any error, defaults to True.
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
-        StringIO, sys.stderr being the default?
+        StringIO, sys.stdout being the default.
+    * `use_c_streams` :
+        Whether output is printed to C stdout and warnings and error messages to C stderr.
+        Defaults to False.
     * `type` :
         Implementation type of the compiler, defaults to
         hfst_dev.get_default_fst_type().
@@ -742,7 +743,10 @@ def _compile_xfst(**kwargs):
         Whether the script is exited on any error, defaults to True.
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
-        StringIO, sys.stderr being the default?
+        StringIO, sys.stdout being the default.
+    * `use_c_streams` :
+        Whether output is printed to C stdout and warnings and error messages to C stderr.
+        Defaults to False.
     * `type` :
         Implementation type of the compiler, defaults to
         hfst_dev.get_default_fst_type().
@@ -758,8 +762,9 @@ def _compile_xfst(**kwargs):
     verbosity=0
     quit_on_fail='ON'
     type = get_default_fst_type()
-    output=None
-    error=None
+    import sys
+    output=sys.stdout
+    use_c_streams=False
     to_console=get_output_to_console()
     filename=None
     script=None
@@ -772,8 +777,8 @@ def _compile_xfst(**kwargs):
           quit_on_fail='OFF'
       elif k == 'output':
           output=v
-      elif k == 'error':
-          error=v
+      elif k == 'use_c_streams':
+          use_c_streams=v
       elif k == 'output_to_console':
           to_console=v
       elif k == 'filename':
@@ -784,51 +789,34 @@ def _compile_xfst(**kwargs):
         print('Warning: ignoring unknown argument %s.' % (k))
 
     if verbosity > 1:
-      print('Compiling with %s implementation...' % fst_type_to_string(type))
+      output.write('Compiling with %s implementation...' % fst_type_to_string(type))
     xfstcomp = XfstCompiler(type)
     xfstcomp.setOutputToConsole(to_console)
     xfstcomp.setVerbosity(verbosity > 0)
+    xfstcomp.setInspectNetSupported(False)
     xfstcomp.set('quit-on-fail', quit_on_fail)
     if filename == None:
       data = script
     else:
       if verbosity > 1:
-        print('Opening xfst file %s...' % filename)
+        output.write('Opening xfst file %s...' % filename)
       f = open(filename, 'r', encoding='utf-8')
       data = f.read()
       f.close()
       if verbosity > 1:
-        print('File closed...')
+        output.write('File closed...')
 
     retval=-1
-    import sys
-    from io import StringIO
 
     # check special case
-    if isinstance(output, StringIO) and isinstance(error, StringIO) and output == error:
+    if use_c_streams:
+       retval = libhfst_dev.hfst_compile_xfst(xfstcomp, data, "cout", "cerr")
+    else:
        retval = libhfst_dev.hfst_compile_xfst_to_string_one(xfstcomp, data)
        output.write(unicode(libhfst_dev.get_hfst_xfst_string_one(), 'utf-8'))
-    else:
-       arg1 = ""
-       arg2 = ""
-       if output == None or output == sys.stdout:
-          arg1 = "cout"
-       if output == sys.stderr:
-          arg1 == "cerr"
-       if error == None or error == sys.stderr:
-          arg2 = "cerr"
-       if error == sys.stdout:
-          arg2 == "cout"
-
-       retval = libhfst_dev.hfst_compile_xfst(xfstcomp, data, arg1, arg2)
-
-       if isinstance(output, StringIO):
-          output.write(unicode(libhfst_dev.get_hfst_xfst_string_one(), 'utf-8'))
-       if isinstance(error, StringIO):
-          error.write(unicode(libhfst_dev.get_hfst_xfst_string_two(), 'utf-8'))
 
     if verbosity > 1:
-      print('Parsed file with return value %i (0 indicating succesful parsing).' % retval)
+      output.write('Parsed file with return value %i (0 indicating succesful parsing).' % retval)
     return retval
 
 def compile_twolc_file(inputfilename, outputfilename, **kwargs):
