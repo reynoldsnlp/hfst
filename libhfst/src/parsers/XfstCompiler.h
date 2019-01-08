@@ -509,6 +509,9 @@ class XfstCompiler
   XfstCompiler& setRestrictedMode(bool value);
   //! @brief Whether restricted mode is on.
   bool getRestrictedMode() const;
+
+  XfstCompiler& setInspectNetSupported(bool value);
+  bool getInspectNetSupported() const;
   
   //! @brief Whether it has been requested to quit the program.
   //  Needed in interactive mode where user input is read line by line.
@@ -761,6 +764,7 @@ class XfstCompiler
   std::ostringstream winoss_stderr_;
 #endif
   bool restricted_mode_;
+  bool inspect_net_supported_;
 }
 ;
 

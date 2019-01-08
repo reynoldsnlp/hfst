@@ -162,7 +162,8 @@ namespace xfst {
         winoss_stdout_(std::ostringstream()),
         //        redirected_stream_(NULL)
 #endif
-	restricted_mode_(false)
+	restricted_mode_(false),
+	inspect_net_supported_(true)
     {
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(this->verbose_);
@@ -229,7 +230,8 @@ namespace xfst {
         winoss_stdout_(std::ostringstream()),
         //redirected_stream_(NULL)
 #endif
-	restricted_mode_(false)
+	restricted_mode_(false),
+	inspect_net_supported_(true)
     {
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(this->verbose_);
@@ -4922,6 +4924,13 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::inspect_net()
     {
+      if (!inspect_net_supported_)
+	{
+	  output() << "inspect net not supported" << std::endl;
+	  flush(&output());
+	  PROMPT_AND_RETURN_THIS;
+	}
+      
       GET_TOP(t);
 
       HfstIterableTransducer net(*t);
@@ -5496,6 +5505,19 @@ namespace xfst {
   XfstCompiler::getRestrictedMode() const
   {
     return restricted_mode_;
+  }
+
+  XfstCompiler&
+  XfstCompiler::setInspectNetSupported(bool value)
+  {
+    inspect_net_supported_ = value;
+    return *this;
+  }
+
+  bool
+  XfstCompiler::getInspectNetSupported() const
+  {
+    return inspect_net_supported_;
   }
   
   XfstCompiler&
