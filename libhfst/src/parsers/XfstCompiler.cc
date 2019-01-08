@@ -716,11 +716,11 @@ namespace xfst {
         if (variables_["print-pairs"] == "OFF")
           {
             HfstOneLevelPaths paths = extract_output_paths(results);
-            printed = this->print_paths(paths);
+            printed = this->print_paths(paths, &output());
           }
         else
           {
-            printed = this->print_paths(results);
+            printed = this->print_paths(results, &output());
           }
 
         if (!printed)
@@ -756,7 +756,7 @@ namespace xfst {
           paths = t->lookup(std::string(token), cutoff);
         }
 
-        bool printed = this->print_paths(*paths);
+        bool printed = this->print_paths(*paths, &output());
         if (!printed)
           {
             output() << "???" << std::endl;
