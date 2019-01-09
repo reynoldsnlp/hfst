@@ -174,7 +174,7 @@ def start_xfst(**kwargs):
             else:
                retval = comp.parse_line(expression + "\n")
         if retval != 0:
-           stdout.write("expression '%s' could not be parsed" % expression)
+           stdout.write("expression '%s' could not be parsed\n" % expression)
            if comp.get("quit-on-fail") == "ON":
               return
         if comp.quit_requested():
