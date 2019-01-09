@@ -1638,6 +1638,7 @@ namespace xfst {
       XfstCompiler& setVerbosity(bool verbosity);
       XfstCompiler& setInspectNetSupported(bool value);
       XfstCompiler& set(const char* name, const char* text);
+      std::string get(const char* name);
       char * get_prompt() const;
       XfstCompiler& apply_up(const char* indata);
       XfstCompiler& apply_down(const char* indata);
