@@ -948,12 +948,12 @@ def compile_sfst_file(filename, **kwargs):
 
 def _compile_lexc(**kwargs):
     """
-    Compile lexc file *filename* into a transducer.
+    Compile lexc into a transducer.
 
     Parameters
     ----------
     * `kwargs` :
-        Arguments recognized are: filename, script, verbosity, with_flags, output.
+        Arguments recognized are: filename, script, verbosity, with_flags, output, use_c_streams.
     * `filename` :
         The name of the lexc file.
     * `script` :
@@ -966,6 +966,9 @@ def _compile_lexc(**kwargs):
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
         StringIO, sys.stderr being the default.
+    * `use_c_streams` :
+        Whether output is printed to C stdout and warnings and error messages to C stderr.
+        Defaults to False.
 
     Returns
     -------
@@ -975,7 +978,9 @@ def _compile_lexc(**kwargs):
     withflags=False
     alignstrings=False
     type = get_default_fst_type()
-    output=None
+    import sys
+    output=sys.stderr
+    use_c_streams=False
     to_console=get_output_to_console()
     filename=None
     script=None
@@ -990,6 +995,8 @@ def _compile_lexc(**kwargs):
           alignstrings = v
       elif k == 'output':
           output=v
+      elif k == 'use_c_streams':
+          use_c_streams=v
       elif k == 'output_to_console':
           to_console=v
       elif k == 'filename':
@@ -1005,22 +1012,11 @@ def _compile_lexc(**kwargs):
     lexccomp.setOutputToConsole(to_console)
 
     retval=-1
-    import sys
-    if output == None:
-       if filename == None:
-          retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "")
-       else:
-          retval = libhfst_dev.hfst_compile_lexc_file(lexccomp, filename, "")
-    elif output == sys.stdout:
+    if use_c_streams:
        if filename == None:
           retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "cout")
        else:
           retval = libhfst_dev.hfst_compile_lexc_file(lexccomp, filename, "cout")
-    elif output == sys.stderr:
-       if filename == None:
-          retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "cerr")
-       else:
-          retval = libhfst_dev.hfst_compile_lexc_file(lexccomp, filename, "cerr")
     else:
        if filename == None:
           retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "")
@@ -1040,7 +1036,7 @@ def compile_lexc_file(filename, **kwargs):
     * `filename` :
         The name of the lexc file.
     * `kwargs` :
-        Arguments recognized are: verbosity, with_flags, output.
+        Arguments recognized are: verbosity, with_flags, output, use_c_streams.
     * `verbosity` :
         The verbosity of the compiler, defaults to 0 (silent). Possible values are:
         0, 1, 2.
@@ -1049,6 +1045,9 @@ def compile_lexc_file(filename, **kwargs):
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
         StringIO, sys.stderr being the default.
+    * `use_c_streams` :
+        Whether output is printed to C stdout and warnings and error messages to C stderr.
+        Defaults to False.
 
     Returns
     -------
@@ -1065,7 +1064,7 @@ def compile_lexc_script(script, **kwargs):
     * `script` :
         The lexc script to be compiled (a string).
     * `kwargs` :
-        Arguments recognized are: verbosity, with_flags, output.
+        Arguments recognized are: verbosity, with_flags, output, use_c_streams.
     * `verbosity` :
         The verbosity of the compiler, defaults to 0 (silent). Possible values are:
         0, 1, 2.
@@ -1074,6 +1073,9 @@ def compile_lexc_script(script, **kwargs):
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
         StringIO, sys.stderr being the default.
+    * `use_c_streams` :
+        Whether output is printed to C stdout and warnings and error messages to C stderr.
+        Defaults to False.
 
     Returns
     -------
