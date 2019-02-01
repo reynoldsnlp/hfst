@@ -585,3 +585,7 @@ tr = hfst_dev.regex('[["<f>" "<o>" "<o>"]:["<b>" "<a>" "<r>"]|["<F>" "<O>" "<O>"
 assert(not (tr == None))
 TR = hfst_dev.HfstTransducer(fsm)
 assert(TR.compare(tr))
+
+comp = hfst_dev.XfstCompiler()
+assert(comp.parse('regex föö:bär::0.5') == 0)
+assert(comp.parse('print net') == 0)
