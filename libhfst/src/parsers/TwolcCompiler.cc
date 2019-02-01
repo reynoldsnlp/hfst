@@ -24,6 +24,8 @@ namespace hfst {
     void set_output(std::ostream & ostr);
     void reset_lexer();
     void reset_parser();
+    void set_warning_stream(std::ostream & ostr);
+    void set_error_stream(std::ostream & ostr);
   }
 }
 
@@ -36,6 +38,8 @@ namespace hfst {
     const HandyDeque<std::string> & get_non_alphabet_symbol_queue();
     void reset_lexer();
     void reset_parser();
+    void set_warning_stream(std::ostream & ostr);
+    void set_error_stream(std::ostream & ostr);
   }
 }
 
@@ -48,6 +52,8 @@ namespace hfst {
     void set_silent(bool val);
     void set_verbose(bool val);
     void reset_parser();
+    void set_warning_stream(std::ostream & ostr);
+    void set_error_stream(std::ostream & ostr);
   }
 }
 
@@ -57,7 +63,8 @@ namespace hfst {
     int TwolcCompiler::compile
     (const std::string & inputfile, const std::string & outputfile,
      bool silent, bool verbose, bool resolve_left_conflicts,
-     bool resolve_right_conflicts, hfst::ImplementationType type)
+     bool resolve_right_conflicts, hfst::ImplementationType type,
+     std::ostream * ostr)
     {
       // Reset previous values
       hfst::twolcpre1::reset_lexer();
@@ -68,6 +75,11 @@ namespace hfst {
       hfst::twolcpre1::set_input(istr);
       std::ostringstream oss1;
       hfst::twolcpre1::set_output(oss1);
+      if (ostr != NULL)
+	{
+	  hfst::twolcpre1::set_warning_stream(*ostr);
+	  hfst::twolcpre1::set_error_stream(*ostr);
+	}
 
       try
 	{
@@ -90,6 +102,12 @@ namespace hfst {
       // (2) Preprocessing
       std::istringstream iss1(oss1.str());
       hfst::twolcpre2::set_input(iss1);
+      if (ostr != NULL)
+	{
+	  hfst::twolcpre2::set_warning_stream(*ostr);
+	  hfst::twolcpre2::set_error_stream(*ostr);
+	}
+
       try
 	{
 	  int retval = hfst::twolcpre2::parse();
@@ -118,6 +136,11 @@ namespace hfst {
 	{
 	  std::istringstream iss2(oss2.str());
 	  hfst::twolcpre3::set_input(iss2);
+	  if (ostr != NULL)
+	    {
+	      hfst::twolcpre3::set_warning_stream(*ostr);
+	      hfst::twolcpre3::set_error_stream(*ostr);
+	    }
 
 	  OtherSymbolTransducer::set_transducer_type(type);
 	  hfst::twolcpre3::set_silent(silent);

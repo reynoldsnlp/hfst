@@ -19,7 +19,8 @@ namespace hfst {
       static int compile
 	(const std::string & inputfile, const std::string & outputfile,
 	 bool silent, bool verbose, bool resolve_left_conflicts,
-	 bool resolve_right_conflicts, hfst::ImplementationType type);
+	 bool resolve_right_conflicts, hfst::ImplementationType type,
+	 std::ostream * ostr=NULL);
     };
 
   } // namespace twolc

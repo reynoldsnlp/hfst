@@ -98,6 +98,7 @@ namespace std {
 %template(HfstTransducerUIntPair) pair<hfst::HfstTransducer*,unsigned int>;
 %template(LocationVector) vector<hfst_ol::Location>;
 %template(LocationVectorVector) vector<vector<hfst_ol::Location> >;
+%template(FooBar) pair<int, string>;
 }
 
 
@@ -1644,6 +1645,18 @@ namespace xfst {
       XfstCompiler& apply_down(const char* indata);
       int parse_line(std::string line);
       bool quit_requested() const;
+%extend{
+%pythoncode %{
+
+  def parse(self, expression):
+      retval = _libhfst_dev.hfst_compile_xfst_to_string_one(self, expression)
+      from sys import stdout
+      stdout.write(_libhfst_dev.get_hfst_xfst_string_one())
+      return retval
+
+%}
+}
+
   };
 }
 
@@ -1721,7 +1734,18 @@ namespace hfst {
     public:
       static int compile(const std::string & inputfile, const std::string & outputfile,
 			 bool silent, bool verbose, bool resolve_left_conflicts,
-			 bool resolve_right_conflicts, hfst::ImplementationType type);
+			 bool resolve_right_conflicts, hfst::ImplementationType type,
+			 std::ostream * ostr=NULL);
+%extend{
+	static std::pair<int, std::string> compile_file(const std::string & inputfile, const std::string & outputfile,
+							bool silent, bool verbose, bool resolve_left_conflicts,
+							bool resolve_right_conflicts, hfst::ImplementationType type)
+        {
+	  std::ostringstream oss;
+	  int retval = hfst::twolc::TwolcCompiler::compile(inputfile, outputfile, silent, verbose, resolve_left_conflicts, resolve_right_conflicts, type, &oss);
+	  return std::pair<int, std::string>(retval, oss.str());
+        }
+}
     };
   }
 }

@@ -196,10 +196,13 @@ def regex(re, **kwargs):
     * `re` :
         The regular expression defined with Xerox transducer notation.
     * `kwargs` :
-        Arguments recognized are: 'error' and 'definitions'.
-    * `error` :
+        Arguments recognized are: 'output', 'use_c_streams' and 'definitions'.
+    * `output` :
         Where warnings and errors are printed. Possible values are sys.stdout,
         sys.stderr (the default), a StringIO or None, indicating a quiet mode.
+    * `use_c_streams` :
+        Whether warnings and error messages are printed to C stderr.
+        Defaults to False.
     * `definitions` :
         A dictionary mapping variable names into transducers.
 
@@ -310,15 +313,18 @@ def regex(re, **kwargs):
     type_ = get_default_fst_type()
     to_console=get_output_to_console()
     import sys
-    err=None
+    err=sys.stderr
+    use_c_streams=False
     defs=None
 
     for k,v in kwargs.items():
       if k == 'output_to_console':
           to_console=v
-      if k == 'error':
+      elif k == 'output':
           err=v
-      if k == 'definitions':
+      elif k == 'use_c_streams':
+          use_c_streams=v
+      elif k == 'definitions':
           defs=v;
       else:
         print('Warning: ignoring unknown argument %s.' % (k))
@@ -334,13 +340,14 @@ def regex(re, **kwargs):
             else:
                 pass
 
+    if use_c_streams:
+       comp.set_verbosity(True)
+       return libhfst_dev.hfst_regex(comp, re, "cerr")
+
     if err == None:
        return libhfst_dev.hfst_regex(comp, re, "")
-    elif err == sys.stdout:
-       return libhfst_dev.hfst_regex(comp, re, "cout")
-    elif err == sys.stderr:
-       return libhfst_dev.hfst_regex(comp, re, "cerr")
     else:
+       comp.set_verbosity(True)
        retval = libhfst_dev.hfst_regex(comp, re, "")
        err.write(unicode(libhfst_dev.get_hfst_regex_error_message(), 'utf-8'))
        return retval
@@ -671,7 +678,7 @@ def compile_xfst_file(filename, **kwargs):
     * `filename` :
         The name of the xfst file.
     * `kwargs` :
-        Arguments recognized are: verbosity, quit_on_fail, output, error, use_c_streams, type.
+        Arguments recognized are: verbosity, quit_on_fail, output, use_c_streams, type.
     * `verbosity` :
         The verbosity of the compiler, defaults to 0 (silent). Possible values are:
         0, 1, 2.
@@ -702,7 +709,7 @@ def compile_xfst_script(script, **kwargs):
     * `script` :
         The xfst script to be compiled (a string).
     * `kwargs` :
-        Arguments recognized are: verbosity, quit_on_fail, output, error, use_c_streams, type.
+        Arguments recognized are: verbosity, quit_on_fail, output, use_c_streams, type.
     * `verbosity` :
         The verbosity of the compiler, defaults to 0 (silent). Possible values are:
         0, 1, 2.
@@ -866,9 +873,12 @@ def compile_twolc_file(inputfilename, outputfilename, **kwargs):
         else:
             print('Warning: ignoring unknown argument %s.' % (k))
 
-    return libhfst_dev.TwolcCompiler.compile(inputfilename, outputfilename, silent, verbose,
-                                         resolve_right_conflicts, resolve_left_conflicts,
-                                         implementation_type)
+    retval = libhfst_dev.TwolcCompiler.compile_file(inputfilename, outputfilename, silent, verbose,
+                                                    resolve_right_conflicts, resolve_left_conflicts,
+                                                    implementation_type)
+    import sys
+    sys.stdout.write(unicode(retval[1], 'utf-8'))
+    return retval[0]
 
 def compile_pmatch_file(filename):
     """
@@ -1427,6 +1437,19 @@ def intersect(transducers):
         retval = HfstTransducer(tr)
       else:
         retval.intersect(tr)
+    retval.minimize()
+    return retval
+
+def subtract(transducers):
+    """
+    Return a subtraction of *transducers*.
+    """
+    retval = None
+    for tr in transducers:
+      if retval == None:
+        retval = HfstTransducer(tr)
+      else:
+        retval.subtract(tr)
     retval.minimize()
     return retval
 
