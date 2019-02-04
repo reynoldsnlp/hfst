@@ -98,7 +98,7 @@ print_dot(FILE* out, HfstTransducer& t, std::map<unsigned int, std::string> * st
       {
         if (mutt->is_final_state(s))
           {
-            if (mutt->get_final_weight(s) > 0)
+            if (mutt->get_final_weight(s) > 0 || mutt->get_final_weight(s) < 0)
               {
 		if (state_names == NULL)
 		  {
@@ -333,7 +333,7 @@ print_dot(std::ostream & out, HfstTransducer& t, std::map<unsigned int, std::str
       {
         if (mutt->is_final_state(s))
           {
-            if (mutt->get_final_weight(s) > 0)
+            if (mutt->get_final_weight(s) > 0 || mutt->get_final_weight(s) < 0)
               {
                 out << "q" << s << " [shape=doublecircle," <<
                   "label=\"q" << s << "/\\n" << mutt->get_final_weight(s) << "\"] " << std::endl;
