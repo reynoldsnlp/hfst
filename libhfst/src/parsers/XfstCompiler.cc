@@ -3507,10 +3507,55 @@ namespace xfst {
     flush(&error());
     PROMPT_AND_RETURN_THIS;
 #else
+
     GET_TOP(tmp);
+
+    // command display found
+    if (::system("which display > /dev/null 2> /dev/null") == 0)
+      {
+	char * dotfilename = tempnam(NULL, "hfst");
+	if (verbose_)
+	  {
+	    error() << "Writing net in dot format to temporary file '" << dotfilename << "'." << std::endl;
+	    flush(&error());
+	  }
+	FILE * dotfile = hfst::hfst_fopen(dotfilename, "wb");
+	hfst::print_dot(dotfile, *tmp);
+	fclose(dotfile);
+
+	if (verbose_)
+	  {
+	    error() << "Viewing the graph." << std::endl;
+	    flush(&error());
+	  }
+	std::string command = std::string("display ") + std::string(dotfilename);
+	if (::system(command.c_str()) != 0)
+	  {
+	    error() << "Viewing failed." << std::endl;
+	    flush(&error());
+	    xfst_lesser_fail();
+	  }
+	PROMPT_AND_RETURN_THIS;
+      }
+
+    // dot and xdg-open must be used instead
+    if (::system("which dot > /dev/null 2> /dev/null") != 0)
+      {
+	error() << "Missing commands 'display' and 'dot'." << std::endl;
+	flush(&error());
+	xfst_lesser_fail();
+	PROMPT_AND_RETURN_THIS;
+      }
+    if (::system("which xdg-open > /dev/null 2> /dev/null") != 0)
+      {
+	error() << "Missing commands 'display' and 'xdg-open'." << std::endl;
+	flush(&error());
+	xfst_lesser_fail();
+	PROMPT_AND_RETURN_THIS;
+      }
     char * dotfilename = tempnam(NULL, "hfst");
     char * pngfilename = tempnam(NULL, "hfst");
-    if (false || verbose_)
+    if (verbose_)
       {
         error() << "Writing net in dot format to temporary file '" << dotfilename << "'." << std::endl;
         flush(&error());
@@ -3518,23 +3563,25 @@ namespace xfst {
     FILE * dotfile = hfst::hfst_fopen(dotfilename, "wb");
     hfst::print_dot(dotfile, *tmp);
     fclose(dotfile);
-    if (false || verbose_)
+    if (verbose_)
       {
-        error() << "Wrote net, closing file and converting into png format." << std::endl;
+        error() << "Converting into png format." << std::endl;
         flush(&error());
       }
-    if (::system(("dot -Tpng " + std::string(dotfilename) + " > " + std::string(pngfilename) + " 2> /dev/null" ).c_str()) != 0)
+    std::string command = std::string("dot -Tpng ") + std::string(dotfilename) + std::string(" > ") + std::string(pngfilename) + std::string(" 2> /dev/null");
+    if (::system(command.c_str()) != 0)
       {
         error() << "Converting failed." << std::endl;
         flush(&error());
         xfst_lesser_fail();
       }
-    if (false || verbose_)
+    if (verbose_)
       {
-        error() << "Converted to png format, viewing the graph." << std::endl;
+        error() << "Viewing the graph." << std::endl;
         flush(&error());
       }
-    if (::system(("/usr/bin/xdg-open " + std::string(pngfilename) + " 2> /dev/null &").c_str()) != 0)
+    command = std::string("xdg-open ") + std::string(pngfilename);
+    if (::system(command.c_str()) != 0)
       {
         error() << "Viewing failed." << std::endl;
         flush(&error());
