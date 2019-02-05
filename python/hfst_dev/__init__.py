@@ -147,7 +147,7 @@ def start_xfst(**kwargs):
                retval = 0
             # Viewing must be handled in python
             elif (expression == "view" or expression == "view net"):
-               tr = comp.top()
+               tr = comp.top(True) # silent mode
                if tr == None:
                   stdout.write('Empty stack.\n')
                   if comp.get("quit-on-fail") == "ON":

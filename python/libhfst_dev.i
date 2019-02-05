@@ -498,7 +498,10 @@ public:
 
   def view(self):
       """
-      View transducer.
+      Return a dot Digraph representation of the transducer as a graphviz.Source object.
+
+      Inside a Jupyter notebook, the return value will be automatically
+      rendered to an svg image and displayed on the console.
       """
       from graphviz import Source
       graph = self._get_dot_graph()
@@ -1656,7 +1659,7 @@ namespace xfst {
       XfstCompiler& setInspectNetSupported(bool value);
       XfstCompiler& set(const char* name, const char* text);
       std::string get(const char* name);
-      HfstTransducer * top();
+      HfstTransducer * top(bool silent=false);
       char * get_prompt() const;
       XfstCompiler& apply_up(const char* indata);
       XfstCompiler& apply_down(const char* indata);
