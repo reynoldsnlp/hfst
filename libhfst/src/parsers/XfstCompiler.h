@@ -668,10 +668,12 @@ class XfstCompiler
   //! @brief Print the result of \a operation when applied to the whole stack.
   XfstCompiler& test_operation(TestOperation operation, bool assertion=false);
 
+ public:
   //! @brief The topmost transducer in the stack.
   //! If empty, print a warning message and return NULL.
   HfstTransducer * top();
 
+ protected:
   //! @brief Get next line from \a file. Return NULL if end of file is reached.
   //! Use \a promptstr as prompt for readline, or print it to stderr if readline is not in use.
   char * xfst_getline(FILE * file, const std::string & promptstr = "");
