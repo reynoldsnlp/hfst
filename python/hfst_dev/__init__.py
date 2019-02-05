@@ -145,6 +145,17 @@ def start_xfst(**kwargs):
             if (expression == "apply down" or expression == "apply up" or expression == "inspect" or expression == "inspect net"):
                stdout.write(expression + ' not supported\n')
                retval = 0
+            # Viewing must be handled in python
+            elif (expression == "view" or expression == "view net"):
+               tr = comp.top()
+               if tr == None:
+                  stdout.write('Empty stack.\n')
+                  if comp.get("quit-on-fail") == "ON":
+                     return
+               else:
+                  from IPython.core.display import display, SVG
+                  display(SVG(tr.view()._repr_svg_()))
+               retval = 0
             else:
                retval = libhfst_dev.hfst_compile_xfst_to_string_one(comp, expression)
                stdout.write(libhfst_dev.get_hfst_xfst_string_one())

@@ -37,6 +37,7 @@
 #include "HfstTokenizer.h"
 #include "HfstFlagDiacritics.h"
 #include "HfstXeroxRules.h"
+#include "HfstPrintDot.h"
 #include "parsers/XreCompiler.h"
 #include "parsers/LexcCompiler.h"
 #include "parsers/XfstCompiler.h"
@@ -433,6 +434,12 @@ public:
     }
     void write(hfst::HfstOutputStream & os) { (void) os.redirect(*$self); }
 
+    std::string _get_dot_graph() {
+      std::ostringstream oss;
+      hfst::print_dot(oss, *$self, NULL);
+      return oss.str();
+    }
+
     hfst::HfstTwoLevelPaths _extract_shortest_paths()
     {
         hfst::HfstTwoLevelPaths results;
@@ -488,6 +495,15 @@ public:
     }
 
 %pythoncode %{
+
+  def view(self):
+      """
+      View transducer.
+      """
+      from graphviz import Source
+      graph = self._get_dot_graph()
+      s = Source(graph)
+      return s
 
   def copy(self):
       """
@@ -1640,6 +1656,7 @@ namespace xfst {
       XfstCompiler& setInspectNetSupported(bool value);
       XfstCompiler& set(const char* name, const char* text);
       std::string get(const char* name);
+      HfstTransducer * top();
       char * get_prompt() const;
       XfstCompiler& apply_up(const char* indata);
       XfstCompiler& apply_down(const char* indata);
