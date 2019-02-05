@@ -14,11 +14,15 @@ int hfst_compile_xfst_to_string_one(hfst::xfst::XfstCompiler & comp, std::string
 
         std::ostringstream os(std::ostringstream::ate);
         hfst::set_warning_stream(&os);
+	std::ostream & ostr = comp.get_output_stream();
+	std::ostream & estr = comp.get_error_stream();
         comp.set_output_stream(os);
         comp.set_error_stream(os);
         int retval = comp.parse_line(input);
         hfst::hfst_xfst_string_one = os.str();
         hfst::set_warning_stream(&std::cerr);
+	comp.set_output_stream(ostr);
+	comp.set_error_stream(estr);
         return retval;
 }
 
