@@ -2286,25 +2286,31 @@ namespace xfst {
     return *this;
   }
   HfstTransducer *
-  XfstCompiler::top()
+  XfstCompiler::top(bool silent/*=false*/)
   {
     if (stack_.size() < 1)
       {
-        EMPTY_STACK;
-        //hfst_fprintf(stderr, "Empty stack.\n");
+	if (!silent)
+	  {
+	    EMPTY_STACK;
+	  }
         xfst_lesser_fail();
-        prompt();
+	if (!silent)
+	  {
+	    prompt();
+	  }
         return NULL;
       }
     HfstTransducer * retval = stack_.top();
     if (retval->get_type() == hfst::HFST_OL_TYPE ||
         retval->get_type() == hfst::HFST_OLW_TYPE)
       {
-        error() << "Operation not supported for optimized lookup format. Consider 'remove-optimization' to convert into ordinary format." << std::endl;
-        flush(&error());
-        //hfst_fprintf(stderr, "Operation not supported for optimized lookup format. "
-        //             "Consider 'remove-optimization' to convert into ordinary format.\n");
-        prompt();
+	if (!silent)
+	  {
+	    error() << "Operation not supported for optimized lookup format. Consider 'remove-optimization' to convert into ordinary format." << std::endl;
+	    flush(&error());
+	    prompt();
+	  }
         return NULL;
       }
     return retval;

@@ -670,8 +670,8 @@ class XfstCompiler
 
  public:
   //! @brief The topmost transducer in the stack.
-  //! If empty, print a warning message and return NULL.
-  HfstTransducer * top();
+  //! If empty, print a warning message (unless \a silent is true) and return NULL.
+  HfstTransducer * top(bool silent=false);
 
  protected:
   //! @brief Get next line from \a file. Return NULL if end of file is reached.
