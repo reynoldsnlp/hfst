@@ -38,7 +38,7 @@ std::string HfstException::operator() (void) const
 std::string HfstException::what() const
 {
   std::ostringstream o;
-  o << "Exception: "<< name << " in file: " << file << " on line: " << line;
+  o << "Exception: \""<< name << "\" in file: \"" << file << "\" on line: " << line;
   return o.str();
 }
 
