@@ -118,6 +118,11 @@ class HfstException
     HfstException(const std::string&, const std::string&, size_t);
     ~HfstException();
     std::string what() const;
+%extend{
+    char *__str__() {
+      return strdup($self->what().c_str());
+    }
+}
 };
 
 class HfstTransducerTypeMismatchException : public HfstException { public: HfstTransducerTypeMismatchException(const std::string&, const std::string&, size_t); ~HfstTransducerTypeMismatchException(); std::string what() const; };
