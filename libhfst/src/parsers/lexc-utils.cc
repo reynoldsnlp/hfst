@@ -24,6 +24,12 @@
 #include <cstring>
 #include <cstdio>
 
+#ifdef PYTHON_BINDINGS
+  #include <pybind11/pybind11.h>
+  #include <pybind11/iostream.h>
+  namespace py = pybind11;
+#endif
+
 // for internal epsilon
 #include "HfstSymbolDefs.h"
 
@@ -360,9 +366,9 @@ strip_percents(const char* s, bool do_zeros)
     if (escaping)
     {
       //fprintf(stderr, "Stray escape char %% in %s\n", s);
-      std::ostream * err = hfst::lexc::lexc_->get_stream((hfst::lexc::lexc_->get_error_stream()));
-      *err << "Stray escape char %% in " << s << std::endl;
-      hfst::lexc::lexc_->flush(err);
+      std::ostringstream err("");
+      err << "Stray escape char %% in " << s << std::endl;
+      print_output(err.str().c_str());
       return NULL;
     }
     return rv;
@@ -442,14 +448,38 @@ strdup_nonconst_part(const char* token, const char* prefix,
 }
 
 void
+print_output(const char* format)
+{
+#ifdef PYTHON_BINDINGS
+    auto d = py::dict();
+    d["file"] = py::module::import("sys").attr("stderr");
+    d["end"] = "";
+    py::print(format, **d);
+#else
+    std::ostream * err = hfst::lexc::lexc_->get_stream((hfst::lexc::lexc_->get_error_stream()));
+    *err << format;
+    hfst::lexc::lexc_->flush(err);
+#endif
+}
+
+void
 error_at_current_token(int, int, const char* format)
 {
     char* leader = strdup_token_positions();
     char* token = strdup_token_part();
     //fprintf(stderr, "%s: %s %s\n", leader, format, token);
-      std::ostream * err = hfst::lexc::lexc_->get_stream((hfst::lexc::lexc_->get_error_stream()));
-      *err << leader << ": " << format << ": " << token << std::endl;
-      hfst::lexc::lexc_->flush(err);
+#ifdef PYTHON_BINDINGS
+    auto d = py::dict();
+    d["file"] = py::module::import("sys").attr("stderr");
+    d["end"] = "";
+    std::ostringstream oss("");
+    oss << leader << ": " << format << ": " << token << std::endl;
+    py::print(oss.str().c_str(), **d);
+#else
+    std::ostream * err = hfst::lexc::lexc_->get_stream((hfst::lexc::lexc_->get_error_stream()));
+    *err << leader << ": " << format << ": " << token << std::endl;
+    hfst::lexc::lexc_->flush(err);
+#endif
     free(leader);
 }
 

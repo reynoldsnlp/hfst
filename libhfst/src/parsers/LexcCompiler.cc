@@ -274,9 +274,9 @@ LexcCompiler& LexcCompiler::parse(const char* filename)
     hlexcin = hfst::hfst_fopen(filename, "r");
     if (hlexcin == NULL)
       {
-        std::ostream * err = get_stream(error_);
-        *err << "could not open " << filename << " for reading" << std::endl;
-        flush(err);
+	std::ostringstream err("");
+        err << "could not open " << filename << " for reading" << std::endl;
+	hfst::lexc::print_output(err.str().c_str());
         parseErrors_ = true;
         return *this;
       }
@@ -517,8 +517,9 @@ static void warn_about_one_sided_flags(const std::pair<std::string, std::string>
           if (treat_one_sided_flags_as_errors_)
             {
               // error messages are always printed
-              *errorstr_ << std::endl << "*** ERROR: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << " [--Werror]" << std::endl;
-              lexc_->flush(errorstr_);
+	      std::ostringstream err("");
+              err << std::endl << "*** ERROR: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << " [--Werror]" << std::endl;
+	      hfst::lexc::print_output(err.str().c_str());
               throw "one-sided flag";
             }
           if (!quiet_one_sided_flags_)
@@ -533,8 +534,9 @@ static void warn_about_one_sided_flags(const std::pair<std::string, std::string>
       if (treat_one_sided_flags_as_errors_)
         {
           // error messages are always printed
-          *hfst::lexc::errorstr_ << std::endl << "*** ERROR: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << " [--Werror]" << std::endl;
-          lexc_->flush(errorstr_);
+	  std::ostringstream err("");
+          err << "*** ERROR: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << " [--Werror]" << std::endl;
+	  hfst::lexc::print_output(err.str().c_str());
           throw "one-sided flag";
         }
       if (!quiet_one_sided_flags_)
@@ -760,9 +762,9 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
       {
         if ((currentEntries_ % 10000) == 0)
           {
-            std::ostream * err = get_stream(error_);
-            *err << currentEntries_ << "...";
-            flush(err);
+	    std::ostringstream err("");
+	    err << currentEntries_ << "...";
+	    hfst::lexc::print_output(err.str().c_str());
           }
           
       }
@@ -802,9 +804,9 @@ LexcCompiler::addXreDefinition(const string& definition_name, const string& xre)
     xre_.define(definition_name, xre);
     if (!quiet_)
       {
-        std::ostream * err = get_stream(error_);
-        *err << "Defined '" << definition_name << "': ? Kb., ? states, ? arcs, ? paths." << std::endl;
-        flush(err);
+        std::ostringstream err("");
+        err << "Defined '" << definition_name << "': ? Kb., ? states, ? arcs, ? paths." << std::endl;
+	hfst::lexc::print_output(err.str().c_str());
       }
     return *this;
 }
@@ -837,7 +839,7 @@ LexcCompiler::setCurrentLexiconName(const string& lexiconName)
         tokenizer_.add_multichar_symbol(encodedName);
     }
 
-    std::ostream * err = get_stream(error_);
+    std::ostringstream err("");
 
     if ((firstLexicon) && (lexiconName == "Root"))
     {
@@ -845,22 +847,22 @@ LexcCompiler::setCurrentLexiconName(const string& lexiconName)
     }
     else if ((firstLexicon) && (lexiconName != "Root"))
     {
-      if (!quiet_) *err << "first lexicon is not named Root" << std::endl;
+      if (!quiet_) err << "first lexicon is not named Root" << std::endl;
         setInitialLexiconName(lexiconName);
     }
     else if ((!firstLexicon) && (lexiconName == "Root"))
     {
-      if (!quiet_) *err << "Root is not first the first lexicon" << std::endl;
+      if (!quiet_) err << "Root is not first the first lexicon" << std::endl;
         setInitialLexiconName(lexiconName);
     }
     if (!firstLexicon && !quiet_)
     {
-      *err << currentEntries_ << " ";
+      err << currentEntries_ << " ";
     }
-    if (!quiet_) *err << lexiconName << "...";
+    if (!quiet_) err << lexiconName << "...";
     firstLexicon = false;
 
-    flush(err);
+    hfst::lexc::print_output(err.str().c_str());
 
     currentEntries_ = 0;
     return *this;
@@ -886,14 +888,14 @@ LexcCompiler::compileLexical()
         return 0;
       }
 
-    std::ostream * err = get_stream(error_);
+    std::ostringstream err("");
 
     bool warnings_generated = false;
     printConnectedness(warnings_generated);
     if (warnings_generated && treat_warnings_as_errors_)
       {
-        if (!quiet_) *err << "*** ERROR: could not parse lexc file: treating warnings as errors [--Werror] ***" << std::endl;
-        flush(err);
+        if (!quiet_) err << "*** ERROR: could not parse lexc file: treating warnings as errors [--Werror] ***" << std::endl;
+	hfst::lexc::print_output(err.str().c_str());
         return 0;
       }
 
@@ -933,8 +935,10 @@ LexcCompiler::compileLexical()
         {
             if (verbose_)
             {
-              *err << "Morphotaxing... " << *s << " ";
-              flush(err);
+	      err.clear();
+	      err.str("");
+              err << "Morphotaxing... " << *s << " ";
+	      hfst::lexc::print_output(err.str().c_str());
             }
             string joinerEnc = *s;
             joinerEncode(joinerEnc);
@@ -987,8 +991,10 @@ LexcCompiler::compileLexical()
           {
             if (verbose_)
             {
-              *err << "Morphotaxing... " << *s << " ";
-              flush(err);
+	      err.clear();
+	      err.str("");
+	      err << "Morphotaxing... " << *s << " ";
+	      hfst::lexc::print_output(err.str().c_str());
             }
             string flagPstring = *s;
             string flagRstring = *s;
@@ -1052,22 +1058,26 @@ LexcCompiler::compileLexical()
 
         if (debug)
           {
-            *err << "lexicons before compose: " << std::endl;
-            *err << lexicons;
+	    err.clear();
+	    err.str("");
+            err << "lexicons before compose: " << std::endl;
+            err << lexicons;
             
-            *err << "joinersAll: " << std::endl;
-            *err << joinersAll;
-            *err << std::endl;
-            flush(err);
+            err << "joinersAll: " << std::endl;
+            err << joinersAll;
+            err << std::endl;
+	    hfst::lexc::print_output(err.str().c_str());
           }
 
         lexicons.compose(joinersAll).optimize();
 
         if (debug)
           {
-            *err << "lexicons after composition: " << std::endl;
-            *err << lexicons << std::endl;
-            flush(err);
+	    err.clear();
+	    err.str("");
+            err << "lexicons after composition: " << std::endl;
+            err << lexicons << std::endl;
+	    hfst::lexc::print_output(err.str().c_str());
           }
 
         HfstSymbolSubstitutions allSubstitutions;
@@ -1075,8 +1085,10 @@ LexcCompiler::compileLexical()
         {
             if (verbose_)
             {
-              *err << std::endl << "Changing flags..." << std::endl;
-              flush(err);
+	      err.clear();
+	      err.str("");
+              err << std::endl << "Changing flags..." << std::endl;
+	      hfst::lexc::print_output(err.str().c_str());
             }
             HfstSymbolSubstitutions fakeFlagsToRealFlags;
             // Change fake flags to real flags
@@ -1089,8 +1101,10 @@ LexcCompiler::compileLexical()
             {
               if (debug)
                 {
-                  *err << "handling alpha: '" << *s << "'..." << std::endl;
-                  flush(err);
+		  err.clear();
+		  err.str("");
+                  err << "handling alpha: '" << *s << "'..." << std::endl;
+		  hfst::lexc::print_output(err.str().c_str());
                 }
                 String alph = *s;
 
@@ -1101,8 +1115,10 @@ LexcCompiler::compileLexical()
                     fakeFlagsToRealFlags.insert(StringPair(*s, alph));
                     if (debug)
                       {
-                        *err << "debug: inserting fakeFlagsToRealFlags replacement: " << *s << " -> " << alph << std::endl;
-                        flush(err);
+			err.clear();
+			err.str("");
+                        err << "debug: inserting fakeFlagsToRealFlags replacement: " << *s << " -> " << alph << std::endl;
+			hfst::lexc::print_output(err.str().c_str());
                       }
                 }
             }
@@ -1119,16 +1135,20 @@ LexcCompiler::compileLexical()
 
         if (debug)
           {
-            *err << "lexicons after substitution: " << std::endl;
-            *err << lexicons << std::endl;
-            flush(err);
+	    err.clear();
+	    err.str("");
+            err << "lexicons after substitution: " << std::endl;
+            err << lexicons << std::endl;
+	    hfst::lexc::print_output(err.str().c_str());
           }
         
         //replace reg exp key with transducers
         if (verbose_)
         {
-          *err << std::endl << "Inserting regular expressions..." << std::endl;
-          flush(err);
+	  err.clear();
+	  err.str("");
+          err << std::endl << "Inserting regular expressions..." << std::endl;
+	  hfst::lexc::print_output(err.str().c_str());
         }
 
 
@@ -1147,8 +1167,10 @@ LexcCompiler::compileLexical()
                 fakeRegexprToReal.insert(StringPair(it->first, alph));
                 if (debug)
                   {
-                    *err << "debug: inserting fakeRegexprToReal replacement: " << it->first << " -> " << alph << std::endl;
-                    flush(err);
+		    err.clear();
+		    err.str("");
+                    err << "debug: inserting fakeRegexprToReal replacement: " << it->first << " -> " << alph << std::endl;
+		    hfst::lexc::print_output(err.str().c_str());
                   }
             }
         }
@@ -1173,9 +1195,11 @@ LexcCompiler::compileLexical()
             regMarkToTr[alph] = btr;
             if (debug)
               {
-                *err << "debug: regMarkToTr[" << alph << "] = " << std::endl;
-                btr.write_in_att_format(*err);
-                flush(err);
+		err.clear();
+		err.str("");
+                err << "debug: regMarkToTr[" << alph << "] = " << std::endl;
+                btr.write_in_att_format(err);
+		hfst::lexc::print_output(err.str().c_str());
               }
         }
       
@@ -1186,9 +1210,11 @@ LexcCompiler::compileLexical()
 
         if (debug)
           {
-            *err << "lexicons_basic after regexp substitution: " << std::endl;
-            lexicons_basic.write_in_att_format(*err);
-            flush(err);
+	    err.clear();
+	    err.str("");
+            err << "lexicons_basic after regexp substitution: " << std::endl;
+            lexicons_basic.write_in_att_format(err);
+	    hfst::lexc::print_output(err.str().c_str());
           }
 
 
@@ -1266,8 +1292,12 @@ LexcCompiler::compileLexical()
 
     rv->optimize();
     
-    if(!quiet_) *err << endl;
-    
+    if(!quiet_) {
+      err.clear();
+      err.str("");
+      err << endl;
+      hfst::lexc::print_output(err.str().c_str());
+    }
     return rv;
 }
 
@@ -1275,7 +1305,7 @@ LexcCompiler::compileLexical()
 const LexcCompiler&
 LexcCompiler::printConnectedness(bool & warnings_generated)
 {
-  std::ostream * err = get_stream(error_);
+  std::ostringstream err("");
 
   if (lexiconNames_ != continuations_)
     {
@@ -1296,8 +1326,7 @@ LexcCompiler::printConnectedness(bool & warnings_generated)
             {
               if (!quiet_)
                 {
-                  *err << "Warning: Sublexicon is mentioned but not defined. (" << *s << ") " << std::endl;
-                  flush(err);
+                  err << "Warning: Sublexicon is mentioned but not defined. (" << *s << ") " << std::endl;
                 }
               warnings_generated = true;
             }
@@ -1307,18 +1336,18 @@ LexcCompiler::printConnectedness(bool & warnings_generated)
           warnings_generated = true;
           if (!quiet_)
             {
-              *err << "Warning: Sublexicons defined but not used" << std::endl;
+              err << "Warning: Sublexicons defined but not used" << std::endl;
               for (vector<string>::iterator s = lexMinusCont.begin();
                    s != lexMinusContEnd; ++s)
                 {
-                  *err << *s << " ";
+                  err << *s << " ";
                 }
-              *err << std::endl;
-              flush(err);
+              err << std::endl;
             }
         }
     }
-    return *this;
+  hfst::lexc::print_output(err.str().c_str());
+  return *this;
 }
 
 } }

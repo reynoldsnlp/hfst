@@ -60,9 +60,9 @@ void
 handle_noflag(const string& lexname)
 {
     //fprintf(stderr, "DEBUG: Adding %s to noflags\n", lexname.c_str());
-    std::ostream * err = hfst::lexc::lexc_->get_stream((hfst::lexc::lexc_->get_error_stream()));
-    *err << "DEBUG: Adding " << lexname << " to noflags" << std::endl;
-    hfst::lexc::lexc_->flush(err);
+    std::ostringstream err("");
+    err << "DEBUG: Adding " << lexname << " to noflags" << std::endl;
+    hfst::lexc::print_output(err.str().c_str());
     hfst::lexc::lexc_->addNoFlag(lexname);
 }
 static
