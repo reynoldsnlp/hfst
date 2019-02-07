@@ -21,6 +21,8 @@
 
 #ifndef UNIT_TEST
 
+extern int xreerror(const char*);
+
 namespace hfst { namespace xre {
 
     unsigned int cr=0; // number of chars read from xre input
@@ -167,9 +169,11 @@ XreCompiler::define(const std::string& name, const std::string& xre)
       //*errorstream_ << "error in XreCompiler::define: xre '" << xre << "' could not be parsed, leaving " << name << "undefined" << std::endl;
       if (this->verbose_)
         {
-          std::ostream * err = get_stream(get_error_stream());
-          *err << "error: could not parse '" << xre << "', leaving '" << name << "' undefined" << std::endl;
-          flush(err);
+          //std::ostream * err = get_stream(get_error_stream());
+	  std::ostringstream oss("");
+	  oss << "error: could not parse '" << xre << "', leaving '" << name << "' undefined" << std::endl;
+	  xreerror(oss.str().c_str());
+          //flush(err);
         }
       return false;
     }

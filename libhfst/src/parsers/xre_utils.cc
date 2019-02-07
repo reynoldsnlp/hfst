@@ -22,6 +22,12 @@
 #include "HfstXeroxRules.h"
 #include "XreCompiler.h"
 
+#ifdef PYTHON_BINDINGS
+  #include <pybind11/pybind11.h>
+  #include <pybind11/iostream.h>
+  namespace py = pybind11;
+#endif
+
 using std::string;
 using std::map;
 using std::ostringstream;
@@ -91,9 +97,16 @@ xreerror(const char *msg)
   char buffer [1024];
   (void) sprintf(buffer, "*** xre parsing failed: %s\n", msg);
   buffer[1023] = '\0';
+#ifdef PYTHON_BINDINGS
+  auto d = py::dict();
+  d["file"] = py::module::import("sys").attr("stderr");
+  d["end"] = "";
+  py::print(buffer, **d);
+#else
   std::ostream * err = xreerrstr();
   *err << std::string(buffer);
   xreflush(err);
+#endif
   return 0;
 }
 
