@@ -16,6 +16,18 @@
 #   include <config.h>
 #endif
 
+// TODO: rewrite printing when using python:
+//#include <pybind11/pybind11.h>
+//#include <pybind11/iostream.h>
+//namespace py = pybind11;
+//auto d = py::dict();
+//d["file"] = py::module::import("sys").attr("stderr");
+//d["end"] = "";
+//py::print("testing...", **d);
+// Add to CPPFLAGS:
+//-I${top_srcdir}/back-ends/pybind11/include
+//-I/usr/include/python3.5m
+
 #include <string>
 #include <map>
 #include <queue>
