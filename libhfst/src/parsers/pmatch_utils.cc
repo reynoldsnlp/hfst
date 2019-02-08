@@ -1232,15 +1232,21 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         timer = clock();
     }
 
-    if (inserted_names.size() > 0) {
+    if (inserted_names.size() > 0 || def_insed_expressions.size() > 0) {
         HfstTransducer dummy(format);
         // We keep TOP and any inserted transducers
         std::map<std::string, PmatchObject *>::iterator defs_it;
         for (defs_it = definitions.begin(); defs_it != definitions.end();
              ++defs_it) {
             if (defs_it->first.compare("TOP") == 0 ||
-                inserted_names.count(defs_it->first) != 0) {
-                HfstTransducer * tmp = defs_it->second->evaluate();
+                inserted_names.count(defs_it->first) != 0 ||
+                def_insed_expressions.count(defs_it->first) != 0) {
+                HfstTransducer * tmp = NULL;
+                if (def_insed_expressions.count(defs_it->first) != 0) {
+                    tmp = def_insed_expressions[defs_it->first]->evaluate();
+                } else {
+                    tmp = defs_it->second->evaluate();
+                }
                 tmp->minimize();
                 dummy.harmonize(*tmp);
                 // This is what it will be called in the archive
@@ -1899,7 +1905,11 @@ void PmatchObject::expand_Ins_arcs(StringSet & ss)
                     expansions_done.insert(*it);
                     if (definitions.count(ins_name) != 0) {
                         StringSet allowed, disallowed;
-                        definitions[ins_name]->collect_initial_symbols_into(allowed, disallowed);
+                        if (def_insed_expressions.count(ins_name) != 0) {
+                            def_insed_expressions[ins_name]->collect_initial_symbols_into(allowed, disallowed);
+                        } else {
+                            definitions[ins_name]->collect_initial_symbols_into(allowed, disallowed);
+                        }
                         if (allowed.size() != 0) {
                             expanded_symbols.insert(allowed.begin(), allowed.end());
                         } else {
