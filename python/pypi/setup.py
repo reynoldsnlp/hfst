@@ -112,7 +112,7 @@ if platform == "darwin" and CPP_STD_11:
 
 # HFST headers needed when compiling the actual c++ extension
 ext_include_dirs = [".", "libhfst/src/", "back-ends/foma", "back-ends",
-                    "parsers", "libhfst/src/parsers"]
+                    "parsers", "libhfst/src/parsers", "back-ends/pybind11/include"]
 if platform == "win32":
     ext_include_dirs.append("back-ends/openfstwin/src/include")
 else:
@@ -137,6 +137,9 @@ if include_readline:
     ext_define_macros.append(('HAVE_READLINE', None))
 if include_getline:
     ext_define_macros.append(('HAVE_GETLINE', None))
+
+# Use python's print function during lexc and xre compilation
+ext_define_macros.append(('PYTHON_BINDINGS', None))
 
 # msvc-specific macros.
 if platform == "win32":
@@ -353,7 +356,7 @@ libhfst_module = Extension('_libhfst_dev',
                            )
 
 setup(name = 'hfst-dev',
-      version = '3.15.0.4_beta',
+      version = '3.15.0.5_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',
