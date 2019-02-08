@@ -1331,6 +1331,35 @@ class HfstIterableTransducer {
   }
 
 %pythoncode %{
+
+  def view(self):
+      """
+      Return a dot Digraph representation of the transducer as a graphviz.Source object.
+
+      Examples:
+
+      Inside a Jupyter notebook, the return value will be automatically
+      rendered to an svg image and displayed on the console:
+
+      tr = hfst_dev.regex('foo:bar')
+      tr.view()
+
+      If inside an intended block, 'display' must be called:
+
+      if (Foo):
+          tr = hfst_dev.regex('foo:bar')
+          display(tr.view())
+
+      On other environments, the return value must be explicitely rendered
+      to an svg image before displaying it:
+
+      tr = hfst_dev.regex('foo:bar')
+      from IPython.core.display import display, SVG
+      display(SVG(tr.view()._repr_svg_()))
+      """
+      TR = HfstTransducer(self)
+      return TR.view()
+
   def transitions(self, s):
       """
       ...
