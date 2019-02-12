@@ -25,6 +25,7 @@
  __if_not_exists( ssize_t ) { typedef SSIZE_T ssize_t; };
 #endif
 
+#include "XfstCompiler.h"
 
 namespace hfst { namespace xfst {
 
@@ -45,6 +46,8 @@ char* strdup_nonconst_part(const char* token,
                            const char* suffix,
                            bool strip);
 
+void print_error(const char * text);
+void print_output(const char * text);
 } }
 // vim: set ft=cpp.doxygen:
 #endif // GUARD_lexc_utils_h

@@ -1535,8 +1535,9 @@ int hxfstparse(void);
 void
 hxfsterror(const char* text)
 {
-    hfst::xfst::xfst_->error() << text << std::endl;
-    hfst::xfst::xfst_->flush(&hfst::xfst::xfst_->error());
+    hfst::xfst::print_error(text);
+    //hfst::xfst::xfst_->error() << text << std::endl;
+    //hfst::xfst::xfst_->flush(&hfst::xfst::xfst_->error());
     //fprintf(stderr,  "%s\n", text);
 }
 

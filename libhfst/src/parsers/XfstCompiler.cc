@@ -526,8 +526,7 @@ namespace xfst {
                 }
               break;
             default:
-              std::cerr << "ERROR: line: " << __LINE__ << std::endl;
-              throw; // for the compiler's peace of mind
+              throw "Error in is_valid_string"; // for the compiler's peace of mind
               break;
             }
           }

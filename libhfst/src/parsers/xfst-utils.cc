@@ -17,6 +17,12 @@
 #  include <config.h>
 #endif
 
+#ifdef PYTHON_BINDINGS
+  #include <pybind11/pybind11.h>
+  #include <pybind11/iostream.h>
+  namespace py = pybind11;
+#endif
+
 #include <string>
 #include <vector>
 #include <sstream>
@@ -231,6 +237,30 @@ strdup_nonconst_part(const char* token, const char* prefix,
     return token_part;
 }
 
+void print_output(const char * text)
+{
+#ifdef PYTHON_BINDINGS
+  auto d = py::dict();
+  //d["end"] = "";
+  py::print(text, **d);
+#else
+  hfst::xfst::xfst_->output() << text << std::endl;
+  hfst::xfst::xfst_->flush(&hfst::xfst::xfst_->output());
+#endif
+}
+
+void print_error(const char * text)
+{
+#ifdef PYTHON_BINDINGS
+  auto d = py::dict();
+  d["file"] = py::module::import("sys").attr("stderr");
+  //d["end"] = "";
+  py::print(text, **d);
+#else
+  hfst::xfst::xfst_->error() << text << std::endl;
+  hfst::xfst::xfst_->flush(&hfst::xfst::xfst_->error());
+#endif
+}
 
 } }
 
