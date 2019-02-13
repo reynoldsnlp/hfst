@@ -93,8 +93,10 @@ using hfst::implementations::HfstTransition;
 
 #ifdef PYTHON_BINDINGS
 #define ERROR(x) std::ostringstream oss(""); oss x; hfst::xfst::print_error(oss.str().c_str());
+#define OUTPUT(x) std::ostringstream oss(""); oss x; hfst::xfst::print_output(oss.str().c_str());
 #else
 #define ERROR(x) error() x << std::endl; flush(&error());
+#define OUTPUT(x) output() x << std::endl; flush(&output());
 #endif
 
 #define WEIGHT_PRECISION "5"
@@ -1672,15 +1674,14 @@ namespace xfst {
       std::string message;
       if (!get_help_message(text, message, HELP_MODE_APROPOS))
         {
-          output() << "nothing found for '" << std::string(text) << "'" << std::endl;
+          OUTPUT(<< "nothing found for '" << std::string(text) << "'");
           //hfst_fprintf(outstream_, "nothing found for '%s'\n", text);
         }
       else
         {
-          output() << message;
+          OUTPUT(<< message);
           //hfst_fprintf(outstream_, "%s", message.c_str());
         }
-      flush(&output());
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -1692,15 +1693,14 @@ namespace xfst {
       std::string message;
       if (!get_help_message(text, message, help_mode))
         {
-          output() << "no help found for '" << std::string(text) << "'" << std::endl;
+          OUTPUT(<< "no help found for '" << std::string(text) << "'");
           //hfst_fprintf(outstream_, "no help found for '%s'\n", text);
         }
       else
         {
-          output() << message;
+          OUTPUT(<< message);
           //hfst_fprintf(outstream_, "%s", message.c_str());
         }
-      flush(&output());
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -1724,8 +1724,7 @@ namespace xfst {
   XfstCompiler::pop()
     {
       if (stack_.empty()) {
-        output() << "Stack is empty." << std::endl; //hfst_fprintf(outstream_, "Stack is empty.\n");
-        flush(&output());
+        OUTPUT(<< "Stack is empty."); //hfst_fprintf(outstream_, "Stack is empty.\n");
       }
       else // todo: delete if not definition?
         stack_.pop();
@@ -1737,8 +1736,7 @@ namespace xfst {
     {
       if (definitions_.find(name) == definitions_.end())
         {
-          output() << "no such defined network: '" << std::string(name) << "'" << std::endl;
-          flush(&output());
+          OUTPUT(<< "no such defined network: '" << std::string(name) << "'");
           //hfst_fprintf(outstream_, "no such defined network: '%s'\n", name);
           PROMPT_AND_RETURN_THIS;
         }
@@ -2014,8 +2012,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::echo(const char* text)
     {
-      output() << text << std::endl;
-      flush(&output());
+      OUTPUT(<< text);
       //hfst_fprintf(outstream_, "%s\n", text);
       PROMPT_AND_RETURN_THIS;
     }
@@ -2025,14 +2022,12 @@ namespace xfst {
     {
       if (verbose_ && (strcmp(message, "dodongo") == 0))
         {
-          output() << "dislikes smoke." << std::endl;
-          flush(&output());
+          OUTPUT(<< "dislikes smoke.");
           //hfst_fprintf(outstream_, "dislikes smoke.\n");
         }
       else if (verbose_)
         {
-          output() << message << "." << std::endl;
-          flush(&output());
+          OUTPUT(<< message << ".");
           //hfst_fprintf(outstream_, "%s.\n", message);
         }
       else
@@ -2071,8 +2066,7 @@ namespace xfst {
               variables_["flag-is-epsilon"] = text;
               if (verbose_)
                 {
-                  output() << "variable flag-is-epsilon = " << text << std::endl;
-                  flush(&output());
+                  OUTPUT(<< "variable flag-is-epsilon = " << text);
                   //hfst_fprintf(outstream_, "variable %s = %s\n", "flag-is-epsilon", text);
                 }
               PROMPT_AND_RETURN_THIS;
@@ -2131,8 +2125,7 @@ namespace xfst {
 
       if (verbose_)
         {
-          output() << "variable " << name << " = " << text << std::endl;
-          flush(&output());
+          OUTPUT(<< "variable " << name << " = " << text);
           //hfst_fprintf(outstream_, "variable %s = %s\n", name, text);
         }
 
@@ -2174,8 +2167,7 @@ namespace xfst {
           // xfst_lesser_fail(); ???
           PROMPT_AND_RETURN_THIS;
         }
-      output() << "variable " << name << " = " << variables_[name] << std::endl;
-      flush(&output());
+      OUTPUT(<< "variable " << name << " = " << variables_[name]);
       //hfst_fprintf(outstream_, "variable %s = %s\n", name, variables_[name].c_str());
       PROMPT_AND_RETURN_THIS;
     }
@@ -2238,8 +2230,7 @@ namespace xfst {
   XfstCompiler::print_bool(bool value)
   {
     int printval = (value)? 1 : 0;
-    output() << printval << ", (1 = TRUE, 0 = FALSE)" << std::endl;
-    flush(&output());
+    OUTPUT(<< printval << ", (1 = TRUE, 0 = FALSE)");
     //hfst_fprintf(outstream_, "%i, (1 = TRUE, 0 = FALSE)\n", printval);
     return *this;
   }
@@ -3033,8 +3024,7 @@ namespace xfst {
 
       if (paths.size() == 0)
         {
-          output() << "transducer is empty" << std::endl;
-          flush(&output());
+          OUTPUT(<< "transducer is empty");
           //hfst_fprintf(outstream_, "transducer is empty\n");
         }
       else
@@ -3054,8 +3044,7 @@ namespace xfst {
       this->shortest_string(topmost, paths);
 
       if (paths.size() == 0) {
-        output() << "transducer is empty" << std::endl;
-        flush(&output());
+        OUTPUT(<< "transducer is empty");
         //hfst_fprintf(outstream_, "transducer is empty\n");
       }
       else {
@@ -3128,12 +3117,10 @@ namespace xfst {
     // Print the results:
     // first, the special cases,
     if (upper_is_cyclic && lower_is_cyclic) {
-      output() << "transducer is cyclic" << std::endl; // hfst_fprintf(outstream_, "transducer is cyclic\n");
-      flush(&output());
+      OUTPUT(<< "transducer is cyclic"); // hfst_fprintf(outstream_, "transducer is cyclic\n");
     }
     else if (transducer_is_empty) {
-      output() << "transducer is empty" << std::endl; // hfst_fprintf(outstream_, "transducer is empty\n");
-      flush(&output());
+      OUTPUT(<< "transducer is empty"); // hfst_fprintf(outstream_, "transducer is empty\n");
     }
     // then the usual:
     else {
@@ -4750,8 +4737,7 @@ namespace xfst {
       }
 #endif
 
-    output() << promptstr;
-    flush(&output());
+    OUTPUT(<< promptstr);
     //hfst_fprintf(outstream_, "%s", promptstr.c_str());
 
 #ifdef WINDOWS
@@ -4829,20 +4815,18 @@ namespace xfst {
   {
     if (number == EOF || number == 0)
       {
-        output() << "could not read arc number" << std::endl;
-        flush(&output());
+        OUTPUT(<< "could not read arc number");
         //hfst_fprintf(outstream_, "could not read arc number\n");
         return false;
       }
     else if (number < 1 || number > (int)number_of_arcs)
       {
-        if (number_of_arcs < 1)
-          output() << "state has no arcs" << std::endl; //hfst_fprintf(outstream_, "state has no arcs\n");
-        else
-          output() << "arc number must be between 1 and " << number_of_arcs << std::endl;
+        if (number_of_arcs < 1) {
+          OUTPUT(<< "state has no arcs"); } //hfst_fprintf(outstream_, "state has no arcs\n");
+	else {
+	  OUTPUT(<< "arc number must be between 1 and " << number_of_arcs); }
         // hfst_fprintf(outstream_, "arc number must be between %i and %i\n",
         //          1, number_of_arcs);
-        flush(&output());
         return false;
       }
     return true;
@@ -4853,16 +4837,14 @@ namespace xfst {
   {
     if (level == EOF || level == 0)
       {
-        output() << "could not read level number (type '0' if you wish to exit program)" << std::endl;
-        flush(&output());
+        OUTPUT(<< "could not read level number (type '0' if you wish to exit program)");
         //hfst_fprintf(outstream_, "could not read level number "
         //        "(type '0' if you wish to exit program)\n");
         return false;
       }
     else if (level < 0 || level > (int)whole_path_length)
       {
-        output() << "no such level: '" << level << "' (current lievel is " << (int)whole_path_length << ")" << std::endl;
-        flush(&output());
+        OUTPUT(<< "no such level: '" << level << "' (current lievel is " << (int)whole_path_length << ")");
         //hfst_fprintf(outstream_, "no such level: '%i' (current level is %i)\n",
         //        level, (int)whole_path_length );
         return false;
@@ -4879,8 +4861,7 @@ namespace xfst {
     {
       if (!inspect_net_supported_)
 	{
-	  output() << "inspect net not supported" << std::endl;
-	  flush(&output());
+	  OUTPUT(<< "inspect net not supported");
 	  PROMPT_AND_RETURN_THIS;
 	}
       
@@ -5554,7 +5535,7 @@ namespace xfst {
             {
               return *this;
             }
-          output() << "? bytes. " << top->number_of_states() << " states, " << top->number_of_arcs() << " arcs, ? paths" << std::endl;
+          OUTPUT(<< "? bytes. " << top->number_of_states() << " states, " << top->number_of_arcs() << " arcs, ? paths");
           //hfst_fprintf(outstream_, "? bytes. %i states, %i arcs, ? paths\n",
           //        top->number_of_states(), top->number_of_arcs());
           std::map<std::string,std::string>::const_iterator it = variables_.find("print-sigma");
@@ -5563,7 +5544,6 @@ namespace xfst {
               (const_cast<XfstCompiler*>(this))->print_sigma(output_, false /* no prompt*/);
             }
         }
-      flush(&output());
       return *this;
     }
 
