@@ -19,10 +19,12 @@ function print_help()
     echo "Adds named entity tags to running Finnish text on standard input."
     echo
     echo "Options:"
-    echo "  --version, -v          Print version information"
-    echo "  --no-tokenize          Instead of running text, expect a newline-separated stream of tokens, with empty line signifying sentence boundaries"
-    echo "  --show-analyses        Include lemmas and morphological analyses in the output"
-    echo "  --show-nested          Show possible tested tags"
+    echo "  --version, -v        Print version information"
+    echo "  --no-tokenize        Instead of running text, expect a newline-separated"
+    echo "                       stream of tokens, with an empty line signifying sentence"
+    echo "                       boundaries"
+    echo "  --show-analyses      Include lemmas and morphological analyses in the output"
+    echo "  --show-nested        Show possible tested tags"
     echo
     echo "The output is returned one token per line. Where named entities are"
     echo "identified, the token in question is followed by a tab character and"

@@ -12,8 +12,10 @@ function print_help()
     echo "Lemmatizes and morphologically labels running Finnish text on standard input."
     echo
     echo "Options:"
-    echo "  --version, -v          Print version information"
-    echo "  --no-tokenize          Instead of running text, expect a newline-separated stream of tokens, with empty line signifying sentence boundaries"
+    echo "  --version, -v        Print version information"
+    echo "  --no-tokenize        Instead of running text, expect a newline-separated"
+    echo "                       stream of tokens, with an empty line signifying sentence"
+    echo "                       boundaries"
     echo
     echo "This package is based on the statistical (CRF-based) tagger FinnPos,"
     echo "the Finnish morphology package OmorFi and the FinnTreeBank corpus of"
