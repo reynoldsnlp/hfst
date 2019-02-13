@@ -89,14 +89,19 @@ using hfst::implementations::HfstTransition;
 #define MAYBE_ASSERT(assertion, value) if (!value && ((variables_["assert"] == "ON" || assertion) && (variables_["quit-on-fail"] == "ON"))) { this->fail_flag_ = true; }
 #define MAYBE_QUIT if(variables_["quit-on-fail"] == "ON") { this->fail_flag_ = true; }
 #define CHECK_FILENAME(x) if (! this->check_filename(x)) { return *this; }
-#define EMPTY_STACK hfst::xfst::print_error("Empty stack.");
 
 #ifdef PYTHON_BINDINGS
 #define ERROR(x) std::ostringstream oss(""); oss x; hfst::xfst::print_error(oss.str().c_str());
-#define OUTPUT(x) std::ostringstream oss(""); oss x; hfst::xfst::print_output(oss.str().c_str());
+#define OUTPUT(x) std::ostringstream oss(""); oss x; hfst::xfst::print_output(oss.str().c_str(), true);
+#define OUTPUT_LINE(x) std::ostringstream oss(""); oss x; hfst::xfst::print_output(oss.str().c_str(), false);
+#define OUTPUT_END hfst::xfst::print_output("", true);
+#define EMPTY_STACK hfst::xfst::print_error("Empty stack.");
 #else
 #define ERROR(x) error() x << std::endl; flush(&error());
 #define OUTPUT(x) output() x << std::endl; flush(&output());
+#define OUTPUT_LINE(x) output() x;
+#define OUTPUT_END output() << std::endl; flush(&output());
+#define EMPTY_STACK error() << "Empty stack." << std::endl; flush(&error());
 #endif
 
 #define WEIGHT_PRECISION "5"
@@ -763,9 +768,7 @@ namespace xfst {
         bool printed = this->print_paths(*paths, &output());
         if (!printed)
           {
-            output() << "???" << std::endl;
-            flush(&output());
-            //hfst_fprintf(outstream_, "???\n");
+            OUTPUT(<< "???");
           }
 
         delete paths;
@@ -1120,8 +1123,7 @@ namespace xfst {
               {
                 // the next command must start on a fresh line
                 if (infile == stdin) {
-                  output() << std::endl;
-                  flush(&output());
+                  OUTPUT(<< "");
                   //hfst_fprintf(outstream_, "\n");
                 }
                 break;
@@ -1292,12 +1294,7 @@ namespace xfst {
 
     if (verbose_)
       {
-        if (was_defined)
-          output() << "Redefined"; // hfst_fprintf(outstream_, "Redefined");
-        else
-          output() << "Defined"; // hfst_fprintf(outstream_, "Defined");
-        output() << " '" << std::string(name) << "'" << std::endl; // hfst_fprintf(outstream_, " '%s'\n", name);
-        flush(&output());
+        OUTPUT(<< (was_defined ? "Redefined" : "Defined") << " '" << std::string(name) << "'"); // hfst_fprintf(outstream_, " '%s'\n", name);
       }
     original_definitions_[name] = "<net taken from stack>";
     PROMPT_AND_RETURN_THIS;
@@ -1347,12 +1344,7 @@ namespace xfst {
 
           if (verbose_)
             {
-              if (was_defined)
-                output() << "Redefined" << std::endl; // hfst_fprintf(outstream_, "Redefined");
-              else
-                output() << "Defined" << std::endl; // hfst_fprintf(outstream_, "Defined");
-              output() << " '" << std::string(name) << "'" << std::endl; // hfst_fprintf(outstream_, " '%s'\n", name);
-              flush(&output());
+              OUTPUT(<< (was_defined ? "Redefined" : "Defined") << " '" << std::string(name) << "'"); // hfst_fprintf(outstream_, " '%s'\n", name);
             }
           original_definitions_[name] = xre;
         }
@@ -1548,17 +1540,7 @@ namespace xfst {
 
       if (verbose_)
         {
-          if (was_defined) {
-            output() << "Redefined";
-            //hfst_fprintf(stderr, "Redefined");
-          }
-          else {
-            output() << "Defined"; // hfst_fprintf(stderr, "Defined");
-          }
-          output() << " function '" << name << "@" << (int)arguments.size() << ")" << std::endl;
-          flush(&output());
-          //hfst_fprintf(stderr, " function '%s@%i)'\n",
-          //        name.c_str(), (int)arguments.size());
+          OUTPUT(<< (was_defined ? "Redefined" : "Defined") << " function '" << name << "@" << (int)arguments.size() << ")");
         }
 
       function_arguments_[name] = hfst::size_t_to_uint(arguments.size());
@@ -2175,6 +2157,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::show()
     {
+      std::ostringstream oss("");
       for (map<string,string>::const_iterator var = variables_.begin();
            var != variables_.end();
            var++)
@@ -2182,23 +2165,23 @@ namespace xfst {
           // HERE
           if (var->first == "copyright-owner")
             {
-              output().width(20);
-              output() << var->first << ": " << var->second << std::endl;
+              oss.width(20);
+              oss << var->first << ": " << var->second << std::endl;
               //hfst_fprintf(stderr, "%20s:        %s\n", var->first.c_str(),
               //          var->second.c_str());
             }
           else
             {
-              output().width(20);
-              output() << var->first << ": ";
-              output().width(6);
-              output() << var->second << ": " << variable_explanations_[var->first] << std::endl;
+              oss.width(20);
+              oss << var->first << ": ";
+              oss.width(6);
+              oss << var->second << ": " << variable_explanations_[var->first] << std::endl;
               //  hfst_fprintf(stderr, "%20s:%6s: %s\n",
               //          var->first.c_str(), var->second.c_str(),
               //          variable_explanations_[var->first].c_str());
             }
         }
-      flush(&output());
+      OUTPUT(<< oss.str());
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -4614,35 +4597,33 @@ namespace xfst {
       {
         if (first_loop)
           {
-            output() << "Arcs:";
+            OUTPUT_LINE(<< "Arcs:");
             //hfst_fprintf(outstream_, "Arcs:");
             first_loop = false;
           }
         else
           {
-            output() << ", ";
+            OUTPUT_LINE(<< ", ");
             //hfst_fprintf(outstream_, ", ");
           }
-        flush(&output());
+
         std::string isymbol = it->get_input_symbol();
         std::string osymbol = it->get_output_symbol();
 
         if (isymbol == osymbol)
           {
-            output() << " " << arc_number << ". " << isymbol;
+            OUTPUT_LINE(<< " " << arc_number << ". " << isymbol);
             //hfst_fprintf(outstream_, " %i. %s", arc_number, isymbol.c_str());
           }
         else
           {
-            output() << " " << arc_number << ". " << isymbol << ":" << osymbol;
+            OUTPUT_LINE(<< " " << arc_number << ". " << isymbol << ":" << osymbol);
             //hfst_fprintf(outstream_, " %i. %s:%s", arc_number,
             //        isymbol.c_str(), osymbol.c_str());
           }
-        flush(&output());
         arc_number++;
       }
-    output() << std::endl;
-    flush(&output());
+    OUTPUT_END;
     //hfst_fprintf(outstream_, "\n");
     return arc_number - 1;
   }
@@ -4652,14 +4633,13 @@ namespace xfst {
   (const std::vector<unsigned int> & whole_path,
    const std::vector<unsigned int> & shortest_path)
   {
-    output() << "Level " << (int)whole_path.size();
+    OUTPUT_LINE(<< "Level " << (int)whole_path.size());
     //hfst_fprintf(outstream_, "Level %i", (int)whole_path.size());
     if (shortest_path.size() < whole_path.size())
       {
-        output() << " (= " << (int)shortest_path.size() << ")";
+        OUTPUT_LINE(<< " (= " << (int)shortest_path.size() << ")");
         //hfst_fprintf(outstream_, " (= %i)", (int)shortest_path.size());
       }
-    flush(&output());
   }
 
   // For 'inspect_net': append state \a state to paths.
@@ -4869,7 +4849,7 @@ namespace xfst {
 
       HfstIterableTransducer net(*t);
 
-      output() << inspect_net_help_msg;
+      OUTPUT_LINE(<< inspect_net_help_msg);
       //hfst_fprintf(outstream_, "%s", inspect_net_help_msg);
 
       // path of states visited, can contain loops
@@ -4881,12 +4861,10 @@ namespace xfst {
       print_level(whole_path, shortest_path);
 
       if (net.is_final_state(0))
-        output() << " (final)"; //hfst_fprintf(outstream_, " (final)");
+        OUTPUT_LINE(<< " (final)"); //hfst_fprintf(outstream_, " (final)");
       
-      output() << std::endl; //hfst_fprintf(outstream_, "\n");
-
-      flush(&output());
-
+      OUTPUT_END;
+      
       // transitions of current state
       hfst::implementations::HfstTransitions transitions = net[0];
       // number of arcs in current state
@@ -4955,7 +4933,7 @@ namespace xfst {
               else
                 {
                   HfstTransition tr = transitions[number - 1];
-                  output() << "  " << tr.get_input_symbol() << ":" << tr.get_output_symbol() << " --> ";
+                  OUTPUT_LINE(<< "  " << tr.get_input_symbol() << ":" << tr.get_output_symbol() << " --> ");
                   //hfst_fprintf(outstream_, "  %s:%s --> ", tr.get_input_symbol().c_str(),
                   //        tr.get_output_symbol().c_str());
                   append_state_to_paths(whole_path, shortest_path, tr.get_target_state());
@@ -4967,17 +4945,16 @@ namespace xfst {
           print_level(whole_path, shortest_path);
           if (net.is_final_state(whole_path.back()))
             {
-              output() << " (final)";
+              OUTPUT_LINE(<< " (final)");
               //hfst_fprintf(outstream_, " (final)");
             }
-          output() << std::endl;
+          OUTPUT_END;
           //hfst_fprintf(outstream_, "\n");
           number_of_arcs = print_arcs(transitions);
 
           free(line);
         } // end of while loop
 
-      flush(&output());
       ignore_history_after_index(ind);
       PROMPT_AND_RETURN_THIS;
     }
@@ -5509,8 +5486,7 @@ namespace xfst {
           // this has no effect.
           //bool val = hfst::is_output_printed_to_console();
           //hfst::print_output_to_console(true);
-          output() << "hfst[" << stack_.size() << "]: ";
-          flush(&output());
+          OUTPUT_LINE(<< "hfst[" << stack_.size() << "]: ");
           //hfst_fprintf(outstream_, "hfst[" SIZE_T_SPECIFIER "]: ", stack_.size());
           //hfst::print_output_to_console(val);
         }

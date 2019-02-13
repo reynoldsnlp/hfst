@@ -1535,10 +1535,12 @@ int hxfstparse(void);
 void
 hxfsterror(const char* text)
 {
+#ifdef PYTHON_BINDINGS
     hfst::xfst::print_error(text);
-    //hfst::xfst::xfst_->error() << text << std::endl;
-    //hfst::xfst::xfst_->flush(&hfst::xfst::xfst_->error());
-    //fprintf(stderr,  "%s\n", text);
+#else
+    hfst::xfst::xfst_->error() << text << std::endl;
+    hfst::xfst::xfst_->flush(&hfst::xfst::xfst_->error());
+#endif
 }
 
 

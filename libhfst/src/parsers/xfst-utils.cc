@@ -237,30 +237,25 @@ strdup_nonconst_part(const char* token, const char* prefix,
     return token_part;
 }
 
-void print_output(const char * text)
-{
 #ifdef PYTHON_BINDINGS
+void print_output(const char * text, bool insert_newline/*=true*/)
+{
   auto d = py::dict();
-  //d["end"] = "";
+  if (!insert_newline)
+    {
+      d["end"] = "";
+    }
   py::print(text, **d);
-#else
-  hfst::xfst::xfst_->output() << text << std::endl;
-  hfst::xfst::xfst_->flush(&hfst::xfst::xfst_->output());
-#endif
 }
 
 void print_error(const char * text)
 {
-#ifdef PYTHON_BINDINGS
   auto d = py::dict();
   d["file"] = py::module::import("sys").attr("stderr");
   //d["end"] = "";
   py::print(text, **d);
-#else
-  hfst::xfst::xfst_->error() << text << std::endl;
-  hfst::xfst::xfst_->flush(&hfst::xfst::xfst_->error());
-#endif
 }
+#endif
 
 } }
 
