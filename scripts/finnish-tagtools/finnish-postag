@@ -13,7 +13,7 @@ function print_help()
     echo
     echo "Options:"
     echo "  --version, -v          Print version information"
-    echo "  --no-tokenize          Instead of running text, expect a space-separated stream of tokens"
+    echo "  --no-tokenize          Instead of running text, expect a newline-separated stream of tokens, with empty line signifying sentence boundaries"
     echo
     echo "This package is based on the statistical (CRF-based) tagger FinnPos,"
     echo "the Finnish morphology package OmorFi and the FinnTreeBank corpus of"
@@ -35,8 +35,8 @@ function print_help()
 
 function print_version()
 {
-    echo "finnish-tagtools version 1.3.2"
-    echo "2018-12-17"
+    echo "finnish-tagtools version 1.3.3"
+    echo "2019-02-13"
     exit 0
 }
 
