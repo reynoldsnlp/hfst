@@ -97,11 +97,11 @@ using hfst::implementations::HfstTransition;
 #define OUTPUT_END hfst::xfst::print_output("", true);
 #define EMPTY_STACK hfst::xfst::print_error("Empty stack.");
 #else
-#define ERROR(x) error() x << std::endl;);
-#define OUTPUT(x) output() x << std::endl;);
+#define ERROR(x) error() x << std::endl;
+#define OUTPUT(x) output() x << std::endl;
 #define OUTPUT_LINE(x) output() x;
-#define OUTPUT_END output() << std::endl;);
-#define EMPTY_STACK error() << "Empty stack." << std::endl;);
+#define OUTPUT_END output() << std::endl;
+#define EMPTY_STACK error() << "Empty stack." << std::endl;
 #endif
 
 #define WEIGHT_PRECISION "5"
@@ -739,12 +739,12 @@ namespace xfst {
 
   std::ostream & XfstCompiler::output()
   {
-    return output_;
+    return *output_;
   }
 
   std::ostream & XfstCompiler::error()
   {
-    return error_;
+    return *error_;
   }
 
 
@@ -3443,7 +3443,7 @@ namespace xfst {
           if (variables_["print-sigma"] == "ON")
             {
               stack_.push(it->second);
-              this->print_sigma(oss_, false /*do not prompt*/);
+              this->print_sigma(oss, false /*do not prompt*/);
               stack_.pop();
             }
           HfstIterableTransducer basic(*(it->second));
