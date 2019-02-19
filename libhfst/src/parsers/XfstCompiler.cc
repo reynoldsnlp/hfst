@@ -91,17 +91,17 @@ using hfst::implementations::HfstTransition;
 #define CHECK_FILENAME(x) if (! this->check_filename(x)) { return *this; }
 
 #ifdef PYTHON_BINDINGS
-#define ERROR(x) std::ostringstream oss(""); oss x; hfst::xfst::print_error(oss.str().c_str());
-#define OUTPUT(x) std::ostringstream oss(""); oss x; hfst::xfst::print_output(oss.str().c_str(), true);
-#define OUTPUT_LINE(x) std::ostringstream oss(""); oss x; hfst::xfst::print_output(oss.str().c_str(), false);
+#define ERROR(x) { std::ostringstream oss(""); oss x; hfst::xfst::print_error(oss.str().c_str()); }
+#define OUTPUT(x) { std::ostringstream oss(""); oss x; hfst::xfst::print_output(oss.str().c_str(), true); }
+#define OUTPUT_LINE(x) { std::ostringstream oss(""); oss x; hfst::xfst::print_output(oss.str().c_str(), false); }
 #define OUTPUT_END hfst::xfst::print_output("", true);
 #define EMPTY_STACK hfst::xfst::print_error("Empty stack.");
 #else
-#define ERROR(x) error() x << std::endl; flush(&error());
-#define OUTPUT(x) output() x << std::endl; flush(&output());
+#define ERROR(x) error() x << std::endl;);
+#define OUTPUT(x) output() x << std::endl;);
 #define OUTPUT_LINE(x) output() x;
-#define OUTPUT_END output() << std::endl; flush(&output());
-#define EMPTY_STACK error() << "Empty stack." << std::endl; flush(&error());
+#define OUTPUT_END output() << std::endl;);
+#define EMPTY_STACK error() << "Empty stack." << std::endl;);
 #endif
 
 #define WEIGHT_PRECISION "5"
@@ -531,13 +531,13 @@ namespace xfst {
     return true;
   }
 
+  // LEAVE
   bool
   XfstCompiler::print_paths
   (const hfst::HfstOneLevelPaths &paths,
-   std::ostream * oss_ /* =cout */,
+   std::ostream * oss /* =cout */,
    int n /* = -1*/)
   {
-    std::ostream * oss = get_stream(oss_);
     bool retval = false; // if anything was printed
     oss->precision(get_precision());
 
@@ -590,17 +590,16 @@ namespace xfst {
 
     //hfst_fprintf(outfile, oss->str().c_str()); // TESTING
 
-    flush(oss);
     return retval;
   }
 
+  // LEAVE
   bool
   XfstCompiler::print_paths
   (const hfst::HfstTwoLevelPaths &paths,
-   std::ostream * oss_ /* =cout */,
+   std::ostream * oss /* =cout */,
    int n /* = -1*/)
   {
-    std::ostream * oss = get_stream(oss_);
     bool retval = false; // if anything was printed
     oss->precision(get_precision());
 
@@ -666,7 +665,6 @@ namespace xfst {
 
     //hfst_fprintf(outfile, oss->str().c_str()); // TESTING
 
-    flush(oss);
     return retval;
   }
 
@@ -734,21 +732,19 @@ namespace xfst {
 
         if (!printed)
           {
-            output() << "???" << std::endl;
+            OUTPUT(<< "???");
           }
-
-        flush(&output());
         return *this;
       }
 
   std::ostream & XfstCompiler::output()
   {
-    return *get_stream(output_);
+    return output_;
   }
 
   std::ostream & XfstCompiler::error()
   {
-    return *get_stream(error_);
+    return error_;
   }
 
 
@@ -2699,9 +2695,8 @@ namespace xfst {
     }
 
   XfstCompiler&
-  XfstCompiler::print_aliases(std::ostream * oss_)
+  XfstCompiler::print_aliases(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       for (map<string,string>::const_iterator alias = aliases_.begin();
            alias != aliases_.end();
            ++alias)
@@ -2712,34 +2707,28 @@ namespace xfst {
           //hfst_fprintf(outfile, "alias %10s %s",
           //        alias->first.c_str(), alias->second.c_str());
         }
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
           
   XfstCompiler&
-  XfstCompiler::print_arc_count(const char* level, std::ostream * oss_)
+  XfstCompiler::print_arc_count(const char* level, std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       *oss << "missing " << level << " arc count" << std::endl;
       //hfst_fprintf(outfile, "missing %s arc count %s:%d\n", level,
       //        __FILE__, __LINE__);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_arc_count(std::ostream * oss_)
+  XfstCompiler::print_arc_count(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       *oss << "missing arc count" << std::endl;
       //hfst_fprintf(outfile, "missing arc count %s:%d\n", __FILE__, __LINE__);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::print_defined(std::ostream * oss_)
+  XfstCompiler::print_defined(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       bool definitions = false;
       for (map<string,string>::const_iterator def
              = original_definitions_.begin(); def != original_definitions_.end();
@@ -2769,7 +2758,6 @@ namespace xfst {
       if (!definitions)
         *oss << "No function definitions." << std::endl; // hfst_fprintf(stderr, "No function definitions.\n");
 
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -2801,12 +2789,10 @@ namespace xfst {
     }
 
   XfstCompiler&
-  XfstCompiler::print_flags(std::ostream * oss_)
+  XfstCompiler::print_flags(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       *oss << "missing print flags" << std::endl;
       //hfst_fprintf(outfile, "missing print flags %s:%d\n", __FILE__, __LINE__);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   
@@ -2818,9 +2804,8 @@ namespace xfst {
   }
 
   XfstCompiler&
-  XfstCompiler::print_labels(const char* name, std::ostream * oss_)
+  XfstCompiler::print_labels(const char* name, std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       std::map<std::string, HfstTransducer*>::const_iterator it
         = definitions_.find(name);
       if (it == definitions_.end())
@@ -2832,14 +2817,13 @@ namespace xfst {
         {
           return this->print_labels(oss, it->second);
         }
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
 
+  // HEREHEREHERE
   XfstCompiler&
-  XfstCompiler::print_labels(std::ostream * oss_, HfstTransducer* tr)
+  XfstCompiler::print_labels(std::ostream * oss, HfstTransducer* tr)
     {
-      std::ostream * oss = get_stream(oss_);
       std::set<std::pair<std::string, std::string> > label_set;
       HfstIterableTransducer fsm(*tr);
       
@@ -2871,23 +2855,19 @@ namespace xfst {
       //hfst_fprintf(outfile, "\n");
       //hfst_fprintf(outfile, "Size: %i\n", (int)label_set.size());
 
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_labelmaps(std::ostream * oss_)
+  XfstCompiler::print_labelmaps(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       *oss << "missing label-maps" << std::endl;
       //hfst_fprintf(outfile, "missing label-maps %s:%d\n", __FILE__, __LINE__);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::print_label_count(std::ostream * oss_)
+  XfstCompiler::print_label_count(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
     GET_TOP(topmost);
 
     std::map<std::pair<std::string, std::string>, unsigned int > label_map;
@@ -2921,19 +2901,16 @@ namespace xfst {
       *oss << std::endl;
       //hfst_fprintf(outfile, "\n");
 
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::print_list(const char* name, std::ostream * oss_)
+  XfstCompiler::print_list(const char* name, std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       if (lists_.find(name) == lists_.end())
         {
           *oss << "No such list defined: " << name << std::endl;
           //hfst_fprintf(outfile, "No such list defined: %s\n", name);
-          flush(oss);
           PROMPT_AND_RETURN_THIS;
         }
       // HERE
@@ -2950,19 +2927,16 @@ namespace xfst {
         }
       *oss << std::endl;
       //hfst_fprintf(outfile, "\n");
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::print_list(std::ostream * oss_)
+  XfstCompiler::print_list(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       if (lists_.size() == 0)
         {
           *oss << "No lists defined." << std::endl;
           //hfst_fprintf(outfile, "No lists defined.\n");
-          flush(oss);
           PROMPT_AND_RETURN_THIS;
         }
       for (map<string,std::set<string> >::const_iterator l = lists_.begin();
@@ -2983,7 +2957,6 @@ namespace xfst {
           *oss << std::endl;
           //hfst_fprintf(outfile, "\n");
         }
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -2997,9 +2970,8 @@ namespace xfst {
   }
 
   XfstCompiler&
-  XfstCompiler::print_shortest_string(std::ostream * oss_)
+  XfstCompiler::print_shortest_string(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       GET_TOP(topmost);
 
       HfstTwoLevelPaths paths;
@@ -3014,13 +2986,11 @@ namespace xfst {
         {
           print_paths(paths, oss);
         }
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_shortest_string_size(std::ostream * oss_)
+  XfstCompiler::print_shortest_string_size(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       GET_TOP(topmost);
 
       HfstTwoLevelPaths paths;
@@ -3034,15 +3004,14 @@ namespace xfst {
         *oss << (int)(paths.begin()->second.size()) << std::endl;
         //hfst_fprintf(outfile, "%i\n", (int)(paths.begin()->second.size()));
       }
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
 
+  // LEAVE
   XfstCompiler&
   XfstCompiler::print_one_string_or_its_size
-  (std::ostream * oss_, const HfstTwoLevelPaths & paths, const char * level, bool print_size)
+  (std::ostream * oss, const HfstTwoLevelPaths & paths, const char * level, bool print_size)
   {
-    std::ostream * oss = get_stream(oss_);
     assert(level != NULL);
     *oss << std::string(level) << ": ";
     //hfst_fprintf(outfile, "%s: ", level);
@@ -3055,14 +3024,13 @@ namespace xfst {
       {
         print_paths(paths, oss, 1);
       }
-    flush(oss);
     return *this;
   }
 
+  // LEAVE
   XfstCompiler&
-  XfstCompiler::print_longest_string_or_its_size(std::ostream * oss_, bool print_size)
+  XfstCompiler::print_longest_string_or_its_size(std::ostream * oss, bool print_size)
   {
-    std::ostream * oss = get_stream(oss_);
     GET_TOP(topmost);
 
     // Variables needed to find out some properties about the transducer
@@ -3133,7 +3101,6 @@ namespace xfst {
           print_one_string_or_its_size(oss, paths_lower, "Lower", print_size); }
     }
 
-    flush(oss);
     PROMPT_AND_RETURN_THIS;
   }
 
@@ -3156,9 +3123,8 @@ namespace xfst {
       return print_words(name, number, oss, LOWER_LEVEL);
     }
   XfstCompiler&
-  XfstCompiler::print_random_lower(const char * name, unsigned int number, std::ostream * oss_)
+  XfstCompiler::print_random_lower(const char * name, unsigned int number, std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       hfst::HfstTwoLevelPaths paths;
 
       HfstTransducer tmp(format_);
@@ -3177,7 +3143,6 @@ namespace xfst {
             {
               //hfst_fprintf(outfile, "no such definition '%s'\n", name);
               *oss << "no such definition '" << std::string(name) << "'" << std::endl;
-              flush(oss);
               prompt();
               return *this;
             }
@@ -3190,7 +3155,6 @@ namespace xfst {
       tmp.output_project();
       tmp.extract_random_paths(paths, number);
       print_paths(paths, oss);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
@@ -3200,9 +3164,8 @@ namespace xfst {
       return print_words(name, number, oss, UPPER_LEVEL);
     }
   XfstCompiler&
-  XfstCompiler::print_random_upper(const char * name, unsigned int number, std::ostream * oss_)
+  XfstCompiler::print_random_upper(const char * name, unsigned int number, std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       hfst::HfstTwoLevelPaths paths;
 
       HfstTransducer tmp(format_);
@@ -3221,7 +3184,6 @@ namespace xfst {
             {
               *oss << "no such definition '" << std::string(name) << std::endl;
               //hfst_fprintf(outfile, "no such definition '%s'\n", name);
-              flush(oss);
               prompt();
               return *this;
             }
@@ -3234,7 +3196,6 @@ namespace xfst {
       tmp.input_project();
       tmp.extract_random_paths(paths, number);
       print_paths(paths, oss);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -3245,11 +3206,11 @@ namespace xfst {
     return print_words(name, number, oss, BOTH_LEVELS);
   }
 
+  // LEAVE
   XfstCompiler&
   XfstCompiler::print_words(const char * name, unsigned int number,
-                            std::ostream * oss_, Level level)
+                            std::ostream * oss, Level level)
     {
-      std::ostream * oss = get_stream(oss_);
       HfstTransducer temp(format_);
       if (name == NULL)
         {
@@ -3266,7 +3227,6 @@ namespace xfst {
             {
               *oss << "no such definition '" << std::string(name) << "'" << std::endl;
               //hfst_fprintf(outfile, "no such definition '%s'\n", name);
-              flush(oss);
               prompt();
               return *this;
             }
@@ -3290,7 +3250,6 @@ namespace xfst {
           ERROR(<< "ERROR: argument given to function 'print_words' not recognized");
           //hfst_fprintf(errorstream_, "ERROR: argument given to function 'print_words'\n"
           //        "not recognized\n");
-          flush(oss);
           PROMPT_AND_RETURN_THIS;
         }
 
@@ -3321,9 +3280,8 @@ namespace xfst {
     }
 
   XfstCompiler&
-  XfstCompiler::print_random_words(const char * name, unsigned int number, std::ostream * oss_)
+  XfstCompiler::print_random_words(const char * name, unsigned int number, std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       const HfstTransducer * tmp = NULL;
       if (name == NULL)
         {
@@ -3339,7 +3297,6 @@ namespace xfst {
             {
               *oss << "no such definition '" << std::string(name) << "'" << std::endl;
               //hfst_fprintf(outfile, "no such definition '%s'\n", name);
-              flush(oss);
               prompt();
               return *this;
             }
@@ -3352,49 +3309,12 @@ namespace xfst {
       hfst::HfstTwoLevelPaths paths;
       tmp->extract_random_paths(paths, number);
       print_paths(paths, oss);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
 
-  std::ostream * XfstCompiler::get_stream(std::ostream * oss)
-  {
-#ifdef WINDOWS
-    if (output_to_console_)
-      {
-        if (oss == &std::cerr)
-          return &winoss_stderr_;
-        if (oss == &std::cout)
-          return &winoss_stdout_;
-      }
-#endif
-    return oss;
-  }
-
-  void XfstCompiler::flush(std::ostream * oss)
-  {
-#ifdef WINDOWS
-    if (output_to_console_)
-      {
-        if (oss == &winoss_stderr_)
-          {
-            hfst_fprintf_console(stderr, winoss_stderr_.str().c_str());
-            winoss_stderr_.str("");
-            return;
-          }
-        if (oss == &winoss_stdout_)
-          {
-            hfst_fprintf_console(stdout, winoss_stdout_.str().c_str());
-            winoss_stdout_.str("");
-            return;
-          }
-      }
-#endif
-  }
-
   XfstCompiler&
-  XfstCompiler::print_name(std::ostream * oss_)
+  XfstCompiler::print_name(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       GET_TOP(tmp);
 
       for (std::map<std::string, HfstTransducer*>::const_iterator it
@@ -3404,14 +3324,12 @@ namespace xfst {
             {
               *oss << "Name " << it->first << std::endl;
               //hfst_fprintf(outfile, "Name: %s\n", it->first.c_str());
-              flush(oss);
               PROMPT_AND_RETURN_THIS;
             }
         }
 
       *oss << "No name." << std::endl;
       //hfst_fprintf(outfile, "No name.\n");
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -3497,21 +3415,19 @@ namespace xfst {
   }
 
   XfstCompiler&
-  XfstCompiler::print_net(std::ostream * oss_)
+  XfstCompiler::print_net(std::ostream * oss)
     {
       if (variables_["print-sigma"] == "ON")
         {
-          this->print_sigma(oss_, false /*do not prompt*/);
+          this->print_sigma(oss, false /*do not prompt*/);
         }
       GET_TOP(tmp);
       HfstIterableTransducer basic(*tmp);
-      std::ostream * oss = get_stream(oss_);
       basic.write_in_xfst_format(*oss, variables_["print-weight"] == "ON");
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_net(const char* name, std::ostream * oss_)
+  XfstCompiler::print_net(const char* name, std::ostream * oss)
     {
       //hfst_fprintf(outfile, "missing print net %s:%d\n", __FILE__, __LINE__);
       std::map<std::string,hfst::HfstTransducer*>::const_iterator it =
@@ -3531,9 +3447,7 @@ namespace xfst {
               stack_.pop();
             }
           HfstIterableTransducer basic(*(it->second));
-          std::ostream * oss = get_stream(oss_);
           basic.write_in_xfst_format(*oss, variables_["print-weight"] == "ON");
-          flush(oss);
           PROMPT_AND_RETURN_THIS;
         }
     }
@@ -3547,10 +3461,10 @@ namespace xfst {
     return false;
   }
 
+  // LEAVE
   void XfstCompiler::print_alphabet
-  (const StringSet & alpha, bool unknown, bool identity, std::ostream * oss_)
+  (const StringSet & alpha, bool unknown, bool identity, std::ostream * oss)
   {
-    std::ostream * oss = get_stream(oss_);
     unsigned int sigma_count=0;
     *oss << "Sigma: ";
     //hfst_fprintf(outfile, "Sigma: ");
@@ -3590,7 +3504,6 @@ namespace xfst {
       }
     *oss << std::endl;
     *oss << "Size: " << sigma_count << "." << std::endl;
-    flush(oss);
     //hfst_fprintf(outfile, "\n");
     //hfst_fprintf(outfile, "Size: %d.\n", sigma_count);
   }
@@ -3628,11 +3541,10 @@ namespace xfst {
       return false;
   }
 
-  // todo: flags?
+  // todo: flags? HEREHEREHERE
   XfstCompiler&
-  XfstCompiler::print_sigma(std::ostream * oss_, bool prompt)
+  XfstCompiler::print_sigma(std::ostream * oss, bool prompt)
     {
-      std::ostream * oss = get_stream(oss_);
       GET_TOP(t);
       hfst::StringSet alpha = t->get_alphabet();
 
@@ -3644,72 +3556,58 @@ namespace xfst {
       print_alphabet(alpha, unknown, identity, oss);
       if (prompt) {
         this->prompt(); }
-      flush(oss);
       return *this;
     }
 
   XfstCompiler&
-  XfstCompiler::print_sigma(const char* /*name*/, std::ostream * oss_)
+  XfstCompiler::print_sigma(const char* /*name*/, std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       *oss << "missing print sigma" << std::endl;
       //hfst_fprintf(outfile, "missing print sigma %s:%d\n", __FILE__, __LINE__);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_sigma_count(std::ostream * oss_)
+  XfstCompiler::print_sigma_count(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       *oss << "missing print sigma count" << std::endl;
       //hfst_fprintf(outfile, "missing print sigma count %s:%d\n", __FILE__, __LINE__);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_sigma_word_count(const char* level, std::ostream * oss_)
+  XfstCompiler::print_sigma_word_count(const char* level, std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       *oss << "missing " << level << " sigma word count" << std::endl;
       //hfst_fprintf(outfile, "missing %s sigma word count %s:%d\n", level,
       //        __FILE__, __LINE__);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_sigma_word_count(std::ostream * oss_)
+  XfstCompiler::print_sigma_word_count(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       *oss << "missing sigma word count" << std::endl;
       //hfst_fprintf(outfile, "missing sigma word count %s:%d\n", __FILE__, __LINE__);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_size(const char* name, std::ostream * oss_)
+  XfstCompiler::print_size(const char* name, std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       // HERE
       oss->width(10);
       *oss << name << ": " << "? bytes. ? states, ? arcs, ? paths." << std::endl;
       //hfst_fprintf(outfile, "%10s: ", name);
       //hfst_fprintf(outfile, "? bytes. ? states, ? arcs, ? paths.\n");
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_size(std::ostream * oss_)
+  XfstCompiler::print_size(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       *oss << "? bytes. ? states, ? arcs, ? paths." << std::endl;
       //hfst_fprintf(outfile, "? bytes. ? states, ? arcs, ? paths.\n");
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_stack(std::ostream * oss_)
+  XfstCompiler::print_stack(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       stack<HfstTransducer*> tmp;
       int i = 0;
       while (!stack_.empty())
@@ -3727,13 +3625,11 @@ namespace xfst {
           stack_.push(tmp.top());
           tmp.pop();
         }
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::write_dot(std::ostream * oss_)
+  XfstCompiler::write_dot(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       if (stack_.size() < 1)
         {
           EMPTY_STACK;
@@ -3742,7 +3638,6 @@ namespace xfst {
         }
       GET_TOP(tmp);
       hfst::print_dot(*oss, *tmp);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
@@ -3766,9 +3661,8 @@ namespace xfst {
     PROMPT_AND_RETURN_THIS;
   }
   XfstCompiler&
-  XfstCompiler::write_prolog(std::ostream * oss_)
+  XfstCompiler::write_prolog(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       if (stack_.size() < 1)
         {
           EMPTY_STACK;
@@ -3796,25 +3690,20 @@ namespace xfst {
           stack_.push(tr);
           reverse_stack.pop();
         }
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::write_spaced(std::ostream * oss_)
+  XfstCompiler::write_spaced(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       *oss << "missing write spaced" << std::endl;
       //hfst_fprintf(outfile, "missing write spaced %s:%d\n", __FILE__, __LINE__);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::write_text(std::ostream * oss_)
+  XfstCompiler::write_text(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       *oss << "missing write text" << std::endl;
       //hfst_fprintf(outfile, "missing write text %s:%d\n", __FILE__, __LINE__);
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
@@ -5326,13 +5215,11 @@ namespace xfst {
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::write_att(std::ostream * oss_)
+  XfstCompiler::write_att(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       GET_TOP(tmp);
       HfstIterableTransducer fsm(*tmp);
       fsm.write_in_att_format(*oss, variables_["print-weight"] == "ON");
-      flush(oss);
       PROMPT_AND_RETURN_THIS;
     }
   const std::stack<HfstTransducer*>&
@@ -5419,12 +5306,10 @@ namespace xfst {
   }
   
   XfstCompiler&
-  XfstCompiler::print_properties(std::ostream * oss_)
+  XfstCompiler::print_properties(std::ostream * oss)
     {
-      std::ostream * oss = get_stream(oss_);
       *oss << "missing print properties" << std::endl;
       //hfst_fprintf(outfile, "missing print properties %s:%d\n", __FILE__, __LINE__);
-      flush(oss);
       return *this;
     }
   XfstCompiler&

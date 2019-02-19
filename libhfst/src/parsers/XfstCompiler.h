@@ -536,25 +536,10 @@ class XfstCompiler
   /* A wrapper around file open function. */
   FILE * xfst_fopen(const char* path, const char* mode);
 
-  /* The following three functions are wrappers around output and error streams.
-     On Unix and Mac, output() and error() just return members output_ and error_,
-     and flush(std::ostream *) does nothing. On windows, it is possible that
-     output() and error() return an ostringstream which is actually printed when
-     flush(std::ostream *) is called.
-
-     This delayed printing is needed because Windows makes a difference between
-     standard output and error streams and console output and error streams.
-     If output_to_console_ is true and the stream where we are writing is a
-     standard stream, we first need to write everything in a ostringstream and
-     then call a specific function hfst_fprintf_console that prints the contents
-     of the ostringstream to console. */
-
   /* Get the output stream. */
   std::ostream & output();
   /* Get the error stream. */
   std::ostream & error();
-  /* Flush the stream. */
-  void flush(std::ostream * oss);
 
   bool check_filename(const char * filename);
   
@@ -709,9 +694,6 @@ class XfstCompiler
   XfstCompiler& print_bool(bool value);
   XfstCompiler& read_prop_line(char* line);
   
-  /* A wrapper around stream objects, see flush(std::ostream *) for more information. */
-  std::ostream * get_stream(std::ostream * oss);
-
   /* Whether readline library is used when reading user input. */
   bool use_readline_;
   /* Whether interactive text is read from standard input. */
