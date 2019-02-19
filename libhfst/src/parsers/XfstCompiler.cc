@@ -2158,8 +2158,7 @@ namespace xfst {
            var != variables_.end();
            var++)
         {
-          // HERE
-          if (var->first == "copyright-owner")
+	  if (var->first == "copyright-owner")
             {
               oss.width(20);
               oss << var->first << ": " << var->second << std::endl;
@@ -2701,7 +2700,6 @@ namespace xfst {
            alias != aliases_.end();
            ++alias)
         {
-          // HERE
           oss->width(10);
           *oss << "alias " << alias->first << " " << alias->second;
           //hfst_fprintf(outfile, "alias %10s %s",
@@ -2713,7 +2711,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::print_arc_count(const char* level, std::ostream * oss)
     {
-      *oss << "missing " << level << " arc count" << std::endl;
+      ERROR(<< "missing " << level << " arc count");
       //hfst_fprintf(outfile, "missing %s arc count %s:%d\n", level,
       //        __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
@@ -2721,7 +2719,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::print_arc_count(std::ostream * oss)
     {
-      *oss << "missing arc count" << std::endl;
+      ERROR(<< "missing arc count");
       //hfst_fprintf(outfile, "missing arc count %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
@@ -2734,7 +2732,6 @@ namespace xfst {
              = original_definitions_.begin(); def != original_definitions_.end();
            ++def)
         {
-          // HERE
           definitions = true;
           oss->width(10);
           *oss << def->first << " " << def->second << std::endl;
@@ -2748,7 +2745,6 @@ namespace xfst {
       for (map<string,string>::const_iterator func = original_function_definitions_.begin();
            func != original_function_definitions_.end(); func++)
         {
-          // HERE
           definitions = true;
           oss->width(10);
           *oss << func->first << " " << func->second << std::endl;
@@ -2791,7 +2787,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::print_flags(std::ostream * oss)
     {
-      *oss << "missing print flags" << std::endl;
+      ERROR(<< "missing print flags");
       //hfst_fprintf(outfile, "missing print flags %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
@@ -2820,7 +2816,6 @@ namespace xfst {
       PROMPT_AND_RETURN_THIS;
     }
 
-  // HEREHEREHERE
   XfstCompiler&
   XfstCompiler::print_labels(std::ostream * oss, HfstTransducer* tr)
     {
@@ -2860,7 +2855,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::print_labelmaps(std::ostream * oss)
     {
-      *oss << "missing label-maps" << std::endl;
+      ERROR(<< "missing label-maps");
       //hfst_fprintf(outfile, "missing label-maps %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
@@ -2913,7 +2908,6 @@ namespace xfst {
           //hfst_fprintf(outfile, "No such list defined: %s\n", name);
           PROMPT_AND_RETURN_THIS;
         }
-      // HERE
       std::set<string> l = lists_[name];
       oss->width(10);
       *oss << name << ": ";
@@ -2943,7 +2937,6 @@ namespace xfst {
            l != lists_.end();
            ++l)
         {
-          // HERE
           oss->width(10);
           *oss << l->first << " ";
           //hfst_fprintf(outfile, "%10s: ", l->first.c_str());
@@ -3541,7 +3534,7 @@ namespace xfst {
       return false;
   }
 
-  // todo: flags? HEREHEREHERE
+  // todo: flags?
   XfstCompiler&
   XfstCompiler::print_sigma(std::ostream * oss, bool prompt)
     {
@@ -3562,21 +3555,21 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::print_sigma(const char* /*name*/, std::ostream * oss)
     {
-      *oss << "missing print sigma" << std::endl;
+      ERROR(<< "missing print sigma");
       //hfst_fprintf(outfile, "missing print sigma %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::print_sigma_count(std::ostream * oss)
     {
-      *oss << "missing print sigma count" << std::endl;
+      ERROR(<< "missing print sigma count");
       //hfst_fprintf(outfile, "missing print sigma count %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::print_sigma_word_count(const char* level, std::ostream * oss)
     {
-      *oss << "missing " << level << " sigma word count" << std::endl;
+      ERROR(<< "missing " << level << " sigma word count");
       //hfst_fprintf(outfile, "missing %s sigma word count %s:%d\n", level,
       //        __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
@@ -3584,14 +3577,13 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::print_sigma_word_count(std::ostream * oss)
     {
-      *oss << "missing sigma word count" << std::endl;
+      ERROR(<< "missing sigma word count");
       //hfst_fprintf(outfile, "missing sigma word count %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::print_size(const char* name, std::ostream * oss)
     {
-      // HERE
       oss->width(10);
       *oss << name << ": " << "? bytes. ? states, ? arcs, ? paths." << std::endl;
       //hfst_fprintf(outfile, "%10s: ", name);
@@ -3612,7 +3604,6 @@ namespace xfst {
       int i = 0;
       while (!stack_.empty())
         {
-          // HERE
           oss->width(10);
           *oss << i << ": ? bytes. ? states, ? arcs, ? paths." << std::endl;
           //hfst_fprintf(outfile, "%10d: ? bytes. ? states, ? arcs, ? paths.\n", i);
@@ -3695,14 +3686,14 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::write_spaced(std::ostream * oss)
     {
-      *oss << "missing write spaced" << std::endl;
+      ERROR(<< "missing write spaced");
       //hfst_fprintf(outfile, "missing write spaced %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::write_text(std::ostream * oss)
     {
-      *oss << "missing write text" << std::endl;
+      ERROR(<< "missing write text");
       //hfst_fprintf(outfile, "missing write text %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
@@ -5308,7 +5299,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::print_properties(std::ostream * oss)
     {
-      *oss << "missing print properties" << std::endl;
+      ERROR(<< "missing print properties");
       //hfst_fprintf(outfile, "missing print properties %s:%d\n", __FILE__, __LINE__);
       return *this;
     }
