@@ -584,7 +584,7 @@ class XfstCompiler
   //! @brief Open HfstInputStream to file \a filename.
   //! Print an error message and return NULL, if not succesful.
   HfstInputStream * open_hfst_input_stream(const char * filename);
-
+  
   //! @brief Read transducers from file \a infilename and either push
   //! them to the stack (if \a definitions is false) or add them as definitions
   //! (if \a definitions is true).
