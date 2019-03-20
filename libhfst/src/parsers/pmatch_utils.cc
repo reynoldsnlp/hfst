@@ -1713,6 +1713,10 @@ HfstTransducer * PmatchUtilityTransducers::make_lowerfy(ImplementationType type)
 
 HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t, Side side, bool optional)
 {
+    bool orig_xerox_composition_value = hfst::get_xerox_composition();
+    // This is to match flags in t with ?'s in "anything"
+    hfst::set_xerox_composition(true);
+
     HfstTransducer * retval = NULL;
     HfstTransducer cap(*capify);
     HfstTransducer decap(cap);
@@ -1778,11 +1782,16 @@ HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t, Side side, bo
         retval->output_project();
     }
     retval->minimize();
+    hfst::set_xerox_composition(orig_xerox_composition_value);
     return retval;
 }
 
 HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t, Side side, bool optional)
 {
+    bool orig_xerox_composition_value = hfst::get_xerox_composition();
+    // This is to match flags in t with ?'s in "anything"
+    hfst::set_xerox_composition(true);
+
     HfstTransducer anything(hfst::internal_identity, hfst::pmatch::format);
     if (optional == false) {
         anything.subtract(*latin1_uppercase_acceptor);
@@ -1810,11 +1819,16 @@ HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t, Side side
         retval->compose(lowercase);
     }
     retval->minimize();
+    hfst::set_xerox_composition(orig_xerox_composition_value);
     return retval;
 }
 
 HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t, Side side, bool optional)
 {
+    bool orig_xerox_composition_value = hfst::get_xerox_composition();
+    // This is to match flags in t with ?'s in "anything"
+    hfst::set_xerox_composition(true);
+
     HfstTransducer anything(hfst::internal_identity, hfst::pmatch::format);
     if (optional == false) {
         anything.subtract(*latin1_lowercase_acceptor);
@@ -1842,6 +1856,7 @@ HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t, Side side
         retval->compose(uppercase);
     }
     retval->minimize();
+    hfst::set_xerox_composition(orig_xerox_composition_value);
     return retval;
 }
 
