@@ -27,6 +27,10 @@
 #include "HfstXeroxRules.h"
 #include "xre_utils.h"
 
+#if USE_GLIB_UNICODE
+#include <glib.h>
+#endif
+
 void pmatchwarning(const char *msg);
 
 namespace hfst { namespace pmatch {
@@ -404,6 +408,15 @@ struct PmatchUtilityTransducers
     HfstTransducer * make_capify(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
 
+    // Unicode handling, if available
+    #if USE_GLIB_UNICODE
+    std::string string_from_g_unichar(gunichar ch);
+    #endif
+    HfstTransducer get_uppercase_acceptor_from_transducer(HfstTransducer & t);
+    HfstTransducer get_lowercase_acceptor_from_transducer(HfstTransducer & t);
+    HfstTransducer uppercaser_from_transducer(HfstTransducer & t);
+    HfstTransducer lowercaser_from_transducer(HfstTransducer & t);
+    
     HfstTransducer * cap(HfstTransducer & t, Side side = Both,
                          bool optional = false);
     HfstTransducer * tolower(HfstTransducer & t, Side side = Both,
