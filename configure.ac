@@ -659,7 +659,10 @@ if test x$ac_cv_lib_glib_2_0_main != xyes ; then
 fi
        AC_DEFINE([USE_GLIB_UNICODE], 1, [if using glib for unicode string handling])])
 AS_IF([test "x$with_unicode_handler" = "xicu"],
-      [AC_MSG_FAILURE([ICU not yet implemented (--with-unicode-handler=hfst to disable)])])
+    [AC_CHECK_ICU([52],
+                  [AC_DEFINE([USE_ICU_UNICODE], 1, [if using icu for unicode string handling])],
+                  [AC_MSG_FAILURE([--with-unicode-handler=icu requested but icu>=52 not found])])
+     ])
 AS_IF([test "x$with_unicode_handler" = "xyes"],
       [AC_MSG_FAILURE([--with-unicode-handler=yes; unicode handler 'yes' not recognized])])
 AS_IF([test "x$with_unicode_handler" = "xno"],
