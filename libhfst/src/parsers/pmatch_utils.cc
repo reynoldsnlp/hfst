@@ -1734,6 +1734,17 @@ HfstTransducer PmatchUtilityTransducers::get_lowercase_acceptor_from_transducer(
             }
         }
     }
+#elif USE_ICU_UNICODE
+    HfstTransducer lowercase(t.get_type());
+    StringSet ss = t.get_alphabet();
+    for (StringSet::const_iterator it = ss.begin(); it != ss.end(); ++it) {
+        icu::UnicodeString us(it->c_str());
+        if (us.countChar32() == 1) {
+            if (u_islower(us.char32At(0))) {
+                lowercase.disjunct(HfstTransducer(*it, t.get_type()));
+            }
+        }
+    }
 #else
     HfstTransducer lowercase(*latin1_lowercase_acceptor);
 #endif
@@ -1749,6 +1760,17 @@ HfstTransducer PmatchUtilityTransducers::get_uppercase_acceptor_from_transducer(
         if (g_utf8_strlen(it->c_str(), -1) == 1) {
             gunichar this_unichar = g_utf8_get_char_validated(it->c_str(), -1);
             if (g_unichar_isupper(this_unichar)) {
+                uppercase.disjunct(HfstTransducer(*it, t.get_type()));
+            }
+        }
+    }
+#elif USE_ICU_UNICODE
+    HfstTransducer uppercase(t.get_type());
+    StringSet ss = t.get_alphabet();
+    for (StringSet::const_iterator it = ss.begin(); it != ss.end(); ++it) {
+        icu::UnicodeString us(it->c_str());
+        if (us.countChar32() == 1) {
+            if (u_isupper(us.char32At(0))) {
                 uppercase.disjunct(HfstTransducer(*it, t.get_type()));
             }
         }
@@ -1779,6 +1801,31 @@ HfstTransducer PmatchUtilityTransducers::lowercaser_from_transducer(HfstTransduc
             }
         }
     }
+#elif USE_ICU_UNICODE
+    HfstTransducer lowercase(t.get_type());
+    StringSet ss = t.get_alphabet();
+    StringSet uppercases_seen;
+    for (StringSet::const_iterator it = ss.begin(); it != ss.end(); ++it) {
+        icu::UnicodeString us(it->c_str());
+        if (us.countChar32() == 1) {
+            UChar32 this_unichar = us.char32At(0);
+            if (u_isalpha(this_unichar)) {
+                icu::UnicodeString upper_u = us;
+                upper_u.toUpper();
+                std::string upper;
+                upper_u.toUTF8String(upper);
+                if (uppercases_seen.count(upper) != 0) {
+                    continue;
+                }
+                uppercases_seen.insert(upper);
+                icu::UnicodeString lower_u = us;
+                lower_u.toLower();
+                std::string lower;
+                lower_u.toUTF8String(lower);
+                lowercase.disjunct(HfstTransducer(upper, lower, t.get_type()));
+            }
+        }
+    }
 #else
     HfstTransducer lowercase(*lowerfy);
 #endif
@@ -1801,6 +1848,31 @@ HfstTransducer PmatchUtilityTransducers::uppercaser_from_transducer(HfstTransduc
                 }
                 uppercases_seen.insert(upper);
                 std::string lower = string_from_g_unichar(g_unichar_tolower(this_unichar));
+                uppercase.disjunct(HfstTransducer(lower, upper, t.get_type()));
+            }
+        }
+    }
+#elif USE_ICU_UNICODE
+    HfstTransducer uppercase(t.get_type());
+    StringSet ss = t.get_alphabet();
+    StringSet uppercases_seen;
+    for (StringSet::const_iterator it = ss.begin(); it != ss.end(); ++it) {
+        icu::UnicodeString us(it->c_str());
+        if (us.countChar32() == 1) {
+            UChar32 this_unichar = us.char32At(0);
+            if (u_isalpha(this_unichar)) {
+                icu::UnicodeString upper_u = us;
+                upper_u.toUpper();
+                std::string upper;
+                upper_u.toUTF8String(upper);
+                if (uppercases_seen.count(upper) != 0) {
+                    continue;
+                }
+                uppercases_seen.insert(upper);
+                icu::UnicodeString lower_u = us;
+                lower_u.toLower();
+                std::string lower;
+                lower_u.toUTF8String(lower);
                 uppercase.disjunct(HfstTransducer(lower, upper, t.get_type()));
             }
         }

@@ -29,6 +29,9 @@
 
 #if USE_GLIB_UNICODE
 #include <glib.h>
+#elif USE_ICU_UNICODE
+#include <unicode/unistr.h>
+#include <unicode/uchar.h>
 #endif
 
 void pmatchwarning(const char *msg);
