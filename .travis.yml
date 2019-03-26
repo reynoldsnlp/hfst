@@ -30,6 +30,7 @@ env:
   - CONFIG_EXTRA="--with-unicode-handler=glib"
 
 script:
+    - find /usr/local -name '*icu*' -o -name 'unicode'
     - ./autogen.sh
     - export CCACHE_ARGS=()
     - if command -v ccache >/dev/null 2>/dev/null; then CCACHE_ARGS+=( CC="ccache gcc" ); CCACHE_ARGS+=( CXX="ccache g++" ); fi
