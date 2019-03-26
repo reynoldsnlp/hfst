@@ -35,7 +35,7 @@ script:
     - export CCACHE_ARGS=()
     - if command -v ccache >/dev/null 2>/dev/null; then CCACHE_ARGS+=( CC="ccache gcc" ); CCACHE_ARGS+=( CXX="ccache g++" ); fi
     - echo "${CCACHE_ARGS[@]:-}"
-    - ./configure --enable-xfst --enable-proc --without-foma --enable-lexc --enable-all-tools --enable-silent-rules "${CCACHE_ARGS[@]:-}" ${CONFIG_EXTRA}
+    - ./configure --enable-xfst --enable-proc --without-foma --enable-lexc --enable-all-tools "${CCACHE_ARGS[@]:-}" ${CONFIG_EXTRA}
     - if [[ $CXX = g++ ]]; then make -j2; else make -j; fi
     - make check VERBOSE=1
 
