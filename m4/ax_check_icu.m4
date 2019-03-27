@@ -25,11 +25,17 @@ AU_ALIAS([AC_CHECK_ICU], [AX_CHECK_ICU])
 AC_DEFUN([AX_CHECK_ICU], [
   succeeded=no
 
+  if test -z "$ICU_CONFIG"; then
+    AC_PATH_PROG(ICU_CONFIG, icu-config, no)
+  fi
   if test -z "$PKG_CONFIG"; then
     AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
   fi
 
-  if test "$PKG_CONFIG" = "no" ; then
+  if test "$ICU_CONFIG" = "no" ; then
+    echo "*** The icu-config script could not be found. Make sure it is"
+    echo "*** in your path, and that taglib is properly installed."
+  elif test "$PKG_CONFIG" = "no" ; then
     echo "*** The pkg-config script could not be found. Make sure it is"
     echo "*** in your path and properly installed."
   else
@@ -39,7 +45,7 @@ AC_DEFUN([AX_CHECK_ICU], [
             succeeded=yes
 
             AC_MSG_CHECKING(ICU_CPPFLAGS)
-            ICU_CPPFLAGS=`pkg-config --variable=CPPFLAGS icu-i18n`
+            ICU_CPPFLAGS=`$ICU_CONFIG --cppflags`
             AC_MSG_RESULT($ICU_CPPFLAGS)
 
             AC_MSG_CHECKING(ICU_CFLAGS)
