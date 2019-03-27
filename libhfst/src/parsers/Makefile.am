@@ -146,69 +146,69 @@ check_PROGRAMS=$(LIBHFST_PARSER_TSTS) $(HFST_TWOLC_TESTS)
 
 XreCompiler_SOURCES=XreCompiler.cc xre_utils.cc xre_parse.yy xre_lex.ll
 XreCompiler_CXXFLAGS=-DUNIT_TEST
-XreCompiler_LDADD=../libhfst.la
+XreCompiler_LDADD=../libhfst.la $(ICU_LIBS)
 #PmatchCompiler_SOURCES=PmatchCompiler.cc pmatch_utils.cc pmatch_parse.yy pmatch_lex.ll
 #PmatchCompiler_CXXFLAGS=-DUNIT_TEST
-##PmatchCompiler_LDADD=../libhfst.la
+##PmatchCompiler_LDADD=../libhfst.la $(ICU_LIBS)
 LexcCompiler_SOURCES=LexcCompiler.cc lexc-utils.cc lexc-parser.yy lexc-lexer.ll
 LexcCompiler_CXXFLAGS=-DUNIT_TEST -DDEBUG_MAIN
-LexcCompiler_LDADD=../libhfst.la
+LexcCompiler_LDADD=../libhfst.la $(ICU_LIBS)
 
 string_manipulation_SOURCES=$(STRING_SRC)/string_manipulation.cc
 string_manipulation_CXXFLAGS=-DSTRING_MANIPULATION_TEST -Wno-deprecated
-string_manipulation_LDADD=../libhfst.la
+string_manipulation_LDADD=../libhfst.la $(ICU_LIBS)
 
 InputReader_SOURCES=$(IO_SRC)/InputReader.cc
 InputReader_CXXFLAGS=-DINPUT_READER_TEST -Wno-deprecated
-InputReader_LDADD=../libhfst.la
+InputReader_LDADD=../libhfst.la $(ICU_LIBS)
 
 Alphabet_SOURCES=$(ALPHABET_SRC)/Alphabet.cc
 Alphabet_CXXFLAGS=-DTEST_ALPHABET -Wno-deprecated
-Alphabet_LDADD=../libhfst.la
+Alphabet_LDADD=../libhfst.la $(ICU_LIBS)
 
 OtherSymbolTransducer_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc
 OtherSymbolTransducer_CXXFLAGS=-DTEST_OTHER_SYMBOL_TRANSDUCER -Wno-deprecated
-OtherSymbolTransducer_LDADD=../libhfst.la
+OtherSymbolTransducer_LDADD=../libhfst.la $(ICU_LIBS)
 
 Rule_SOURCES=$(RULE_SRC)/Rule.cc
 Rule_CXXFLAGS=-DTEST_RULE -Wno-deprecated
-Rule_LDADD=../libhfst.la
+Rule_LDADD=../libhfst.la $(ICU_LIBS)
 
 LeftArrowRule_SOURCES=$(RULE_SRC)/LeftArrowRule.cc
 LeftArrowRule_CXXFLAGS=-DTEST_LEFT_ARROW_RULE -Wno-deprecated
-LeftArrowRule_LDADD=../libhfst.la
+LeftArrowRule_LDADD=../libhfst.la $(ICU_LIBS)
 
 LeftRestrictionArrowRule_SOURCES=$(RULE_SRC)/LeftRestrictionArrowRule.cc
 LeftRestrictionArrowRule_CXXFLAGS=-DTEST_LEFT_RESTRICTION_ARROW_RULE -Wno-deprecated
-LeftRestrictionArrowRule_LDADD=../libhfst.la
+LeftRestrictionArrowRule_LDADD=../libhfst.la $(ICU_LIBS)
 
 RightArrowRule_SOURCES=$(RULE_SRC)/RightArrowRule.cc
 RightArrowRule_CXXFLAGS=-DTEST_RIGHT_ARROW_RULE -Wno-deprecated
-RightArrowRule_LDADD=../libhfst.la
+RightArrowRule_LDADD=../libhfst.la $(ICU_LIBS)
 
 RuleContainer_SOURCES=$(RULE_SRC)/RuleContainer.cc
 RuleContainer_CXXFLAGS=-DTEST_RULE_CONTAINER -Wno-deprecated
-RuleContainer_LDADD=../libhfst.la
+RuleContainer_LDADD=../libhfst.la $(ICU_LIBS)
 
 LeftArrowRuleContainer_SOURCES=$(RULE_SRC)/LeftArrowRuleContainer.cc
 LeftArrowRuleContainer_CXXFLAGS=-DTEST_LEFT_ARROW_RULE_CONTAINER -Wno-deprecated
-LeftArrowRuleContainer_LDADD=../libhfst.la
+LeftArrowRuleContainer_LDADD=../libhfst.la $(ICU_LIBS)
 
 RightArrowRuleContainer_SOURCES=$(RULE_SRC)/RightArrowRuleContainer.cc
 RightArrowRuleContainer_CXXFLAGS=-DTEST_RIGHT_ARROW_RULE_CONTAINER -Wno-deprecated
-RightArrowRuleContainer_LDADD=../libhfst.la
+RightArrowRuleContainer_LDADD=../libhfst.la $(ICU_LIBS)
 
 ConflictResolvingLeftArrowRule_SOURCES=$(RULE_SRC)/ConflictResolvingLeftArrowRule.cc
 ConflictResolvingLeftArrowRule_CXXFLAGS=-DTEST_CONFLICT_RESOLVING_LEFT_ARROW_RULE -Wno-deprecated
-ConflictResolvingLeftArrowRule_LDADD=../libhfst.la
+ConflictResolvingLeftArrowRule_LDADD=../libhfst.la $(ICU_LIBS)
 
 ConflictResolvingRightArrowRule_SOURCES=$(RULE_SRC)/ConflictResolvingRightArrowRule.cc
 ConflictResolvingRightArrowRule_CXXFLAGS=-DTEST_CONFLICT_RESOLVING_RIGHT_ARROW_RULE -Wno-deprecated
-ConflictResolvingRightArrowRule_LDADD=../libhfst.la
+ConflictResolvingRightArrowRule_LDADD=../libhfst.la $(ICU_LIBS)
 
 TwolCGrammar_SOURCES=$(RULE_SRC)/TwolCGrammar.cc
 TwolCGrammar_CXXFLAGS=-DTEST_TWOL_C_GRAMMAR -Wno-deprecated
-TwolCGrammar_LDADD=../libhfst.la
+TwolCGrammar_LDADD=../libhfst.la $(ICU_LIBS)
 
 TESTS=$(LIBHFST_PARSER_TSTS) $(HFST_TWOLC_TESTS)
 

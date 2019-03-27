@@ -30,7 +30,7 @@ HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 # libtool takes over
 libhfst_la_SOURCES = $(HFST_SRCS)
 libhfst_la_LIBADD = implementations/libhfstimplementations.la \
-			parsers/libhfstparsers.la
+			parsers/libhfstparsers.la $(ICU_LIBS)
 
 if WANT_SFST
   libhfst_la_LIBADD += $(top_builddir)/back-ends/sfst/libsfst.la
@@ -115,34 +115,34 @@ check_PROGRAMS=$(LIBHFST_TSTS)
 
 HfstApply_SOURCES=HfstApply.cc
 HfstApply_CXXFLAGS=-DMAIN_TEST
-HfstApply_LDADD=libhfst.la
+HfstApply_LDADD=libhfst.la $(ICU_LIBS)
 HfstInputStream_SOURCES=HfstInputStream.cc
 HfstInputStream_CXXFLAGS=-DMAIN_TEST
-HfstInputStream_LDADD=libhfst.la
+HfstInputStream_LDADD=libhfst.la $(ICU_LIBS)
 HfstTransducer_SOURCES=HfstTransducer.cc
 HfstTransducer_CXXFLAGS=-DMAIN_TEST
-HfstTransducer_LDADD=libhfst.la
+HfstTransducer_LDADD=libhfst.la $(ICU_LIBS)
 HfstOutputStream_SOURCES=HfstOutputStream.cc
 HfstOutputStream_CXXFLAGS=-DMAIN_TEST
-HfstOutputStream_LDADD=libhfst.la
+HfstOutputStream_LDADD=libhfst.la $(ICU_LIBS)
 HfstXeroxRules_SOURCES=HfstXeroxRules.cc
 HfstXeroxRules_CXXFLAGS=-DMAIN_TEST
-HfstXeroxRules_LDADD=libhfst.la
+HfstXeroxRules_LDADD=libhfst.la $(ICU_LIBS)
 HfstRules_SOURCES=HfstRules.cc
 HfstRules_CXXFLAGS=-DMAIN_TEST
-HfstRules_LDADD=libhfst.la
+HfstRules_LDADD=libhfst.la $(ICU_LIBS)
 HfstSymbolDefs_SOURCES=HfstSymbolDefs.cc
 HfstSymbolDefs_CXXFLAGS=-DMAIN_TEST
-HfstSymbolDefs_LDADD=libhfst.la
+HfstSymbolDefs_LDADD=libhfst.la $(ICU_LIBS)
 HfstTokenizer_SOURCES=HfstTokenizer.cc
 HfstTokenizer_CXXFLAGS=-DMAIN_TEST
-HfstTokenizer_LDADD=libhfst.la
+HfstTokenizer_LDADD=libhfst.la $(ICU_LIBS)
 HfstFlagDiacritics_SOURCES=HfstFlagDiacritics.cc
 HfstFlagDiacritics_CXXFLAGS=-DMAIN_TEST
-HfstFlagDiacritics_LDADD=libhfst.la
+HfstFlagDiacritics_LDADD=libhfst.la $(ICU_LIBS)
 HarmonizeUnknownAndIdentitySymbols_SOURCES=HarmonizeUnknownAndIdentitySymbols.cc
 HarmonizeUnknownAndIdentitySymbols_CXXFLAGS=-DMAIN_TEST
-HarmonizeUnknownAndIdentitySymbols_LDADD=libhfst.la
+HarmonizeUnknownAndIdentitySymbols_LDADD=libhfst.la $(ICU_LIBS)
 
 TESTS=$(LIBHFST_TSTS)
 
