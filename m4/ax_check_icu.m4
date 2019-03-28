@@ -28,19 +28,16 @@ AC_DEFUN([AX_CHECK_ICU], [
   if test -z "$ICU_CONFIG"; then
     AC_PATH_PROG(ICU_CONFIG, icu-config, no)
   fi
-  if test -z "$PKG_CONFIG"; then
-    AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
-  fi
 
   if test "$ICU_CONFIG" = "no" ; then
     echo "*** The icu-config script could not be found. Make sure it is"
     echo "*** in your path, and that taglib is properly installed."
-  elif test "$PKG_CONFIG" = "no" ; then
-    echo "*** The pkg-config script could not be found. Make sure it is"
-    echo "*** in your path and properly installed."
+    echo "*** Or see http://ibm.com/software/globalization/icu/"
   else
+    ICU_VERSION=`$ICU_CONFIG --version`
     AC_MSG_CHECKING(for ICU >= $1)
-        if pkg-config --atleast-version=$1 icu-i18n ; then
+        VERSION_CHECK=`expr $ICU_VERSION \>\= $1`
+        if test "$VERSION_CHECK" = "1" ; then
             AC_MSG_RESULT(yes)
             succeeded=yes
 
@@ -49,15 +46,15 @@ AC_DEFUN([AX_CHECK_ICU], [
             AC_MSG_RESULT($ICU_CPPFLAGS)
 
             AC_MSG_CHECKING(ICU_CFLAGS)
-            ICU_CFLAGS=`pkg-config --variable=CFLAGS icu-i18n`
+            ICU_CFLAGS=`$ICU_CONFIG --cflags`
             AC_MSG_RESULT($ICU_CFLAGS)
 
             AC_MSG_CHECKING(ICU_CXXFLAGS)
-            ICU_CXXFLAGS=`pkg-config --variable=CXXFLAGS icu-i18n`
+            ICU_CXXFLAGS=`$ICU_CONFIG --cxxflags`
             AC_MSG_RESULT($ICU_CXXFLAGS)
 
             AC_MSG_CHECKING(ICU_LIBS)
-            ICU_LIBS=`pkg-config --libs icu-i18n`
+            ICU_LIBS=`$ICU_CONFIG --ldflags`
             AC_MSG_RESULT($ICU_LIBS)
         else
             ICU_CPPFLAGS=""
