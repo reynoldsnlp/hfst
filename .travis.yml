@@ -19,10 +19,7 @@ before_install:
     - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then wget http://apertium.projectjj.com/osx/install-nightly.sh -O - | sudo bash; fi
     - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then brew update; fi
     - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then brew install bison flex icu4c glib; fi
-    - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then brew ls --verbose icu4c; fi
-    - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then brew --prefix icu4c; fi
-    - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then brew --prefix bison; fi
-    - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then export "PATH=/usr/local/opt/bison/bin:$(brew --prefix icu4c)/bin:$PATH"; fi
+    - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then export "PATH=$(brew --prefix bison)/bin:$(brew --prefix icu4c)/bin:$PATH"; fi
 
 # TODO: "apt-get build-dep hfst" fails with "Unable to find a source package for hfst";
 # is there a source package in the nightly repo?
@@ -33,7 +30,6 @@ env:
   - CONFIG_EXTRA="--with-unicode-handler=glib"
 
 script:
-    - find /usr/local -name '*icu*' -o -name 'unicode'
     - ./autogen.sh
     - export CCACHE_ARGS=()
     - if command -v ccache >/dev/null 2>/dev/null; then CCACHE_ARGS+=( CC="ccache gcc" ); CCACHE_ARGS+=( CXX="ccache g++" ); fi
