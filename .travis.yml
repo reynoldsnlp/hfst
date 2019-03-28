@@ -20,7 +20,9 @@ before_install:
     - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then brew update; fi
     - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then brew install bison flex icu4c glib; fi
     - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then brew ls --verbose icu4c; fi
-    - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then export "PATH=/usr/local/opt/bison/bin:$PATH"; fi
+    - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then brew --prefix icu4c; fi
+    - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then brew --prefix bison; fi
+    - if [[ "$TRAVIS_OS_NAME" = "osx" ]];then export "PATH=/usr/local/opt/bison/bin:$(brew --prefix icu4c)/bin:$PATH"; fi
 
 # TODO: "apt-get build-dep hfst" fails with "Unable to find a source package for hfst";
 # is there a source package in the nightly repo?
