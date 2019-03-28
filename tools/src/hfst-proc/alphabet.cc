@@ -379,13 +379,13 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
         std::string cased;
         if (u_isupper(uc)) {
             case_res = 1;
-            cased_u.toUpper();
+            cased_u.toLower();
             cased_u.toUTF8String(cased);
             return cased;
         }
         else if (u_islower(uc)) {
             case_res = -1;
-            cased_u.toLower();
+            cased_u.toUpper();
             cased_u.toUTF8String(cased);
             return cased;
         }
