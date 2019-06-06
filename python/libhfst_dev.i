@@ -1692,6 +1692,7 @@ namespace lexc {
       LexcCompiler(hfst::ImplementationType impl, bool withFlags, bool alignStrings);
       LexcCompiler& setVerbosity(unsigned int verbose);
       void setOutputToConsole(bool);
+      void print_output(const char * str);
   };
 
 }

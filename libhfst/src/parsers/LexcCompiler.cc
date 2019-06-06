@@ -266,6 +266,11 @@ LexcCompiler& LexcCompiler::parse(FILE* infile)
     return *this;
 }
 
+void LexcCompiler::print_output(const char * str)
+{
+  hfst::lexc::print_output(str);
+}
+
 LexcCompiler& LexcCompiler::parse(const char* filename)
 {
     lexc_ = this;

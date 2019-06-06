@@ -153,6 +153,9 @@ class LexcCompiler
   //! Works like xerox lexc, for compatibility.
   const LexcCompiler& printConnectedness(bool & warnings_printed);
 
+  // for python bindings
+  void print_output(const char *);
+
   private:
   bool quiet_;
   bool verbose_;
