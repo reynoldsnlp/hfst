@@ -747,6 +747,8 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
 
     HfstTransducer* newPaths = xre_.compile(regexp);
 
+    if (newPaths == NULL) { throw("compiling regexp failed"); }
+
     newPaths->optimize();
 
     // encode key
