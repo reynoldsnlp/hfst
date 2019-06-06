@@ -976,7 +976,7 @@ def _compile_lexc(**kwargs):
     * `kwargs` :
         Arguments recognized are: filename, script, verbosity, with_flags, output, use_c_streams.
     * `filename` :
-        The name of the lexc file.
+        The name of the lexc file of list of files.
     * `script` :
         The lexc script to be compiled (a string).
     * `verbosity` :
@@ -1037,25 +1037,31 @@ def _compile_lexc(**kwargs):
        if filename == None:
           retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "cout")
        else:
-          retval = libhfst_dev.hfst_compile_lexc_file(lexccomp, filename, "cout")
+          if isinstance(filename, str):
+            retval = libhfst_dev.hfst_compile_lexc_file(lexccomp, filename, "cout")
+          else:
+            retval = libhfst_dev.hfst_compile_lexc_files(lexccomp, filename, "cout")
     else:
        if filename == None:
           retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "")
           output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
        else:
-          retval = libhfst_dev.hfst_compile_lexc_file(lexccomp, filename, "")
+          if isinstance(filename, str):
+            retval = libhfst_dev.hfst_compile_lexc_file(lexccomp, filename, "")
+          else:
+            retval = libhfst_dev.hfst_compile_lexc_files(lexccomp, filename, "")
           output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
 
     return retval
 
 def compile_lexc_file(filename, **kwargs):
     """
-    Compile lexc file *filename* into a transducer.
+    Compile lexc file (or list of files) *filename* or into a transducer.
 
     Parameters
     ----------
     * `filename` :
-        The name of the lexc file.
+        The name of the lexc file or list of filenames.
     * `kwargs` :
         Arguments recognized are: verbosity, with_flags, output, use_c_streams.
     * `verbosity` :
