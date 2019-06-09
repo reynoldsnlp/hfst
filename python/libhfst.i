@@ -1298,7 +1298,7 @@ class HfstBasicTransducer {
           Whether weights are written.
       """
       xfststr = self.get_xfst_string(write_weights)
-      f.write(prologstr)
+      f.write(xfststr)
 
   def write_att(self, f, write_weights=True):
       """
