@@ -112,12 +112,4 @@ hfst::HfstTransducer * hfst_compile_lexc_script(hfst::lexc::LexcCompiler & comp,
         }
 }
 
-  hfst::HfstTransducer * hfst_compile_lexc_file(hfst::lexc::LexcCompiler & comp, const std::string & filename, const std::string & error_stream)
-  {
-    std::vector<std::string> filenames;
-    filenames.push_back(std::string(filename));
-    return hfst::hfst_compile_lexc_files(comp, filenames, error_stream);
-  }
-
-
 }

@@ -1744,7 +1744,6 @@ int hfst::hfst_compile_xfst_to_string_one(hfst::xfst::XfstCompiler & comp, std::
 int hfst::hfst_compile_xfst(hfst::xfst::XfstCompiler & comp, std::string input, const std::string & output_stream, const std::string & error_stream);
 
 std::string hfst::get_hfst_lexc_output();
-hfst::HfstTransducer * hfst::hfst_compile_lexc_file(hfst::lexc::LexcCompiler & comp, const std::string & filename, const std::string & error_stream);
 hfst::HfstTransducer * hfst::hfst_compile_lexc_files(hfst::lexc::LexcCompiler & comp, const std::vector<std::string> & filenames, const std::string & error_stream);
 hfst::HfstTransducer * hfst::hfst_compile_lexc_script(hfst::lexc::LexcCompiler & comp, std::string script, const std::string & error_stream);
 
