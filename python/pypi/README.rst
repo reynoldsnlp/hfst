@@ -3,7 +3,7 @@ Package description
 *******************
 
 Package ``hfst_dev`` contains a development version of Python bindings for
-`HFST <https://hfst.github.io>`_(Helsinki Finite-State Technology) C++ library.
+`HFST <https://hfst.github.io>`_ (Helsinki Finite-State Technology) C++ library.
 HFST toolkit is intended for processing natural language morphologies.
 The toolkit is demonstrated by wide-coverage implementations of a number of languages
 of varying morphological complexity.
