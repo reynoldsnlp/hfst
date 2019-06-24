@@ -68,6 +68,9 @@ class Rule
   //! @brief Store this transducer in @a out.
   void store(HfstOutputStream &out);
 
+  //! @brief Get a storable transducer.
+  hfst::HfstTransducer * get_storable_transducer();
+
   //! @brief Get the name of this rule.
   std::string get_name(void);
 

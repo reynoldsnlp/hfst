@@ -100,6 +100,7 @@ namespace std {
 %template(LocationVector) vector<hfst_ol::Location>;
 %template(LocationVectorVector) vector<vector<hfst_ol::Location> >;
 %template(FooBar) pair<int, string>;
+%template(FooBarBaz) pair<vector<hfst::HfstTransducer>, string>;
 }
 
 
@@ -1809,6 +1810,12 @@ namespace hfst {
 			 bool silent, bool verbose, bool resolve_left_conflicts,
 			 bool resolve_right_conflicts, hfst::ImplementationType type,
 			 std::ostream * ostr=NULL);
+      static std::vector<hfst::HfstTransducer> compile_and_get_storable_rules
+	(const std::string & inputfile,
+	 bool silent, bool verbose, bool resolve_left_conflicts,
+	 bool resolve_right_conflicts, hfst::ImplementationType type,
+	 std::ostream * ostr=NULL);
+
 %extend{
 	static std::pair<int, std::string> compile_file(const std::string & inputfile, const std::string & outputfile,
 							bool silent, bool verbose, bool resolve_left_conflicts,
@@ -1818,6 +1825,16 @@ namespace hfst {
 	  int retval = hfst::twolc::TwolcCompiler::compile(inputfile, outputfile, silent, verbose, resolve_left_conflicts, resolve_right_conflicts, type, &oss);
 	  return std::pair<int, std::string>(retval, oss.str());
         }
+	static std::pair<std::vector<hfst::HfstTransducer>, std::string> compile_file_and_get_storable_rules
+	  (const std::string & inputfile,
+	   bool silent, bool verbose, bool resolve_left_conflicts,
+	   bool resolve_right_conflicts, hfst::ImplementationType type)
+        {
+	  std::ostringstream oss;
+	  std::vector<hfst::HfstTransducer> retval = hfst::twolc::TwolcCompiler::compile_and_get_storable_rules
+	    (inputfile, silent, verbose, resolve_left_conflicts, resolve_right_conflicts, type, &oss);
+	  return std::pair<std::vector<hfst::HfstTransducer>, std::string>(retval, oss.str());
+	}
 }
     };
   }

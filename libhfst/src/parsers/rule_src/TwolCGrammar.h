@@ -83,6 +83,7 @@ class TwolCGrammar
         op::OPERATOR oper,
         const OtherSymbolTransducerVector contexts);
   void compile_and_store(HfstOutputStream &out);
+  std::vector<hfst::HfstTransducer> compile_and_get_storable_rules();
 };
 
 #endif // TWOL_C_GRAMMAR_H_

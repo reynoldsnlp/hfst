@@ -195,6 +195,28 @@ void TwolCGrammar::compile_and_store(HfstOutputStream &out)
   compiled_rule_container.store(out,std::cerr,(! be_quiet) && be_verbose);
 }
 
+std::vector<hfst::HfstTransducer> TwolCGrammar::compile_and_get_storable_rules()
+{
+  if (! be_quiet)
+    { std::cerr << "Compiling rules." << std::endl; }
+
+  left_arrow_rule_container.compile(std::cerr,(! be_quiet) && be_verbose);
+  right_arrow_rule_container.compile(std::cerr,(! be_quiet) && be_verbose);
+  other_rule_container.compile(std::cerr,(! be_quiet) && be_verbose);
+
+  for (StringRuleSetMap::const_iterator it = name_to_rule_subcases.begin();
+       it != name_to_rule_subcases.end();
+       ++it)
+    { compiled_rule_container.add_rule
+    (new Rule(it->first,Rule::RuleVector(it->second.begin(),
+                         it->second.end()))); }
+  compiled_rule_container.add_missing_symbols_freely(diacritics);
+
+  if (! be_quiet)
+    { std::cerr << "Storing rules." << std::endl; }
+  return compiled_rule_container.get_storable_rules(std::cerr,(! be_quiet) && be_verbose);
+}
+
 #ifdef TEST_TWOL_C_GRAMMAR
 #include <cassert>
 #include "../alphabet_src/Alphabet.h"

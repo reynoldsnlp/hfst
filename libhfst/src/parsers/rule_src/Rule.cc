@@ -104,6 +104,27 @@ void Rule::store(HfstOutputStream &out)
   out << t;
 }
 
+hfst::HfstTransducer * Rule::get_storable_transducer()
+{
+  if (is_empty)
+    { return NULL; }
+  add_name();
+  rule_transducer.remove_diacritics_from_output();
+  rule_transducer.apply(&HfstTransducer::substitute,TWOLC_EPSILON,HFST_EPSILON,
+            true,true);
+  rule_transducer.apply(&HfstTransducer::substitute,"__HFST_TWOLC_.#.","@#@",
+            true,true);
+  rule_transducer.apply(&HfstTransducer::substitute,"__HFST_TWOLC_SPACE",
+            " ",
+            true,true);
+  rule_transducer.apply(&HfstTransducer::substitute,SymbolPair("@#@","@#@"),
+            SymbolPair("@#@",HFST_EPSILON));
+  rule_transducer.apply(&HfstTransducer::substitute,TWOLC_IDENTITY,
+            HFST_IDENTITY,
+            true,true);
+  return &rule_transducer.transducer;
+}
+
 std::string Rule::get_name(void)
 { return name; }
 

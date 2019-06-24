@@ -40,6 +40,7 @@ class RuleContainer
   virtual ~RuleContainer(void);
   void compile(std::ostream &msg_out,bool be_verbose);
   void store(HfstOutputStream &out,std::ostream &msg_out,bool be_verbose);
+  std::vector<hfst::HfstTransducer> get_storable_rules(std::ostream &msg_out,bool be_verbose);
   void add_missing_symbols_freely(const SymbolRange &diacritics);
 };
 

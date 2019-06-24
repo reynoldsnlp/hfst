@@ -21,6 +21,11 @@ namespace hfst {
 	 bool silent, bool verbose, bool resolve_left_conflicts,
 	 bool resolve_right_conflicts, hfst::ImplementationType type,
 	 std::ostream * ostr=NULL);
+      static std::vector<hfst::HfstTransducer> compile_and_get_storable_rules
+	(const std::string & inputfile,
+	 bool silent, bool verbose, bool resolve_left_conflicts,
+	 bool resolve_right_conflicts, hfst::ImplementationType type,
+	 std::ostream * ostr=NULL);
     };
 
   } // namespace twolc

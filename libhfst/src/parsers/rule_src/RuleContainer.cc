@@ -60,6 +60,26 @@ void RuleContainer::store
     }
 }
 
+std::vector<hfst::HfstTransducer> RuleContainer::get_storable_rules
+(std::ostream &msg_out,bool be_verbose)
+{
+  std::vector<hfst::HfstTransducer> retval;
+  for (RuleVector::iterator it = rule_vector.begin();
+       it != rule_vector.end();
+       ++it)
+    {
+      if (be_verbose)
+    { msg_out << "Storing " << Rule::get_print_name((*it)->get_name())
+          << std::endl; }
+      hfst::HfstTransducer * tr = (*it)->get_storable_transducer();
+      if (tr != NULL)
+	{
+	  retval.push_back(*tr);
+	}
+    }
+  return retval;
+}
+
 void RuleContainer::add_missing_symbols_freely(const SymbolRange &diacritics)
 {
   for (RuleVector::iterator it = rule_vector.begin();
