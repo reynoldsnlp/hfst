@@ -1806,11 +1806,11 @@ namespace hfst {
     class TwolcCompiler
     {
     public:
-      static int compile(const std::string & inputfile, const std::string & outputfile,
+      /*static int compile(const std::string & inputfile, const std::string & outputfile,
 			 bool silent, bool verbose, bool resolve_left_conflicts,
 			 bool resolve_right_conflicts, hfst::ImplementationType type,
-			 std::ostream * ostr=NULL);
-      static std::vector<hfst::HfstTransducer> compile_and_get_storable_rules
+			 std::ostream * ostr=NULL);*/
+      static std::vector<hfst::HfstTransducer> compile_file_and_get_storable_rules
 	(const std::string & inputfile,
 	 bool silent, bool verbose, bool resolve_left_conflicts,
 	 bool resolve_right_conflicts, hfst::ImplementationType type,
@@ -1822,25 +1822,17 @@ namespace hfst {
 	 std::ostream * ostr=NULL);
 
 %extend{
-	static std::pair<int, std::string> compile_file(const std::string & inputfile, const std::string & outputfile,
-							bool silent, bool verbose, bool resolve_left_conflicts,
-							bool resolve_right_conflicts, hfst::ImplementationType type)
-        {
-	  std::ostringstream oss;
-	  int retval = hfst::twolc::TwolcCompiler::compile(inputfile, outputfile, silent, verbose, resolve_left_conflicts, resolve_right_conflicts, type, &oss);
-	  return std::pair<int, std::string>(retval, oss.str());
-        }
-	static std::pair<std::vector<hfst::HfstTransducer>, std::string> compile_file_and_get_storable_rules
+	static std::pair<std::vector<hfst::HfstTransducer>, std::string> twolc_compile_file_and_get_storable_rules_
 	  (const std::string & inputfile,
 	   bool silent, bool verbose, bool resolve_left_conflicts,
 	   bool resolve_right_conflicts, hfst::ImplementationType type)
         {
 	  std::ostringstream oss;
-	  std::vector<hfst::HfstTransducer> retval = hfst::twolc::TwolcCompiler::compile_and_get_storable_rules
+	  std::vector<hfst::HfstTransducer> retval = hfst::twolc::TwolcCompiler::compile_file_and_get_storable_rules
 	    (inputfile, silent, verbose, resolve_left_conflicts, resolve_right_conflicts, type, &oss);
 	  return std::pair<std::vector<hfst::HfstTransducer>, std::string>(retval, oss.str());
 	}
-	static std::pair<std::vector<hfst::HfstTransducer>, std::string> compile_twolc_script_and_get_storable_rules
+	static std::pair<std::vector<hfst::HfstTransducer>, std::string> twolc_compile_script_and_get_storable_rules_
 	  (const std::string & script,
 	   bool silent, bool verbose, bool resolve_left_conflicts,
 	   bool resolve_right_conflicts, hfst::ImplementationType type)

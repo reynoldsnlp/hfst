@@ -838,67 +838,13 @@ def _compile_xfst(**kwargs):
       output.write('Parsed file with return value %i (0 indicating succesful parsing).' % retval)
     return retval
 
-def compile_twolc_file_to_file(inputfilename, outputfilename, **kwargs):
+def compile_twolc_file(filename, **kwargs):
     """
-    Compile twolc file *inputfilename* and store the result to file *outputfilename*.
+    Compile twolc file *filename* and return the result.
 
     Parameters
     ----------
-    * `inputfilename` :
-        The name of the twolc input file.
-    * `outputfilename` :
-        The name of the transducer output file.
-    * `kwargs` :
-        Arguments recognized are: silent, verbose, resolve_right_conflicts, resolve_left_conflicts, type.
-    * `silent` :
-        Whether compilation is performed in silent mode, defaults to False.
-    * `verbose` :
-        Whether compilation is performed in verbose mode, defaults to False.
-    * `resolve_right_conflicts` :
-        Whether right arrow conflicts are resolved, defaults to True.
-    * `resolve_left_conflicts` :
-        Whether left arrow conflicts are resolved, defaults to False.
-    * `type` :
-        Implementation type of the compiler, defaults to hfst_dev.get_default_fst_type().
-
-    Returns
-    -------
-    On success zero, else an integer other than zero.
-    """
-    silent=False
-    verbose=False
-    resolve_right_conflicts=True
-    resolve_left_conflicts=False
-    implementation_type=get_default_fst_type()
-
-    for k,v in kwargs.items():
-        if k == 'type':
-            implementation_type = v
-        elif k == 'silent':
-            silent=v
-        elif k == 'verbose':
-            verbose=v
-        elif k == 'resolve_right_conflicts':
-            resolve_right_conflicts=v
-        elif k == 'resolve_left_conflicts':
-            resolve_left_conflicts=v
-        else:
-            print('Warning: ignoring unknown argument %s.' % (k))
-
-    retval = libhfst_dev.TwolcCompiler.compile_file(inputfilename, outputfilename, silent, verbose,
-                                                    resolve_right_conflicts, resolve_left_conflicts,
-                                                    implementation_type)
-    import sys
-    sys.stdout.write(unicode(retval[1], 'utf-8'))
-    return retval[0]
-
-def compile_twolc_file(inputfilename, **kwargs):
-    """
-    Compile twolc file *inputfilename* and return the result.
-
-    Parameters
-    ----------
-    * `inputfilename` :
+    * `filename` :
         The name of the twolc input file.
     * `kwargs` :
         Arguments recognized are: silent, verbose, resolve_right_conflicts, resolve_left_conflicts, type.
@@ -915,34 +861,9 @@ def compile_twolc_file(inputfilename, **kwargs):
 
     Returns
     -------
-    On success zero, else an integer other than zero.
+    The compiled rules.
     """
-    silent=False
-    verbose=False
-    resolve_right_conflicts=True
-    resolve_left_conflicts=False
-    implementation_type=get_default_fst_type()
-
-    for k,v in kwargs.items():
-        if k == 'type':
-            implementation_type = v
-        elif k == 'silent':
-            silent=v
-        elif k == 'verbose':
-            verbose=v
-        elif k == 'resolve_right_conflicts':
-            resolve_right_conflicts=v
-        elif k == 'resolve_left_conflicts':
-            resolve_left_conflicts=v
-        else:
-            print('Warning: ignoring unknown argument %s.' % (k))
-
-    retval = libhfst_dev.TwolcCompiler.compile_file_and_get_storable_rules(inputfilename, silent, verbose,
-                                                    resolve_right_conflicts, resolve_left_conflicts,
-                                                    implementation_type)
-    import sys
-    sys.stdout.write(unicode(retval[1], 'utf-8'))
-    return retval[0]
+    return _compile_twolc(filename=filename, **kwargs)
 
 def compile_twolc_script(script, **kwargs):
     """
@@ -967,8 +888,39 @@ def compile_twolc_script(script, **kwargs):
 
     Returns
     -------
-    On success zero, else an integer other than zero.
+    A tuple containing the compiled rules.
     """
+    return _compile_twolc(script=script, **kwargs)
+
+def _compile_twolc(**kwargs):
+    """
+    Compile twolc script *script* and return the result.
+
+    Parameters
+    ----------
+    * `kwargs` :
+        Arguments recognized are: script, inputfilename, silent, verbose, resolve_right_conflicts, resolve_left_conflicts, type.
+    * `script` :
+        The twolc script.
+    * `filename` :
+        The name of the twolc input file.
+    * `silent` :
+        Whether compilation is performed in silent mode, defaults to False.
+    * `verbose` :
+        Whether compilation is performed in verbose mode, defaults to False.
+    * `resolve_right_conflicts` :
+        Whether right arrow conflicts are resolved, defaults to True.
+    * `resolve_left_conflicts` :
+        Whether left arrow conflicts are resolved, defaults to False.
+    * `type` :
+        Implementation type of the compiler, defaults to hfst_dev.get_default_fst_type().
+
+    Returns
+    -------
+    A tuple containing the compiled rules.
+    """
+    script=None
+    filename=None
     silent=False
     verbose=False
     resolve_right_conflicts=True
@@ -976,7 +928,11 @@ def compile_twolc_script(script, **kwargs):
     implementation_type=get_default_fst_type()
 
     for k,v in kwargs.items():
-        if k == 'type':
+        if k == 'script':
+            script = v
+        elif k == 'filename':
+            filename = v
+        elif k == 'type':
             implementation_type = v
         elif k == 'silent':
             silent=v
@@ -989,7 +945,12 @@ def compile_twolc_script(script, **kwargs):
         else:
             print('Warning: ignoring unknown argument %s.' % (k))
 
-    retval = libhfst_dev.TwolcCompiler.compile_twolc_script_and_get_storable_rules(script, silent, verbose,
+    if filename == None:
+        retval = libhfst_dev.TwolcCompiler.compile_script_and_get_storable_rules_(script, silent, verbose,
+                                                    resolve_right_conflicts, resolve_left_conflicts,
+                                                    implementation_type)
+    else:
+        retval = libhfst_dev.TwolcCompiler.compile_file_and_get_storable_rules_(filename, silent, verbose,
                                                     resolve_right_conflicts, resolve_left_conflicts,
                                                     implementation_type)
     import sys

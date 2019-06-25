@@ -176,7 +176,7 @@ namespace hfst {
 
     }
 
-    std::vector<hfst::HfstTransducer> TwolcCompiler::compile_and_get_storable_rules
+    std::vector<hfst::HfstTransducer> TwolcCompiler::compile_file_and_get_storable_rules
     (const std::string & inputfile,
      bool silent, bool verbose, bool resolve_left_conflicts,
      bool resolve_right_conflicts, hfst::ImplementationType type,
