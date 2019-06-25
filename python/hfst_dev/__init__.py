@@ -946,16 +946,14 @@ def _compile_twolc(**kwargs):
             print('Warning: ignoring unknown argument %s.' % (k))
 
     if filename == None:
-        retval = libhfst_dev.TwolcCompiler.compile_script_and_get_storable_rules_(script, silent, verbose,
+        retval = libhfst_dev.TwolcCompiler.compile_script_and_get_storable_rules(script, silent, verbose,
                                                     resolve_right_conflicts, resolve_left_conflicts,
                                                     implementation_type)
     else:
-        retval = libhfst_dev.TwolcCompiler.compile_file_and_get_storable_rules_(filename, silent, verbose,
+        retval = libhfst_dev.TwolcCompiler.compile_file_and_get_storable_rules(filename, silent, verbose,
                                                     resolve_right_conflicts, resolve_left_conflicts,
                                                     implementation_type)
-    import sys
-    sys.stdout.write(unicode(retval[1], 'utf-8'))
-    return retval[0]
+    return retval
 
 def compile_pmatch_file(filename):
     """
