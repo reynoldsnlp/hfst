@@ -16,10 +16,6 @@
 #   include <config.h>
 #endif
 
-// Add to CPPFLAGS:
-//-I${top_srcdir}/back-ends/pybind11/include
-//-I/usr/include/python3.5m
-
 #include <string>
 #include <map>
 #include <queue>

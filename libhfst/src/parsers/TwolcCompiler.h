@@ -31,6 +31,7 @@ namespace hfst {
 	 bool silent, bool verbose, bool resolve_left_conflicts,
 	 bool resolve_right_conflicts, hfst::ImplementationType type,
 	 std::ostream * ostr=NULL);
+      static void print_message(const std::string & msg);
     };
 
   } // namespace twolc

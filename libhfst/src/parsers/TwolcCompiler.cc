@@ -17,6 +17,12 @@
 #include "rule_src/OtherSymbolTransducer.h"
 #include "TwolcCompiler.h"
 
+#ifdef PYTHON_BINDINGS
+#include "pybind11/pybind11.h"
+#include "pybind11/iostream.h"
+namespace py = pybind11;
+#endif
+
 namespace hfst {
   namespace twolcpre1 {
     int parse();
@@ -419,6 +425,18 @@ namespace hfst {
 	  //return -1;
 	}
 
+    }
+
+    void TwolcCompiler::print_message(const std::string & msg)
+    {
+#ifdef PYTHON_BINDINGS
+      auto d = py::dict();
+      d["file"] = py::module::import("sys").attr("stderr");
+      //d["end"] = "";
+      py::print(msg.c_str(), **d);
+#else
+      std::cerr << msg << std::endl;
+#endif
     }
 
   } // namespace twolc

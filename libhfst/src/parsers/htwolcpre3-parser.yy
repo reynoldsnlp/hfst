@@ -30,6 +30,7 @@
 #include "alphabet_src/Alphabet.h"
 #include "string_src/string_manipulation.h"
 #include <cstdio>
+#include "TwolcCompiler.h"
 
 #ifdef DEBUG_TWOLC_3_GRAMMAR
 #define YYDEBUG 1
@@ -586,7 +587,7 @@ unsigned int get_second_number(const std::string &s)
 void htwolcpre3message(const std::string &m)
 {
   if (! silent_)
-    { std::cerr << m << std::endl; }
+    { hfst::twolc::TwolcCompiler::print_message(m); }
 }
 
 std::string get_name(const std::string &s)

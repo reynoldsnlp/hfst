@@ -25,8 +25,8 @@
 #include <cstdio>
 
 #ifdef PYTHON_BINDINGS
-  #include <pybind11/pybind11.h>
-  #include <pybind11/iostream.h>
+  #include "pybind11/pybind11.h"
+  #include "pybind11/iostream.h"
   namespace py = pybind11;
 #endif
 
