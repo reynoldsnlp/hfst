@@ -1822,7 +1822,7 @@ namespace hfst {
 	 std::ostream * ostr=NULL);
 
 %extend{
-	static std::pair<std::vector<hfst::HfstTransducer>, std::string> twolc_compile_file_and_get_storable_rules_
+	static std::pair<std::vector<hfst::HfstTransducer>, std::string> compile_file_and_get_storable_rules_
 	  (const std::string & inputfile,
 	   bool silent, bool verbose, bool resolve_left_conflicts,
 	   bool resolve_right_conflicts, hfst::ImplementationType type)
@@ -1832,7 +1832,7 @@ namespace hfst {
 	    (inputfile, silent, verbose, resolve_left_conflicts, resolve_right_conflicts, type, &oss);
 	  return std::pair<std::vector<hfst::HfstTransducer>, std::string>(retval, oss.str());
 	}
-	static std::pair<std::vector<hfst::HfstTransducer>, std::string> twolc_compile_script_and_get_storable_rules_
+	static std::pair<std::vector<hfst::HfstTransducer>, std::string> compile_script_and_get_storable_rules_
 	  (const std::string & script,
 	   bool silent, bool verbose, bool resolve_left_conflicts,
 	   bool resolve_right_conflicts, hfst::ImplementationType type)
