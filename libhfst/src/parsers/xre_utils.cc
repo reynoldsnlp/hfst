@@ -53,14 +53,20 @@ namespace hfst {
   }
 }
 
-std::ostream * xreerrstr()
+void print_error(const char * buffer)
 {
-  return hfst::xre::XreCompiler::get_stream(hfst::xre::error_);
-}
-
-void xreflush(std::ostream * os)
-{
-  hfst::xre::XreCompiler::flush(os);
+  if (hfst::xre::error_ == NULL)
+    {
+#ifdef PYTHON_BINDINGS
+      hfst::py_print_stderr(buffer,true);
+#else
+      std::cerr << std::string(buffer);
+#endif
+    }
+  else
+    {
+      *hfst::xre::error_ << std::string(buffer);
+    }
 }
 
 int xreerror(yyscan_t scanner, const char* msg)
@@ -83,10 +89,8 @@ int xreerror(yyscan_t scanner, const char* msg)
                       hfst::xre::data, xreget_text(scanner), hfst::xre::lr, '\0');
         }
 
-      std::ostream * err = xreerrstr();
-      *(err) << std::string(buffer);
+      print_error(buffer);
       free(buffer);
-      xreflush(err);
     }
   return 0;
 }
@@ -97,13 +101,7 @@ xreerror(const char *msg)
   char buffer [1024];
   (void) sprintf(buffer, "*** xre parsing failed: %s\n", msg);
   buffer[1023] = '\0';
-#ifdef PYTHON_BINDINGS
-  hfst::py_print_stderr(buffer,false);
-#else
-  std::ostream * err = xreerrstr();
-  *err << std::string(buffer);
-  xreflush(err);
-#endif
+  print_error(buffer);
   return 0;
 }
 
@@ -118,10 +116,10 @@ namespace xre
   std::map<std::string,unsigned int> function_arguments;
   std::map<std::string,std::set<string> > symbol_lists;
   char* startptr; // changed this to an internal variable in compile functions
-hfst::HfstTransducer* last_compiled;
-bool contains_only_comments = false;
-hfst::ImplementationType format;
-size_t len;
+  hfst::HfstTransducer* last_compiled;
+  bool contains_only_comments = false;
+  hfst::ImplementationType format;
+  size_t len;
 
   bool expand_definitions=false;
   bool harmonize_=true;
@@ -329,8 +327,6 @@ get_quoted(const char *s)
 char*
 parse_quoted(const char *s, unsigned int & length)
 {
-  std::ostream * err = xreerrstr();
-
     char* quoted = get_quoted(s);
 
     char* rv = static_cast<char*>(malloc(sizeof(char)*strlen(quoted) + 1)); // added + 1
@@ -360,11 +356,14 @@ parse_quoted(const char *s, unsigned int & length)
               case '5':
               case '6':
               case '7':
-                *err << "*** XRE unimplemented: parse octal escape in " << std::string(p);
-                xreflush(err);
-                *r = '\0';
-                p = p + 5;
-                break;
+		{
+		  std::ostringstream oss("");
+		  oss << "*** XRE unimplemented: parse octal escape in " << std::string(p);
+		  print_error(oss.str().c_str());
+		  *r = '\0';
+		  p = p + 5;
+		  break;
+		}
               case 'a':
                 *r = '\a';
                 r++;
@@ -396,12 +395,15 @@ parse_quoted(const char *s, unsigned int & length)
                 p = p + 2;
                 break;
               case 'u':
-                *err << "Unimplemented: parse unicode escapes in " << std::string(p);
-                xreflush(err);
-                *r = '\0';
-                r++;
-                p = p + 6;
-                break;
+		{
+		  std::ostringstream oss("");
+		  oss << "Unimplemented: parse unicode escapes in " << std::string(p);
+		  print_error(oss.str().c_str());
+		  *r = '\0';
+		  r++;
+		  p = p + 6;
+		  break;
+		}
               case 'v':
                 *r = '\v';
                 r++;
@@ -417,8 +419,9 @@ parse_quoted(const char *s, unsigned int & length)
                       }
                     else
                       {
-                        *err << "*** XRE unimplemented: parse \\x" << i << std::endl;
-                        xreflush(err);
+			std::ostringstream oss("");
+                        oss << "*** XRE unimplemented: parse \\x" << i << std::endl;
+			print_error(oss.str().c_str());
                         //fprintf(stderr, "*** XRE unimplemented: "
                         //        "parse \\x%d\n", i);
                         *r = '\0';
@@ -429,13 +432,16 @@ parse_quoted(const char *s, unsigned int & length)
                    break;
                 }
               case '\0':
-                *err << "End of line after \\ escape" << std::endl;
-                xreflush(err);
-                //fprintf(stderr, "End of line after \\ escape\n");
-                *r = '\0';
-                r++;
-                p++;
-                break;
+		{
+		  std::ostringstream oss("");
+		  oss << "End of line after \\ escape" << std::endl;
+		  print_error(oss.str().c_str());
+		  //fprintf(stderr, "End of line after \\ escape\n");
+		  *r = '\0';
+		  r++;
+		  p++;
+		  break;
+		}
               default:
                 *r = *(p + 1);
                 r++;
@@ -630,9 +636,9 @@ bool is_valid_function_call
   if (name2xre == function_definitions.end() ||
       name2args == function_arguments.end())
     {
-      std::ostream * err = xreerrstr();
-      *err << "No such function defined: '" << name << "'" << std::endl;
-      xreflush(err);
+      std::ostringstream oss("");
+      oss << "No such function defined: '" << name << "'" << std::endl;
+      print_error(oss.str().c_str());
       //fprintf(stderr, "No such function defined: '%s'\n", name);
       return false;
     }
@@ -641,10 +647,10 @@ bool is_valid_function_call
 
   if ( number_of_args != args->size())
     {
-      std::ostream * err = xreerrstr();
-      *err << "Wrong number of arguments: function '" << name << "' expects "
-                           << (int)number_of_args << ", " << (int)args->size() << " given" << std::endl;
-      xreflush(err);
+      std::ostringstream oss("");
+      oss << "Wrong number of arguments: function '" << name << "' expects "
+	  << (int)number_of_args << ", " << (int)args->size() << " given" << std::endl;
+      print_error(oss.str().c_str());
         //fprintf(stderr, "Wrong number of arguments: function '%s' expects %i, %i given\n",
         //       name, (int)number_of_args, (int)args->size());
       return false;
@@ -1060,10 +1066,8 @@ xfst_label_to_transducer(const char* input, const char* output)
   {
     if (!verbose_)
       return;
-    
-    std::ostream * err = xreerrstr();
-    *err << msg;
-    xreflush(err);
+
+    print_error(msg);
   }
 
 void warn_about_xfst_special_symbol(const char * symbol)
@@ -1087,9 +1091,10 @@ void warn_about_xfst_special_symbol(const char * symbol)
     return;
   if (!verbose_)
     return;
-  std::ostream * err = xreerrstr();
-  *err << "warning: '" << symbol << " ' is an ordinary symbol in hfst" << std::endl;
-  xreflush(err);
+
+  std::ostringstream oss("");
+  oss << "warning: '" << symbol << " ' is an ordinary symbol in hfst" << std::endl;
+  warn(oss.str().c_str());
 }
 
 void warn_about_hfst_special_symbol(const char * symbol)
@@ -1112,9 +1117,9 @@ void warn_about_hfst_special_symbol(const char * symbol)
     return;
   if (hfst::xre::verbose_)
     {
-      std::ostream * err = xreerrstr();
-      *err << "warning: '" << symbol << "' is not an ordinary symbol in hfst" << std::endl;
-      xreflush(err);
+      std::ostringstream oss("");
+      oss << "warning: '" << symbol << "' is not an ordinary symbol in hfst" << std::endl;
+      warn(oss.str().c_str());
     }
 }
 
@@ -1122,8 +1127,6 @@ void warn_about_special_symbols_in_replace(HfstTransducer * t)
 {
   if (!verbose_)
     return;
-
-  std::ostream * err = xreerrstr();
 
   StringSet alphabet = t->get_alphabet();
   for (StringSet::const_iterator it = alphabet.begin();
@@ -1134,10 +1137,11 @@ void warn_about_special_symbols_in_replace(HfstTransducer * t)
           *it != hfst::internal_unknown &&
           *it != hfst::internal_identity)
         {
-          *err << "warning: using special symbol '" << *it << "' in replace rule, use substitute instead" << std::endl;
+	  std::ostringstream oss("");
+          oss << "warning: using special symbol '" << *it << "' in replace rule, use substitute instead" << std::endl;
+	  warn(oss.str().c_str());
         }
     }
-  xreflush(err);
 }
 
 void check_multichar_symbol(const char * symbol)
@@ -1148,9 +1152,9 @@ void check_multichar_symbol(const char * symbol)
   if (defined_multichar_symbols_->find(std::string(symbol)) ==
       defined_multichar_symbols_->end())
     {
-      std::ostream * err = xreerrstr();
-      *err << "warning: multichar symbol '" << symbol << "' used but not defined" << std::endl;
-      xreflush(err);
+      std::ostringstream oss("");
+      oss << "warning: multichar symbol '" << symbol << "' used but not defined" << std::endl;
+      warn(oss.str().c_str());
     }
 }
 

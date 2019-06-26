@@ -447,9 +447,7 @@ print_output(const char* format)
 #ifdef PYTHON_BINDINGS
   hfst::py_print_error(format, false);
 #else
-  std::ostream * err = hfst::lexc::lexc_->get_stream((hfst::lexc::lexc_->get_error_stream()));
-  *err << format;
-  hfst::lexc::lexc_->flush(err);
+  std::cerr << format;
 #endif
 }
 
@@ -464,9 +462,7 @@ error_at_current_token(int, int, const char* format)
     oss << leader << ": " << format << ": " << token << std::endl;
     hfst::py_print_error(oss.str().c_str(), false);
 #else
-    std::ostream * err = hfst::lexc::lexc_->get_stream((hfst::lexc::lexc_->get_error_stream()));
-    *err << leader << ": " << format << ": " << token << std::endl;
-    hfst::lexc::lexc_->flush(err);
+    std::cerr << leader << ": " << format << ": " << token << std::endl;
 #endif
     free(leader);
 }

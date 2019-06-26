@@ -29,12 +29,7 @@ namespace hfst { namespace xre {
     unsigned int lr=1; // number of lines read from xre input
     std::set<unsigned int> positions;
     char * position_symbol = NULL;
-    std::ostream * error_(&std::cerr);
-#ifdef WINDOWS
-    std::ostringstream winoss_;
-    std::ostream * redirected_stream_ = NULL;
-    bool output_to_console_(false);
-#endif
+    std::ostream * error_ = NULL;
     bool verbose_(false);
     std::set<std::string> * defined_multichar_symbols_(NULL);
 
@@ -45,9 +40,6 @@ XreCompiler::XreCompiler() :
     list_definitions_(),
     format_(hfst::TROPICAL_OPENFST_TYPE),
     verbose_(false)
-#ifdef WINDOWS
-    , output_to_console_(false)
-#endif
 {}
 
 XreCompiler::XreCompiler(hfst::ImplementationType impl) :
@@ -57,9 +49,6 @@ XreCompiler::XreCompiler(hfst::ImplementationType impl) :
     list_definitions_(),
     format_(impl),
     verbose_(false)
-#ifdef WINDOWS
-    , output_to_console_(false)
-#endif
 {}
 
     XreCompiler::XreCompiler(const struct XreConstructorArguments & args) :
@@ -69,9 +58,6 @@ XreCompiler::XreCompiler(hfst::ImplementationType impl) :
     list_definitions_(args.list_definitions),
     format_(args.format),
     verbose_(false)
-#ifdef WINDOWS
-    , output_to_console_(false)
-#endif
 {}
 
     XreCompiler::~XreCompiler()
@@ -104,59 +90,6 @@ XreCompiler::XreCompiler(hfst::ImplementationType impl) :
     {
       return hfst::xre::error_;
     }
-
-  XreCompiler&
-  XreCompiler::setOutputToConsole(bool value)
-  {
-#ifdef WINDOWS
-    output_to_console_ = value;
-    hfst::xre::output_to_console_ = value;
-#else
-    (void)value;
-#endif
-    //hfst::print_output_to_console(output_to_console_);
-    return *this;
-  }
-
-  bool
-  XreCompiler::getOutputToConsole()
-  {
-#ifdef WINDOWs
-    return output_to_console_;
-#else
-    return false;
-#endif
-  }
-
-    std::ostream * XreCompiler::get_stream(std::ostream * oss)
-    {
-#ifdef WINDOWS
-      if (hfst::xre::output_to_console_ && (oss == &std::cerr || oss == &std::cout))
-        {
-          hfst::xre::redirected_stream_ = oss;
-          return &hfst::xre::winoss_;
-        }
-#endif
-      return oss;
-    }
-
-    void XreCompiler::flush(std::ostream * oss)
-    {
-#ifdef WINDOWS
-      if (hfst::xre::output_to_console_ && (oss == &hfst::xre::winoss_))
-        {
-          if (hfst::xre::redirected_stream_ == &std::cerr)
-            hfst_fprintf_console(stderr, hfst::xre::winoss_.str().c_str());
-          else if (hfst::xre::redirected_stream_ == &std::cout)
-            hfst_fprintf_console(stdout, hfst::xre::winoss_.str().c_str());
-          else
-            ;
-          hfst::xre::redirected_stream_ = NULL;
-          hfst::xre::winoss_.str("");
-        }
-#endif
-    }
-
 
 bool
 XreCompiler::define(const std::string& name, const std::string& xre)

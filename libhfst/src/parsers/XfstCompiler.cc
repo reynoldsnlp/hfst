@@ -179,7 +179,7 @@ namespace xfst {
         xre_.set_flag_harmonization(false);
         xre_.set_error_stream(this->error_);
         lexc_.setVerbosity(this->verbose_ ? 2 : 0);
-        lexc_.set_error_stream(this->error_);
+        //lexc_.set_error_stream(this->error_);
         hfst::set_xerox_composition(true);
         variables_["assert"] = "OFF";
         variables_["att-epsilon"] = "@0@ | @_EPSILON_SYMBOL_@";
@@ -246,7 +246,7 @@ namespace xfst {
         xre_.set_flag_harmonization(false);
         xre_.set_error_stream(this->error_);
         lexc_.setVerbosity(this->verbose_ ? 2 : 0);
-        lexc_.set_error_stream(this->error_);
+        //lexc_.set_error_stream(this->error_);
         hfst::set_xerox_composition(true);
         variables_["assert"] = "OFF";
         variables_["att-epsilon"] = "@0@ | @_EPSILON_SYMBOL_@";
@@ -331,7 +331,7 @@ namespace xfst {
   {
     error_ = &os;
     //this->xre_.set_error_stream(this->error_);
-    this->lexc_.set_error_stream(this->error_);
+    //this->lexc_.set_error_stream(this->error_);
   }
 
   std::ostream & XfstCompiler::get_error_stream()

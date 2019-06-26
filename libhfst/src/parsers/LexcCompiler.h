@@ -73,19 +73,7 @@ class LexcCompiler
 
   unsigned int getVerbosity();
 
-  void set_error_stream(std::ostream * os);
-
-  std::ostream * get_error_stream();
-
-  void setOutputToConsole(bool);
-
-  bool getOutputToConsole();
-
   bool isQuiet();
-
-  std::ostream * get_stream(std::ostream * oss);
-
-  void flush(std::ostream * oss);
 
   LexcCompiler& setTreatWarningsAsErrors(bool value);
 
@@ -165,12 +153,6 @@ class LexcCompiler
   bool rename_flags_;
   bool treat_warnings_as_errors_;
   bool allow_multiple_sublexicon_definitions_;
-  std::ostream * error_;
-#ifdef WINDOWS
-  bool output_to_console_;
-  std::ostringstream winoss_;
-  std::ostream * redirected_stream_;
-#endif
 
   hfst::ImplementationType format_;
   hfst::HfstTokenizer tokenizer_;
@@ -179,8 +161,6 @@ class LexcCompiler
   std::map<std::string,hfst::HfstTransducer*> stringTries_;
   std::map<std::string,HfstIterableTransducer*> stringVectors_;
   HfstIterableTransducer stringsTrie_;
-
-
 
   std::map<std::string,hfst::HfstTransducer*> regexps_;
   std::set<std::string> lexiconNames_;

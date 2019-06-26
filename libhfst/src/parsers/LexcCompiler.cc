@@ -41,11 +41,6 @@ using std::set_difference;
 #include "xre_utils.h"
 #include "HfstSymbolDefs.h"
 
-#ifdef WINDOWS
-#include "hfst-string-conversions.h"
-using hfst::hfst_fprintf_console;
-#endif // WINDOWS
-
 using hfst::HfstTransducer;
 using hfst::implementations::HfstIterableTransducer;
 using hfst::implementations::HfstState;
@@ -86,21 +81,14 @@ LexcCompiler::LexcCompiler() :
     rename_flags_(false),
     treat_warnings_as_errors_(false),
     allow_multiple_sublexicon_definitions_(false),
-    error_(&std::cerr),
     format_(TROPICAL_OPENFST_TYPE),
     xre_(TROPICAL_OPENFST_TYPE),
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0),
-#ifdef WINDOWS
-    output_to_console_(false),
-    winoss_(std::ostringstream()),
-    redirected_stream_(NULL),
-#endif
     parseErrors_(false)
 {
     xre_.set_expand_definitions(true);
-    xre_.set_error_stream(this->error_);
     xre_.set_verbosity(!quiet_);
 }
 
@@ -113,17 +101,11 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
     rename_flags_(false),
     treat_warnings_as_errors_(false),
     allow_multiple_sublexicon_definitions_(false),
-    error_(&std::cerr),
     format_(impl),
     xre_(impl),
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0),
-#ifdef WINDOWS
-    output_to_console_(false),
-    winoss_(std::ostringstream()),
-    redirected_stream_(NULL),
-#endif
     parseErrors_(false)
 {
   tokenizer_.add_multichar_symbol(hfst::internal_epsilon);
@@ -134,7 +116,6 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
     lexiconNames_.insert(hash);
     tokenizer_.add_multichar_symbol(joinerEncode(hash));
     xre_.set_expand_definitions(true);
-    xre_.set_error_stream(this->error_);
     xre_.set_verbosity(!quiet_);
 }
 
@@ -147,17 +128,11 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
     rename_flags_(false),
     treat_warnings_as_errors_(false),
     allow_multiple_sublexicon_definitions_(false),
-    error_(&std::cerr),
     format_(impl),
     xre_(impl),
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0),
-#ifdef WINDOWS
-    output_to_console_(false),
-    winoss_(std::ostringstream()),
-    redirected_stream_(NULL),
-#endif
     parseErrors_(false)
 {
     tokenizer_.add_multichar_symbol(hfst::internal_epsilon);
@@ -168,7 +143,6 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
     lexiconNames_.insert(hash);
     tokenizer_.add_multichar_symbol(joinerEncode(hash));
     xre_.set_expand_definitions(true);
-    xre_.set_error_stream(this->error_);
     xre_.set_verbosity(!quiet_);
 }
 
@@ -194,55 +168,6 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
       stringVectors_.clear();
       regexps_.clear();
     }
-
-
-    std::ostream * LexcCompiler::get_stream(std::ostream * oss)
-    {
-#ifdef WINDOWS
-      if (output_to_console_ && (oss == &std::cerr || oss == &std::cout))
-        {
-          redirected_stream_ = oss;
-          return &winoss_;
-        }
-#endif
-      return oss;
-    }
-
-    void LexcCompiler::flush(std::ostream * oss)
-    {
-#ifdef WINDOWS
-      if (output_to_console_ && (oss == &winoss_))
-        {
-          if (redirected_stream_ == &std::cerr)
-            hfst_fprintf_console(stderr, winoss_.str().c_str());
-          else if (redirected_stream_ == &std::cout)
-            hfst_fprintf_console(stdout, winoss_.str().c_str());
-          else
-            ;
-          redirected_stream_ = NULL;
-          winoss_.str("");
-        }
-#endif
-    }
-
-    void LexcCompiler::setOutputToConsole(bool value)
-    {
-#ifdef WINDOWS
-      output_to_console_ = value;
-#else
-      (void)value;
-#endif
-    }
-
-    bool LexcCompiler::getOutputToConsole()
-    {
-#ifdef WINDOWS
-      return output_to_console_;
-#else
-      return false;
-#endif
-    }
-
 
 LexcCompiler& LexcCompiler::parse(FILE* infile)
 {
@@ -362,17 +287,6 @@ LexcCompiler::setTreatWarningsAsErrors(bool value)
 {
     treat_warnings_as_errors_ = value;
     return *this;
-}
-
-void LexcCompiler::set_error_stream(std::ostream * os)
-{
-  error_ = os;
-  xre_.set_error_stream(this->error_);
-}
-
-std::ostream * LexcCompiler::get_error_stream()
-{
-  return error_;
 }
 
 LexcCompiler&
@@ -511,7 +425,6 @@ LexcCompiler::addStringEntry(const string& data,
 // to handle information to warn_about_one_sided_flags_
 static bool treat_one_sided_flags_as_errors_ = false;
 static bool quiet_one_sided_flags_ = false;
-static std::ostream * errorstr_ = NULL;
 
 static void warn_about_one_sided_flags(const std::pair<std::string, std::string> & symbol_pair)
 {
@@ -603,7 +516,6 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
     // information for function pointer &warn_about_one_sided_flags
     treat_one_sided_flags_as_errors_ = treat_warnings_as_errors_;
     quiet_one_sided_flags_ = quiet_;
-    errorstr_ = this->get_stream(this->error_);
     
     StringPairVector newVector;
 
