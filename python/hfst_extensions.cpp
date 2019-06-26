@@ -13,7 +13,7 @@ namespace hfst {
   HfstTransducer * empty_transducer()
   {
     hfst::xre::XreCompiler comp(hfst::get_default_fst_type());
-    return hfst::hfst_regex(comp, "[0 - 0]", "");
+    return comp.compile("[0 - 0]");
   }
   HfstTransducer * copy_hfst_transducer(const hfst::HfstTransducer & t) { return new HfstTransducer(t); }
   HfstTransducer * copy_hfst_transducer_from_basic_transducer(const hfst::implementations::HfstIterableTransducer & t) { return new HfstTransducer(t, type); }
