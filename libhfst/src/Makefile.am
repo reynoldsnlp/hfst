@@ -16,6 +16,10 @@ lib_LTLIBRARIES = libhfst.la
 AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -g
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/back-ends/openfst/src/include
 
+#if WANT_PYTHON_BINDINGS
+AM_CPPFLAGS += -I${top_srcdir}/back-ends/pybind11/include -I/usr/include/python3.5m -DPYTHON_BINDINGS
+#endif
+
 # HFST bridge specific stuff
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 		  HfstRules.cc HfstXeroxRules.cc HfstDataTypes.cc \

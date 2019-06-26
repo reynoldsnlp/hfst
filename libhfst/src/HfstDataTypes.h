@@ -32,6 +32,11 @@
 namespace hfst
 {
 
+#ifdef PYTHON_BINDINGS
+  void py_print_error(const char * text, bool insert_newline=true);
+  void py_print_output(const char * text, bool insert_newline=true);
+#endif
+
   class HfstTransducer;
   class HfstGrammar;
   class HfstInputStream;

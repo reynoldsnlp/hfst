@@ -98,10 +98,7 @@ xreerror(const char *msg)
   (void) sprintf(buffer, "*** xre parsing failed: %s\n", msg);
   buffer[1023] = '\0';
 #ifdef PYTHON_BINDINGS
-  auto d = py::dict();
-  d["file"] = py::module::import("sys").attr("stderr");
-  d["end"] = "";
-  py::print(buffer, **d);
+  hfst::py_print_stderr(buffer,false);
 #else
   std::ostream * err = xreerrstr();
   *err << std::string(buffer);

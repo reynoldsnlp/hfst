@@ -124,10 +124,6 @@ AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src \
 		-I${top_srcdir}/back-ends/openfst/src/include \
 		-Wno-deprecated
 
-#if WANT_PYTHON_BINDINGS
-#AM_CPPFLAGS += -I${top_srcdir}/back-ends/pybind11/include -I/usr/include/python3.5m -DPYTHON_BINDINGS
-#endif
-
 if WANT_MINGW
   AM_CPPFLAGS += -I${top_srcdir}/back-ends/dlfcn -DWINDOWS
 endif

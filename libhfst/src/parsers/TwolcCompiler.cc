@@ -430,10 +430,7 @@ namespace hfst {
     void TwolcCompiler::print_message(const std::string & msg)
     {
 #ifdef PYTHON_BINDINGS
-      auto d = py::dict();
-      d["file"] = py::module::import("sys").attr("stderr");
-      //d["end"] = "";
-      py::print(msg.c_str(), **d);
+      hfst::py_print_stderr(msg);
 #else
       std::cerr << msg << std::endl;
 #endif

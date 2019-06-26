@@ -237,26 +237,6 @@ strdup_nonconst_part(const char* token, const char* prefix,
     return token_part;
 }
 
-#ifdef PYTHON_BINDINGS
-void print_output(const char * text, bool insert_newline/*=true*/)
-{
-  auto d = py::dict();
-  if (!insert_newline)
-    {
-      d["end"] = "";
-    }
-  py::print(text, **d);
-}
-
-void print_error(const char * text)
-{
-  auto d = py::dict();
-  d["file"] = py::module::import("sys").attr("stderr");
-  //d["end"] = "";
-  py::print(text, **d);
-}
-#endif
-
 } }
 
 // vim: set ft=cpp.doxygen:

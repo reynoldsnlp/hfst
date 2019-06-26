@@ -13,6 +13,12 @@
 #include <stdexcept>
 #include <cstdio>
 
+#ifdef PYTHON_BINDINGS
+#include "pybind11/pybind11.h"
+#include "pybind11/iostream.h"
+namespace py = pybind11;
+#endif
+
 namespace hfst
 {
 
@@ -145,6 +151,29 @@ namespace hfst
     return fopen(filename, mode);
 #endif
   }
+
+#ifdef PYTHON_BINDINGS
+  void py_print_stdout(const char * text, bool insert_newline/*=true*/)
+  {
+    auto d = py::dict();
+    if (!insert_newline)
+      {
+	d["end"] = "";
+      }
+    py::print(text, **d);
+  }
+
+  void py_print_stderr(const char * text, bool insert_newline/*=true*/)
+  {
+    auto d = py::dict();
+    d["file"] = py::module::import("sys").attr("stderr");
+    if (!insert_newline)
+      {
+	d["end"] = "";
+      }
+    py::print(text, **d);
+  }
+#endif
 
 }
 

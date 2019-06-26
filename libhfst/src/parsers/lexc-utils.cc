@@ -24,12 +24,6 @@
 #include <cstring>
 #include <cstdio>
 
-#ifdef PYTHON_BINDINGS
-  #include "pybind11/pybind11.h"
-  #include "pybind11/iostream.h"
-  namespace py = pybind11;
-#endif
-
 // for internal epsilon
 #include "HfstSymbolDefs.h"
 
@@ -451,14 +445,11 @@ void
 print_output(const char* format)
 {
 #ifdef PYTHON_BINDINGS
-    auto d = py::dict();
-    d["file"] = py::module::import("sys").attr("stderr");
-    d["end"] = "";
-    py::print(format, **d);
+  hfst::py_print_error(format, false);
 #else
-    std::ostream * err = hfst::lexc::lexc_->get_stream((hfst::lexc::lexc_->get_error_stream()));
-    *err << format;
-    hfst::lexc::lexc_->flush(err);
+  std::ostream * err = hfst::lexc::lexc_->get_stream((hfst::lexc::lexc_->get_error_stream()));
+  *err << format;
+  hfst::lexc::lexc_->flush(err);
 #endif
 }
 
@@ -469,12 +460,9 @@ error_at_current_token(int, int, const char* format)
     char* token = strdup_token_part();
     //fprintf(stderr, "%s: %s %s\n", leader, format, token);
 #ifdef PYTHON_BINDINGS
-    auto d = py::dict();
-    d["file"] = py::module::import("sys").attr("stderr");
-    d["end"] = "";
     std::ostringstream oss("");
     oss << leader << ": " << format << ": " << token << std::endl;
-    py::print(oss.str().c_str(), **d);
+    hfst::py_print_error(oss.str().c_str(), false);
 #else
     std::ostream * err = hfst::lexc::lexc_->get_stream((hfst::lexc::lexc_->get_error_stream()));
     *err << leader << ": " << format << ": " << token << std::endl;

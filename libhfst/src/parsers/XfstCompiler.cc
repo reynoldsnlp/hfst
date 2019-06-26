@@ -87,11 +87,11 @@ using hfst::implementations::HfstTransition;
 #define CHECK_FILENAME(x) if (! this->check_filename(x)) { return *this; }
 
 #ifdef PYTHON_BINDINGS
-#define ERROR(x) { std::ostringstream oss(""); oss x; hfst::xfst::print_error(oss.str().c_str()); }
-#define OUTPUT(x) { std::ostringstream oss(""); oss x; hfst::xfst::print_output(oss.str().c_str(), true); }
-#define OUTPUT_LINE(x) { std::ostringstream oss(""); oss x; hfst::xfst::print_output(oss.str().c_str(), false); }
-#define OUTPUT_END hfst::xfst::print_output("", true);
-#define EMPTY_STACK hfst::xfst::print_error("Empty stack.");
+#define ERROR(x) { std::ostringstream oss(""); oss x; hfst::py_print_error(oss.str().c_str(),true); }
+#define OUTPUT(x) { std::ostringstream oss(""); oss x; hfst::py_print_output(oss.str().c_str(), true); }
+#define OUTPUT_LINE(x) { std::ostringstream oss(""); oss x; hfst::py_print_output(oss.str().c_str(), false); }
+#define OUTPUT_END hfst::py_print_output("", true);
+#define EMPTY_STACK hfst::py_print_error("Empty stack.", true);
 #else
 #define ERROR(x) error() x << std::endl;
 #define OUTPUT(x) output() x << std::endl;
