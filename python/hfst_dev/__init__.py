@@ -208,13 +208,10 @@ def regex(re, **kwargs):
     * `re` :
         The regular expression defined with Xerox transducer notation.
     * `kwargs` :
-        Arguments recognized are: 'output', 'use_c_streams' and 'definitions'.
+        Arguments recognized are: 'output' and 'definitions'.
     * `output` :
         Where warnings and errors are printed. Possible values are sys.stdout,
         sys.stderr (the default), a StringIO or None, indicating a quiet mode.
-    * `use_c_streams` :
-        Whether warnings and error messages are printed to C stderr.
-        Defaults to False.
     * `definitions` :
         A dictionary mapping variable names into transducers.
 
@@ -326,7 +323,6 @@ def regex(re, **kwargs):
     to_console=get_output_to_console()
     import sys
     err=sys.stderr
-    use_c_streams=False
     defs=None
 
     for k,v in kwargs.items():
@@ -334,8 +330,6 @@ def regex(re, **kwargs):
           to_console=v
       elif k == 'output':
           err=v
-      elif k == 'use_c_streams':
-          use_c_streams=v
       elif k == 'definitions':
           defs=v;
       else:
@@ -351,10 +345,6 @@ def regex(re, **kwargs):
                 # print('defining transducer')
             else:
                 pass
-
-    if use_c_streams:
-       comp.set_verbosity(True)
-       return libhfst_dev.hfst_regex(comp, re, "cerr")
 
     if err == None:
        return libhfst_dev.hfst_regex(comp, re, "")
@@ -690,7 +680,7 @@ def compile_xfst_file(filename, **kwargs):
     * `filename` :
         The name of the xfst file.
     * `kwargs` :
-        Arguments recognized are: verbosity, quit_on_fail, output, use_c_streams, type.
+        Arguments recognized are: verbosity, quit_on_fail, output, type.
     * `verbosity` :
         The verbosity of the compiler, defaults to 0 (silent). Possible values are:
         0, 1, 2.
@@ -699,9 +689,6 @@ def compile_xfst_file(filename, **kwargs):
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
         StringIO, sys.stdout being the default.
-    * `use_c_streams` :
-        Whether output is printed to C stdout and warnings and error messages to C stderr.
-        Defaults to False.
     * `type` :
         Implementation type of the compiler, defaults to
         hfst_dev.get_default_fst_type().
@@ -721,7 +708,7 @@ def compile_xfst_script(script, **kwargs):
     * `script` :
         The xfst script to be compiled (a string).
     * `kwargs` :
-        Arguments recognized are: verbosity, quit_on_fail, output, use_c_streams, type.
+        Arguments recognized are: verbosity, quit_on_fail, output, type.
     * `verbosity` :
         The verbosity of the compiler, defaults to 0 (silent). Possible values are:
         0, 1, 2.
@@ -730,9 +717,6 @@ def compile_xfst_script(script, **kwargs):
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
         StringIO, sys.stdout being the default.
-    * `use_c_streams` :
-        Whether output is printed to C stdout and warnings and error messages to C stderr.
-        Defaults to False.
     * `type` :
         Implementation type of the compiler, defaults to
         hfst_dev.get_default_fst_type().
@@ -763,9 +747,6 @@ def _compile_xfst(**kwargs):
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
         StringIO, sys.stdout being the default.
-    * `use_c_streams` :
-        Whether output is printed to C stdout and warnings and error messages to C stderr.
-        Defaults to False.
     * `type` :
         Implementation type of the compiler, defaults to
         hfst_dev.get_default_fst_type().
@@ -783,7 +764,6 @@ def _compile_xfst(**kwargs):
     type = get_default_fst_type()
     import sys
     output=sys.stdout
-    use_c_streams=False
     to_console=get_output_to_console()
     filename=None
     script=None
@@ -796,8 +776,6 @@ def _compile_xfst(**kwargs):
           quit_on_fail='OFF'
       elif k == 'output':
           output=v
-      elif k == 'use_c_streams':
-          use_c_streams=v
       elif k == 'output_to_console':
           to_console=v
       elif k == 'filename':
@@ -826,13 +804,8 @@ def _compile_xfst(**kwargs):
         output.write('File closed...')
 
     retval=-1
-
-    # check special case
-    if use_c_streams:
-       retval = libhfst_dev.hfst_compile_xfst(xfstcomp, data, "cout", "cerr")
-    else:
-       retval = libhfst_dev.hfst_compile_xfst_to_string_one(xfstcomp, data)
-       output.write(unicode(libhfst_dev.get_hfst_xfst_string_one(), 'utf-8'))
+    retval = libhfst_dev.hfst_compile_xfst_to_string_one(xfstcomp, data)
+    output.write(unicode(libhfst_dev.get_hfst_xfst_string_one(), 'utf-8'))
 
     if verbosity > 1:
       output.write('Parsed file with return value %i (0 indicating succesful parsing).' % retval)
@@ -1038,7 +1011,7 @@ def _compile_lexc(**kwargs):
     Parameters
     ----------
     * `kwargs` :
-        Arguments recognized are: filenames, script, verbosity, with_flags, output, use_c_streams.
+        Arguments recognized are: filenames, script, verbosity, with_flags, output.
     * `filenames` :
         The names of the lexc files.
     * `script` :
@@ -1051,9 +1024,6 @@ def _compile_lexc(**kwargs):
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
         StringIO, sys.stderr being the default.
-    * `use_c_streams` :
-        Whether output is printed to C stdout and warnings and error messages to C stderr.
-        Defaults to False.
 
     Returns
     -------
@@ -1065,7 +1035,6 @@ def _compile_lexc(**kwargs):
     type = get_default_fst_type()
     import sys
     output=sys.stderr
-    use_c_streams=False
     to_console=get_output_to_console()
     filenames=None
     script=None
@@ -1080,8 +1049,6 @@ def _compile_lexc(**kwargs):
           alignstrings = v
       elif k == 'output':
           output=v
-      elif k == 'use_c_streams':
-          use_c_streams=v
       elif k == 'output_to_console':
           to_console=v
       elif k == 'filenames':
@@ -1097,18 +1064,12 @@ def _compile_lexc(**kwargs):
     lexccomp.setOutputToConsole(to_console)
 
     retval=-1
-    if use_c_streams:
-       if filenames == None:
-          retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "cout")
-       else:
-          retval = libhfst_dev.hfst_compile_lexc_files(lexccomp, filenames, "cout")
+    if filenames == None:
+        retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "")
+        output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
     else:
-       if filenames == None:
-          retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "")
-          output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
-       else:
-          retval = libhfst_dev.hfst_compile_lexc_files(lexccomp, filenames, "")
-          output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
+        retval = libhfst_dev.hfst_compile_lexc_files(lexccomp, filenames, "")
+        output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
 
     return retval
 
@@ -1121,7 +1082,7 @@ def compile_lexc_file(filename, **kwargs):
     * `filename` :
         The name of the lexc file.
     * `kwargs` :
-        Arguments recognized are: verbosity, with_flags, output, use_c_streams.
+        Arguments recognized are: verbosity, with_flags, output.
     * `verbosity` :
         The verbosity of the compiler, defaults to 0 (silent). Possible values are:
         0, 1, 2.
@@ -1130,9 +1091,6 @@ def compile_lexc_file(filename, **kwargs):
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
         StringIO, sys.stderr being the default.
-    * `use_c_streams` :
-        Whether output is printed to C stdout and warnings and error messages to C stderr.
-        Defaults to False.
 
     Returns
     -------
@@ -1149,7 +1107,7 @@ def compile_lexc_files(filenames, **kwargs):
     * `filenames` :
         The list of lexc filenames.
     * `kwargs` :
-        Arguments recognized are: verbosity, with_flags, output, use_c_streams.
+        Arguments recognized are: verbosity, with_flags, output.
     * `verbosity` :
         The verbosity of the compiler, defaults to 0 (silent). Possible values are:
         0, 1, 2.
@@ -1158,9 +1116,6 @@ def compile_lexc_files(filenames, **kwargs):
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
         StringIO, sys.stderr being the default.
-    * `use_c_streams` :
-        Whether output is printed to C stdout and warnings and error messages to C stderr.
-        Defaults to False.
 
     Returns
     -------
@@ -1177,7 +1132,7 @@ def compile_lexc_script(script, **kwargs):
     * `script` :
         The lexc script to be compiled (a string).
     * `kwargs` :
-        Arguments recognized are: verbosity, with_flags, output, use_c_streams.
+        Arguments recognized are: verbosity, with_flags, output.
     * `verbosity` :
         The verbosity of the compiler, defaults to 0 (silent). Possible values are:
         0, 1, 2.
@@ -1186,9 +1141,6 @@ def compile_lexc_script(script, **kwargs):
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
         StringIO, sys.stderr being the default.
-    * `use_c_streams` :
-        Whether output is printed to C stdout and warnings and error messages to C stderr.
-        Defaults to False.
 
     Returns
     -------
