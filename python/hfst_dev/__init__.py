@@ -19,7 +19,6 @@ FUNCTIONS:
     fst
     fst_type_to_string
     get_default_fst_type
-    get_output_to_console
     intersect
     is_diacritic
     read_att_input
@@ -28,7 +27,6 @@ FUNCTIONS:
     read_prolog_transducer
     regex
     set_default_fst_type
-    set_output_to_console
     start_xfst
     tokenized_fst
 
@@ -69,22 +67,6 @@ EPSILON='@_EPSILON_SYMBOL_@'
 UNKNOWN='@_UNKNOWN_SYMBOL_@'
 IDENTITY='@_IDENTITY_SYMBOL_@'
 
-# Windows...
-OUTPUT_TO_CONSOLE=False
-
-def set_output_to_console(val):
-    """
-    (Windows-specific:) set whether output is printed to console instead of standard output.
-    """
-    global OUTPUT_TO_CONSOLE
-    OUTPUT_TO_CONSOLE=val
-
-def get_output_to_console():
-    """
-    (Windows-specific:) get whether output is printed to console instead of standard output.
-    """
-    return OUTPUT_TO_CONSOLE
-
 def start_xfst(**kwargs):
     """
     Start interactive xfst compiler.
@@ -101,7 +83,6 @@ def start_xfst(**kwargs):
     """
     type = get_default_fst_type()
     quit_on_fail = 'OFF'
-    to_console=get_output_to_console()
     for k,v in kwargs.items():
       if k == 'type':
         type = v
@@ -114,14 +95,6 @@ def start_xfst(**kwargs):
     comp = XfstCompiler(type)
     comp.setReadInteractiveTextFromStdin(True) # ?
     comp.setReadline(False) # do not mix python and c++ readline
-
-    # Windows-specific...
-    import sys
-    idle = 'idlelib' in sys.modules
-    if to_console and idle:
-        print('Cannot output to console when running libhfst from IDLE.')
-        to_console=False
-    comp.setOutputToConsole(to_console)
     comp.set('quit-on-fail', quit_on_fail)
 
     rl_length_1 = 0
@@ -321,15 +294,12 @@ def regex(re, **kwargs):
     #   starts a comment until end of line    
     """
     type_ = get_default_fst_type()
-    to_console=get_output_to_console()
     import sys
     err=sys.stderr
     defs=None
 
     for k,v in kwargs.items():
-      if k == 'output_to_console':
-          to_console=v
-      elif k == 'output':
+      if k == 'output':
           err=v
       elif k == 'definitions':
           defs=v;
@@ -337,7 +307,6 @@ def regex(re, **kwargs):
         print('Warning: ignoring unknown argument %s.' % (k))
 
     comp = XreCompiler(type_)
-    comp.setOutputToConsole(to_console)
     if not defs == None:
         for k,v in defs.items():
             vtype = str(type(v))
@@ -761,7 +730,6 @@ def _compile_xfst(**kwargs):
     type = get_default_fst_type()
     import sys
     output=sys.stdout
-    to_console=get_output_to_console()
     filename=None
     script=None
 
@@ -773,8 +741,6 @@ def _compile_xfst(**kwargs):
           quit_on_fail='OFF'
       elif k == 'output':
           output=v
-      elif k == 'output_to_console':
-          to_console=v
       elif k == 'filename':
           filename=v
       elif k == 'script':
@@ -785,7 +751,6 @@ def _compile_xfst(**kwargs):
     if verbosity > 1:
       output.write('Compiling with %s implementation...' % fst_type_to_string(type))
     xfstcomp = XfstCompiler(type)
-    xfstcomp.setOutputToConsole(to_console)
     xfstcomp.setVerbosity(verbosity > 0)
     xfstcomp.setInspectNetSupported(False)
     xfstcomp.set('quit-on-fail', quit_on_fail)
@@ -976,28 +941,25 @@ def compile_sfst_file(filename, **kwargs):
     verbosity=False
     type = get_default_fst_type()
     output=None
-    to_console=get_output_to_console()
 
     for k,v in kwargs.items():
       if k == 'verbose':
         verbosity=v
       elif k == 'output':
           output=v
-      elif k == 'output_to_console':
-          to_console=v
       else:
         print('Warning: ignoring unknown argument %s.' % (k))
 
     retval=None
     import sys
     if output == None:
-       retval = libhfst_dev.hfst_compile_sfst(filename, "", verbosity, to_console)
+       retval = libhfst_dev.hfst_compile_sfst(filename, "", verbosity)
     elif output == sys.stdout:
-       retval = libhfst_dev.hfst_compile_sfst(filename, "cout", verbosity, to_console)
+       retval = libhfst_dev.hfst_compile_sfst(filename, "cout", verbosity)
     elif output == sys.stderr:
-       retval = libhfst_dev.hfst_compile_sfst(filename, "cerr", verbosity, to_console)
+       retval = libhfst_dev.hfst_compile_sfst(filename, "cerr", verbosity)
     else:
-       retval = libhfst_dev.hfst_compile_sfst(filename, "", verbosity, to_console)
+       retval = libhfst_dev.hfst_compile_sfst(filename, "", verbosity)
        output.write(unicode(libhfst_dev.get_hfst_sfst_output(), 'utf-8'))
 
     return retval
@@ -1033,7 +995,6 @@ def _compile_lexc(**kwargs):
     type = get_default_fst_type()
     import sys
     output=sys.stderr
-    to_console=get_output_to_console()
     filenames=None
     script=None
 
@@ -1047,8 +1008,6 @@ def _compile_lexc(**kwargs):
           alignstrings = v
       elif k == 'output':
           output=v
-      elif k == 'output_to_console':
-          to_console=v
       elif k == 'filenames':
           filenames=v
       elif k == 'script':
@@ -1059,7 +1018,6 @@ def _compile_lexc(**kwargs):
 
     lexccomp = LexcCompiler(type, withflags, alignstrings)
     lexccomp.setVerbosity(verbosity)
-    lexccomp.setOutputToConsole(to_console)
 
     retval=-1
     if filenames == None:

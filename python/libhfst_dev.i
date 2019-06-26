@@ -1646,7 +1646,6 @@ class XreCompiler
   HfstTransducer* compile(const std::string& xre);
   //HfstTransducer* compile_first(const std::string& xre, unsigned int & chars_read);
   void set_verbosity(bool verbose);
-  bool getOutputToConsole();
   void set_expand_definitions(bool expand); // TODO: should this be set automatically to True?
   void set_harmonization(bool harmonize);
   bool contained_only_comments();
@@ -1662,10 +1661,6 @@ class XreCompiler
   {
     self->set_expand_definitions(true);
     self->define(name, transducer);
-  }
-  void setOutputToConsole(bool value)
-  {
-    (void)self->setOutputToConsole(value);
   }
   HfstTransducerUIntPair compile_first(const std::string & xre)
   {
@@ -1686,7 +1681,6 @@ namespace lexc {
       LexcCompiler(hfst::ImplementationType impl);
       LexcCompiler(hfst::ImplementationType impl, bool withFlags, bool alignStrings);
       LexcCompiler& setVerbosity(unsigned int verbose);
-      void setOutputToConsole(bool);
       void print_output(const char * str);
       LexcCompiler& parse(const char* filename);
       LexcCompiler& parse_line(std::string line);
@@ -1701,7 +1695,6 @@ namespace xfst {
     public:
       XfstCompiler();
       XfstCompiler(hfst::ImplementationType impl);
-      XfstCompiler& setOutputToConsole(bool value);
       XfstCompiler& setReadInteractiveTextFromStdin(bool Value);
       XfstCompiler& setReadline(bool value);
       XfstCompiler& setVerbosity(bool verbosity);
