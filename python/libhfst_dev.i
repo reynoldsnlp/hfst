@@ -1713,7 +1713,7 @@ namespace xfst {
 // internal functions
 
 std::string hfst::get_hfst_sfst_output();
-hfst::HfstTransducer * hfst::hfst_compile_sfst(const std::string & filename, const std::string & error_stream, bool verbose, bool output_to_console);
+hfst::HfstTransducer * hfst::hfst_compile_sfst(const std::string & filename, const std::string & error_stream, bool verbose);
 
 std::string hfst::one_level_paths_to_string(const HfstOneLevelPaths &, bool show_flags);
 std::string hfst::two_level_paths_to_string(const HfstTwoLevelPaths &);
