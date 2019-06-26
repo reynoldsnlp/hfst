@@ -51,10 +51,7 @@ namespace hfst { typedef std::vector<hfst::xeroxRules::Rule> HfstRuleVector; }
 namespace hfst { typedef std::pair<hfst::HfstTransducer*,unsigned int> HfstTransducerUIntPair; }
 
 // Most of C++ extension code is located in separate files.
-#include "hfst_regex_extensions.cpp"
 #include "hfst_extensions.cpp"
-#include "hfst_lexc_extensions.cpp"
-#include "hfst_xfst_extensions.cpp"
 #include "hfst_pmatch_extensions.cpp"
 #include "hfst_pmatch_tokenize_extensions.cpp"
 #include "hfst_sfst_extensions.cpp"
@@ -1681,8 +1678,6 @@ class XreCompiler
 };
 }
 
-// *** The LexcCompiler functions are offered only because they are needed in some python functions... *** //
-
 namespace lexc {
   class LexcCompiler
   {
@@ -1693,11 +1688,12 @@ namespace lexc {
       LexcCompiler& setVerbosity(unsigned int verbose);
       void setOutputToConsole(bool);
       void print_output(const char * str);
+      LexcCompiler& parse(const char* filename);
+      LexcCompiler& parse_line(std::string line);
+      hfst::HfstTransducer* compileLexical();
   };
 
 }
-
-// *** The XfstCompiler functions are offered only because they are needed in some python functions... *** //
 
 namespace xfst {
   class XfstCompiler
@@ -1718,34 +1714,10 @@ namespace xfst {
       XfstCompiler& apply_down(const char* indata);
       int parse_line(std::string line);
       bool quit_requested() const;
-%extend{
-%pythoncode %{
-
-  def parse(self, expression):
-      retval = _libhfst_dev.hfst_compile_xfst_to_string_one(self, expression)
-      from sys import stdout
-      stdout.write(_libhfst_dev.get_hfst_xfst_string_one())
-      return retval
-
-%}
-}
-
   };
 }
 
 // internal functions
-
-std::string hfst::get_hfst_regex_error_message();
-hfst::HfstTransducer * hfst::hfst_regex(hfst::xre::XreCompiler & comp, const std::string & regex_string, const std::string & error_stream);
-
-char * hfst::get_hfst_xfst_string_one();
-char * hfst::get_hfst_xfst_string_two();
-int hfst::hfst_compile_xfst_to_string_one(hfst::xfst::XfstCompiler & comp, std::string input);
-int hfst::hfst_compile_xfst(hfst::xfst::XfstCompiler & comp, std::string input, const std::string & output_stream, const std::string & error_stream);
-
-std::string hfst::get_hfst_lexc_output();
-hfst::HfstTransducer * hfst::hfst_compile_lexc_files(hfst::lexc::LexcCompiler & comp, const std::vector<std::string> & filenames, const std::string & error_stream);
-hfst::HfstTransducer * hfst::hfst_compile_lexc_script(hfst::lexc::LexcCompiler & comp, std::string script, const std::string & error_stream);
 
 std::string hfst::get_hfst_sfst_output();
 hfst::HfstTransducer * hfst::hfst_compile_sfst(const std::string & filename, const std::string & error_stream, bool verbose, bool output_to_console);

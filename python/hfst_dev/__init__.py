@@ -158,8 +158,9 @@ def start_xfst(**kwargs):
                   display(SVG(tr.view()._repr_svg_()))
                retval = 0
             else:
-               retval = libhfst_dev.hfst_compile_xfst_to_string_one(comp, expression)
-               stdout.write(libhfst_dev.get_hfst_xfst_string_one())
+               retval = comp.parse_line(expression);
+               #retval = libhfst_dev.hfst_compile_xfst_to_string_one(comp, expression)
+               #stdout.write(libhfst_dev.get_hfst_xfst_string_one())
         # at the moment, interactive commands are not supported
         else:
             # interactive command
@@ -346,13 +347,9 @@ def regex(re, **kwargs):
             else:
                 pass
 
-    if err == None:
-       return libhfst_dev.hfst_regex(comp, re, "")
-    else:
-       comp.set_verbosity(True)
-       retval = libhfst_dev.hfst_regex(comp, re, "")
-       err.write(unicode(libhfst_dev.get_hfst_regex_error_message(), 'utf-8'))
-       return retval
+    if err != None:
+        comp.set_verbosity(True)
+    return comp.compile(re)
 
 def _replace_symbols(symbol, epsilonstr=EPSILON):
     if symbol == epsilonstr:
@@ -803,9 +800,10 @@ def _compile_xfst(**kwargs):
       if verbosity > 1:
         output.write('File closed...')
 
-    retval=-1
-    retval = libhfst_dev.hfst_compile_xfst_to_string_one(xfstcomp, data)
-    output.write(unicode(libhfst_dev.get_hfst_xfst_string_one(), 'utf-8'))
+    retval = xfstcomp.parse_line(data);
+    #retval=-1
+    #retval = libhfst_dev.hfst_compile_xfst_to_string_one(xfstcomp, data)
+    #output.write(unicode(libhfst_dev.get_hfst_xfst_string_one(), 'utf-8'))
 
     if verbosity > 1:
       output.write('Parsed file with return value %i (0 indicating succesful parsing).' % retval)
@@ -1065,11 +1063,15 @@ def _compile_lexc(**kwargs):
 
     retval=-1
     if filenames == None:
-        retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "")
-        output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
+        retval = lexccomp.parse_line(script)
+        #retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "")
+        #output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
     else:
-        retval = libhfst_dev.hfst_compile_lexc_files(lexccomp, filenames, "")
-        output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
+        for filename in filenames:
+            lexccomp.parse(filename)
+        retval = lexccomp.compileLexical()
+        #retval = libhfst_dev.hfst_compile_lexc_files(lexccomp, filenames, "")
+        #output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
 
     return retval
 
