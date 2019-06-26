@@ -97,6 +97,7 @@ namespace std {
 %template(LocationVector) vector<hfst_ol::Location>;
 %template(LocationVectorVector) vector<vector<hfst_ol::Location> >;
 %template(FooBar) pair<int, string>;
+%template(HfstTransducerStringPair) pair<hfst::HfstTransducer*,string>;
 }
 
 
@@ -199,6 +200,7 @@ typedef std::pair<hfst::HfstTransducer, hfst::HfstTransducer> HfstTransducerPair
 typedef std::vector<std::pair<hfst::HfstTransducer, hfst::HfstTransducer> > HfstTransducerPairVector;
 typedef std::vector<hfst::xeroxRules::Rule> HfstRuleVector;
 typedef std::pair<hfst::HfstTransducer*,unsigned int> HfstTransducerUIntPair;
+typedef std::pair<hfst::HfstTransducer*,std::string> HfstTransducerStringPair;
 
 // *** Some enumerations *** //
 
@@ -1667,6 +1669,17 @@ class XreCompiler
     unsigned int c=0;
     hfst::HfstTransducer * result = self->compile_first(xre, c);
     return std::pair<hfst::HfstTransducer*, unsigned int>(result, c);
+  }
+  std::pair<hfst::HfstTransducer*,std::string> compile_iostream(const std::string & xre)
+  {
+    std::ostringstream os(std::ostringstream::ate);
+    self->set_error_stream(&os);
+    hfst::set_warning_stream(&os);
+    hfst::HfstTransducer * tr = self->compile(xre);
+    hfst::set_warning_stream(&std::cerr);
+    self->set_error_stream(NULL);
+    std::pair<hfst::HfstTransducer*,std::string> retval(tr,os.str());
+    return retval;
   }
 }
 

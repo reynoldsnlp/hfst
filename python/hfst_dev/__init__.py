@@ -184,8 +184,8 @@ def regex(re, **kwargs):
     * `kwargs` :
         Arguments recognized are: 'output' and 'definitions'.
     * `output` :
-        Where warnings and errors are printed. Possible values are sys.stdout,
-        sys.stderr (the default), a StringIO or None, indicating a quiet mode.
+        Where warnings and errors are printed. Possible values are sys.stderr
+        (the default), a StringIO or None, indicating a quiet mode.
     * `definitions` :
         A dictionary mapping variable names into transducers.
 
@@ -294,13 +294,13 @@ def regex(re, **kwargs):
     #   starts a comment until end of line    
     """
     type_ = get_default_fst_type()
-    import sys
-    err=sys.stderr
     defs=None
+    import sys
+    output=sys.stderr
 
     for k,v in kwargs.items():
       if k == 'output':
-          err=v
+          output=v;
       elif k == 'definitions':
           defs=v;
       else:
@@ -316,9 +316,13 @@ def regex(re, **kwargs):
             else:
                 pass
 
-    if err != None:
-        comp.set_verbosity(True)
-    return comp.compile(re)
+    comp.set_verbosity((output != None))
+    if 'StringIO' in str(type(output)):
+        retval = comp.compile_iostream(re)
+        output.write(retval[1])
+        return retval[0]
+    else:
+        return comp.compile(re)
 
 def _replace_symbols(symbol, epsilonstr=EPSILON):
     if symbol == epsilonstr:
