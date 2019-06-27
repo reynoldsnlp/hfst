@@ -445,7 +445,7 @@ void
 print_output(const char* format)
 {
 #ifdef PYTHON_BINDINGS
-  hfst::py_print_error(format, false);
+  hfst::py_print_stderr(format, false);
 #else
   std::cerr << format;
 #endif
@@ -460,7 +460,7 @@ error_at_current_token(int, int, const char* format)
 #ifdef PYTHON_BINDINGS
     std::ostringstream oss("");
     oss << leader << ": " << format << ": " << token << std::endl;
-    hfst::py_print_error(oss.str().c_str(), false);
+    hfst::py_print_stderr(oss.str().c_str(), false);
 #else
     std::cerr << leader << ": " << format << ": " << token << std::endl;
 #endif

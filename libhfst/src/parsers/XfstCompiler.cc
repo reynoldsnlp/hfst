@@ -87,13 +87,13 @@ using hfst::implementations::HfstTransition;
 #define CHECK_FILENAME(x) if (! this->check_filename(x)) { return *this; }
 
 #ifdef PYTHON_BINDINGS
-#define ERROR(x) { std::ostringstream oss(""); oss x; hfst::py_print_error(oss.str().c_str(),true); }
-#define OUTPUT(x) { std::ostringstream oss(""); oss x; hfst::py_print_output(oss.str().c_str(), true); }
-#define OUTPUT_LINE(x) { std::ostringstream oss(""); oss x; hfst::py_print_output(oss.str().c_str(), false); }
-#define OUTPUT_STRING(x) hfst::py_print_output(x.c_str(), false); }
-#define OUTPUT_END hfst::py_print_output("", true);
-#define EMPTY_STACK hfst::py_print_error("Empty stack.", true);
-#define PRINT_STREAM(X,Y) if (X == NULL) { hfst::py_print_output(Y.c_str(), false); } else { *X << Y; }
+#define ERROR(x) { std::ostringstream oss(""); oss x; hfst::py_print_stderr(oss.str().c_str(),true); }
+#define OUTPUT(x) { std::ostringstream oss(""); oss x; hfst::py_print_stdout(oss.str().c_str(), true); }
+#define OUTPUT_LINE(x) { std::ostringstream oss(""); oss x; hfst::py_print_stdout(oss.str().c_str(), false); }
+#define OUTPUT_STRING(x) { hfst::py_print_stdout(x.c_str(), false); }
+#define OUTPUT_END { hfst::py_print_stdout("", true); }
+#define EMPTY_STACK { hfst::py_print_stderr("Empty stack.", true); }
+#define PRINT_STREAM(X,Y) { if (X == NULL) { hfst::py_print_stdout(Y.c_str(), false); } else { *X << Y; } }
 #else
 #define ERROR(x) error() x << std::endl;
 #define OUTPUT(x) output() x << std::endl;

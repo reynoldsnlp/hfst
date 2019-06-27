@@ -1536,7 +1536,7 @@ void
 hxfsterror(const char* text)
 {
 #ifdef PYTHON_BINDINGS
-    hfst::xfst::print_error(text);
+    hfst::py_print_stderr(text);
 #else
     hfst::xfst::xfst_->error() << text << std::endl;
 #endif
