@@ -291,43 +291,43 @@ class XfstCompiler
   //! @brief Print random pair strings of language
   XfstCompiler& print_random_words(const char * name, unsigned int number, std::ofstream * ofstr);
   //! @brief Print name of top network
-  XfstCompiler& print_name(std::ostream * oss);
+  XfstCompiler& print_name(std::ofstream * ofstr);
   //! @brief View top network
   XfstCompiler& view_net();
   //! @brief Print network
-  XfstCompiler& print_net(std::ostream * oss);
+  XfstCompiler& print_net(std::ofstream * ofstr);
   //! @brief Print network named @a name
-  XfstCompiler& print_net(const char* name, std::ostream * oss);
+  XfstCompiler& print_net(const char* name, std::ofstream * ofstr);
   //! @brief Print properties of top network
-  XfstCompiler& print_properties(std::ostream * oss);
+  XfstCompiler& print_properties(std::ofstream * ofstr);
   //! @brief Print properties of network named @a name
-  XfstCompiler& print_properties(const char* name, std::ostream * oss);
+  XfstCompiler& print_properties(const char* name, std::ofstream * ofstr);
   //! @brief Print all symbols of network named @a name
-  XfstCompiler& print_sigma(const char* name, std::ostream * oss);
+  XfstCompiler& print_sigma(const char* name, std::ofstream * ofstr);
   //! @brief Print all symbols of network
-  XfstCompiler& print_sigma(std::ostream * oss, bool prompt=true);
+  XfstCompiler& print_sigma(std::ofstream * ofstr, bool prompt=true);
   //! @brief Print nnumber of symbols in network
-  XfstCompiler& print_sigma_count(std::ostream * oss);
+  XfstCompiler& print_sigma_count(std::ofstream * ofstr);
   //! @brief Print number of paths with all symbols on @a level
-  XfstCompiler& print_sigma_word_count(const char* level, std::ostream * oss);
+  XfstCompiler& print_sigma_word_count(const char* level, std::ofstream * ofstr);
   //! @brief Print number of paths with all symbols
-  XfstCompiler& print_sigma_word_count(std::ostream * oss);
+  XfstCompiler& print_sigma_word_count(std::ofstream * ofstr);
   //! @brief Print size of network named @a name
-  XfstCompiler& print_size(const char* name, std::ostream * oss);
+  XfstCompiler& print_size(const char* name, std::ofstream * ofstr);
   //! @brief Print size of top network
-  XfstCompiler& print_size(std::ostream * oss);
+  XfstCompiler& print_size(std::ofstream * ofstr);
   //! @brief Print all networks in stack
-  XfstCompiler& print_stack(std::ostream * oss);
+  XfstCompiler& print_stack(std::ofstream * ofstr);
   //! @brief Save @a name network in dot form in @a outfile
-  XfstCompiler& write_dot(const char* name, std::ostream * oss);
+  XfstCompiler& write_dot(const char* name, std::ofstream * ofstr);
   //! @brief Save top networks dot form in @a outfile
-  XfstCompiler& write_dot(std::ostream * oss);
+  XfstCompiler& write_dot(std::ofstream * ofstr);
   //! @brief Save top networks prolog form in @a outfile
-  XfstCompiler& write_prolog(std::ostream * oss);
+  XfstCompiler& write_prolog(std::ofstream * ofstr);
   //! @brief Save top networks spaced paths form in @a outfile
-  XfstCompiler& write_spaced(std::ostream * oss);
+  XfstCompiler& write_spaced(std::ofstream * ofstr);
   //! @brief Save top networks paths form in @a outfile
-  XfstCompiler& write_text(std::ostream * oss);
+  XfstCompiler& write_text(std::ofstream * ofstr);
   //! @brief Save function @a name in @a outfile
   //! @todo HFST does not support function macros in automata
   XfstCompiler& write_function(const char* name, const char* outfilename);
@@ -372,7 +372,7 @@ class XfstCompiler
   //! @brief Read a transducer in att format from file @a filename
   XfstCompiler& read_att_from_file(const char * filename);
   //! @brief Write top transducer in att format to @a outfile
-  XfstCompiler& write_att(std::ostream * oss);
+  XfstCompiler& write_att(std::ofstream * ofstr);
 
   //! @brief do some label pushing
   //! @todo HFST automata cannot push labels
@@ -614,7 +614,7 @@ class XfstCompiler
   //! @brief Print alphabet \a alpha to \a outfile. \a unknown and \a identity
   //! define whether these symbols occur in the transitions of the transducer
   //! whose alphabet we are printing.
-  void print_alphabet(const StringSet & alpha, bool unknown, bool identity, std::ostream * oss);
+  void print_alphabet(const StringSet & alpha, bool unknown, bool identity, std::ofstream * ofstr);
 
   void print_level
     (const std::vector<unsigned int> & whole_path,

@@ -3311,21 +3311,23 @@ namespace xfst {
     }
 
   XfstCompiler&
-  XfstCompiler::print_name(std::ostream * oss)
+  XfstCompiler::print_name(std::ofstream * ofstr)
     {
       GET_TOP(tmp);
 
+      std::ostringstream oss("");
       for (std::map<std::string, HfstTransducer*>::const_iterator it
              = names_.begin(); it != names_.end(); it++)
         {
           if (tmp == it->second)
             {
-              *oss << "Name " << it->first << std::endl;
+              oss << "Name " << it->first << std::endl;
               PROMPT_AND_RETURN_THIS;
             }
         }
 
-      *oss << "No name." << std::endl;
+      oss << "No name." << std::endl;
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -3411,19 +3413,21 @@ namespace xfst {
   }
 
   XfstCompiler&
-  XfstCompiler::print_net(std::ostream * oss)
+  XfstCompiler::print_net(std::ofstream * ofstr)
     {
       if (variables_["print-sigma"] == "ON")
         {
-          this->print_sigma(oss, false /*do not prompt*/);
+          this->print_sigma(ofstr, false /*do not prompt*/);
         }
       GET_TOP(tmp);
       HfstIterableTransducer basic(*tmp);
-      basic.write_in_xfst_format(*oss, variables_["print-weight"] == "ON");
+      std::ostringstream oss("");
+      basic.write_in_xfst_format(oss, variables_["print-weight"] == "ON");
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_net(const char* name, std::ostream * oss)
+  XfstCompiler::print_net(const char* name, std::ofstream * ofstr)
     {
       std::map<std::string,hfst::HfstTransducer*>::const_iterator it =
         definitions_.find(name);
@@ -3437,11 +3441,13 @@ namespace xfst {
           if (variables_["print-sigma"] == "ON")
             {
               stack_.push(it->second);
-              this->print_sigma(oss, false /*do not prompt*/);
+              this->print_sigma(ofstr, false /*do not prompt*/);
               stack_.pop();
             }
           HfstIterableTransducer basic(*(it->second));
-          basic.write_in_xfst_format(*oss, variables_["print-weight"] == "ON");
+	  std::ostringstream oss("");
+          basic.write_in_xfst_format(oss, variables_["print-weight"] == "ON");
+	  PRINT_STREAM(ofstr, oss.str());
           PROMPT_AND_RETURN_THIS;
         }
     }
@@ -3457,26 +3463,27 @@ namespace xfst {
 
   // LEAVE
   void XfstCompiler::print_alphabet
-  (const StringSet & alpha, bool unknown, bool identity, std::ostream * oss)
+  (const StringSet & alpha, bool unknown, bool identity, std::ofstream * ofstr)
   {
+    std::ostringstream oss("");
     unsigned int sigma_count=0;
-    *oss << "Sigma: ";
+    oss << "Sigma: ";
 
     if (variables_["print-foma-sigma"] == "ON")
       {
         if (unknown)
-          *oss << "?";
+          oss << "?";
         if (identity)
           {
             if (unknown)
-              *oss << ", ";
-            *oss << "@";
+              oss << ", ";
+            oss << "@";
           }
       }
     else // xfst-style sigma print
       {
         if (unknown || identity)
-          *oss << "?";
+          oss << "?";
       }
 
     bool first_symbol = true;
@@ -3485,19 +3492,20 @@ namespace xfst {
         if (! is_special_symbol(*it))
           {
             if (!first_symbol || unknown || identity)
-              *oss << ", ";
+              oss << ", ";
             if (*it == "?")
-              *oss << "\"?\"";
+              oss << "\"?\"";
             else if (*it == "@" && variables_["print-foma-sigma"] == "ON")
-              *oss << "\"@\"";
+              oss << "\"@\"";
             else
-              *oss << *it;
+              oss << *it;
             sigma_count++;
             first_symbol = false;
           }
       }
-    *oss << std::endl;
-    *oss << "Size: " << sigma_count << "." << std::endl;
+    oss << std::endl;
+    oss << "Size: " << sigma_count << "." << std::endl;
+    PRINT_STREAM(ofstr, oss.str());
   }
 
   static bool is_unknown_or_identity_used_in_transducer
@@ -3535,7 +3543,7 @@ namespace xfst {
 
   // todo: flags?
   XfstCompiler&
-  XfstCompiler::print_sigma(std::ostream * oss, bool prompt)
+  XfstCompiler::print_sigma(std::ofstream * ofstr, bool prompt)
     {
       GET_TOP(t);
       hfst::StringSet alpha = t->get_alphabet();
@@ -3545,58 +3553,63 @@ namespace xfst {
       bool identity = false;
       (void)is_unknown_or_identity_used_in_transducer(t, unknown, identity);
 
-      print_alphabet(alpha, unknown, identity, oss);
+      print_alphabet(alpha, unknown, identity, ofstr);
       if (prompt) {
         this->prompt(); }
       return *this;
     }
 
   XfstCompiler&
-  XfstCompiler::print_sigma(const char* /*name*/, std::ostream * oss)
+  XfstCompiler::print_sigma(const char* /*name*/, std::ofstream * ofstr)
     {
       ERROR(<< "missing print sigma");
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_sigma_count(std::ostream * oss)
+  XfstCompiler::print_sigma_count(std::ofstream * ofstr)
     {
       ERROR(<< "missing print sigma count");
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_sigma_word_count(const char* level, std::ostream * oss)
+  XfstCompiler::print_sigma_word_count(const char* level, std::ofstream * ofstr)
     {
       ERROR(<< "missing " << level << " sigma word count");
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_sigma_word_count(std::ostream * oss)
+  XfstCompiler::print_sigma_word_count(std::ofstream * ofstr)
     {
       ERROR(<< "missing sigma word count");
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_size(const char* name, std::ostream * oss)
+  XfstCompiler::print_size(const char* name, std::ofstream * ofstr)
     {
-      oss->width(10);
-      *oss << name << ": " << "? bytes. ? states, ? arcs, ? paths." << std::endl;
+      std::ostringstream oss("");
+      oss.width(10);
+      oss << name << ": " << "? bytes. ? states, ? arcs, ? paths." << std::endl;
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_size(std::ostream * oss)
+  XfstCompiler::print_size(std::ofstream * ofstr)
     {
-      *oss << "? bytes. ? states, ? arcs, ? paths." << std::endl;
+      std::ostringstream oss("");
+      oss << "? bytes. ? states, ? arcs, ? paths." << std::endl;
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_stack(std::ostream * oss)
+  XfstCompiler::print_stack(std::ofstream * ofstr)
     {
+      std::ostringstream oss("");
       stack<HfstTransducer*> tmp;
       int i = 0;
       while (!stack_.empty())
         {
-          oss->width(10);
-          *oss << i << ": ? bytes. ? states, ? arcs, ? paths." << std::endl;
+          oss.width(10);
+          oss << i << ": ? bytes. ? states, ? arcs, ? paths." << std::endl;
           tmp.push(stack_.top());
           stack_.pop();
           i++;
@@ -3606,10 +3619,11 @@ namespace xfst {
           stack_.push(tmp.top());
           tmp.pop();
         }
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::write_dot(std::ostream * oss)
+  XfstCompiler::write_dot(std::ofstream * ofstr)
     {
       if (stack_.size() < 1)
         {
@@ -3618,31 +3632,13 @@ namespace xfst {
           PROMPT_AND_RETURN_THIS;
         }
       GET_TOP(tmp);
-      hfst::print_dot(*oss, *tmp);
+      std::ostringstream oss("");
+      hfst::print_dot(oss, *tmp);
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::write_dot(const char* name, std::ostream * oss_)
-  {
-    if (stack_.size() < 1)
-      {
-        EMPTY_STACK;
-        xfst_lesser_fail();
-        PROMPT_AND_RETURN_THIS;
-      }
-    FILE * outfile = hfst::hfst_fopen(name, "wb");
-    if (outfile == NULL)
-      {
-        ERROR(<< "Could not open file " << name);
-        xfst_fail();
-        PROMPT_AND_RETURN_THIS;
-      }
-    GET_TOP(tmp);
-    hfst::print_dot(outfile, *tmp);
-    PROMPT_AND_RETURN_THIS;
-  }
-  XfstCompiler&
-  XfstCompiler::write_prolog(std::ostream * oss)
+  XfstCompiler::write_dot(const char * name, std::ofstream * ofstr)
     {
       if (stack_.size() < 1)
         {
@@ -3650,6 +3646,28 @@ namespace xfst {
           xfst_lesser_fail();
           PROMPT_AND_RETURN_THIS;
         }
+      std::map<std::string,hfst::HfstTransducer*>::const_iterator it =
+        definitions_.find(name);
+      if (it == definitions_.end())
+        {
+          ERROR(<< "no such defined network: '" << name << "'");
+          PROMPT_AND_RETURN_THIS;
+        }
+      std::ostringstream oss("");
+      hfst::print_dot(oss, *(it->second));
+      PRINT_STREAM(ofstr, oss.str());
+      PROMPT_AND_RETURN_THIS;
+    }
+  XfstCompiler&
+  XfstCompiler::write_prolog(std::ofstream * ofstr)
+    {
+      if (stack_.size() < 1)
+        {
+          EMPTY_STACK;
+          xfst_lesser_fail();
+          PROMPT_AND_RETURN_THIS;
+        }
+      std::ostringstream oss("");
       std::stack<hfst::HfstTransducer*> reverse_stack;
       while (stack_.size() != 0)
         {
@@ -3658,9 +3676,9 @@ namespace xfst {
           if (name == "")
             name = "NO_NAME";
           HfstIterableTransducer fsm(*tr);
-          fsm.write_in_prolog_format(*oss, name, variables_["print-weight"] == "ON");
+          fsm.write_in_prolog_format(oss, name, variables_["print-weight"] == "ON");
           if (stack_.size() != 1) // separator
-            *oss << std::endl;
+            oss << std::endl;
           reverse_stack.push(tr);
           stack_.pop();
         }
@@ -3670,16 +3688,17 @@ namespace xfst {
           stack_.push(tr);
           reverse_stack.pop();
         }
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::write_spaced(std::ostream * oss)
+  XfstCompiler::write_spaced(std::ofstream * ofstr)
     {
       ERROR(<< "missing write spaced");
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::write_text(std::ostream * oss)
+  XfstCompiler::write_text(std::ofstream * ofstr)
     {
       ERROR(<< "missing write text");
       PROMPT_AND_RETURN_THIS;
@@ -4406,7 +4425,7 @@ namespace xfst {
     }
 
   XfstCompiler&
-  XfstCompiler::print_properties(const char* /* name */, std::ostream * oss)
+  XfstCompiler::print_properties(const char* /* name */, std::ofstream * ofstr)
     {
       ERROR(<< "missing print properties");
       PROMPT_AND_RETURN_THIS;
@@ -5109,11 +5128,13 @@ namespace xfst {
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::write_att(std::ostream * oss)
+  XfstCompiler::write_att(std::ofstream * ofstr)
     {
       GET_TOP(tmp);
       HfstIterableTransducer fsm(*tmp);
-      fsm.write_in_att_format(*oss, variables_["print-weight"] == "ON");
+      std::ostringstream oss("");
+      fsm.write_in_att_format(oss, variables_["print-weight"] == "ON");
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
   const std::stack<HfstTransducer*>&
@@ -5199,7 +5220,7 @@ namespace xfst {
   }
   
   XfstCompiler&
-  XfstCompiler::print_properties(std::ostream * oss)
+  XfstCompiler::print_properties(std::ofstream * ofstr)
     {
       ERROR(<< "missing print properties");
       return *this;
@@ -5285,7 +5306,7 @@ namespace xfst {
           std::map<std::string,std::string>::const_iterator it = variables_.find("print-sigma");
           if (it != variables_.end() && it->second == "ON")
             {
-              (const_cast<XfstCompiler*>(this))->print_sigma(output_, false /* no prompt*/);
+              (const_cast<XfstCompiler*>(this))->print_sigma(NULL, false /* no prompt*/);
             }
         }
       return *this;
