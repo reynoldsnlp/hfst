@@ -117,7 +117,7 @@ def start_xfst(**kwargs):
         retval = -1
         if True:
             if (expression == "apply down" or expression == "apply up" or expression == "inspect" or expression == "inspect net"):
-               stdout.write(expression + ' not supported\n')
+               stdout.write('interactive command \'' + expression + '\' not supported\n')
                retval = 0
             # Viewing must be handled in python
             elif (expression == "view" or expression == "view net"):
@@ -132,8 +132,6 @@ def start_xfst(**kwargs):
                retval = 0
             else:
                retval = comp.parse_line(expression);
-               #retval = libhfst_dev.hfst_compile_xfst_to_string_one(comp, expression)
-               #stdout.write(libhfst_dev.get_hfst_xfst_string_one())
         # at the moment, interactive commands are not supported
         else:
             # interactive command
