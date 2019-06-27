@@ -268,28 +268,28 @@ class XfstCompiler
     (const hfst::HfstTransducer* transducer, hfst::HfstTwoLevelPaths& paths);
 
   //! @brief Print shortest string of network
-  XfstCompiler& print_shortest_string(std::ostream * oss);
+  XfstCompiler& print_shortest_string(std::ofstream * ofstr);
   //! @brief Print length of shortest string
-  XfstCompiler& print_shortest_string_size(std::ostream * oss);
+  XfstCompiler& print_shortest_string_size(std::ofstream * ofstr);
   //! @brief Print longest string in network
-  XfstCompiler& print_longest_string(std::ostream * oss);
+  XfstCompiler& print_longest_string(std::ofstream * ofstr);
   //! @brief Print length of longest string
-  XfstCompiler& print_longest_string_size(std::ostream * oss);
+  XfstCompiler& print_longest_string_size(std::ofstream * ofstr);
   //! @brief Print strings of lower language
   XfstCompiler& print_lower_words(const char * name, unsigned int number,
-                                  std::ostream * oss);
+                                  std::ofstream * ofstr);
   //! @brief Print random strings of lower language
-  XfstCompiler& print_random_lower(const char * name, unsigned int number, std::ostream * oss);
+  XfstCompiler& print_random_lower(const char * name, unsigned int number, std::ofstream * ofstr);
   //! @brief Print astrings of upper language
   XfstCompiler& print_upper_words(const char * name, unsigned int number,
-                                  std::ostream * oss);
+                                  std::ofstream * ofstr);
   //! @brief Print random strings of upper language
-  XfstCompiler& print_random_upper(const char * name, unsigned int number, std::ostream * oss);
+  XfstCompiler& print_random_upper(const char * name, unsigned int number, std::ofstream * ofstr);
   //! @brief Print pair strings of language
   XfstCompiler& print_words(const char * name, unsigned int number,
-                            std::ostream * oss);
+                            std::ofstream * ofstr);
   //! @brief Print random pair strings of language
-  XfstCompiler& print_random_words(const char * name, unsigned int number, std::ostream * oss);
+  XfstCompiler& print_random_words(const char * name, unsigned int number, std::ofstream * ofstr);
   //! @brief Print name of top network
   XfstCompiler& print_name(std::ostream * oss);
   //! @brief View top network
@@ -553,23 +553,23 @@ class XfstCompiler
   //! @brief Print \a n first paths (or all, if n is negative)
   //! from \a paths to \a outfile.
   bool print_paths(const hfst::HfstTwoLevelPaths &paths,
-                   std::ostream * oss = &std::cout, int n=-1);
+                   std::ostringstream & oss, int n=-1);
   //! @brief Print \a n first paths (or all, if n is negative)
   //! from \a paths to \a outfile.
   bool print_paths(const hfst::HfstOneLevelPaths &paths,
-                   std::ostream * oss = &std::cout, int n=-1);
+                   std::ostringstream & oss, int n=-1);
   // A method used by function print_longest_string_or_its_size.
   XfstCompiler& print_one_string_or_its_size
-    (std::ostream * oss, const HfstTwoLevelPaths & paths, const char * level, bool print_size);
+    (std::ostringstream & oss, const HfstTwoLevelPaths & paths, const char * level, bool print_size);
   //! @brief Print the longest string of topmost transducer in the stack
   //! (if print_size is false) or the size of that string (if print_size is true)
   //! to \a outfile.
-  XfstCompiler& print_longest_string_or_its_size(std::ostream * oss, bool print_size);
+  XfstCompiler& print_longest_string_or_its_size(std::ostringstream & oss, bool print_size);
   //! @brief Try to extract a maximum of \a number paths from topmost
   //! transducer in the stack and print them to \a outfile. \a level
   //! defines whether the input or output level is printed or both are printed.
   XfstCompiler& print_words(const char * name, unsigned int number,
-                            std::ostream * oss, Level level);
+                            std::ofstream * ofstr, Level level);
   //! @brief Read strings (with or without spaces between the symbols,
   //! as defined by \a spaces) from \a infile, disjunct them into
   //! a single transducer and push it to the stack.

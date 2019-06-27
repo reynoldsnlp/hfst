@@ -90,6 +90,7 @@ using hfst::implementations::HfstTransition;
 #define ERROR(x) { std::ostringstream oss(""); oss x; hfst::py_print_error(oss.str().c_str(),true); }
 #define OUTPUT(x) { std::ostringstream oss(""); oss x; hfst::py_print_output(oss.str().c_str(), true); }
 #define OUTPUT_LINE(x) { std::ostringstream oss(""); oss x; hfst::py_print_output(oss.str().c_str(), false); }
+#define OUTPUT_STRING(x) hfst::py_print_output(x.c_str(), false); }
 #define OUTPUT_END hfst::py_print_output("", true);
 #define EMPTY_STACK hfst::py_print_error("Empty stack.", true);
 #define PRINT_STREAM(X,Y) if (X == NULL) { hfst::py_print_output(Y.c_str(), false); } else { *X << Y; }
@@ -97,6 +98,7 @@ using hfst::implementations::HfstTransition;
 #define ERROR(x) error() x << std::endl;
 #define OUTPUT(x) output() x << std::endl;
 #define OUTPUT_LINE(x) output() x;
+#define OUTPUT_STRING(x) output() << x;
 #define OUTPUT_END output() << std::endl;
 #define EMPTY_STACK error() << "Empty stack." << std::endl;
 #define PRINT_STREAM(X,Y) if (X == NULL) { output() << Y; } else { *X << Y; }
@@ -533,11 +535,11 @@ namespace xfst {
   bool
   XfstCompiler::print_paths
   (const hfst::HfstOneLevelPaths &paths,
-   std::ostream * oss /* =cout */,
+   std::ostringstream & oss /* =cout */,
    int n /* = -1*/)
   {
     bool retval = false; // if anything was printed
-    oss->precision(get_precision());
+    oss.precision(get_precision());
 
     // go through at most n paths
     for (hfst::HfstOneLevelPaths::const_iterator it = paths.begin();
@@ -562,10 +564,10 @@ namespace xfst {
                 something_printed &&                  // not first symbol shown
                 strcmp(print_symbol, "") != 0)        // something to show
               {
-                *oss << " "; // hfst_fprintf(outfile, " ");
+                oss << " "; // hfst_fprintf(outfile, " ");
               }
 
-            *oss << std::string(print_symbol); // hfst_fprintf(outfile, "%s", print_symbol);
+            oss << std::string(print_symbol); // hfst_fprintf(outfile, "%s", print_symbol);
 
             if (strcmp(print_symbol, "") != 0) {
               something_printed = true;
@@ -578,10 +580,10 @@ namespace xfst {
           {
             //hfst_fprintf(outfile, "\t");
             //hfst_print_weight(outfile, it->first);
-            *oss << "\t" << std::fixed << it->first;
+            oss << "\t" << std::fixed << it->first;
           }
 
-        *oss << std::endl; // hfst_fprintf(outfile, "\n");
+        oss << std::endl; // hfst_fprintf(outfile, "\n");
         --n;
 
       } // at most n paths gone through
@@ -595,11 +597,11 @@ namespace xfst {
   bool
   XfstCompiler::print_paths
   (const hfst::HfstTwoLevelPaths &paths,
-   std::ostream * oss /* =cout */,
+   std::ostringstream & oss /* =cout */,
    int n /* = -1*/)
   {
     bool retval = false; // if anything was printed
-    oss->precision(get_precision());
+    oss.precision(get_precision());
 
     // go through at most n paths
     for (hfst::HfstTwoLevelPaths::const_iterator it = paths.begin();
@@ -628,10 +630,10 @@ namespace xfst {
                 something_printed &&                  // not first symbol shown
                 strcmp(print_symbol, "") != 0)        // something to show
               {
-                *oss << " "; // hfst_fprintf(outfile, " ");
+                oss << " "; // hfst_fprintf(outfile, " ");
               }
 
-            *oss << std::string(print_symbol); // hfst_fprintf(outfile, "%s", print_symbol);
+            oss << std::string(print_symbol); // hfst_fprintf(outfile, "%s", print_symbol);
 
             if (strcmp(print_symbol, "") != 0) {
               something_printed = true;
@@ -643,7 +645,7 @@ namespace xfst {
             if (strcmp(print_symbol, "") != 0 &&   // something to show
                 p->first != p->second)             // input and output symbols differ
               {
-                *oss << ":" << std::string(print_symbol); // hfst_fprintf(outfile, ":%s", print_symbol);
+                oss << ":" << std::string(print_symbol); // hfst_fprintf(outfile, ":%s", print_symbol);
               }
 
           } // path gone through
@@ -653,10 +655,10 @@ namespace xfst {
           {
             // hfst_fprintf(outfile, "\t");
             // hfst_print_weight(outfile, it->first);
-            *oss << "\t" << std::fixed << it->first;
+            oss << "\t" << std::fixed << it->first;
           }
 
-        *oss << std::endl; // hfst_fprintf(outfile, "\n");
+        oss << std::endl; // hfst_fprintf(outfile, "\n");
         --n;
 
       } // at most n paths gone through
@@ -718,20 +720,22 @@ namespace xfst {
 
         bool printed = false; // if anything was printed
 
+	std::ostringstream oss("");
         if (variables_["print-pairs"] == "OFF")
           {
             HfstOneLevelPaths paths = extract_output_paths(results);
-            printed = this->print_paths(paths, &output());
+            printed = this->print_paths(paths, oss);
           }
         else
           {
-            printed = this->print_paths(results, &output());
+            printed = this->print_paths(results, oss);
           }
 
         if (!printed)
           {
-            OUTPUT(<< "???");
+            oss << "???" << std::endl;
           }
+	OUTPUT_STRING(oss.str());
         return *this;
       }
 
@@ -759,13 +763,15 @@ namespace xfst {
           paths = t->lookup(std::string(token), cutoff);
         }
 
-        bool printed = this->print_paths(*paths, &output());
+	std::ostringstream oss("");
+        bool printed = this->print_paths(*paths, oss);
         if (!printed)
           {
-            OUTPUT(<< "???");
+            oss << "???" << std::endl;
           }
 
         delete paths;
+	OUTPUT_STRING(oss.str());
         return *this;
       }
 
@@ -2955,7 +2961,7 @@ namespace xfst {
   }
 
   XfstCompiler&
-  XfstCompiler::print_shortest_string(std::ostream * oss)
+  XfstCompiler::print_shortest_string(std::ofstream * ofstr)
     {
       GET_TOP(topmost);
 
@@ -2968,12 +2974,14 @@ namespace xfst {
         }
       else
         {
+	  std::ostringstream oss("");
           print_paths(paths, oss);
+	  PRINT_STREAM(ofstr, oss.str());
         }
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_shortest_string_size(std::ostream * oss)
+  XfstCompiler::print_shortest_string_size(std::ofstream * ofstr)
     {
       GET_TOP(topmost);
 
@@ -2984,7 +2992,9 @@ namespace xfst {
         OUTPUT(<< "transducer is empty");
       }
       else {
-        *oss << (int)(paths.begin()->second.size()) << std::endl;
+	std::ostringstream oss("");
+        oss << (int)(paths.begin()->second.size()) << std::endl;
+	PRINT_STREAM(ofstr, oss.str());
       }
       PROMPT_AND_RETURN_THIS;
     }
@@ -2992,14 +3002,14 @@ namespace xfst {
   // LEAVE
   XfstCompiler&
   XfstCompiler::print_one_string_or_its_size
-  (std::ostream * oss, const HfstTwoLevelPaths & paths, const char * level, bool print_size)
+  (std::ostringstream & oss, const HfstTwoLevelPaths & paths, const char * level, bool print_size)
   {
     assert(level != NULL);
-    *oss << std::string(level) << ": ";
+    oss << std::string(level) << ": ";
 
     if (print_size)
       {
-        *oss << (int)paths.begin()->second.size() << std::endl;
+        oss << (int)paths.begin()->second.size() << std::endl;
       }
     else
       {
@@ -3010,7 +3020,7 @@ namespace xfst {
 
   // LEAVE
   XfstCompiler&
-  XfstCompiler::print_longest_string_or_its_size(std::ostream * oss, bool print_size)
+  XfstCompiler::print_longest_string_or_its_size(std::ostringstream & oss, bool print_size)
   {
     GET_TOP(topmost);
 
@@ -3067,41 +3077,48 @@ namespace xfst {
       
       // print one longest string of the upper level, if not cyclic
       if (upper_is_cyclic) {
-        *oss << "Upper level is cyclic." << std::endl; }
+        oss << "Upper level is cyclic." << std::endl; }
       else {
         print_one_string_or_its_size(oss, paths_upper, "Upper", print_size); }
       
       // print one longest string of the lower level, if not cyclic
         if (lower_is_cyclic) {
-          *oss << "Lower level is cyclic." << std::endl; }
+          oss << "Lower level is cyclic." << std::endl; }
         else {
           print_one_string_or_its_size(oss, paths_lower, "Lower", print_size); }
     }
 
-    PROMPT_AND_RETURN_THIS;
+    return *this;
   }
 
   XfstCompiler&
-  XfstCompiler::print_longest_string(std::ostream * oss)
+  XfstCompiler::print_longest_string(std::ofstream * ofstr)
     {
-      return print_longest_string_or_its_size(oss, false);
+      std::ostringstream oss("");
+      print_longest_string_or_its_size(oss, false);
+      PRINT_STREAM(ofstr, oss.str());
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::print_longest_string_size(std::ostream * oss)
+  XfstCompiler::print_longest_string_size(std::ofstream * ofstr)
     {
-      return print_longest_string_or_its_size(oss, true);
+      std::ostringstream oss("");
+      print_longest_string_or_its_size(oss, true);
+      PRINT_STREAM(ofstr, oss.str());
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
   XfstCompiler::print_lower_words(const char * name, unsigned int number,
-                                  std::ostream * oss)
+                                  std::ofstream * ofstr)
     {
-      return print_words(name, number, oss, LOWER_LEVEL);
+      return print_words(name, number, ofstr, LOWER_LEVEL);
     }
   XfstCompiler&
-  XfstCompiler::print_random_lower(const char * name, unsigned int number, std::ostream * oss)
+  XfstCompiler::print_random_lower(const char * name, unsigned int number, std::ofstream * ofstr)
     {
+      std::ostringstream oss("");
       hfst::HfstTwoLevelPaths paths;
 
       HfstTransducer tmp(format_);
@@ -3118,7 +3135,8 @@ namespace xfst {
             = definitions_.find(name);
           if (it == definitions_.end())
             {
-              *oss << "no such definition '" << std::string(name) << "'" << std::endl;
+              oss << "no such definition '" << std::string(name) << "'" << std::endl;
+	      PRINT_STREAM(ofstr, oss.str());
               prompt();
               return *this;
             }
@@ -3131,17 +3149,19 @@ namespace xfst {
       tmp.output_project();
       tmp.extract_random_paths(paths, number);
       print_paths(paths, oss);
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::print_upper_words(const char * name, unsigned int number,
-                                  std::ostream * oss)
+                                  std::ofstream * ofstr)
     {
-      return print_words(name, number, oss, UPPER_LEVEL);
+      return print_words(name, number, ofstr, UPPER_LEVEL);
     }
   XfstCompiler&
-  XfstCompiler::print_random_upper(const char * name, unsigned int number, std::ostream * oss)
+  XfstCompiler::print_random_upper(const char * name, unsigned int number, std::ofstream * ofstr)
     {
+      std::ostringstream oss("");
       hfst::HfstTwoLevelPaths paths;
 
       HfstTransducer tmp(format_);
@@ -3158,7 +3178,8 @@ namespace xfst {
             = definitions_.find(name);
           if (it == definitions_.end())
             {
-              *oss << "no such definition '" << std::string(name) << std::endl;
+              oss << "no such definition '" << std::string(name) << std::endl;
+	      PRINT_STREAM(ofstr, oss.str());
               prompt();
               return *this;
             }
@@ -3171,21 +3192,23 @@ namespace xfst {
       tmp.input_project();
       tmp.extract_random_paths(paths, number);
       print_paths(paths, oss);
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
   XfstCompiler::print_words(const char * name, unsigned int number,
-                            std::ostream * oss)
+                            std::ofstream * ofstr)
   {
-    return print_words(name, number, oss, BOTH_LEVELS);
+    return print_words(name, number, ofstr, BOTH_LEVELS);
   }
 
   // LEAVE
   XfstCompiler&
   XfstCompiler::print_words(const char * name, unsigned int number,
-                            std::ostream * oss, Level level)
+                            std::ofstream * ofstr, Level level)
     {
+      std::ostringstream oss("");
       HfstTransducer temp(format_);
       if (name == NULL)
         {
@@ -3200,7 +3223,8 @@ namespace xfst {
             = definitions_.find(name);
           if (it == definitions_.end())
             {
-              *oss << "no such definition '" << std::string(name) << "'" << std::endl;
+              oss << "no such definition '" << std::string(name) << "'" << std::endl;
+	      PRINT_STREAM(ofstr, oss.str());
               prompt();
               return *this;
             }
@@ -3247,13 +3271,14 @@ namespace xfst {
         }
 
       print_paths(results, oss);
-
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::print_random_words(const char * name, unsigned int number, std::ostream * oss)
+  XfstCompiler::print_random_words(const char * name, unsigned int number, std::ofstream * ofstr)
     {
+      std::ostringstream oss("");
       const HfstTransducer * tmp = NULL;
       if (name == NULL)
         {
@@ -3267,7 +3292,8 @@ namespace xfst {
             = definitions_.find(name);
           if (it == definitions_.end())
             {
-              *oss << "no such definition '" << std::string(name) << "'" << std::endl;
+              oss << "no such definition '" << std::string(name) << "'" << std::endl;
+	      PRINT_STREAM(ofstr, oss.str());
               prompt();
               return *this;
             }
@@ -3280,6 +3306,7 @@ namespace xfst {
       hfst::HfstTwoLevelPaths paths;
       tmp->extract_random_paths(paths, number);
       print_paths(paths, oss);
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
 
