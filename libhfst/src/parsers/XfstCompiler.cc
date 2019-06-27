@@ -331,28 +331,6 @@ namespace xfst {
     return f;
   }
 
-  void XfstCompiler::set_error_stream(std::ostream & os)
-  {
-    error_ = &os;
-    //this->xre_.set_error_stream(this->error_);
-    //this->lexc_.set_error_stream(this->error_);
-  }
-
-  std::ostream & XfstCompiler::get_error_stream()
-  {
-    return *error_;
-  }
-
-  void XfstCompiler::set_output_stream(std::ostream & os)
-  {
-    output_ = &os;
-  }
-
-  std::ostream & XfstCompiler::get_output_stream()
-  {
-    return *output_;
-  }
-
   int XfstCompiler::get_precision()
   {
     std::istringstream iss(variables_["precision"]);

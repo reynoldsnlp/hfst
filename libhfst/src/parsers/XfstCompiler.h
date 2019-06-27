@@ -522,15 +522,6 @@ class XfstCompiler
   // For xfst parser.
   bool get_fail_flag() const;
 
-  /* Set the stream where error messages and warnings are printed. */
-  void set_error_stream(std::ostream & os);
-  /* Get the stream where error messages and warnings are printed. */
-  std::ostream & get_error_stream();
-  /* Set the stream where output is printed. */
-  void set_output_stream(std::ostream & os);
-  /* Get the stream where output is printed. */
-  std::ostream & get_output_stream();
-
   /* A wrapper around file close function. */
   int xfst_fclose(FILE * f, const char * name);
   /* A wrapper around file open function. */
