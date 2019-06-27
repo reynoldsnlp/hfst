@@ -92,12 +92,14 @@ using hfst::implementations::HfstTransition;
 #define OUTPUT_LINE(x) { std::ostringstream oss(""); oss x; hfst::py_print_output(oss.str().c_str(), false); }
 #define OUTPUT_END hfst::py_print_output("", true);
 #define EMPTY_STACK hfst::py_print_error("Empty stack.", true);
+#define PRINT_STREAM(X,Y) if (X == NULL) { hfst::py_print_output(Y.c_str(), false); } else { *X << Y; }
 #else
 #define ERROR(x) error() x << std::endl;
 #define OUTPUT(x) output() x << std::endl;
 #define OUTPUT_LINE(x) output() x;
 #define OUTPUT_END output() << std::endl;
 #define EMPTY_STACK error() << "Empty stack." << std::endl;
+#define PRINT_STREAM(X,Y) if (X == NULL) { output() << Y; } else { *X << Y; }
 #endif
 
 #define WEIGHT_PRECISION "5"
@@ -2689,63 +2691,68 @@ namespace xfst {
     }
   
   XfstCompiler&
-  XfstCompiler::print_aliases(std::ostream * oss)
+  XfstCompiler::print_aliases(std::ofstream * ofstr)
     {
+      std::ostringstream oss("");
       for (map<string,string>::const_iterator alias = aliases_.begin();
            alias != aliases_.end();
            ++alias)
         {
-          oss->width(10);
-          *oss << "alias " << alias->first << " " << alias->second;
+          oss.width(10);
+          oss << "alias " << alias->first << " " << alias->second;
         }
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
           
   XfstCompiler&
-  XfstCompiler::print_arc_count(const char* level, std::ostream * oss)
+  XfstCompiler::print_arc_count(const char* level, std::ofstream * ofstr)
     {
       ERROR(<< "missing " << level << " arc count");
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::print_arc_count(std::ostream * oss)
+  XfstCompiler::print_arc_count(std::ofstream * ofstr)
     {
       ERROR(<< "missing arc count");
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::print_defined(std::ostream * oss)
+  XfstCompiler::print_defined(std::ofstream * ofstr)
     {
+      std::ostringstream oss("");
       bool definitions = false;
       for (map<string,string>::const_iterator def
              = original_definitions_.begin(); def != original_definitions_.end();
            ++def)
         {
           definitions = true;
-          oss->width(10);
-          *oss << def->first << " " << def->second << std::endl;
+          oss.width(10);
+          oss << def->first << " " << def->second << std::endl;
         }
       if (!definitions)
-        *oss << "No defined symbols." << std::endl;
+        oss << "No defined symbols." << std::endl;
 
       definitions = false;
       for (map<string,string>::const_iterator func = original_function_definitions_.begin();
            func != original_function_definitions_.end(); func++)
         {
           definitions = true;
-          oss->width(10);
-          *oss << func->first << " " << func->second << std::endl;
+          oss.width(10);
+          oss << func->first << " " << func->second << std::endl;
         }
       if (!definitions)
-        *oss << "No function definitions." << std::endl;
+        oss << "No function definitions." << std::endl;
 
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::print_dir(const char* globdata, std::ostream * oss)
+  XfstCompiler::print_dir(const char* globdata, std::ofstream * ofstr)
     {
+      std::ostringstream oss("");
 #ifndef _WIN32
       glob_t globbuf;
 
@@ -2754,51 +2761,57 @@ namespace xfst {
         {
           for (unsigned int i = 0; i < globbuf.gl_pathc; i++)
             {
-              *oss << globbuf.gl_pathv[i] << std::endl;
+              oss << globbuf.gl_pathv[i] << std::endl;
             }
         }
       else
         {
-          *oss << "glob(" << globdata << ") = " << rv << std::endl;
+          oss << "glob(" << globdata << ") = " << rv << std::endl;
         }
 #else
       ERROR(<< "print dir not implemented for windows");
 #endif // WINDOWS
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::print_flags(std::ostream * oss)
+  XfstCompiler::print_flags(std::ofstream * ofstr)
     {
       ERROR(<< "missing print flags");
       PROMPT_AND_RETURN_THIS;
     }
   
   XfstCompiler&
-  XfstCompiler::print_labels(std::ostream * oss)
+  XfstCompiler::print_labels(std::ofstream * ofstr)
   {
     GET_TOP(topmost);
-    return this->print_labels(oss, topmost);
+    std::ostringstream oss("");
+    this->print_labels(oss, topmost);
+    PRINT_STREAM(ofstr, oss.str());
+    PROMPT_AND_RETURN_THIS;
   }
 
   XfstCompiler&
-  XfstCompiler::print_labels(const char* name, std::ostream * oss)
+  XfstCompiler::print_labels(const char* name, std::ofstream * ofstr)
     {
+      std::ostringstream oss("");
       std::map<std::string, HfstTransducer*>::const_iterator it
         = definitions_.find(name);
       if (it == definitions_.end())
         {
-          *oss << "no such definition '" << name << "'" << std::endl;
+          oss << "no such definition '" << name << "'" << std::endl;
         }
       else
         {
-          return this->print_labels(oss, it->second);
+          this->print_labels(oss, it->second);
         }
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::print_labels(std::ostream * oss, HfstTransducer* tr)
+  XfstCompiler::print_labels(std::ostringstream & ostr, HfstTransducer* tr)
     {
       std::set<std::pair<std::string, std::string> > label_set;
       HfstIterableTransducer fsm(*tr);
@@ -2815,31 +2828,31 @@ namespace xfst {
             }
         }
         
-      *oss << "Labels: ";
+      ostr << "Labels: ";
 
       for(std::set<std::pair<std::string, std::string> >::const_iterator it
             = label_set.begin(); it != label_set.end(); it++)
         {
           if (it != label_set.begin())
-            *oss << ", ";
-          *oss << it->first;
+            ostr << ", ";
+          ostr << it->first;
           if (it->first != it->second)
-            *oss << ":" << it->second;
+            ostr << ":" << it->second;
         }
-      *oss << std::endl;
-      *oss << "Size: " << (int)label_set.size() << std::endl;
+      ostr << std::endl;
+      ostr << "Size: " << (int)label_set.size() << std::endl;
 
-      PROMPT_AND_RETURN_THIS;
+      return *this;
     }
   XfstCompiler&
-  XfstCompiler::print_labelmaps(std::ostream * oss)
+  XfstCompiler::print_labelmaps(std::ofstream * ofstr)
     {
       ERROR(<< "missing label-maps");
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::print_label_count(std::ostream * oss)
+  XfstCompiler::print_label_count(std::ofstream * ofstr)
     {
     GET_TOP(topmost);
 
@@ -2858,68 +2871,77 @@ namespace xfst {
             }
         }
 
+      std::ostringstream oss("");
       unsigned int index=1;
       for(std::map<std::pair<std::string, std::string>, unsigned int >::const_iterator
             it= label_map.begin(); it != label_map.end(); it++)
         {
           if (it != label_map.begin())
-            *oss << "   ";
-          *oss << index << ". ";
-          *oss << it->first.first;
+            oss << "   ";
+          oss << index << ". ";
+          oss << it->first.first;
           if (it->first.first != it->first.second)
-            *oss << ":" << it->first.second;
-          *oss << " " << it->second;
+            oss << ":" << it->first.second;
+          oss << " " << it->second;
           index++;
         }
-      *oss << std::endl;
+      oss << std::endl;
+
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::print_list(const char* name, std::ostream * oss)
+  XfstCompiler::print_list(const char* name, std::ofstream * ofstr)
     {
+      std::ostringstream oss("");
       if (lists_.find(name) == lists_.end())
         {
-          *oss << "No such list defined: " << name << std::endl;
+          oss << "No such list defined: " << name << std::endl;
+	  PRINT_STREAM(ofstr, oss.str());
           PROMPT_AND_RETURN_THIS;
         }
       std::set<string> l = lists_[name];
-      oss->width(10);
-      *oss << name << ": ";
+      oss.width(10);
+      oss << name << ": ";
 
       for (std::set<string>::const_iterator s = l.begin();
            s != l.end();
            ++s)
         {
-          *oss << *s << " ";
+          oss << *s << " ";
         }
-      *oss << std::endl;
+      oss << std::endl;
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::print_list(std::ostream * oss)
+  XfstCompiler::print_lists(std::ofstream * ofstr)
     {
+      std::ostringstream oss("");
       if (lists_.size() == 0)
         {
-          *oss << "No lists defined." << std::endl;
+          oss << "No lists defined." << std::endl;
+	  PRINT_STREAM(ofstr, oss.str());
           PROMPT_AND_RETURN_THIS;
         }
       for (map<string,std::set<string> >::const_iterator l = lists_.begin();
            l != lists_.end();
            ++l)
         {
-          oss->width(10);
-          *oss << l->first << " ";
+          oss.width(10);
+          oss << l->first << " ";
 
           for (std::set<string>::const_iterator s = l->second.begin();
                s != l->second.end();
                ++s)
             {
-              *oss << *s << " ";
+              oss << *s << " ";
             }
-          *oss << std::endl;
+          oss << std::endl;
         }
+      PRINT_STREAM(ofstr, oss.str());
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -4350,7 +4372,7 @@ namespace xfst {
     }
 
   XfstCompiler&
-  XfstCompiler::print_file_info(std::ostream * oss)
+  XfstCompiler::print_file_info(std::ofstream * ofstr)
     {
       ERROR(<< "file info not implemented (cf. summarize)");
       PROMPT_AND_RETURN_THIS;

@@ -235,34 +235,34 @@ class XfstCompiler
   XfstCompiler& substitute_symbol(const char* list, const char* target);
 
   //! @brief Print aliases
-  XfstCompiler& print_aliases(std::ostream * oss);
+  XfstCompiler& print_aliases(std::ofstream * ofstr);
   //! @brief Print arc count for @a level
-  XfstCompiler& print_arc_count(const char* level, std::ostream * oss);
+  XfstCompiler& print_arc_count(const char* level, std::ofstream * ofstr);
   //! @brief Print arc count
-  XfstCompiler& print_arc_count(std::ostream * oss);
+  XfstCompiler& print_arc_count(std::ofstream * ofstr);
   //! @brief Print definition
-  XfstCompiler& print_defined(std::ostream * oss);
+  XfstCompiler& print_defined(std::ofstream * ofstr);
   //! @brief Print directory contents
-  XfstCompiler& print_dir(const char* glob, std::ostream * oss);
+  XfstCompiler& print_dir(const char* glob, std::ofstream * ofstr);
   //! @brief Print file info
-  XfstCompiler& print_file_info(std::ostream * oss);
+  XfstCompiler& print_file_info(std::ofstream * ofstr);
   //! @brief Print flag diacritics
-  XfstCompiler& print_flags(std::ostream * oss);
+  XfstCompiler& print_flags(std::ofstream * ofstr);
 
-  XfstCompiler& print_labels(std::ostream * oss, HfstTransducer* tr);
+  XfstCompiler& print_labels(std::ostringstream & ostr, HfstTransducer* tr);
 
   //! @brief Print labels in network @a name
-  XfstCompiler& print_labels(const char* name, std::ostream * oss);
+  XfstCompiler& print_labels(const char* name, std::ofstream * ofstr);
   //! @brief Print labels
-  XfstCompiler& print_labels(std::ostream * oss);
+  XfstCompiler& print_labels(std::ofstream * ofstr);
   //! @brief Print label mappings
-  XfstCompiler& print_labelmaps(std::ostream * oss);
+  XfstCompiler& print_labelmaps(std::ofstream * ofstr);
   //! @brief Print label count
-  XfstCompiler& print_label_count(std::ostream * oss);
+  XfstCompiler& print_label_count(std::ofstream * ofstr);
   //! @brief Print list named @a name
-  XfstCompiler& print_list(const char* name, std::ostream * oss);
+  XfstCompiler& print_list(const char* name, std::ofstream * ofstr);
   //! @brief Print all lists
-  XfstCompiler& print_list(std::ostream * oss);
+  XfstCompiler& print_lists(std::ofstream * ofstr);
 
   XfstCompiler& shortest_string
     (const hfst::HfstTransducer* transducer, hfst::HfstTwoLevelPaths& paths);

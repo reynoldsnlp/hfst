@@ -594,13 +594,13 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             if (hfst::xfst::xfst_->check_filename($2))
             {
 	      std::ofstream oss($2);
-              hfst::xfst::xfst_->print_list(&oss);
+              hfst::xfst::xfst_->print_lists(&oss);
               oss.close();
 	    }
 	    CHECK;
        }
        | PRINT_LISTS END_COMMAND {
-            hfst::xfst::xfst_->print_list(NULL); CHECK;
+            hfst::xfst::xfst_->print_lists(NULL); CHECK;
        }
        | PRINT_LONGEST_STRING REDIRECT_OUT END_COMMAND {
             if (hfst::xfst::xfst_->check_filename($2))
