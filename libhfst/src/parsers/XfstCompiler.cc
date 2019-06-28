@@ -5031,7 +5031,7 @@ namespace xfst {
     else
       has_lexc_been_read_ = true;
 
-    lexc_.parse(infile);
+    lexc_.parse(infile, filename);
     t = lexc_.compileLexical();
 
     if (0 != fclose(infile))

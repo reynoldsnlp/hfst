@@ -57,7 +57,7 @@ class LexcCompiler
   void reset();
 
   //! @brief compile lexc description from @c infile into current compiler
-  LexcCompiler& parse(FILE* infile);
+  LexcCompiler& parse(FILE* infile, const char * filename=NULL);
 
   //! @brief compile lexc description from file @a filename into current
   //!        compiler.

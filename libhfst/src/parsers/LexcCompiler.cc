@@ -169,10 +169,14 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
       regexps_.clear();
     }
 
-LexcCompiler& LexcCompiler::parse(FILE* infile)
+    LexcCompiler& LexcCompiler::parse(FILE* infile, const char * filename/*=NULL*/)
 {
     lexc_ = this;
-    if (infile == stdin)
+    if (filename != NULL)
+      {
+	hfst::lexc::set_infile_name(filename);
+      }
+    else if (infile == stdin)
       {
         hfst::lexc::set_infile_name("<stdin>");
       }
