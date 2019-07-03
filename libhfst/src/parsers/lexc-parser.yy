@@ -393,12 +393,14 @@ LEXICON_LINE: ULSTRING LEXICON_NAME ';' {
                 free( $3);
               }
               | XEROX_REGEXP LEXICON_NAME ';' {
-                handle_regexp_entry($1, $2, "");
+                try { handle_regexp_entry($1, $2, ""); }
+		catch (const char *) { hlexcerror("Erroneous regexp entry"); YYABORT; }
                 free( $1);
                 free( $2);
               }
               | XEROX_REGEXP LEXICON_NAME ENTRY_GLOSS ';' {
-                handle_regexp_entry($1, $2, $3);
+                try { handle_regexp_entry($1, $2, $3); }
+		catch (const char *) { hlexcerror("Erroneous regexp entry"); YYABORT; }
                 free( $1);
                 free( $2);
                 free( $3);
