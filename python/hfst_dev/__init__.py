@@ -1023,7 +1023,8 @@ def _compile_lexc(**kwargs):
 
     retval=-1
     if filenames == None:
-        retval = lexccomp.parse_line(script)
+        lexccomp.parse_line(script)
+        retval = lexccomp.compileLexical()
         #retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "")
         #output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
     else:
