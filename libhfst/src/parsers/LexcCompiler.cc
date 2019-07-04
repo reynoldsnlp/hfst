@@ -86,7 +86,8 @@ LexcCompiler::LexcCompiler() :
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0),
-    parseErrors_(false)
+    parseErrors_(false),
+    firstLexicon(true)
 {
     xre_.set_expand_definitions(true);
     xre_.set_verbosity(!quiet_);
@@ -107,7 +108,8 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0),
-    parseErrors_(false)
+    parseErrors_(false),
+    firstLexicon(true)
 {
   tokenizer_.add_multichar_symbol(hfst::internal_epsilon);
     tokenizer_.add_multichar_symbol("@0@");
@@ -135,7 +137,8 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0),
-    parseErrors_(false)
+    parseErrors_(false),
+    firstLexicon(true)
 {
     tokenizer_.add_multichar_symbol(hfst::internal_epsilon);
     tokenizer_.add_multichar_symbol("@0@");
@@ -160,6 +163,7 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
       totalEntries_ = 0;
       currentEntries_ = 0;
       parseErrors_ = false;
+      firstLexicon = false;
       lexiconNames_.clear();
       noFlags_.clear();
       continuations_.clear();
@@ -742,7 +746,6 @@ LexcCompiler::addXreDefinition(const string& definition_name, const string& xre)
 LexcCompiler&
 LexcCompiler::setCurrentLexiconName(const string& lexiconName)
 {
-    static bool firstLexicon = true;
     currentLexiconName_ = lexiconName;
 
     if (!allow_multiple_sublexicon_definitions_)

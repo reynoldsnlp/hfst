@@ -170,6 +170,8 @@ class LexcCompiler
   size_t totalEntries_;
   size_t currentEntries_;
   bool parseErrors_;
+
+  bool firstLexicon;
 }
 ;
 
