@@ -40,7 +40,7 @@ XreCompiler::XreCompiler() :
     list_definitions_(),
     format_(hfst::TROPICAL_OPENFST_TYPE),
     verbose_(false)
-{}
+{ hfst::xre::cr=0; hfst::xre::lr=0; }
 
 XreCompiler::XreCompiler(hfst::ImplementationType impl) :
     definitions_(),
@@ -49,7 +49,7 @@ XreCompiler::XreCompiler(hfst::ImplementationType impl) :
     list_definitions_(),
     format_(impl),
     verbose_(false)
-{}
+{ hfst::xre::cr=0; hfst::xre::lr=0; }
 
     XreCompiler::XreCompiler(const struct XreConstructorArguments & args) :
     definitions_(args.definitions),
@@ -58,7 +58,7 @@ XreCompiler::XreCompiler(hfst::ImplementationType impl) :
     list_definitions_(args.list_definitions),
     format_(args.format),
     verbose_(false)
-{}
+{ hfst::xre::cr=0; hfst::xre::lr=0; }
 
     XreCompiler::~XreCompiler()
     {

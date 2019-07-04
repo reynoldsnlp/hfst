@@ -167,6 +167,7 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
       stringTries_.clear();
       stringVectors_.clear();
       regexps_.clear();
+      hfst::lexc::token_reset_positions();
     }
 
     LexcCompiler& LexcCompiler::parse(FILE* infile, const char * filename/*=NULL*/)
