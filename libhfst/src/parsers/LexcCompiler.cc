@@ -775,14 +775,14 @@ LexcCompiler::setCurrentLexiconName(const string& lexiconName)
     }
     else if ((!firstLexicon) && (lexiconName == "Root"))
     {
-      if (!quiet_) err << "Root is not first the first lexicon" << std::endl;
+      if (!quiet_) err << "Root is not the first lexicon" << std::endl;
         setInitialLexiconName(lexiconName);
     }
-    if (!firstLexicon && !quiet_)
+    if (!firstLexicon && verbose_)
     {
       err << currentEntries_ << " ";
     }
-    if (!quiet_) err << lexiconName << "...";
+    if (verbose_) err << lexiconName << "...";
     firstLexicon = false;
 
     hfst::lexc::print_output(err.str().c_str());

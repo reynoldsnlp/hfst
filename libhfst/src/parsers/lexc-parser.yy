@@ -422,8 +422,11 @@ int hlexcparse(void);
 void
 hlexcerror(const char* text)
 {
+  if (! hfst::lexc::lexc_->isQuiet())
+  {
     hfst::lexc::error_at_current_token(0, 0, text);
     hlexcnerrs++;
+  }
 }
 
 // vim: set ft=yacc:
