@@ -73,6 +73,8 @@ class XreCompiler
   // ...
   ~XreCompiler();
 
+  void reset_linecount();
+
   //! @brief Add a definition macro.
   //!        Compilers will replace arcs labeled @a name, with the transducer
   //!        defined by @a xre in later phases of compilation.

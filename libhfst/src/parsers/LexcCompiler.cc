@@ -90,6 +90,7 @@ LexcCompiler::LexcCompiler() :
 {
     xre_.set_expand_definitions(true);
     xre_.set_verbosity(!quiet_);
+    hfst::lexc::token_reset_positions();
 }
 
 LexcCompiler::LexcCompiler(ImplementationType impl) :
@@ -117,6 +118,7 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
     tokenizer_.add_multichar_symbol(joinerEncode(hash));
     xre_.set_expand_definitions(true);
     xre_.set_verbosity(!quiet_);
+    hfst::lexc::token_reset_positions();
 }
 
 LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignStrings) :
@@ -144,6 +146,7 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
     tokenizer_.add_multichar_symbol(joinerEncode(hash));
     xre_.set_expand_definitions(true);
     xre_.set_verbosity(!quiet_);
+    hfst::lexc::token_reset_positions();
 }
 
     void LexcCompiler::reset()
@@ -662,6 +665,7 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
     tokenizer_.add_multichar_symbol(encodedCont);
     //char* xre_encoded = hfst::xre::add_percents(encodedCont.c_str());
 
+    xre_.reset_linecount();
     HfstTransducer* newPaths = xre_.compile(regexp);
 
     if (newPaths == NULL) { throw("compiling regexp failed"); }

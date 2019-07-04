@@ -69,6 +69,12 @@ XreCompiler::XreCompiler(hfst::ImplementationType impl) :
         }
     }
 
+    void XreCompiler::reset_linecount()
+    {
+      hfst::xre::cr=0;
+      hfst::xre::lr=0;
+    }
+
     void XreCompiler::set_verbosity(bool verbose)
     {
       this->verbose_ = verbose;
