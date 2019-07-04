@@ -193,6 +193,7 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
         hfst::lexc::set_infile_name("<unnamed>");
       }
     hlexclex_destroy();
+    hfst::lexc::token_reset_positions();
     hlexcin = infile;
     hlexcparse();
     xre_.remove_defined_multichar_symbols();
@@ -212,6 +213,7 @@ LexcCompiler& LexcCompiler::parse(const char* filename)
 {
     lexc_ = this;
     hlexclex_destroy();
+    hfst::lexc::token_reset_positions();
     hfst::lexc::set_infile_name(filename);
     hlexcin = hfst::hfst_fopen(filename, "r");
     if (hlexcin == NULL)
@@ -235,6 +237,7 @@ LexcCompiler& LexcCompiler::parse_line(std::string line)
 {
   lexc_ = this;
   hlexclex_destroy();
+  hfst::lexc::token_reset_positions();
   hfst::lexc::set_infile_name("<unnamed>");
   hlexcin = NULL;
   char * line_ = strdup(line.c_str());
