@@ -180,6 +180,8 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
     LexcCompiler& LexcCompiler::parse(FILE* infile, const char * filename/*=NULL*/)
 {
     lexc_ = this;
+    hlexclex_destroy();
+    hfst::lexc::token_reset_positions();
     if (filename != NULL)
       {
 	hfst::lexc::set_infile_name(filename);
@@ -192,8 +194,6 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
       {
         hfst::lexc::set_infile_name("<unnamed>");
       }
-    hlexclex_destroy();
-    hfst::lexc::token_reset_positions();
     hlexcin = infile;
     hlexcparse();
     xre_.remove_defined_multichar_symbols();
