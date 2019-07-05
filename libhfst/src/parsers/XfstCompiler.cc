@@ -2135,30 +2135,30 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::show()
     {
-      std::ostringstream oss("");
+      std::ostringstream oss_("");
       for (map<string,string>::const_iterator var = variables_.begin();
            var != variables_.end();
            var++)
         {
 	  if (var->first == "copyright-owner")
             {
-              oss.width(20);
-              oss << var->first << ": " << var->second << std::endl;
+              oss_.width(20);
+              oss_ << var->first << ": " << var->second << std::endl;
               //hfst_fprintf(stderr, "%20s:        %s\n", var->first.c_str(),
               //          var->second.c_str());
             }
           else
             {
-              oss.width(20);
-              oss << var->first << ": ";
-              oss.width(6);
-              oss << var->second << ": " << variable_explanations_[var->first] << std::endl;
+              oss_.width(20);
+              oss_ << var->first << ": ";
+              oss_.width(6);
+	      oss_ << var->second << ": " << variable_explanations_[var->first] << std::endl;
               //  hfst_fprintf(stderr, "%20s:%6s: %s\n",
               //          var->first.c_str(), var->second.c_str(),
               //          variable_explanations_[var->first].c_str());
             }
         }
-      OUTPUT(<< oss.str());
+      OUTPUT(<< oss_.str());
       PROMPT_AND_RETURN_THIS;
     }
 
