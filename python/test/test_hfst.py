@@ -587,5 +587,5 @@ TR = hfst_dev.HfstTransducer(fsm)
 assert(TR.compare(tr))
 
 comp = hfst_dev.XfstCompiler()
-assert(comp.parse('regex föö:bär::0.5') == 0)
-assert(comp.parse('print net') == 0)
+assert(comp.parse_line('regex föö:bär::0.5') == 0)
+assert(comp.parse_line('print net') == 0)
