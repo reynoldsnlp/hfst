@@ -1494,13 +1494,6 @@ Parameters
     A python file where transducer is written.
 * `write_weights` :
     Whether weights are written.
-"""
-
-%feature("docstring") hfst::HfstTransducer::write_att
-"""
-
-Write the transducer in AT&T format to file *ofile*, *write_weights* defines
-whether weights are written.
 
 The fields in the resulting AT&T format are separated by tabulator characters.
 
@@ -1512,7 +1505,8 @@ If several transducers are written in the same file, they must be separated by a
 line of two consecutive hyphens \"--\", so that they will be read correctly by
 hfst.read_att.
 
-An example:
+Examples
+--------
 
      tr1 = hfst.regex('[foo:bar baz:0 \" \"]::0.3')
      tr2 = hfst.empty_fst()
@@ -1547,19 +1541,6 @@ Exceptions
 * `StreamIsClosedException` :
 
 See also: hfst.HfstOutputStream.write
-
-See also: hfst.HfstTransducer.__init__
-"""
-
-%feature("docstring") hfst::HfstTransducer::write_att
-"""
-
-Write the transducer in AT&T format to file named *filename*.
-
-*write_weights* defines whether weights are written.
-
-If the file exists, it is overwritten. If the file does not exist, it is
-created.
 """
 
 %feature("docstring") hfst::HfstTransducer::lookup
@@ -1594,45 +1575,29 @@ note: This function is implemented only for optimized lookup format
 %feature("docstring") hfst::HfstTransducer::__init__
 """
 
-Create an empty transducer.
+Create an HfstTransducer. Parameters (*args) can be defined in three ways:
 
-     tr = hfst.HfstTransducer()
-     assert(tr.compare(hfst.empty_fst()))
-"""
+Parameters (1)
+--------------
+(no parameters)
 
-%feature("docstring") hfst::HfstTransducer::__init__
-"""
+Create an empty HfstTransducer, i.e. a transducer with one non-final state, 0.
 
-Create a deep copy of HfstTransducer *another* or a transducer equivalent to
-HfstIterableTransducer *another*.
-
-Parameters
-----------
-* `another` :
+Parameters (2)
+--------------
+* `t (arg1)` :
     An HfstTransducer or HfstIterableTransducer.
 
-An example:
+Create an HfstTransducer equivalent to *t*.
 
-     tr1 = hfst.regex('foo bar foo')
-     tr2 = hfst.HfstTransducer(tr1)
-     tr2.substitute('foo','FOO')
-     tr1.concatenate(tr2)
-"""
-
-%feature("docstring") hfst::HfstTransducer::__init__
-"""
-
-Create an HFST transducer equivalent to HfstIterableTransducer *t*.
-
-The type of the created transducer is defined by *type*.
-
-Parameters
-----------
-* `t` :
+Parameters (3)
+--------------
+* `t (arg1)` :
     An HfstIterableTransducer.
-* `type` :
-    The type of the resulting transducer. If you want to use the default type,
-    you can just call hfst.HfstTransducer(fsm)
+* `type (arg2)` :
+    The type of the resulting transducer, ImplementationType.
+
+Create an HfstTransducer equivalent to *t* that has implementation type *type*.
 """
 
 %feature("docstring") hfst::HfstTransducer::insert_to_alphabet
@@ -1943,13 +1908,14 @@ A regular expression compiler.
 %feature("docstring") hfst::xre::XreCompiler::__init__
 """
 
-Construct compiler for OpenFst format (the default) transducers.
-"""
+Construct a regular expression compiler. The parameters (*args) are:
 
-%feature("docstring") hfst::xre::XreCompiler::__init__
-"""
+Parameters
+----------
+* `type (arg1, optional)` :
+    ImplementationType of the transducers produced by the compiler.
+    Defaults to hfst.get_default_fst_type().
 
-Create compiler for *impl* format transducers.
 """
 
 %feature("docstring") hfst::xre::XreCompiler::define_list
@@ -2143,15 +2109,6 @@ See also: SFST manual
 The same as replace_up, but matching is done on the output side of *mapping*.
 
 See also: replace_up SFST manual.
-"""
-
-%feature("docstring") hfst_rules::replace_down
-"""
-
-The same as replace_down(context, mapping, optional, alphabet) but *mapping* is
-performed in every context.
-
-See also: replace_up
 """
 
 %feature("docstring") hfst_rules::deep_restriction_and_coercion
@@ -2372,17 +2329,6 @@ Parameters
 Inversion of the replace_up and the result needs to be composed on the upper
 side of the input language.
 
-B <- A is the inversion of A -> B. *mapping* is performed in every context.
-
-See also: replace_up
-"""
-
-%feature("docstring") hfst_rules::left_replace_up
-"""
-
-Inversion of the replace_up and the result needs to be composed on the upper
-side of the input language.
-
 B <- A is the inversion of A -> B.
 
 See also: replace_up
@@ -2413,7 +2359,8 @@ Parameters
 * `context` :
     A pair of transducers where the first transducer defines the left context
     and the second transducer the right context. Both transducers must be
-    automata, i.e. map strings onto themselves.
+    automata, i.e. map strings onto themselves. *None* means that mapping will
+    be performed in every context.
 * `mapping` :
     The mapping (transducer) that the resulting transducer will perform in the
     context given in *context*.
@@ -2447,14 +2394,6 @@ Exceptions
 * `ContextTransducersAreNotAutomataException` :
 
 See also: SFST manual
-"""
-
-%feature("docstring") hfst_rules::replace_up
-"""
-
-The same as replace_up but *mapping* is performed in every context.
-
-See also: replace_up
 """
 
 %feature("docstring") hfst_rules::two_level_only_if
