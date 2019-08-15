@@ -70,28 +70,27 @@ Exceptions
 %feature("docstring") hfst::implementations::HfstIterableTransducer::__init__
 """
 
-Create a transducer with one initial state that has state number zero and is not
-a final state, i.e.
-
-create an empty transducer.
-
-     tr = hfst.HfstIterableTransducer()
-"""
-
-%feature("docstring") hfst::implementations::HfstIterableTransducer::__init__
-"""
-
-Create a transducer equivalent to *transducer*.
+Create an HfstIterableTransducer. The parameters (*args) are:
 
 Parameters
 ----------
-* `transducer` :
-    The transducer to be copied, hfst.HfstIterableTransducer or
-    hfst.HfstTransducer.
+* `transducer (arg1, optional)` :
+    The transducer to be copied, HfstIterableTransducer or HfstTransducer.
 
-     tr = hfst.regex('foo') # creates an HfstTransducer
-     TR = hfst.HfstIterableTransducer(tr)
-     TR2 = hfst.HfstIterableTransducer(TR)
+Examples
+--------
+
+# Create an HfstIterableTransducer with one initial state, 0, which is not
+# a final state, i.e. create an empty transducer:
+tr = hfst.HfstIterableTransducer()
+
+# Create an HfstTransducer equivalent to regex [f o o]
+tr = regex('[f o o]')
+# convert it to an HfstIterableTransducer
+tr1 = HfstIterableTransducer(tr)
+# and create a copy of it
+tr2 = HfstIterableTransducer(tr1)
+assert(tr1.compare(tr2))
 """
 
 %feature("docstring") hfst::implementations::HfstIterableTransducer::symbols_used
@@ -193,29 +192,26 @@ The biggest state number in use.
 %feature("docstring") hfst::implementations::HfstIterableTransducer::add_state
 """
 
-Add a new state to this transducer and return its number.
-
-Returns
--------
-The next (smallest) free state number.
-"""
-
-%feature("docstring") hfst::implementations::HfstIterableTransducer::add_state
-"""
-
-Add a state *s* to this graph.
+Add a state to this graph. The parameters (*args) are:
 
 Parameters
 ----------
-* `state` :
-    The number of the state to be added.
+* `state (arg1, optional)` :
+    The number of the state to be added. Defaults to the next (smallest) free state number.
 
 Returns
 -------
-*state*
+The number of state that was added.
 
-If the state already exists, it is not added again. All states with state number
-smaller than *s* are also added to the transducer if they did not exist before.
+If the state already exists, it is not added again. All states with a smaller
+state number are also added to the transducer if they did not exist before.
+
+Examples
+--------
+tr = HfstIterableTransducer()  # has one initial state, 0
+tr.add_state()  # adds state 1
+tr.add_state(5) # adds states 2, 3, 4 and 5
+tr.add_state()  # adds state 6
 """
 
 %feature("docstring") hfst::implementations::HfstIterableTransducer::write_att
@@ -351,48 +347,49 @@ invalidate the iteration. Iteration of states (e.g. with 'states') is possible.
 
 %feature("docstring") hfst::implementations::HfstIterableTransducer::add_transition
 """
+Add transition to a state. The parameters (*args) can be defined in two ways:
 
-Add a transition *transition* to state *state*, *add_symbols_to_alphabet*
-defines whether the transition symbols are added to the alphabet.
-
-Parameters
-----------
-* `state` :
+Parameters (1)
+--------------
+* `state (arg1)` :
     The number of the state where the transition is added. If it does not exist,
     it is created.
-* `transition` :
-    A hfst.HfstTransition that is added to *state*.
-* `add_symbols_to_alphabet` :
+* `transition (arg2)` :
+    An hfst.HfstTransition that is added to *state*.
+* `add_symbols_to_alphabet (arg3, optional)` :
     Whether the transition symbols are added to the alphabet of the transducer.
-    (In special cases this is not wanted.)
+    (In special cases this is not wanted.) Defaults to True.
 
-Note: Adding transitions during iteration (e.g. with 'transitions') will
-invalidate the iteration. Iteration of states (e.g. with 'states') is possible.
-"""
-
-%feature("docstring") hfst::implementations::HfstIterableTransducer::add_transition
-"""
-
-Add a transition from state *source* to state *target* with input symbol
-*input*, output symbol *output* and weight *weight*.
-
-Parameters
-----------
-* `source` :
+Parameters (2)
+--------------
+* `source (arg1)` :
     The number of the state where the transition is added. If it does not exist,
     it is created.
-* `target` :
+* `target (arg2)` :
     The number of the state where the transition leads. If it does not exist, it
     is created.
-* `input` :
+* `input (arg3)` :
     The input symbol of the transition.
-* `output` :
+* `output (arg4)` :
     The output symbol of the transition.
-* `weight` :
-    The weight of the transition.
+* `weight (arg5, optional)` :
+    The weight of the transition. Defaults to zero.
+* `add_symbols_to_alphabet (arg6, optional)` :
+    Whether the transition symbols are added to the alphabet of the transducer.
+    (In special cases this is not wanted.) Defaults to True.
 
 Note: Adding transitions during iteration (e.g. with 'transitions') will
 invalidate the iteration. Iteration of states (e.g. with 'states') is possible.
+
+Examples
+--------
+tr = HfstIterableTransducer()  # has one initial state, 0
+transition = HfstTransition(1, 'foo', 'bar', 0.5)
+tr.add_transition(0, transition)
+tr.add_transition(1, 2, 'Foo', 'Bar')
+tr.add_transition(1, 2, 'FOO', 'BAR', 0.3)
+tr.set_final_weight(2, 0.4)
+# tr now maps 'fooFooFOO' to 'barBarBAR' with weight 1.2.
 """
 
 %feature("docstring") hfst::implementations::HfstIterableTransducer::read_prolog
@@ -543,23 +540,39 @@ A tuple of HfstTransitions.
 %feature("docstring") hfst::implementations::HfstIterableTransducer::insert_freely
 """
 
-Insert freely any number of *symbol_pair* in the transducer with weight
-*weight*.
+Insert freely any number of transition or copy of a transducer.
+The parameters (*args) can be defined in two ways:
 
-Parameters
-----------
-* `symbol_pair` :
+Parameters (1)
+--------------
+* `symbol_pair (arg1)` :
     A string pair to be inserted.
-* `weight` :
-    The weight of the inserted symbol pair.
-"""
+* `weight (arg2, optional)` :
+    The weight of the inserted symbol pair. Defaults to zero.
 
-%feature("docstring") hfst::implementations::HfstIterableTransducer::insert_freely
-"""
+Parameters (2)
+--------------
+* `transducer (arg1)` :
+    An HfstIterableTransducer to be inserted.
 
-Insert freely any number of *transducer* in this transducer.
+Examples
+--------
 
-param transducer An HfstIterableTransducer to be inserted.
+# [foo:bar]
+tr = HfstIterableTransducer()
+tr.add_transition(0, 1, 'foo', 'bar')
+tr.set_final_weight(1, 0)
+
+# [BAZ::0.2]
+TR = HfstIterableTransducer()
+TR.add_transition(0, 1, 'BAZ', 'BAZ', 0.2)
+TR.set_final_weight(1, 0)
+
+# [[baz::0.1]* foo:bar [baz::0.1]*]
+tr.insert_freely(('baz', 'baz'), 0.1)
+
+# [[BAZ::0.2]* [baz::0.1]* foo:bar [baz::0.1]* [BAZ::0.2]*]
+tr.insert_freely(TR)
 """
 
 %feature("docstring") hfst::implementations::HfstIterableTransducer::write_xfst

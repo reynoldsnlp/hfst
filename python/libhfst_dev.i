@@ -64,7 +64,10 @@ namespace hfst { typedef std::pair<hfst::HfstTransducer*,unsigned int> HfstTrans
 %include <windows.h>
 #endif
 
+// Contains docstrings for functions and classes that are generated
+// from c++ by swig.
 %include "docstrings.i"
+// Extra code written with python is documented in this file.
 
 // Templates needed for conversion between c++ and python datatypes.
 //
@@ -1324,9 +1327,9 @@ class HfstIterableTransducer {
     return strdup(oss.str().c_str());
   }
 
-  void add_transition(HfstState source, HfstState target, std::string input, std::string output, float weight=0) {
+  void add_transition(HfstState source, HfstState target, std::string input, std::string output, float weight=0, bool add_symbols_to_alphabet=true) {
     hfst::implementations::HfstTransition tr(target, input, output, weight);
-    $self->add_transition(source, tr);
+    $self->add_transition(source, tr, add_symbols_to_alphabet);
   }
 
 %pythoncode %{
