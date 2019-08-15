@@ -24,12 +24,19 @@ namespace hfst_rules {
     StringPairSet alphabet_(alphabet);
     return hfst::rules::two_level_if_and_only_if(context_, mappings_, alphabet_);
   }
-  HfstTransducer replace_down(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  HfstTransducer replace_down(const HfstTransducerPair * context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
   {
-    hfst::HfstTransducerPair context_(context);
     hfst::HfstTransducer mapping_(mapping);
     StringPairSet alphabet_(alphabet);
-    return hfst::rules::replace_down(context_, mapping_, optional, alphabet_);
+    if (context == NULL)
+      {
+	return hfst::rules::replace_down(mapping_, optional, alphabet_);
+      }
+    else
+      {
+	hfst::HfstTransducerPair context_(*context);
+	return hfst::rules::replace_down(context_, mapping_, optional, alphabet_);
+      }
   }
   HfstTransducer replace_down_karttunen(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
   {
@@ -52,30 +59,33 @@ namespace hfst_rules {
     StringPairSet alphabet_(alphabet);
     return hfst::rules::replace_left(context_, mapping_, optional, alphabet_);
   }
-  HfstTransducer replace_up(const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  HfstTransducer replace_up(const HfstTransducerPair * context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
   {
     hfst::HfstTransducer mapping_(mapping);
     StringPairSet alphabet_(alphabet);
-    return hfst::rules::replace_up(mapping_, optional, alphabet_);
+    if (context == NULL)
+      {
+	return hfst::rules::replace_up(mapping_, optional, alphabet_);
+      }
+    else
+      {
+	hfst::HfstTransducerPair context_(*context);
+	return hfst::rules::replace_up(context_, mapping_, optional, alphabet_);
+      }
   }
-  HfstTransducer replace_down(const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  HfstTransducer left_replace_up(const HfstTransducerPair * context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
   {
     hfst::HfstTransducer mapping_(mapping);
     StringPairSet alphabet_(alphabet);
-    return hfst::rules::replace_down(mapping_, optional, alphabet_);
-  }
-  HfstTransducer left_replace_up(const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
-  {
-    hfst::HfstTransducer mapping_(mapping);
-    StringPairSet alphabet_(alphabet);
-    return hfst::rules::left_replace_up(mapping_, optional, alphabet_);
-  }
-  HfstTransducer left_replace_up(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
-  {
-    hfst::HfstTransducerPair context_(context);
-    hfst::HfstTransducer mapping_(mapping);
-    StringPairSet alphabet_(alphabet);
-    return hfst::rules::left_replace_up(context_, mapping_, optional, alphabet_);
+    if (context == NULL)
+      {
+	return hfst::rules::left_replace_up(mapping_, optional, alphabet_);
+      }
+    else
+      {
+	hfst::HfstTransducerPair context_(*context);
+	return hfst::rules::left_replace_up(context_, mapping_, optional, alphabet_);
+      }
   }
   HfstTransducer left_replace_down(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
   {
