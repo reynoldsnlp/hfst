@@ -57,38 +57,11 @@ FUNCTIONS
     subtract(transducers)
     tokenized_fst(arg, weight=0)
 
-DATA (ImplementationType and ReplaceType handle all cases except symbols?)
+DATA
 
     EPSILON = '@_EPSILON_SYMBOL_@'
-    ERROR_TYPE = 9
-    FOMA_TYPE = 3
-    HFST2_TYPE = 7
-    HFST_OLW_TYPE = 6
-    HFST_OL_TYPE = 5
     IDENTITY = '@_IDENTITY_SYMBOL_@'
-    LOG_OPENFST_TYPE = 2
-    REPL_DOWN = 1
-    REPL_LEFT = 3
-    REPL_RIGHT = 2
-    REPL_UP = 0
-    SFST_TYPE = 0
-    TROPICAL_OPENFST_TYPE = 1
     UNKNOWN = '@_UNKNOWN_SYMBOL_@'
-    UNSPECIFIED_TYPE = 8
-    XFSM_TYPE = 4
-
-STATIC FUNCTIONS?
-
-    # HfstIterableTransducer_read_binary_sfst_transducer(...)
-    # HfstTokenizer_check_utf8_correctness(...)
-    # HfstTokenizer_tokenize_space_separated(...)
-    # HfstTransducer_is_implementation_type_available(type)
-    # TwolcCompiler_compile_file_and_get_storable_rules(...)
-    # TwolcCompiler_compile_script_and_get_storable_rules(...)
-
-REDEFINED FUNCTIONS?
-
-    # unicode(s, c)
 
 """
 
