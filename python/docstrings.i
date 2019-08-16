@@ -2748,6 +2748,13 @@ Flag diacritics are of the form
      @[PNDRCU][.][A-Z]+([.][A-Z]+)?@
 """
 
+%feature("docstring") hfst::is_epsilon
+"""
+
+Whether symbol *symbol* is the epsilon, i.e. \"@_EPSILON_SYMBOL_@\".
+
+"""
+
 %feature("docstring") compile_xfst_file
 """
 
