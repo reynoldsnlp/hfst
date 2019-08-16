@@ -2025,8 +2025,7 @@ todo
 todo
 """
 
-// note: this function is offered as 'replace_left' in package hfst.xerox_rules
-%feature("docstring") hfst::xeroxRules::xerox_replace_left
+%feature("docstring") hfst::xeroxRules::replace_left
 """
 todo
 """
@@ -2056,8 +2055,7 @@ todo
 todo
 """
 
-// note: this function is offered as 'restriction' in package hfst.xerox_rules
-%feature("docstring") hfst::xeroxRules::xerox_restriction
+%feature("docstring") hfst::xeroxRules::restriction
 """
 todo
 """
