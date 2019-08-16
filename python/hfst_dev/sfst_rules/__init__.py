@@ -8,7 +8,6 @@ two_level_if_and_only_if, \
 replace_down, \
 replace_down_karttunen, \
 replace_right, \
-replace_left, \
 replace_up, \
 replace_down, \
 left_replace_up, \
@@ -17,7 +16,6 @@ left_replace_down, \
 left_replace_down_karttunen, \
 left_replace_left, \
 left_replace_right, \
-restriction, \
 coercion, \
 restriction_and_coercion, \
 surface_restriction, \
@@ -26,3 +24,8 @@ surface_restriction_and_coercion, \
 deep_restriction, \
 deep_coercion, \
 deep_restriction_and_coercion
+
+# these functions had to be renamed in the swig interface
+# to prevent name collision
+from libhfst_dev import sfst_replace_left as replace_left
+from libhfst_dev import sfst_restriction as restriction

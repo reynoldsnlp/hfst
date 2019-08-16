@@ -52,7 +52,7 @@ namespace hfst_rules {
     StringPairSet alphabet_(alphabet);
     return hfst::rules::replace_right(context_, mapping_, optional, alphabet_);
   }
-  HfstTransducer replace_left(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  HfstTransducer sfst_replace_left(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
   {
     hfst::HfstTransducerPair context_(context);
     hfst::HfstTransducer mapping_(mapping);
@@ -115,7 +115,7 @@ namespace hfst_rules {
     StringPairSet alphabet_(alphabet);
     return hfst::rules::left_replace_right(context_, mapping_, optional, alphabet_);
   }
-  HfstTransducer restriction(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet)
+  HfstTransducer sfst_restriction(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet)
   {
     hfst::HfstTransducerPairVector contexts_(contexts);
     hfst::HfstTransducer mapping_(mapping);

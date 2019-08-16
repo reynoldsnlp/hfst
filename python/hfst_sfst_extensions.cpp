@@ -3,9 +3,9 @@ namespace hfst {
 // *** Wrapper variables for IOString outputs, TODO *** //
 
 std::string hfst_sfst_output("");
-std::string get_hfst_sfst_output() { return hfst::hfst_sfst_output; }
+std::string _get_hfst_sfst_output() { return hfst::hfst_sfst_output; }
   
-hfst::HfstTransducer * hfst_compile_sfst(const std::string & filename, const std::string & error_stream, bool verbose)
+hfst::HfstTransducer * _hfst_compile_sfst(const std::string & filename, const std::string & error_stream, bool verbose)
 {
   (void)error_stream;
 

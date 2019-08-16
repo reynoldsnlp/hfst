@@ -1,6 +1,6 @@
 namespace hfst {
 
-std::string one_level_paths_to_string(const hfst::HfstOneLevelPaths & paths, bool show_flags)
+std::string _one_level_paths_to_string(const hfst::HfstOneLevelPaths & paths, bool show_flags)
 {
     std::ostringstream oss;
     for(hfst::HfstOneLevelPaths::const_iterator it = paths.begin(); it != paths.end(); it++)
@@ -31,7 +31,7 @@ hfst::HfstOneLevelPaths extract_output_side(const hfst::HfstTwoLevelPaths & path
     return result;
 }
 
-std::string two_level_paths_to_string(const hfst::HfstTwoLevelPaths & paths)
+std::string _two_level_paths_to_string(const hfst::HfstTwoLevelPaths & paths)
 {
     std::ostringstream oss;
     for(hfst::HfstTwoLevelPaths::const_iterator it = paths.begin(); it != paths.end(); it++)

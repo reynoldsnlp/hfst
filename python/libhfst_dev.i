@@ -89,7 +89,7 @@ namespace std {
 %template(HfstSymbolSubstitutions) map<string, string>;
 %template(HfstSymbolPairSubstitutions) map<pair<string, string>, pair<string, string> >;
 // needed for HfstIterableTransducer.states()
-%template(BarBazFoo) vector<unsigned int>;
+%template(UIntVector) vector<unsigned int>;
 %template(HfstTransitions) vector<hfst::implementations::HfstTransition>;
 %template(HfstOneLevelPath) pair<float, vector<string> >;
 %template(HfstOneLevelPaths) set<pair<float, vector<string> > >;
@@ -101,7 +101,6 @@ namespace std {
 %template(HfstTransducerUIntPair) pair<hfst::HfstTransducer*,unsigned int>;
 %template(LocationVector) vector<hfst_ol::Location>;
 %template(LocationVectorVector) vector<vector<hfst_ol::Location> >;
-%template(FooBar) pair<int, string>;
 %template(HfstTransducerStringPair) pair<hfst::HfstTransducer*,string>;
 }
 
@@ -234,37 +233,35 @@ enum ImplementationType
     hfst::HfstTransducer replace(const Rule &rule, bool optional);
     // for parallel rules
     hfst::HfstTransducer replace(const HfstRuleVector &ruleVector, bool optional);
+
     // replace up, left, right, down
-%rename("xerox_replace_left") replace_left(const Rule &rule, bool optional);
     hfst::HfstTransducer replace_left(const Rule &rule, bool optional);
     // for parallel rules
-%rename("xerox_replace_left") replace_left(const HfstRuleVector &ruleVector, bool optional);
     hfst::HfstTransducer replace_left(const HfstRuleVector &ruleVector, bool optional);
+
     // left to right
     hfst::HfstTransducer replace_leftmost_longest_match(const Rule &rule);
-    // left to right
     hfst::HfstTransducer replace_leftmost_longest_match(const HfstRuleVector &ruleVector);
-    // right to left
-    hfst::HfstTransducer replace_rightmost_longest_match(const Rule &rule);
 
     // right to left
+    hfst::HfstTransducer replace_rightmost_longest_match(const Rule &rule);
     hfst::HfstTransducer replace_rightmost_longest_match(const HfstRuleVector &ruleVector);
 
     hfst::HfstTransducer replace_leftmost_shortest_match(const Rule &rule);
-
     hfst::HfstTransducer replace_leftmost_shortest_match(const HfstRuleVector &ruleVector);
+
     hfst::HfstTransducer replace_rightmost_shortest_match(const Rule &rule);
     hfst::HfstTransducer replace_rightmost_shortest_match(const HfstRuleVector &ruleVector);
 
     // replace up, left, right, down
     hfst::HfstTransducer replace_epenthesis(const Rule &rule, bool optional);
-    // replace up, left, right, down
     hfst::HfstTransducer replace_epenthesis(const HfstRuleVector &ruleVector, bool optional);
 
     // Restriction function "=>"
-%rename("xerox_restriction") restriction(const hfst::HfstTransducer &automata, const hfst::HfstTransducerPairVector &context);
     hfst::HfstTransducer restriction(const hfst::HfstTransducer &automata, const hfst::HfstTransducerPairVector &context);
+
     hfst::HfstTransducer before(const hfst::HfstTransducer &left, const hfst::HfstTransducer &right);
+
     hfst::HfstTransducer after(const hfst::HfstTransducer &left, const hfst::HfstTransducer &right);
 
   }
@@ -707,7 +704,7 @@ public:
          except:
             raise RuntimeError('Input argument must be string or tuple.')
       if output == 'text':
-         return one_level_paths_to_string(retval, show_flags)
+         return _one_level_paths_to_string(retval, show_flags)
       elif output == 'tuple':
          return _one_level_paths_to_tuple(retval, show_flags)
       else:
@@ -756,7 +753,7 @@ public:
       retval = self._extract_longest_paths(obey_flags)
 
       if output == 'text':
-         return two_level_paths_to_string(retval)
+         return _two_level_paths_to_string(retval)
       elif output == 'dict':
          return _two_level_paths_to_dict(retval)
       else:
@@ -793,7 +790,7 @@ public:
       retval = self._extract_shortest_paths()
 
       if output == 'text':
-         return two_level_paths_to_string(retval)
+         return _two_level_paths_to_string(retval)
       elif output == 'dict':
          return _two_level_paths_to_dict(retval)
       else:
@@ -936,7 +933,7 @@ public:
             retval=self._extract_paths(max_number, max_cycles)
 
       if output == 'text':
-         return two_level_paths_to_string(retval)
+         return _two_level_paths_to_string(retval)
       elif output == 'dict':
          return _two_level_paths_to_dict(retval)
       else:
@@ -1036,7 +1033,7 @@ public:
 
 // *** HfstOutputStream *** //
 
-hfst::HfstOutputStream * create_hfst_output_stream(const std::string & filename, hfst::ImplementationType type, bool hfst_format);
+hfst::HfstOutputStream * _create_hfst_output_stream(const std::string & filename, hfst::ImplementationType type, bool hfst_format);
 
 class HfstOutputStream
 {
@@ -1120,9 +1117,9 @@ def __init__(self, **kwargs):
         if k == 'type':
             type = v
     if filename == "":
-        self.this = _libhfst_dev.create_hfst_output_stream("", type, hfst_format)
+        self.this = _libhfst_dev._create_hfst_output_stream("", type, hfst_format)
     else:
-        self.this = _libhfst_dev.create_hfst_output_stream(filename, type, hfst_format)
+        self.this = _libhfst_dev._create_hfst_output_stream(filename, type, hfst_format)
 %}
 
 }
@@ -1244,7 +1241,6 @@ class HfstIterableTransducer {
     float get_final_weight(HfstState s) const throw(StateIsNotFinalException, StateIndexOutOfBoundsException);
     void set_final_weight(HfstState s, const float & weight);
     void remove_final_weight(HfstState s);
-%rename("_transitions") transitions(HfstState s);
     hfst::implementations::HfstTransitions & transitions(HfstState s);
     bool is_infinitely_ambiguous();
     bool is_lookup_infinitely_ambiguous(const StringVector & s);
@@ -1728,16 +1724,16 @@ namespace xfst {
 
 // internal functions
 
-std::string hfst::get_hfst_sfst_output();
-hfst::HfstTransducer * hfst::hfst_compile_sfst(const std::string & filename, const std::string & error_stream, bool verbose);
+std::string hfst::_get_hfst_sfst_output();
+hfst::HfstTransducer * hfst::_hfst_compile_sfst(const std::string & filename, const std::string & error_stream, bool verbose);
 
-std::string hfst::one_level_paths_to_string(const HfstOneLevelPaths &, bool show_flags);
-std::string hfst::two_level_paths_to_string(const HfstTwoLevelPaths &);
+std::string hfst::_one_level_paths_to_string(const HfstOneLevelPaths &, bool show_flags);
+std::string hfst::_two_level_paths_to_string(const HfstTwoLevelPaths &);
 
-bool parse_prolog_network_line(const std::string & line, hfst::implementations::HfstIterableTransducer * graph);
-bool parse_prolog_arc_line(const std::string & line, hfst::implementations::HfstIterableTransducer * graph);
-bool parse_prolog_symbol_line(const std::string & line, hfst::implementations::HfstIterableTransducer * graph);
-bool parse_prolog_final_line(const std::string & line, hfst::implementations::HfstIterableTransducer * graph);
+bool _parse_prolog_network_line(const std::string & line, hfst::implementations::HfstIterableTransducer * graph);
+bool _parse_prolog_arc_line(const std::string & line, hfst::implementations::HfstIterableTransducer * graph);
+bool _parse_prolog_symbol_line(const std::string & line, hfst::implementations::HfstIterableTransducer * graph);
+bool _parse_prolog_final_line(const std::string & line, hfst::implementations::HfstIterableTransducer * graph);
 
 
 // fuctions visible under module hfst
@@ -1757,14 +1753,22 @@ namespace hfst_rules {
   HfstTransducer replace_down(const HfstTransducerPair * context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet);
   HfstTransducer replace_down_karttunen(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet);
   HfstTransducer replace_right(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet);
-  HfstTransducer replace_left(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet);
+
+  // rename to avoid name collision with sfst rules
+  //HfstTransducer replace_left(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet);
+  HfstTransducer sfst_replace_left(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet);
+
   HfstTransducer replace_up(const HfstTransducerPair * context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet);
   HfstTransducer left_replace_up(const HfstTransducerPair * context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet);
   HfstTransducer left_replace_down(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet);
   HfstTransducer left_replace_down_karttunen(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet);
   HfstTransducer left_replace_left(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet);
   HfstTransducer left_replace_right(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet);
-  HfstTransducer restriction(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet);
+
+  // rename to avoid name collision with sfst rules
+  //HfstTransducer restriction(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet);
+  HfstTransducer sfst_restriction(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet);
+
   HfstTransducer coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet);
   HfstTransducer restriction_and_coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet);
   HfstTransducer surface_restriction(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet);
@@ -1806,7 +1810,7 @@ namespace hfst {
 
 // hfst_pmatch_tokenize_extensions.cc
 namespace hfst {
-  std::string pmatch_get_tokenized_output(hfst_ol::PmatchContainer * cont,
+  std::string _pmatch_get_tokenized_output(hfst_ol::PmatchContainer * cont,
 					  const std::string & input_text,
 					  const std::string & output_format,
 					  int * max_weight_classes,
@@ -1817,10 +1821,10 @@ namespace hfst {
 					  bool verbose,
 					  float beam,
 					  bool tokenize_multichar);
-  hfst_ol::LocationVectorVector pmatch_locate(hfst_ol::PmatchContainer * cont,
+  hfst_ol::LocationVectorVector _pmatch_locate(hfst_ol::PmatchContainer * cont,
 					      const std::string & input,
 					      double time_cutoff = 0.0);
-  hfst_ol::LocationVectorVector pmatch_locate(hfst_ol::PmatchContainer * cont,
+  hfst_ol::LocationVectorVector _pmatch_locate(hfst_ol::PmatchContainer * cont,
 					      const std::string & input,
 					      double time_cutoff,
 					      float weight_cutoff);
@@ -1851,13 +1855,13 @@ namespace hfst_ol {
 	  hfst_ol::LocationVectorVector locate(const std::string & input,
 					       double time_cutoff = 0.0)
 	    {
-	      return hfst::pmatch_locate(self, input, time_cutoff);
+	      return hfst::_pmatch_locate(self, input, time_cutoff);
 	    };
 	  hfst_ol::LocationVectorVector locate(const std::string & input,
 					       double time_cutoff,
 					       float weight_cutoff)
 	    {
-	      return hfst::pmatch_locate(self, input, time_cutoff, weight_cutoff);
+	      return hfst::_pmatch_locate(self, input, time_cutoff, weight_cutoff);
 	    };
 %pythoncode %{
   def get_tokenized_output(self, input, **kwargs):
@@ -2469,7 +2473,7 @@ def read_prolog_transducer(f, linecount=[0]):
         else:
             break
 
-    if not libhfst_dev.parse_prolog_network_line(line, fsm):
+    if not libhfst_dev._parse_prolog_network_line(line, fsm):
         raise hfst_dev.exceptions.NotValidPrologFormatException(line,"",linecount[0] + linecount_)
 
     while(True):
@@ -2486,11 +2490,11 @@ def read_prolog_transducer(f, linecount=[0]):
             retval.set_name(fsm.name)
             linecount[0] = linecount[0] + linecount_
             return retval
-        if libhfst_dev.parse_prolog_arc_line(line, fsm):
+        if libhfst_dev._parse_prolog_arc_line(line, fsm):
             pass
-        elif libhfst_dev.parse_prolog_final_line(line, fsm):
+        elif libhfst_dev._parse_prolog_final_line(line, fsm):
             pass
-        elif libhfst_dev.parse_prolog_symbol_line(line, fsm):
+        elif libhfst_dev._parse_prolog_symbol_line(line, fsm):
             pass
         else:
             raise hfst_dev.exceptions.NotValidPrologFormatException(line,"",linecount[0] + linecount_)
@@ -2900,14 +2904,14 @@ def compile_sfst_file(filename, **kwargs):
     retval=None
     import sys
     if output == None:
-       retval = libhfst_dev.hfst_compile_sfst(filename, "", verbosity)
+       retval = libhfst_dev._hfst_compile_sfst(filename, "", verbosity)
     elif output == sys.stdout:
-       retval = libhfst_dev.hfst_compile_sfst(filename, "cout", verbosity)
+       retval = libhfst_dev._hfst_compile_sfst(filename, "cout", verbosity)
     elif output == sys.stderr:
-       retval = libhfst_dev.hfst_compile_sfst(filename, "cerr", verbosity)
+       retval = libhfst_dev._hfst_compile_sfst(filename, "cerr", verbosity)
     else:
-       retval = libhfst_dev.hfst_compile_sfst(filename, "", verbosity)
-       output.write(unicode(libhfst_dev.get_hfst_sfst_output(), 'utf-8'))
+       retval = libhfst_dev._hfst_compile_sfst(filename, "", verbosity)
+       output.write(unicode(libhfst_dev._get_hfst_sfst_output(), 'utf-8'))
 
     return retval
 

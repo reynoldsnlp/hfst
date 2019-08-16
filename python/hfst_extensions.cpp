@@ -19,7 +19,7 @@ namespace hfst {
   HfstTransducer * copy_hfst_transducer_from_basic_transducer(const hfst::implementations::HfstIterableTransducer & t) { return new HfstTransducer(t, type); }
   HfstTransducer * copy_hfst_transducer_from_basic_transducer(const hfst::implementations::HfstIterableTransducer & t, hfst::ImplementationType impl) { return new HfstTransducer(t, impl); }
 
-  hfst::HfstOutputStream * create_hfst_output_stream(const std::string & filename, hfst::ImplementationType type, bool hfst_format)
+  hfst::HfstOutputStream * _create_hfst_output_stream(const std::string & filename, hfst::ImplementationType type, bool hfst_format)
   {
     if (filename == "") { return new hfst::HfstOutputStream(type, hfst_format); }
     else { return new hfst::HfstOutputStream(filename, type, hfst_format); }
