@@ -2,7 +2,7 @@ language: cpp
 
 # let linux be Ubuntu 14.04 Trusty
 sudo: required
-dist: trusty
+dist: xenial
 
 os:
   - linux
