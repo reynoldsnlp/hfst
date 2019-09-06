@@ -121,3 +121,5 @@ from libhfst_dev import \
     EPSILON, \
     IDENTITY, \
     UNKNOWN
+
+__version__="3.15.0.9"
