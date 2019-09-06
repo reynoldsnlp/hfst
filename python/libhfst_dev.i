@@ -2473,7 +2473,7 @@ def read_prolog_transducer(f, linecount=[0]):
         else:
             break
 
-    if not libhfst_dev._parse_prolog_network_line(line, fsm):
+    if not _libhfst_dev._parse_prolog_network_line(line, fsm):
         raise hfst_dev.exceptions.NotValidPrologFormatException(line,"",linecount[0] + linecount_)
 
     while(True):
@@ -2490,11 +2490,11 @@ def read_prolog_transducer(f, linecount=[0]):
             retval.set_name(fsm.name)
             linecount[0] = linecount[0] + linecount_
             return retval
-        if libhfst_dev._parse_prolog_arc_line(line, fsm):
+        if _libhfst_dev._parse_prolog_arc_line(line, fsm):
             pass
-        elif libhfst_dev._parse_prolog_final_line(line, fsm):
+        elif _libhfst_dev._parse_prolog_final_line(line, fsm):
             pass
-        elif libhfst_dev._parse_prolog_symbol_line(line, fsm):
+        elif _libhfst_dev._parse_prolog_symbol_line(line, fsm):
             pass
         else:
             raise hfst_dev.exceptions.NotValidPrologFormatException(line,"",linecount[0] + linecount_)
@@ -2718,8 +2718,8 @@ def _compile_xfst(**kwargs):
 
     retval = xfstcomp.parse_line(data);
     #retval=-1
-    #retval = libhfst_dev.hfst_compile_xfst_to_string_one(xfstcomp, data)
-    #output.write(unicode(libhfst_dev.get_hfst_xfst_string_one(), 'utf-8'))
+    #retval = _libhfst_dev.hfst_compile_xfst_to_string_one(xfstcomp, data)
+    #output.write(unicode(_libhfst_dev.get_hfst_xfst_string_one(), 'utf-8'))
 
     if verbosity > 1:
       output.write('Parsed file with return value %i (0 indicating succesful parsing).' % retval)
@@ -2833,11 +2833,11 @@ def _compile_twolc(**kwargs):
             print('Warning: ignoring unknown argument %s.' % (k))
 
     if filename == None:
-        retval = libhfst_dev.TwolcCompiler.compile_script_and_get_storable_rules(script, silent, verbose,
+        retval = TwolcCompiler.compile_script_and_get_storable_rules(script, silent, verbose,
                                                     resolve_right_conflicts, resolve_left_conflicts,
                                                     implementation_type)
     else:
-        retval = libhfst_dev.TwolcCompiler.compile_file_and_get_storable_rules(filename, silent, verbose,
+        retval = TwolcCompiler.compile_file_and_get_storable_rules(filename, silent, verbose,
                                                     resolve_right_conflicts, resolve_left_conflicts,
                                                     implementation_type)
     return retval
@@ -2904,14 +2904,14 @@ def compile_sfst_file(filename, **kwargs):
     retval=None
     import sys
     if output == None:
-       retval = libhfst_dev._hfst_compile_sfst(filename, "", verbosity)
+       retval = _hfst_compile_sfst(filename, "", verbosity)
     elif output == sys.stdout:
        retval = libhfst_dev._hfst_compile_sfst(filename, "cout", verbosity)
     elif output == sys.stderr:
-       retval = libhfst_dev._hfst_compile_sfst(filename, "cerr", verbosity)
+       retval = _hfst_compile_sfst(filename, "cerr", verbosity)
     else:
-       retval = libhfst_dev._hfst_compile_sfst(filename, "", verbosity)
-       output.write(unicode(libhfst_dev._get_hfst_sfst_output(), 'utf-8'))
+       retval = _hfst_compile_sfst(filename, "", verbosity)
+       output.write(unicode(_get_hfst_sfst_output(), 'utf-8'))
 
     return retval
 
@@ -2974,14 +2974,14 @@ def _compile_lexc(**kwargs):
     if filenames == None:
         lexccomp.parse_line(script)
         retval = lexccomp.compileLexical()
-        #retval = libhfst_dev.hfst_compile_lexc_script(lexccomp, script, "")
-        #output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
+        #retval = hfst_compile_lexc_script(lexccomp, script, "")
+        #output.write(unicode(get_hfst_lexc_output(), 'utf-8'))
     else:
         for filename in filenames:
             lexccomp.parse(filename)
         retval = lexccomp.compileLexical()
-        #retval = libhfst_dev.hfst_compile_lexc_files(lexccomp, filenames, "")
-        #output.write(unicode(libhfst_dev.get_hfst_lexc_output(), 'utf-8'))
+        #retval = hfst_compile_lexc_files(lexccomp, filenames, "")
+        #output.write(unicode(get_hfst_lexc_output(), 'utf-8'))
 
     return retval
 
@@ -3208,7 +3208,7 @@ def fst_to_fsa(fst, separator=''):
     the transducer [f^b:f^b o^a:o^a o^r:o^r].
 
     """
-    encoded_symbols = libhfst_dev.StringSet()
+    encoded_symbols = StringSet()
     retval = hfst_dev.HfstIterableTransducer(fst)
     for state in retval.states():
         arcs = retval.transitions(state)
@@ -3270,7 +3270,7 @@ def fsa_to_fst(fsa, separator=''):
     will create again the original transducer [f:b o:a o:r].
     """
     retval = hfst_dev.HfstIterableTransducer(fsa)
-    encoded_symbols = libhfst_dev.StringSet()
+    encoded_symbols = StringSet()
     for state in retval.states():
         arcs = retval.transitions(state)
         for arc in arcs:
