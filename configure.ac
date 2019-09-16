@@ -745,6 +745,26 @@ AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul 
 
 AM_CONDITIONAL([WINDOWS], [test x$version_type = xwindows])
 
+# Python bindings
+AC_ARG_ENABLE([python-bindings],
+              AS_HELP_STRING([--enable-python-bindings],
+                             [build python bindings (default=disabled)]),
+              [enable_python_bindings=$enableval],
+              [enable_python_bindings=no])
+AM_CONDITIONAL([HAVE_PYTHON_BINDINGS], [test x$enable_python_bindings = xyes])
+
+if test "x$enable_python_bindings" = "xyes"
+then
+	AM_PATH_PYTHON([3.4], [], [AC_MSG_WARN([Can't generate SWIG wrapper without Python])])
+	AC_CONFIG_FILES([python/Makefile python/test/Makefile])
+
+	AC_ARG_VAR([PYTHON_INSTALL_PARAMS], [Parameters to pass to the Python 3 module install step])
+	if test "x$PYTHON_INSTALL_PARAMS" = "x"
+	then
+	  PYTHON_INSTALL_PARAMS="--prefix=\$(prefix) --root=\$(DESTDIR)/"
+	fi
+fi
+
 # Checks for system services
 
 # config files
@@ -775,8 +795,6 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 back-ends/foma/Makefile
 		 back-ends/sfst/Makefile
 		 man/Makefile
-		 python/Makefile
-		 python/test/Makefile
 		 scripts/Makefile])
 AC_CONFIG_FILES([scripts/hfst-foma-wrapper.sh], [chmod +x scripts/hfst-foma-wrapper.sh])
 AC_CONFIG_FILES([scripts/hfst-foma], [chmod +x scripts/hfst-foma])
@@ -874,6 +892,5 @@ AS_IF([test "x$enable_calculate" == "xno"],
       [AC_MSG_WARN([hfst-calculate is not enabled; you will not be able to compile SFST-PL scripts; enable using --enable-calculate])])
 AS_IF([test "x$enable_xfst" == "xno"],
       [AC_MSG_WARN([hfst-xfst is not enabled; you will not be able to compile XFST scripts; enable using --enable-xfst])])
-AC_MSG_WARN([Python bindings for HFST are not under autotools; see python/README for instructions about how to build and install them])
 AS_IF([test "$automake_version" \< "1.12"],
       [AC_MSG_WARN([automake version < 1.12; building parsers will fail unless you are building with pre-yacc-generated *.cc files and do not modify the *.yy source files])])

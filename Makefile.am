@@ -17,7 +17,11 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = back-ends libhfst tools test doc man scripts python
+SUBDIRS = back-ends libhfst tools test doc man scripts
+
+if HAVE_PYTHON_BINDINGS
+SUBDIRS += python
+endif
 
 # for external projects to use HFST from auto*
 m4dir=$(datadir)/aclocal
@@ -29,6 +33,7 @@ if CAN_DOXYGEN
 doxygen:
 	doxygen Doxyfile
 endif
+
 valgrind:
 	$(MAKE) -C libhfst/src/ valgrind
 	$(MAKE) -C test/tools/ valgrind
