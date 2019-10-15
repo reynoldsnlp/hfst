@@ -1198,7 +1198,7 @@ bool PmatchContainer::input_matches_at(unsigned int pos,
                                        SymbolNumberVector::iterator begin,
                                        SymbolNumberVector::iterator end)
 {
-    if (pos + (end - begin) > input.size()) {
+    if (pos + (end - begin) >= input.size()) {
         return false;
     }
     for (size_t i = 0; begin + i != end; ++i) {
