@@ -1,4 +1,56 @@
-7ab98be (HEAD -> master, origin/master, origin/HEAD) Small fixes noticed when compiling on windows.
+57dd2e1 (HEAD -> master, origin/master, origin/HEAD) Fix off-by-one bug in checking captures
+95ec868 Change Travis: ccache fails for Python bindings
+dee52b3 Put Python bindings under autotools via --enable-python-bindings
+356ddd3 (tag: v3.15.1) Fix Travis
+b456e6e Release 3.15.1; Python 2 -> 3; Trusty -> Xenial
+f1dc19a Handle all-space-forms in hfst-tokenize, cf. #443
+6a31890 HFST does not need nightly
+12a1695 EL7 has ICU 50
+5a25971 icu-config is gone in newer distros
+99e606b doh, switched upper/lower here
+7dbd2df test non-latin1 hfst-proc uppercasing
+1c8aa88 travis: test icu config too
+7d1f88f we need $(ICU_LIBS) here on mac
+c1a18f6 go back to icu-config since .pc isn't in old debians
+3fa86a8 Add $(ICU_LIBS) to LDADD to make it compile
+5f0c489 (origin/icu) no GLIB_CFLAGS/ICU_CFLAGS in hfst.pc
+0250e35 use pkg-config instead of icu-config (deprecated)
+490efdd implement icu handler in hfst-proc and hfst-pmatch2fst
+7ad603a real configure.ac check for icu
+16b1b38 Unicode support for pmatch casing functions, if available
+de22d58 Include glib headers if we have them to support unicode
+024c111 Fixes https://github.com/hfst/hfst/issues/429
+c2f13c6 Adjust spacing of help message to better fit in 80 columns
+ec14ee3 Fixes to help strings as per KP-2152
+a391124 Fix handling of DefInsed nets when precomputing allowed initial symbols
+368f15b Sort PROPtags so they appear in consistent order
+61413f6 Add tests
+d05a7b7 New version
+506337c Fix bug where finnish-tokenize was printing analyses too
+4f72bb2 Set PYTHONIOENCODING environment variable
+4c9ebad New package structure
+1b60168 Add throw specifiers to destructors, one inheriting the other
+d26cd6b hfst-tokenize: drop trailing zeroes (except first) off weights
+f09fc9b Also mention python 2.7.
+ae56dba Update pypi README.
+f06b5f3 Support python version 2 in tests.
+b89d26a Fix issue #409.
+c75708c Use hfst_commandline module in all python command line tools.
+72c97f5 Rewrite output stream processing.
+58f31fa Use module hfst_commandline for option parsing.
+b2d6386 Define functions for output stream handling as well as single input stream handling.
+49d3b33 Fix free parameter handling.
+8993896 Use hfst_commandline module in all binary tools.
+91d1218 Make hfst-compose use hfst_commandline.
+0cb784d Handle input streams in a separate module.
+5be41fb Improve command line argument handling.
+701048a Rewrite comamnd line option processing.
+0e26ecf pmatch: Make sure @PMATCH_BACKTRACK@ is not treated as special symbol either
+e98973a Define encoding.
+9abdc7c Fix some things noticed when compiling with clang with c++11 disabled.
+dd4420a (tag: v3.15.0) Ready for release 3.15.0.
+ad30283 Do not print warnings.
+7ab98be Small fixes noticed when compiling on windows.
 a76e3c9 Ignore hfst-eliminate-flags
 1c8e521 pmatch: Make INPUT_MARK not special_symbols, so we can refer to it in pmscripts
 432203d When verbose, print what goes into Like() operations
@@ -32,7 +84,7 @@ a1eeead Fix typo
 630fd7b Merge branch 'pmatch-implode-explode-fixes'
 1afaca8 Make Implode() and Explode() allow symbol expansion
 ae00e6b Preserve empty lines; Flush
-f1ff773 (origin/pmatch-implode-explode-fixes) Merge branch 'master' into pmatch-implode-explode-fixes
+f1ff773 Merge branch 'master' into pmatch-implode-explode-fixes
 295b126 Don't try to collect initial symbols if initial state is -1
 87e74a6 Merge branch 'master' of https://github.com/hfst/hfst
 01cfc9f Fix internal punctuation case

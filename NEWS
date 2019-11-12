@@ -5,6 +5,22 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.15.2
+----------------------------
+
+* Fix off-by-one bug in checking captures in pmatch
+
+
+Noteworthy changes in 3.15.1
+----------------------------
+
+* Fix issue #443
+
+* Fix issue #429
+
+* Fix issue #409
+
+
 Noteworthy changes in 3.15.0
 ----------------------------
 
