@@ -177,6 +177,18 @@ ProcTransducerAlphabet::ProcTransducerAlphabet(std::istream& is,
   calculate_caps();
   if(printDebuggingInformationFlag)
     print_table();
+
+  escaped_symbols.insert(symbolizer.find_symbol("["));
+  escaped_symbols.insert(symbolizer.find_symbol("]"));
+  escaped_symbols.insert(symbolizer.find_symbol("{"));
+  escaped_symbols.insert(symbolizer.find_symbol("}"));
+  escaped_symbols.insert(symbolizer.find_symbol("^"));
+  escaped_symbols.insert(symbolizer.find_symbol("$"));
+  escaped_symbols.insert(symbolizer.find_symbol("/"));
+  escaped_symbols.insert(symbolizer.find_symbol("\\"));
+  escaped_symbols.insert(symbolizer.find_symbol("@"));
+  escaped_symbols.insert(symbolizer.find_symbol("<"));
+  escaped_symbols.insert(symbolizer.find_symbol(">"));
 }
 
 void
@@ -614,10 +626,14 @@ ProcTransducerAlphabet::symbols_to_string(const SymbolNumberVector& symbols, Cap
   bool first=true;
   for(SymbolNumberVector::const_iterator it=symbols.begin(); it!=symbols.end(); it++, first=false)
   {
-    if(caps==UpperCase || (caps==FirstUpperCase && first==true))
-      str += symbol_to_string(to_upper(*it));
-    else
-      str += symbol_to_string(*it);
+      if(!is_tag(*it) && escaped_symbols.find(*it) != escaped_symbols.end()) {
+          str += "\\";
+      }
+      if(caps==UpperCase || (caps==FirstUpperCase && first==true)) {
+          str += symbol_to_string(to_upper(*it));
+      } else {
+          str += symbol_to_string(*it);
+      }
   }
   return str;
 }

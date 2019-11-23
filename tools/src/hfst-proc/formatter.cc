@@ -200,9 +200,9 @@ ApertiumOutputFormatter::process_finals(const LookupPathSet& finals, Capitalizat
   {
     std::ostringstream res;
     res << token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols(), caps);
-    if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
-      res << '~' << dynamic_cast<const LookupPathW*>(*it)->get_weight() << '~';
-
+    if (dynamic_cast<const LookupPathW *>(*it) != NULL && displayWeightsFlag) {
+      res << '~' << dynamic_cast<const LookupPathW *>(*it)->get_weight() << '~';
+    }
     results.push_back(res.str());
   }
   return results;

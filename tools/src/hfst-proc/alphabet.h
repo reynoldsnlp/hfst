@@ -15,6 +15,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_set>
 
 #include "hfst-proc.h"
 
@@ -142,6 +143,8 @@ class ProcTransducerAlphabet : public TransducerAlphabet
    * symbolic representation for a superblank block of text
    */
   SymbolNumber blank_symbol;
+
+  std::unordered_set<SymbolNumber> escaped_symbols;
     
   /**
    * Find the upper/lower-case equivalencies for the symbols in the table
