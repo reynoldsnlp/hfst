@@ -9,6 +9,14 @@
 
 #include "pmatch_tokenize.h"
 
+
+#if USE_ICU_UNICODE
+#include <unicode/unistr.h>
+#include <unicode/brkiter.h>
+static UErrorCode characterBoundaryStatus = U_ZERO_ERROR;
+static icu::BreakIterator* characterBoundary = icu::BreakIterator::createCharacterInstance(NULL, characterBoundaryStatus);
+#endif
+
 namespace hfst_ol_tokenize {
 
 using std::string;
@@ -21,7 +29,6 @@ using hfst_ol::LocationVectorVector;
 
 static const string subreading_separator = "#";
 static const string wtag = "W"; // TODO: cg-conv has an argument --wtag, allow changing here as well?
-
 
 void print_escaping_backslashes(std::string const & str, std::ostream & outstream)
 {
@@ -221,10 +228,20 @@ size_t u8_first_codepoint_size(const unsigned char* c) {
  * Since non-Multichar_symbols may still be multi*byte*, we check that
  * the symbol is strictly longer than the size of the first
  * possibly-multi-byte codepoint.
+ *
+ * If we have ICU, we check that the symbol is longer than the first
+ * "character" (so characters composed of multiple codepoints are
+ * treated the same as their non-composed counterparts).
  */
 bool is_cg_tag(const string & str) {
+#if USE_ICU_UNICODE
+    icu::UnicodeString us(str.c_str());
+    characterBoundary->setText(us);
+    return us.length() > characterBoundary->following(0);
+#else
     // Note: invalid codepoints are also treated as tags;  ¯\_(ツ)_/¯
     return str.size() > u8_first_codepoint_size((const unsigned char*)str.c_str());
+#endif
 }
 
 void print_cg_subreading(size_t const & indent,
