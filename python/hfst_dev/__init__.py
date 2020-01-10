@@ -122,4 +122,4 @@ from libhfst_dev import \
     IDENTITY, \
     UNKNOWN
 
-__version__="3.15.0.9"
+__version__="3.15.0.10"

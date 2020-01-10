@@ -356,7 +356,7 @@ libhfst_module = Extension('_libhfst_dev',
                            )
 
 setup(name = 'hfst-dev',
-      version = '3.15.0.9_beta',
+      version = '3.15.0.10_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',

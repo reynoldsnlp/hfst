@@ -128,6 +128,10 @@ if WANT_MINGW
   AM_CPPFLAGS += -I${top_srcdir}/back-ends/dlfcn -DWINDOWS
 endif
 
+#if WANT_PYTHON_BINDINGS
+AM_CPPFLAGS += -I${top_srcdir}/back-ends/pybind11/include -I/usr/include/python3.5m -DPYTHON_BINDINGS
+#endif
+
 # headers of parsers
 hfstincludedir = $(includedir)/hfst
 extincludedir = $(hfstincludedir)/parsers
