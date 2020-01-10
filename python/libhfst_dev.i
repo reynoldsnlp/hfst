@@ -1236,13 +1236,13 @@ class HfstIterableTransducer {
     float get_final_weight(HfstState s) const throw(StateIsNotFinalException, StateIndexOutOfBoundsException);
     void set_final_weight(HfstState s, const float & weight);
     void remove_final_weight(HfstState s);
-    hfst::implementations::HfstTransitions & transitions(HfstState s);
     bool is_infinitely_ambiguous();
     bool is_lookup_infinitely_ambiguous(const StringVector & s);
     int longest_path_size();
 
 %extend {
 
+    hfst::implementations::HfstTransitions & _transitions(HfstState s) { return self->transitions(s); } // 'transitions' will be defined later in pythoncode section
     void _substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true) { self->substitute_symbol(old_symbol, new_symbol, input_side, output_side); }
     void _substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair) { self->substitute_symbol_pair(old_symbol_pair, new_symbol_pair); }
     void _substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set) { self->substitute_symbol_pair_with_set(old_symbol_pair, new_symbol_pair_set); }
@@ -1926,7 +1926,7 @@ namespace hfst_ol {
             tokenize_multichar=v
          else:
             print('Warning: ignoring unknown argument %s.' % (k))
-      return pmatch_get_tokenized_output(self, input, output_format, max_weight_classes, dedupe, print_weights, print_all, time_cutoff, verbose, beam, tokenize_multichar)
+      return _pmatch_get_tokenized_output(self, input, output_format, max_weight_classes, dedupe, print_weights, print_all, time_cutoff, verbose, beam, tokenize_multichar)
 
   def tokenize(self, input):
       """
@@ -2308,7 +2308,7 @@ def read_att_string(att):
     for line in lines:
         linecount = linecount + 1
         if not _parse_att_line(line, fsm):
-           raise hfst_dev.exceptions.NotValidAttFormatException(line, "", linecount)
+           raise NotValidAttFormatException(line, "", linecount)
     return HfstTransducer(fsm, get_default_fst_type())
 
 def read_att_input():
@@ -2324,7 +2324,7 @@ def read_att_input():
            break
         linecount = linecount + 1
         if not _parse_att_line(line, fsm):
-           raise hfst_dev.exceptions.NotValidAttFormatException(line, "", linecount)
+           raise NotValidAttFormatException(line, "", linecount)
     return HfstTransducer(fsm, get_default_fst_type())
 
 def read_att_transducer(f, epsilonstr=EPSILON, linecount=[0]):
@@ -2339,7 +2339,7 @@ def read_att_transducer(f, epsilonstr=EPSILON, linecount=[0]):
         line = f.readline()
         if line == "":
            if linecount_ == 0:
-              raise hfst_dev.exceptions.EndOfStreamException("","",0)
+              raise EndOfStreamException("","",0)
            else:
               linecount_ = linecount_ + 1
               break
@@ -2347,7 +2347,7 @@ def read_att_transducer(f, epsilonstr=EPSILON, linecount=[0]):
         if line[0] == '-':
            break
         if not _parse_att_line(line, fsm, epsilonstr):
-           raise hfst_dev.exceptions.NotValidAttFormatException(line, "", linecount[0] + linecount_)
+           raise NotValidAttFormatException(line, "", linecount[0] + linecount_)
     linecount[0] = linecount[0] + linecount_
     return HfstTransducer(fsm, get_default_fst_type())
 
@@ -2426,7 +2426,7 @@ class AttReader:
           """
           try:
              return self.read()
-          except hfst_dev.exceptions.EndOfStreamException as e:
+          except EndOfStreamException as e:
              raise StopIteration
 
       def __next__(self):
@@ -2457,7 +2457,7 @@ def read_prolog_transducer(f, linecount=[0]):
         line = f.readline()
         linecount_ = linecount_ + 1
         if line == "":
-            raise hfst_dev.exceptions.EndOfStreamException("","",linecount[0] + linecount_)
+            raise EndOfStreamException("","",linecount[0] + linecount_)
         line = line.rstrip()
         if line == "":
             pass # allow extra prolog separator(s)
@@ -2467,7 +2467,7 @@ def read_prolog_transducer(f, linecount=[0]):
             break
 
     if not _libhfst_dev._parse_prolog_network_line(line, fsm):
-        raise hfst_dev.exceptions.NotValidPrologFormatException(line,"",linecount[0] + linecount_)
+        raise NotValidPrologFormatException(line,"",linecount[0] + linecount_)
 
     while(True):
         line = f.readline()
@@ -2490,7 +2490,7 @@ def read_prolog_transducer(f, linecount=[0]):
         elif _libhfst_dev._parse_prolog_symbol_line(line, fsm):
             pass
         else:
-            raise hfst_dev.exceptions.NotValidPrologFormatException(line,"",linecount[0] + linecount_)
+            raise NotValidPrologFormatException(line,"",linecount[0] + linecount_)
 
 class PrologReader:
       """
@@ -2563,7 +2563,7 @@ class PrologReader:
           """
           try:
              return self.read()
-          except hfst_dev.exceptions.EndOfStreamException as e:
+          except EndOfStreamException as e:
              raise StopIteration
 
       def __next__(self):
@@ -3202,13 +3202,13 @@ def fst_to_fsa(fst, separator=''):
 
     """
     encoded_symbols = StringSet()
-    retval = hfst_dev.HfstIterableTransducer(fst)
+    retval = HfstIterableTransducer(fst)
     for state in retval.states():
         arcs = retval.transitions(state)
         for arc in arcs:
             input = arc.get_input_symbol()
             output = arc.get_output_symbol()
-            if (input == output) and ((input == hfst_dev.EPSILON) or (input == hfst_dev.UNKNOWN) or (input == hfst_dev.IDENTITY)):
+            if (input == output) and ((input == EPSILON) or (input == UNKNOWN) or (input == IDENTITY)):
                 continue
             symbol = input + separator + output
             arc.set_input_symbol(symbol)
@@ -3216,7 +3216,7 @@ def fst_to_fsa(fst, separator=''):
             encoded_symbols.insert(symbol)
     retval.add_symbols_to_alphabet(encoded_symbols)
     if 'HfstTransducer' in str(type(fst)):
-        return hfst_dev.HfstTransducer(retval)
+        return HfstTransducer(retval)
     else:
         return retval
 
@@ -3262,7 +3262,7 @@ def fsa_to_fst(fsa, separator=''):
 
     will create again the original transducer [f:b o:a o:r].
     """
-    retval = hfst_dev.HfstIterableTransducer(fsa)
+    retval = HfstIterableTransducer(fsa)
     encoded_symbols = StringSet()
     for state in retval.states():
         arcs = retval.transitions(state)
@@ -3298,7 +3298,7 @@ def fsa_to_fst(fsa, separator=''):
                 encoded_symbols.insert(input)
     retval.remove_symbols_from_alphabet(encoded_symbols)
     if 'HfstTransducer' in str(type(fsa)):
-        return hfst_dev.HfstTransducer(retval)
+        return HfstTransducer(retval)
     else:
         return retval
 
