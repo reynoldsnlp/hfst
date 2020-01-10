@@ -11,7 +11,7 @@ of varying morphological complexity.
 Requirements
 ############
 
-We offer binary wheels for Linux and Mac OS X (and experimentally for Windows).
+We offer binary wheels for Linux and Mac OS X. Wheels for Windows are experimental.
 
 Wheels for Linux are compiled with a 64-bit docker image (quay.io/pypa/manylinux1_x86_64)
 for python versions 3.5, 3.6 and 3.7.
@@ -20,7 +20,7 @@ Wheels for Mac are compiled as universal binaries for python versions 3.5, 3.6 a
 OS X must be 10.7 or higher.
 
 Wheels for Windows are experimental. They are 32-bit and also require a 32-bit
-python to work correctly. They are available for python versions 3.5 and 3.6;
+python to work correctly. Wheels are available for python versions 3.5 and 3.6;
 earlier versions would need an older compiler that does not support C++11 features.
 Wheels for version 3.7. may be added to future releases.
 
