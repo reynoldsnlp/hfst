@@ -109,6 +109,7 @@ print_usage()
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out);
     fprintf(message_out,
+            "Pmatch options:\n"
             "  -n  --newline           Newline as input separator (default is blank line)\n"
             "  -x  --extract-patterns  Only print tagged parts in output\n"
             "  -l  --locate            Only print locations of matches\n"
