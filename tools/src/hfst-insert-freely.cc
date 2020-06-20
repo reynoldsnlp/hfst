@@ -48,12 +48,86 @@
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
+using hfst::StringPair;
 
 
 // add tools-specific variables here
-static string symbol_pair_str = "";
-hfst::StringPair symbol_pair;
+static char* label = 0;
 static bool harmonise_flags = false;
+static StringPair* symbol_pair = 0;
+
+
+// FMT: Copied from hfst-substitute.cc ... should probably go in a library function
+
+/**
+ * @brief parse string pair from arc label.
+ *
+ * @return new stringpair, or null if not a pair.
+ */
+static
+StringPair*
+label_to_stringpair(const char* label)
+  {
+    const char* colon = strchr(label, ':');
+    const char* endstr = strchr(label, '\0');
+    while (colon != NULL)
+      {
+        if (colon == label)
+          {
+            colon = strchr(colon + 1, ':');
+          }
+        else if (colon == (endstr - 1))
+          {
+            colon = 0;
+          }
+        else if (*(colon - 1) == '\\')
+          {
+            if (colon > (label + 1))
+              {
+                if (*(colon - 2) == '\\')
+                  {
+                    break;
+                  }
+                else
+                  {
+                    colon = strchr(colon + 1, ':');
+                  }
+              }
+          }
+        else
+          {
+            break;
+          }
+      }
+    char* first = 0;
+    char* second = 0;
+    if ((label < colon) && (colon < endstr))
+      {
+        first = hfst_strndup(label, colon-label);
+        second = hfst_strndup(colon + 1, endstr - colon - 1);
+      }
+    else
+      {
+        return NULL;
+      }
+
+    if (strcmp(first, "@0@") == 0)
+      {
+        free(first);
+        first = hfst_strdup(hfst::internal_epsilon.c_str());
+      }
+    if (strcmp(second, "@0@") == 0)
+      {
+        free(second);
+        second = hfst_strdup(hfst::internal_epsilon.c_str());
+      }
+
+    StringPair* rv = new StringPair(first, second);
+    free(first);
+    free(second);
+    return rv;
+  }
+
 
 void
 print_usage()
@@ -113,24 +187,20 @@ parse_options(int argc, char** argv)
           case 'a':
           { 
             // This will probably break for unicode
-            symbol_pair_str = string(optarg);
-            if(symbol_pair_str.length() == 1)
-            {
-              symbol_pair = hfst::StringPair(symbol_pair_str.c_str(), symbol_pair_str.c_str());
-            } 
-            else if(symbol_pair_str.length() == 3) 
-            {
-              // This is horrible, should be done differently
-              char a[2] = {0}; a[0] = symbol_pair_str[0];
-              char b[2] = {0}; b[0] = symbol_pair_str[2];
-              symbol_pair = hfst::StringPair(string(a),string(b));
-            }
-            else
-            { 
-              error(EXIT_FAILURE, 0, "%s is not a valid symbol pair",
-                    symbol_pair);
-              return EXIT_FAILURE;
-            }
+            label = hfst_strdup(optarg);
+            if (strcmp(label, "@0@") == 0)
+              {
+                free(label);
+                label = hfst_strdup(hfst::internal_epsilon.c_str());
+              }
+            symbol_pair = label_to_stringpair(label);
+            if (strlen(label) == 0)
+              {
+                error(EXIT_FAILURE, 0, "argument of source label option is "
+                      "empty;\n"
+                      "if you REALLY want to replace epsilons with something, "
+                      "use @0@ or %s", hfst::internal_epsilon.c_str());
+              }
             break;
           }
           case 'H':
@@ -169,7 +239,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 
 // StringPair("a", "a")
 
-          trans.insert_freely(symbol_pair, harmonise_flags);
+          trans.insert_freely(*symbol_pair, harmonise_flags);
           hfst_set_name(trans, trans, "insert-freely");
           hfst_set_formula(trans, trans, "Id");
         }
