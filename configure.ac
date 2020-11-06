@@ -329,6 +329,12 @@ AC_ARG_ENABLE([info],
 			  [enable_info=$enableval],
 			  [if test x$enable_no_tools != xno; then enable_info=no; else enable_info=yes; fi])
 AM_CONDITIONAL([WANT_INFO], [test x$enable_info != xno])
+AC_ARG_ENABLE([insert-freely],
+			  [AS_HELP_STRING([--enable-insert-freely],
+							  [build insert-freely tool @<:@default=yes@:>@])],
+			  [enable_insert_freely=$enableval],
+			  [if test x$enable_no_tools != xno; then enable_insert_freely=no; else enable_insert_freely=yes; fi])
+AM_CONDITIONAL([WANT_INSERT_FREELY], [test x$enable_insert_freely != xno])
 AC_ARG_ENABLE([invert],
 			  [AS_HELP_STRING([--enable-invert],
 							  [build invert tool @<:@default=yes@:>@])],
@@ -852,6 +858,7 @@ cat <<EOF
     *                 guess: $enable_guess
     *                 head: $enable_head
     *                 invert: $enable_invert
+    *                 insert-freely: $enable_insert_freely
     *                 lexc: $enable_lexc
     *                 lexc-wrapper: $enable_lexc_wrapper
     *                 lookup: $enable_lookup
