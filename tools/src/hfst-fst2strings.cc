@@ -98,15 +98,15 @@ print_usage()
 "  -S, --print-separator      print separator \"--\" after each transducer\n"
 "  -e, --epsilon-format=EPS   print epsilon as EPS\n"
 "  -X, --xfst=VARIABLE        toggle xfst compatibility option VARIABLE\n");
-    fprintf(message_out, "Ignore paths if:\n"
-"  -b, --beam=B               output string weight not within B from the weight\n"
-"                             of the best output string\n"
-"  -l, --max-in-length=MIL    input string longer than MIL\n"
-"  -L, --max-out-length=MOL   output string longer than MOL\n"
-"  -p, --in-prefix=OPREFIX    input string not beginning with IPREFIX\n"
-"  -P, --out-prefix=OPREFIX   output string not beginning with OPREFIX\n"
-"  -u, --in-exclude=IXSTR     input string containing IXSTR\n"
-"  -U, --out-exclude=OXST     output string containing OXSTR\n");
+    fprintf(message_out, "Path filters:\n"
+"  -b, --beam=B               reject output string with weight more than B away from\n"
+"                             the weight of the best output string\n"
+"  -l, --max-in-length=MIL    reject input string longer than MIL\n"
+"  -L, --max-out-length=MOL   reject output string longer than MOL\n"
+"  -p, --in-prefix=OPREFIX    input string must begin with IPREFIX\n"
+"  -P, --out-prefix=OPREFIX   output string must begin with OPREFIX\n"
+"  -u, --in-exclude=IXSTR     input string must not contain IXSTR\n"
+"  -U, --out-exclude=OXST     output string must not contain OXSTR\n");
 
     fprintf(message_out, "\n");
 
@@ -124,7 +124,9 @@ print_usage()
     fprintf(message_out,
         "\n"
         "Examples:\n"
-        "  %s lexical.hfst  generates all forms of lexical.hfst\n"
+        "  %s lexical.hfst    generates all forms of lexical.hfst\n"
+        "  %s -P \"cat<n>\" -c 2 lexical.hfst\n"
+        "                     generates paradigm for cat<n> following cycles at most twice\n"
         "\n", program_name);
 
     fprintf(message_out,
