@@ -125,8 +125,8 @@ print_usage()
         "\n"
         "Examples:\n"
         "  %s lexical.hfst    generates all forms of lexical.hfst\n"
-        "  %s -P \"cat<n>\" -c 2 lexical.hfst\n"
-        "                     generates paradigm for cat<n> following cycles at most twice\n"
+        "  %s -P \"cat<n>\" -c 0 lexical.hfst\n"
+        "                     generates paradigm for cat<n> without following cycles\n"
         "\n", program_name);
 
     fprintf(message_out,
