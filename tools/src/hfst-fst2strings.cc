@@ -127,7 +127,7 @@ print_usage()
         "  %s lexical.hfst    generates all forms of lexical.hfst\n"
         "  %s -P \"cat<n>\" -c 0 lexical.hfst\n"
         "                     generates paradigm for cat<n> without following cycles\n"
-        "\n", program_name);
+        "\n", program_name, program_name);
 
     fprintf(message_out,
         "Known bugs:\n"
