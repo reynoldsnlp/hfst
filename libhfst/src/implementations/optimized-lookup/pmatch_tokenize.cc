@@ -23,6 +23,17 @@ static const string subreading_separator = "#";
 static const string wtag = "W"; // TODO: cg-conv has an argument --wtag, allow changing here as well?
 
 
+void print_escaping_backslashes(std::string const & str, std::ostream & outstream)
+{
+    // TODO: inline?
+    size_t i = 0, j = 0;
+    while((j = str.find("\\", i)) != std::string::npos) {
+        outstream << str.substr(i, j-i) << "\\\\";
+        i = j+1;
+    }
+    outstream << str.substr(i, j-i);
+}
+
 void print_no_output(std::string const & input, std::ostream & outstream, const TokenizeSettings& s)
 {
     if (s.output_format == tokenize || s.output_format == space_separated) {
@@ -30,7 +41,11 @@ void print_no_output(std::string const & input, std::ostream & outstream, const 
     } else if (s.output_format == xerox) {
         outstream << input << "\t" << input << "+?";
     } else if (s.output_format == cg || s.output_format == giellacg) {
-	    outstream << "\"<" << input << ">\"" << std::endl << "\t\"" << input << "\" ?";
+	    outstream << "\"<";
+        print_escaping_backslashes(input, outstream);
+        outstream << ">\"" << std::endl << "\t\"";
+        print_escaping_backslashes(input, outstream);
+        outstream << "\" ?";
     }
 //    std::cerr << "from print_no_output\n";
     outstream << "\n\n";
@@ -54,7 +69,11 @@ void print_nonmatching_sequence(std::string const & str, std::ostream & outstrea
     } else if (s.output_format == xerox) {
         outstream << str << "\t" << str << "+?";
     } else if (s.output_format == cg) {
-        outstream << "\"<" << str << ">\"" << std::endl << "\t\"" << str << "\" ?";
+        outstream << "\"<";
+        print_escaping_backslashes(str, outstream);
+        outstream << ">\"" << std::endl << "\t\"";
+        print_escaping_backslashes(str, outstream);
+        outstream << "\" ?";
     } else if (s.output_format == giellacg) {
         outstream << ":";
         print_escaping_newlines(str, outstream);
@@ -237,7 +256,7 @@ void print_cg_subreading(size_t const & indent,
                 outstream << "\"";
             }
         }
-        outstream << (*it);
+        print_escaping_backslashes(*it, outstream);
     }
     if(in_lemma) {
         outstream << "\"";
@@ -270,7 +289,9 @@ void print_cg_subreading(size_t const & indent,
     if (in_beg != in_end) {
         std::ostringstream form;
         std::copy(in_beg, in_end, std::ostream_iterator<string>(form, ""));
-        outstream << " \"<" << form.str() << ">\"";
+        outstream << " \"<";
+        print_escaping_backslashes(form.str(), outstream);
+        outstream << ">\"";
     }
     outstream << std::endl;
 }
@@ -426,10 +447,14 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
                                     std::ostream & outstream,
                                     const TokenizeSettings& s)
 {
-    outstream << "\"<" << locations.at(0).input << ">\"" << std::endl;
+    outstream << "\"<";
+    print_escaping_backslashes(locations.at(0).input, outstream);
+    outstream << ">\"" << std::endl;
     if(locations.size() == 1 && locations.at(0).output.empty()) {
         // Treat empty analyses as unknown-but-tokenised:
-        outstream << "\t\"" << locations.at(0).input << "\" ?" << std::endl;
+        outstream << "\t\"";
+        print_escaping_backslashes(locations.at(0).input, outstream);
+        outstream << "\" ?" << std::endl;
         return;
     }
     // Output regular analyses first, making a note of backtracking points.
@@ -619,7 +644,9 @@ void print_location_vector(hfst_ol::PmatchContainer & container,
         }
     } else if (s.output_format == cg && locations.size() != 0) {
         // Print the cg cohort header
-        outstream << "\"<" << locations.at(0).input << ">\"" << std::endl;
+        outstream << "\"<";
+        print_escaping_backslashes(locations.at(0).input, outstream);
+        outstream << ">\"" << std::endl;
         for (LocationVector::const_iterator loc_it = locations.begin();
              loc_it != locations.end(); ++loc_it) {
             // For the most common case, eg. analysis strings that begin with the original input,
@@ -627,7 +654,9 @@ void print_location_vector(hfst_ol::PmatchContainer & container,
             // Otherwise we omit the double quotes and assume the rule writer knows what he's doing.
             if (loc_it->output.find(loc_it->input) == 0) {
                 // The nice case obtains
-                outstream << "\t\"" << loc_it->input << "\"" <<
+                outstream << "\t\"";
+                print_escaping_backslashes(loc_it->input, outstream);
+                outstream << "\"" <<
                     loc_it->output.substr(loc_it->input.size(), std::string::npos);
             } else {
                 outstream << "\t" << loc_it->output;
