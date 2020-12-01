@@ -388,7 +388,7 @@ public:
             {
               *out_ << " ";
             }
-        
+
           *out_ << get_print_format(it->first);
           first_pair=false;
         }
@@ -424,7 +424,7 @@ public:
               }
             if (it->first.compare(it->second) != 0)
               is_automaton=false;
-            
+
             *out_ << get_print_format(it->first);
           }
         first_symbol=false;
@@ -468,14 +468,14 @@ int
 process_stream(HfstInputStream& instream, std::ostream& outstream)
 {
   //instream.open();
-  
+
   bool first_transducer=true;
   while(instream.is_good())
   {
     if (!first_transducer && print_separator_after_each_transducer)
       outstream << "--" << std::endl;
     first_transducer=false;
-    
+
     HfstTransducer t(instream);
 
     /* Pairstring format is not supported on optimized lookup format. */
@@ -487,10 +487,10 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
           "       optimized lookup transducers, exiting program\n" );
       exit(1);
     }
- 
+
     if(input_prefix != "")
       verbose_printf("input_prefix: '%s'\n", input_prefix.c_str());
-    
+
     if(beam >= 0)
       {
         verbose_printf("Finding the weight of the best path...\n");
@@ -565,7 +565,7 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
         return EXIT_FAILURE;
       }
     }
-    
+
     if(max_strings > 0)
       verbose_printf("Finding at most %i path(s)...\n", max_strings);
     else if(max_random_strings > 0)
@@ -573,7 +573,7 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
              max_random_strings);
     else
       verbose_printf("Finding strings...\n");
-    
+
     /* not random strings */
     if (max_random_strings <= 0)
       {
@@ -608,7 +608,7 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
         }
       return EXIT_FAILURE;
     }
-      
+
     Callback cb(max_random_strings, &outstream);
     for (HfstTwoLevelPaths::const_iterator it = results.begin();
          it != results.end(); it++)
@@ -622,7 +622,7 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     //if (print_separator_after_each_transducer)
     //  outstream << "--" << std::endl;
   }
-    
+
   instream.close();
   return EXIT_SUCCESS;
 }
@@ -668,7 +668,7 @@ int main( int argc, char **argv ) {
         fprintf(stderr, "%s is not a valid transducer file\n", inputfilename);
         return EXIT_FAILURE;
     }
-    
+
     if (outfile != stdout)
     {
       std::ofstream outstream(outfilename);
@@ -676,7 +676,7 @@ int main( int argc, char **argv ) {
     }
     else
       retval = process_stream(*instream, std::cout);
-    
+
     delete instream;
     free(inputfilename);
     free(outfilename);
