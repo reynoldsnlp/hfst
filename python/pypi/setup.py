@@ -25,8 +25,11 @@ and msvc 14.0 (with python 3.5 and 3.6).
 
 """
 
-from setuptools import setup, Extension
-from sys import argv, platform
+from setuptools import Extension
+from setuptools import setup
+from sys import argv
+from sys import platform
+from sys import version_info
 
 
 # ----- README -----
@@ -50,12 +53,10 @@ def hfst_specific_option(option):
 
 # ----- C++ STANDARD  -----
 
-# Use C++ standard C++11 unless compiling for Python 2.7 for Windows (requires msvc 2008 which does not support C++11)
-# or for OS X (C++11 requires libc++ instead of libstdc++ and minimum version requirement 10.7 instead of 10.6).
+# Use C++ standard C++11 unless compiling for MacOS (C++11 requires libc++
+# instead of libstdc++ and minimum version requirement 10.9).
+
 CPP_STD_11=True
-from sys import version_info
-if (platform == "darwin") or (platform == "win32" and version_info[0] == 2):
-    CPP_STD_11=False
 # Override default behaviour, if requested.
 if hfst_specific_option('--with-c++11'):
     CPP_STD_11=True
@@ -73,7 +74,7 @@ if hfst_specific_option('--with-c-foma'):
 # Experimental...
 if platform == "darwin" and CPP_STD_11:
     import os
-    os.environ["_PYTHON_HOST_PLATFORM"] = 'macosx-10.7-x86_64'
+    os.environ["_PYTHON_HOST_PLATFORM"] = 'macosx-10.9-x86_64'
 
 
 # ----- SWIG CONFIGURATION -----
@@ -106,7 +107,7 @@ if include_readline:
     ext_extra_link_args = ['-lreadline']
 # Experimental...
 if platform == "darwin" and CPP_STD_11:
-    ext_extra_link_args.extend(['-mmacosx-version-min=10.7'])
+    ext_extra_link_args.extend(['-mmacosx-version-min=10.9'])
 
 
 # ----- INCLUDE DIRECTORIES -----
@@ -167,7 +168,7 @@ if platform == "linux" or platform == "linux2" or platform == "darwin":
         ext_extra_compile_args.extend(["-std=c++0x"])
 # Experimental...
 if platform == "darwin" and CPP_STD_11:
-    ext_extra_compile_args.extend(["-stdlib=libc++", "-mmacosx-version-min=10.7"])
+    ext_extra_compile_args.extend(["-stdlib=libc++", "-mmacosx-version-min=10.9"])
 # define error handling mechanism on windows
 if platform == "win32":
     ext_extra_compile_args = ["/EHsc"]
@@ -329,7 +330,7 @@ if (platform == "win32"):
 # (Is this needed?)
 # foma_object_files = []
 # (compile foma backend separately)
-# for file in back-ends/foma/*.c; do clang -fPIC -std=c99 -arch i386 -arch x86_64 -mmacosx-version-min=10.7 -DHAVE_FOMA -c $file ; done
+# for file in back-ends/foma/*.c; do clang -fPIC -std=c99 -arch i386 -arch x86_64 -mmacosx-version-min=10.9 -DHAVE_FOMA -c $file ; done
 # if platform == "darwin":
 #     for file in foma_source_files:
 #         foma_object_files.append(file.replace('back-ends/foma/','').replace('.c','.o'))
@@ -355,6 +356,7 @@ setup(name = 'hfst',
       url = 'http://hfst.github.io/',
       description = 'Python interface for HFST',
       long_description = readme(),
+      long_description_content_type = 'text/x-rst',
       license = 'GNU GPL3',
       ext_modules = [libhfst_module],
       py_modules = ["libhfst"],

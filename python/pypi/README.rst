@@ -14,17 +14,18 @@ Requirements
 
 We offer binary wheels on PyPI for Linux, Mac OS X and Windows.
 
-Wheels for Linux are compiled with a 64-bit docker image (quay.io/pypa/manylinux1_x86_64)
-for python versions 2.7, 3.4, 3.5, 3.6 and 3.7.
-It is also possible to install hfst to Linux using Debian binary packages (see below).
+Wheels for Linux are compiled with a 64-bit docker image
+(quay.io/pypa/manylinux1_x86_64) for python versions 3.6, 3.7, 3.8, and 3.9.
+It is also possible to install hfst to Linux using Debian binary packages (see
+below).
 
-Wheels for Mac are compiled as universal binaries for python versions 2.7, 3.5, 3.6 and 3.7.
-OS X must be 10.7 or higher.
+Wheels for Mac are compiled as universal binaries for python versions 3.6, 3.7,
+3.8, and 3.9.  OS X must be 10.9 or higher.
 
-Wheels for Windows are 32-bit and also require a 32-bit python to work correctly.
-They are available for python versions 3.5 and 3.6; earlier versions would need
-an older compiler that does not support C++11 features.
-Wheels for version 3.7. may be added to future releases.
+Wheels for Windows are 32-bit and also require a 32-bit python to work
+correctly.  They are available for python versions 3.6, 3.7, 3.8, and 3.9;
+earlier versions would need an older compiler that does not support C++11
+features.
 
 Compiling hfst from source requires at least C++ compiler (tested with gcc 5.4.0),
 readline and getline libraries and setuptools package for python
@@ -37,22 +38,13 @@ We recommend python version 3 as it works better with unicode.
 Installation via PyPI
 #####################
 
-We recommend using ``pip`` tool for installation.
-Before installation, see that dependencies given under heading 'Requirements' are met.
+We recommend using ``pip`` tool for installation.  Before installation, see
+that dependencies given under heading 'Requirements' are met.
 
-For python version 3, the ``pip`` tool is usually named ``pip3``, plain ``pip`` being used
-for python version 2. Basic installation is done with:
-
-``pip3 install [--upgrade] hfst``
-
-``pip install [--upgrade] hfst``
-
-Starting from python 3.4.0 and 2.7.9, pip is included by default
-and can be called via python with option ``-m pip``:
+Starting from python 3.4.0, pip is included by default and can be called via
+python with option ``-m pip``:
 
 ``python3 -m pip install [--upgrade] hfst``
-
-``python -m pip install [--upgrade] hfst``
 
 The commands above are run in a shell/terminal/command prompt, but they can
 also be run on python command line or via a graphical user interface
@@ -116,18 +108,11 @@ HFST is licensed under Gnu GPL version 3.0.
 Troubleshooting
 ###############
 
-(In the commands below, ``python[3]`` means either ``python`` or ``python3`` depending of the version of python you are using;
-the same goes for ``pip[3]`` meaning ``pip`` or ``pip3``.)
-
 *Pip starts to compile from source although there is a wheel available:*
 
 Try upgrading pip with
 
-``pip[3] install --upgrade pip``
-
-or
-
-``python[3] -m pip install --upgrade pip``.
+``python3 -m pip install --upgrade pip``
 
 Another reason for this can be that
 the source package on PyPI is newer (i.e. has a higher version number) than
@@ -139,28 +124,26 @@ will be created.
 
 Try rerunning pip in verbose mode with
 
-``pip[3] install --verbose [--upgrade] hfst``
-
-or
-
-``python[3] -m pip install --verbose [--upgrade] hfst``
+``python3 -m pip install --verbose [--upgrade] hfst``
 
 to get more information.
 
 *Error message "error: could not delete ... : permission denied":*
 
-You do not have sufficient rights to install packages. On Mac and Linux, try
-installing as super user with
+You do not have sufficient rights to install packages. There are two possible
+solutions: 1) To install for only your user, run
 
-``sudo pip[3] install [--upgrade] hfst``
+``python3 -m pip install --user [--upgrade] hfst``
 
-or
+2) To install for all users, try installing as super user. On Mac and Linux,
+run
 
-``sudo python[3] -m pip install [--upgrade] hfst``.
+``sudo -H python3 -m pip install [--upgrade] hfst``
 
 On Windows, reopen Command Prompt/Python command line/IDLE by right-clicking
-and choose "Run as administrator", then run pip again.
+and choose "Run as administrator", then run the original command again:
 
+``python3 -m pip install --upgrade pip``
 
 Links
 #####
@@ -170,4 +153,3 @@ the project
 
 `Github issue tracker <https://github.com/hfst/hfst/issues/>`_: for comments,
 feature requests and bug reports
-

@@ -17,12 +17,14 @@ if '--local-hfst' in sys.argv:
 
 from sys import platform
 
+MACOSX_VERSION_MIN = '10.9'
+
 libhfst_src_path = '../libhfst/src/'
 absolute_libhfst_src_path = os.path.abspath(libhfst_src_path)
 
 extra_link_arguments = []
 if platform == "darwin":
-        extra_link_arguments.extend(['-mmacosx-version-min=10.7'])
+        extra_link_arguments.extend(['-mmacosx-version-min=' + MACOSX_VERSION_MIN])
 
 # If you wish to link to the local HFST library:
 if local_hfst:
@@ -30,7 +32,8 @@ if local_hfst:
 
 extra_compile_arguments = ['-std=c++0x']
 if platform == "darwin":
-        extra_compile_arguments.extend(["-stdlib=libc++", "-mmacosx-version-min=10.7"])
+        extra_compile_arguments.extend(["-stdlib=libc++",
+                                        "-mmacosx-version-min=" + MACOSX_VERSION_MIN])
 
 # If you wish to link hfst c++ library statically, use:
 # library_dirs = []
