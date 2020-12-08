@@ -4,15 +4,19 @@ set -e -x
 
 PYTHON_EXECUTABLES="python3.6 python3.7 python3.8 python3.9"
 
+for p in ${PYTHON_EXECUTABLES}; do
+	${p} -m pip install --user --upgrade setuptools twine wheel
+
 echo "STEP Configuring..."
 cd ../../
-# make clean
 autoreconf -i  # Is this necessary?
 ./configure --enable-all-tools --with-readline --enable-fsmbook-tests
+# make clean
+make  # is this necessary?
 
 echo "STEP Making flex/yacc files..."
 cd libhfst/src/parsers/
-make
+make  # this is unnecessary if `make` is already called in the root dir, but it doesn't hurt
 
 echo "STEP Building libhfst.py..."
 cd ../../../python/
