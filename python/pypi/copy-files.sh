@@ -3,6 +3,8 @@
 ## Copy files needed for a pypi distribution for linux or os x.
 ## copy-files-win.sh is the equivalent script for windows environment.
 
+set -x
+
 if [ "$1" = "--help" -o "$1" = "-h" ]; then
     echo "copy-files.sh [--with-c-foma]"
     echo ""
