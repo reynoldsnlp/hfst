@@ -43,6 +43,7 @@
 /python/hfst.egg-info/
 /python/hfstpy.egg-info/
 /python/libhfst_swig.egg-info/
+/python/test/tmp
 *.pyc
 
 # Generated and copied python pypi files and folders
