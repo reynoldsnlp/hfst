@@ -67,5 +67,5 @@ cd ../test
 for PYBIN in /opt/python/*/bin/python
 do
     ${PYBIN} -m pip install hfst --no-index -f /io/python/pypi/dist/
-    ./test.sh --python ${PYBIN}
+    ./test.sh --python "${PYBIN}"
 done

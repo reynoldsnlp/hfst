@@ -6,6 +6,7 @@ PYTHON_EXECUTABLES="python3.6 python3.7 python3.8 python3.9"
 
 for p in ${PYTHON_EXECUTABLES}; do
 	${p} -m pip install --user --upgrade setuptools twine wheel
+done
 
 echo "STEP Configuring..."
 cd ../../
@@ -39,6 +40,6 @@ echo "STEP Running tests..."
 cd ../test
 for p in ${PYTHON_EXECUTABLES}; do
 	${p} -m pip install hfst --no-index -f ../pypi/dist/ --force-reinstall
-	abs_p=$(which ${p})
-	./test.sh --python ${abs_p}
+	abs_p=$(which "${p}")
+	./test.sh --python "${abs_p}"
 done
