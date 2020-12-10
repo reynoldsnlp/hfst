@@ -13,7 +13,7 @@ do
 	DOCKER_IMAGE="${URL_BASE}${PLAT}"
 	docker pull "${DOCKER_IMAGE}"
 	docker container run -t --rm \
-		-e PLAT=$PLAT \
+		-e PLAT="$PLAT" \
 		-v "$(pwd)":/io \
 		--workdir /io \
 		"${DOCKER_IMAGE}" /io/python/pypi/build_manylinux_wheels_sub.sh
