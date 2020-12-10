@@ -15,9 +15,9 @@ Requirements
 We offer binary wheels on PyPI for Linux, Mac OS X and Windows.
 
 Wheels for Linux are compiled with a 64-bit docker image
-(quay.io/pypa/manylinux1_x86_64) for python versions 3.6, 3.7, 3.8, and 3.9.
-It is also possible to install hfst to Linux using Debian binary packages (see
-below).
+(quay.io/pypa/manylinux1_x86_64) for python versions 2.7, 3.5, 3.6, 3.7, 3.8,
+and 3.9.  It is also possible to install hfst to Linux using Debian binary
+packages (see below).
 
 Wheels for Mac are compiled as universal binaries for python versions 3.6, 3.7,
 3.8, and 3.9.  OS X must be 10.9 or higher.
