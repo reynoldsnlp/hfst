@@ -6,7 +6,11 @@ PYTHON_EXECUTABLES="python3.6 python3.7 python3.8 python3.9"
 
 for p in ${PYTHON_EXECUTABLES}; do
 	${p} -m pip install --user --upgrade setuptools twine wheel
+	# ${p} -m pip uninstall hfst
 done
+
+# echo "STEP Cleaning old files..."
+# ./clean.sh
 
 echo "STEP Configuring..."
 cd ../../
@@ -39,7 +43,9 @@ ${p} setup.py sdist
 echo "STEP Running tests..."
 cd ../test
 for p in ${PYTHON_EXECUTABLES}; do
-	${p} -m pip install hfst --no-index -f ../pypi/dist/ --force-reinstall
+	${p} -c "import sys; print(sys.executable)"
+	${p} -m pip install --user --no-index -f ../pypi/dist/ --force-reinstall hfst
 	abs_p=$(which "${p}")
 	./test.sh --python "${abs_p}"
+	${p} -m pip uninstall hfst
 done
