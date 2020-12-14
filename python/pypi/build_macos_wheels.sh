@@ -41,11 +41,4 @@ echo "STEP Building source distribution..."
 ${p} setup.py sdist
 
 echo "STEP Running tests..."
-cd ../test
-for p in ${PYTHON_EXECUTABLES}; do
-	${p} -c "import sys; print(sys.executable)"
-	${p} -m pip install --user --no-index -f ../pypi/dist/ --force-reinstall hfst
-	abs_p=$(which "${p}")
-	./test.sh --python "${abs_p}"
-	${p} -m pip uninstall hfst
-done
+./test_builds.sh ${PYTHON_EXECUTABLES}
