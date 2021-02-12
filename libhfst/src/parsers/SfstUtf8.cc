@@ -1,3 +1,15 @@
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+// See the file COPYING included with this distribution for more
+// information.
+
+/*
+   HFST has a written agreement with the author of SFST, Helmut Schmid,
+   that this file, though derived from SFST which is GPLv2+,
+   may be distributed under the LGPLv3+ license as part of HFST.
+*/
 
 /*******************************************************************/
 /*                                                                 */
@@ -43,14 +55,14 @@ namespace sfst_utf8 {
       ch[0] = (unsigned char)sym;
       ch[1] = 0;
     }
-  
+
     else if (sym < 2048) {
       // 2-byte UTF8 symbol, 5+6 bits
       ch[0] = (unsigned char)((sym >> 6) | set2MSbits);
       ch[1] = (unsigned char)((sym & get6LSbits) | set1MSbits);
       ch[2] = 0;
     }
-  
+
     else if (sym < 65536) {
       // 3-byte UTF8 symbol, 4+6+6 bits
       ch[0] = (unsigned char)((sym >> 12) | set3MSbits);
@@ -58,7 +70,7 @@ namespace sfst_utf8 {
       ch[2] = (unsigned char)((sym & get6LSbits) | set1MSbits);
       ch[3] = 0;
     }
-  
+
     else if (sym < 2097152) {
       // 4-byte UTF8 symbol, 3+6+6+6 bits
       ch[0] = (unsigned char)((sym >> 18) | set4MSbits);
@@ -67,7 +79,7 @@ namespace sfst_utf8 {
       ch[3] = (unsigned char)((sym & get6LSbits) | set1MSbits);
       ch[4] = 0;
     }
-  
+
     else
       return NULL;
 
@@ -92,19 +104,19 @@ namespace sfst_utf8 {
       bytes_to_come = 3;
       result = (result << 3) | (c & get3LSbits);
     }
-      
+
     else if (c >= (unsigned char) set3MSbits) { // 1110xxxx
       // start of a three-byte symbol
       bytes_to_come = 2;
       result = (result << 4) | (c & get4LSbits);
     }
-      
+
     else if (c >= (unsigned char) set2MSbits) { // 1100xxxx
       // start of a two-byte symbol
       bytes_to_come = 1;
       result = (result << 5) | (c & get5LSbits);
     }
-      
+
     else if (c < (unsigned char) set1MSbits) { // 0100xxxx
       // one-byte symbol
       bytes_to_come = 0;

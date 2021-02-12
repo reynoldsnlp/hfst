@@ -1,13 +1,13 @@
-//       This program is free software: you can redistribute it and/or modify
-//       it under the terms of the GNU General Public License as published by
+//       This library is free software: you can redistribute it and/or modify
+//       it under the terms of the GNU Lesser General Public License as published by
 //       the Free Software Foundation, version 3 of the License.
 //
-//       This program is distributed in the hope that it will be useful,
+//       This library is distributed in the hope that it will be useful,
 //       but WITHOUT ANY WARRANTY; without even the implied warranty of
 //       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//       GNU General Public License for more details.
+//       GNU Lesser General Public License for more details.
 //
-//       You should have received a copy of the GNU General Public License
+//       You should have received a copy of the GNU Lesser General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /*
@@ -19,6 +19,10 @@
    This file is based on SFST's file 'interface.C'. Some functions are
    copied as such and some are less or more modified so that they work
    properly with the HFST interface.
+
+   HFST has a written agreement with the author of SFST, Helmut Schmid,
+   that this file, though derived from SFST which is GPLv2+,
+   may be distributed under the LGPLv3+ license as part of HFST.
 
  */
 
@@ -55,7 +59,7 @@ namespace hfst
     switch_ = 0;
     sfst_compiler = this;
   };
-  
+
   typedef std::pair<unsigned int, unsigned int> NumberPair;
   typedef std::set<NumberPair> NumberPairSet;
   typedef std::vector<NumberPair> NumberPairVector;
@@ -64,7 +68,7 @@ namespace hfst
   {
     result_ = tr;
   }
- 
+
   HfstTransducer * SfstCompiler::get_result()
   {
     return result_;
@@ -107,7 +111,7 @@ namespace hfst
         " requires the definition of an alphabet");
     HFST_THROW(HfstException);
       }
-      
+
       // one of the ranges was '.'
       for(SfstAlphabet::const_iterator it=TheAlphabet.begin();
       it!=TheAlphabet.end(); it++) {
@@ -137,7 +141,7 @@ namespace hfst
 
     return new HfstTransducer(sps, type);
   }
-  
+
   HfstTransducer * SfstCompiler::new_transducer( Range *r1, Range *r2, ImplementationType type )
   {
     HfstTransducer * t = make_transducer(r1, r2, type);
@@ -146,7 +150,7 @@ namespace hfst
     free_values(r2);
     return t;
   }
-  
+
   Character SfstCompiler::character_code( unsigned int uc ) {
     // UTF-8 is always used
     return symbol_code(sfst_basic::fst_strdup(sfst_utf8::int2utf8(uc)));
@@ -175,7 +179,7 @@ namespace hfst
     std::cerr << "\nError: " << message << ": " << input << "\naborted.\n";
     HFST_THROW(HfstException);
   }
-  
+
   Character SfstCompiler::symbol_code( char *symbol )
   { // In SFST programming language epsilon is denoted as "<>"
     // but in HFST as "@_EPSILON_SYMBOL_@". That is why it must be
@@ -188,7 +192,7 @@ namespace hfst
     free(symbol);
     return (Character)c;
   }
-  
+
   unsigned int SfstCompiler::utf8toint( char *s ) {
     return sfst_utf8::utf8toint(s);
   }
@@ -237,7 +241,7 @@ namespace hfst
     TheAlphabet.complement(sym);
     if (sym.size() == 0)
       error("Empty character range!");
-    
+
 
     Range *result=NULL;
     for( size_t i=0; i<sym.size(); i++ ) {
@@ -249,7 +253,7 @@ namespace hfst
 
     return result;
   }
-  
+
   bool SfstCompiler::def_var( char *name, HfstTransducer *t ) {
     // delete the old value of the variable
     VarMap::iterator it=VM.find(std::string(name));
@@ -260,10 +264,10 @@ namespace hfst
       delete v;
       //free(n);
     }
-    
+
     t = explode(t);
     t->minimize();
-    
+
     VM[std::string(name)] = t;
 
     return false;
@@ -274,7 +278,7 @@ namespace hfst
       error2("cyclic transducer assigned to", name);
     return def_var( name, t );
   }
-  
+
   HfstTransducer * SfstCompiler::var_value( char *name ) {
     VarMap::iterator it=VM.find(std::string(name));
     if (it == VM.end()) {
@@ -374,12 +378,12 @@ namespace hfst
       l = new HfstTransducer(internal_epsilon,type);
     if (r == NULL)
       r = new HfstTransducer(internal_epsilon,type);
-    
+
     Contexts *c=new Contexts();
     c->left = l;
     c->right = r;
     c->next = NULL;
-    
+
     return c;
   }
 
@@ -429,7 +433,7 @@ namespace hfst
       //fprintf(stderr, "... no need to explode\n");
       return t;
     }
-    
+
     t->minimize();
 
     // transducer agreement variable names
@@ -442,12 +446,12 @@ namespace hfst
     // Make a tokenizer that recognizes all multicharacter symbols in t.
     // It is needed when weighted paths are transformed into transducers.
     // HfstTokenizer TOK = t->create_tokenizer(); // no effect on performance
-    
+
     // replace all agreement variables
     for( size_t i=0; i<name.size(); i++ ) {
       //fprintf(stderr, "substituting transducer agreement variable \"%s\"\n", name[i]);
       HfstTransducer *nt = new HfstTransducer(t->get_type()); // an initially empty transducer
-      
+
       // enumerate all paths of the transducer
       HfstTransducer *vt=var_value(strdup(name[i])); // var_value frees its argument
       std::vector<HfstTransducer*> transducer_paths;
@@ -474,7 +478,7 @@ namespace hfst
       transducer_paths.push_back(path);
     }
       }
-      
+
 
       // insert each path
       for( size_t j=0; j<transducer_paths.size(); j++ ) {
@@ -494,28 +498,28 @@ namespace hfst
       t = nt;
     }
 
-    
+
     name.clear();
     for( RVarSet::iterator it=RSS.begin(); it!=RSS.end(); it++)
       name.push_back(*it);
     RSS.clear();
-    
+
     // replace all agreement variables
     for( size_t i=0; i<name.size(); i++ ) {
       //printf("substituting range agreement variable \"%s\"\n", name[i]);
       HfstTransducer *nt = new HfstTransducer(t->get_type());
       Range *r=svar_value(strdup(name[i]));  // svar_value frees its argument
-      
+
       // insert each character
       while (r != NULL) {
-    
+
     // insertion
     HfstTransducer ti(*t);
     // agreement variable marker should always appear on both sides of the tape..
     //printf("substituting agreement range variable %s with %s\n", name[i], TheAlphabet.code2symbol(r->character));
     ti.substitute(std::string(name[i]), TheAlphabet.code2symbol(r->character));
     nt->disjunct(ti);
-    
+
     Range *next = r->next;
     delete r;
     r = next;
@@ -556,7 +560,7 @@ namespace hfst
 
     if (RS.size() > 0 || RSS.size() > 0)
       std::cerr << "\nWarning: agreement operation inside of replacement rule!\n";
-    
+
     if (!Alphabet_Defined) {
       fprintf(stderr, "\nERROR:"
           " Two level rules require the definition of an alphabet!\n");
@@ -587,7 +591,7 @@ namespace hfst
         " requires the definition of an alphabet");
     HFST_THROW(HfstException);
       }
-      
+
       // one of the ranges was '.'
       for(SfstAlphabet::const_iterator it=TheAlphabet.begin();
       it!=TheAlphabet.end(); it++) {
@@ -612,7 +616,7 @@ namespace hfst
       r2 = r2->next;
       }
     }
-    
+
     switch(type)
       {
       case twol_left:
@@ -638,7 +642,7 @@ namespace hfst
       filestr.append("/"); // FIX: WINDOWS
     }
     filestr.append(filename);
-    
+
     if (Verbose)
       fprintf(stderr,"\nreading words from %s...", filestr.c_str());
     std::ifstream is(filestr.c_str());
@@ -749,7 +753,7 @@ namespace hfst
   }
 
   HfstTransducer * SfstCompiler::replace_in_context(HfstTransducer * mapping, Repl_Type repl_type, Contexts *contexts, bool optional) {
-    
+
     HfstTransducerPair tr_pair(*(contexts->left), *(contexts->right));
     StringPairSet sps;
     for( SfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
@@ -776,7 +780,7 @@ namespace hfst
   }
 
   HfstTransducer * SfstCompiler::replace(HfstTransducer * mapping, Repl_Type repl_type, bool optional) {
-    
+
     StringPairSet sps;
     for( SfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
       SfstAlphabet::NumberPair l=*it;
@@ -837,12 +841,12 @@ namespace hfst
 
     free_values(list1);
     free_values(list2);
-    
+
     return new HfstTransducer(spsv, type);
 
   }
 
-  
+
   HfstTransducer * SfstCompiler::result( HfstTransducer *t, bool switch_flag) {
 
     t = explode(t);
@@ -858,7 +862,7 @@ namespace hfst
     //for( size_t i=0; i<s.size(); i++ )
     //  free(s[i]);
     //s.clear();
-    
+
     if (switch_flag)
       t->invert();
     //add_alphabet(t);
@@ -882,7 +886,7 @@ namespace hfst
     for (StringPairSet::const_iterator it = sps.begin(); it != sps.end(); it ++)
       {
         unsigned int inumber, onumber;
-        
+
         if (it->first.compare("<>") == 0)
           inumber=0;
         else
@@ -896,11 +900,11 @@ namespace hfst
       }
     Alphabet_Defined = 1;
       }
- 
+
     else {
-      
+
       HfstBasicTransducer t(*tr);
-      
+
       for (HfstBasicTransducer::const_iterator it = t.begin();
        it != t.end(); it++)
     {

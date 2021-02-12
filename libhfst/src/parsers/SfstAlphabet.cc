@@ -1,3 +1,16 @@
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+// See the file COPYING included with this distribution for more
+// information.
+
+/*
+   HFST has a written agreement with the author of SFST, Helmut Schmid,
+   that this file, though derived from SFST which is GPLv2+,
+   may be distributed under the LGPLv3+ license as part of HFST.
+*/
+
 #include "SfstAlphabet.h"
 #include "SfstBasic.h"
 #include "SfstUtf8.h"
@@ -8,13 +21,13 @@
 
 namespace hfst {
   namespace implementations {
-    
+
     SfstAlphabet::SfstAlphabet() {
       add(hfst::internal_epsilon.c_str(),0);
       add(hfst::internal_unknown.c_str(),1);
       add(hfst::internal_identity.c_str(),2);
     }
-    
+
     SfstAlphabet::SfstAlphabet(const SfstAlphabet &alpha)
     {
       for (CharMap::const_iterator it = alpha.cm.begin(); it != alpha.cm.end(); it++) {
@@ -32,21 +45,21 @@ namespace hfst {
       char **s=new char*[cm.size()];
       pairs.clear();
       sm.clear();
-      
+
       size_t i, n=0;
       for( CharMap::iterator it=cm.begin(); it!=cm.end(); it++ )
     s[n++] = it->second;
       cm.clear();
-      
+
       for( i=0; i<n; i++ )
     free(s[i]);
       delete[] s;
     }
-    
+
     SfstAlphabet::const_iterator SfstAlphabet::begin() const { return pairs.begin(); }
     SfstAlphabet::const_iterator SfstAlphabet::end() const { return pairs.end(); };
     size_t SfstAlphabet::size() const { return pairs.size(); };
-    
+
     //bool SfstAlphabet::contains_special_symbols(StringPair sp);
 
     void SfstAlphabet::print_pairs(FILE *file) {
@@ -60,7 +73,7 @@ namespace hfst {
     printf("%i\t%s\n",it->first,it->second);
       printf("..alphabet\n");
     }
-    
+
     void SfstAlphabet::insert(NumberPair sp) {
       /* check special symbols */ pairs.insert(sp); };
     void SfstAlphabet::clear_pairs() { pairs.clear(); };
@@ -71,13 +84,13 @@ namespace hfst {
       cm[c] = s;
       sm[s] = c;
     }
-    
+
     int SfstAlphabet::symbol2code( const char * s ) const {
       SymbolMap::const_iterator p = sm.find(s);
       if (p != sm.end()) return p->second;
       return EOF;
     }
-    
+
     const char *SfstAlphabet::code2symbol( unsigned int c ) const {
       CharMap::const_iterator p=cm.find(c);
       if (p == cm.end())
@@ -85,21 +98,21 @@ namespace hfst {
       else
     return p->second;
     }
-    
+
     unsigned int SfstAlphabet::add_symbol(const char * symbol) {
       if (sm.find(symbol) != sm.end())
     return sm[symbol];
-      
+
       // assign the symbol to some unused character
       for(unsigned int i=1; i!=0; i++)
     if (cm.find(i) == cm.end()) {
       add(symbol, i);
       return i;
     }
-      
+
       throw "Error: too many symbols in transducer definition";
     }
-    
+
     void SfstAlphabet::add_symbol( const char *symbol, unsigned int c )
 
     {
@@ -108,7 +121,7 @@ namespace hfst {
       if (sc != EOF) {
     if ((unsigned int)sc == c)
       return;
-    
+
     if (strlen(symbol) < 60) {
       static char message[100];
       sprintf(message, "Error: reinserting symbol '%s' in alphabet with incompatible character value %u %u", symbol, (unsigned)sc, (unsigned)c);
@@ -117,7 +130,7 @@ namespace hfst {
     else
       throw "reinserting symbol in alphabet with incompatible character value";
       }
-      
+
       // check whether the character is already in use
       const char *s=code2symbol(c);
       if (s == NULL)
@@ -160,12 +173,12 @@ namespace hfst {
     /*  order to be recognized.                                        */
     /*                                                                 */
     /*******************************************************************/
-    
+
     int SfstAlphabet::next_mcsym( char* &string, bool insert )
-      
+
     {
       char *start=string;
-      
+
       if (*start == '<')
     // symbol might start here
     for( char *end=start+1; *end; end++ )
@@ -174,7 +187,7 @@ namespace hfst {
         // mark the end of the substring with \0
         char lastc = *(++end);
         *end = 0;
-        
+
         int c;
 
         // handle epsilon symbol "<>" here
@@ -189,7 +202,7 @@ namespace hfst {
         }
         // restore the original string
         *end = lastc;
-        
+
         if (c != EOF) {
           // symbol found
           // return its code
@@ -204,18 +217,18 @@ namespace hfst {
     }
 
     int SfstAlphabet::next_code( char* &string, bool extended, bool insert )
-      
+
     {
       if (*string == 0)
     return EOF; // finished
-      
+
       int c = next_mcsym(string, insert);
       if (c != EOF)
     return c;
-      
+
       if (extended && *string == '\\')
     string++; // remove quotation
-      
+
       //if (utf8) {
       {
     unsigned int c = sfst_utf8::utf8toint( &string );
@@ -238,14 +251,14 @@ namespace hfst {
       if (c == EOF) {
     return std::pair<unsigned int, unsigned int>(0,0); // end of string reached
       }
-      
+
       unsigned int lc=(unsigned int)c;
       if (!extended || *string != ':') { // single character?
     if (lc == 0)
       return next_label(string, extended); // ignore epsilon
     return std::pair<unsigned int, unsigned int>(lc,lc);
       }
-      
+
       // read second character
       string++; // jump over ':'
       c = next_code( string );
@@ -254,13 +267,13 @@ namespace hfst {
     sprintf(buffer,"Error: incomplete symbol in input file: %s", string);
     throw buffer;
       }
-      
+
       std::pair<unsigned int, unsigned int> retval(lc, (unsigned int)c);
       if (retval.first == 0 && retval.second == 0)
     return next_label(string, extended); // ignore epsilon transitions
       return retval;
     }
-    
+
   }
 }
 #else

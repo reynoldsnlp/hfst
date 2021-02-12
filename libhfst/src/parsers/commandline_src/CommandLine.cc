@@ -1,3 +1,10 @@
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+// See the file COPYING included with this distribution for more
+// information.
+
 //! @file CommandLine.cc
 
 #include "CommandLine.h"
@@ -77,7 +84,7 @@ void CommandLine::print_help(void)
         << std::endl
         << "  -f, --format=FORMAT      Store result in format FORMAT."
         << std::endl << std::endl;
-  
+
   std::cerr << "Format may be one of openfst-log, openfst-tropical, foma or sfst."
         << std::endl << std::endl;
 
@@ -129,7 +136,7 @@ int CommandLine::parse_options(int argc, char** argv)
         {
       break;
         }
-      
+
       switch (c)
         {
     case 'h':
@@ -216,7 +223,7 @@ int CommandLine::parse_options(int argc, char** argv)
             << std::endl;
       exit(1);
         }
-      
+
     }
 
   if (! inputNamed)
@@ -243,7 +250,7 @@ int CommandLine::parse_options(int argc, char** argv)
     }
 
     }
-  
+
   this->be_verbose = verbose;
   this->be_quiet = silent;
   this->has_input_file = inputNamed;

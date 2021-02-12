@@ -1,3 +1,10 @@
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+// See the file COPYING included with this distribution for more
+// information.
+
 #ifdef WINDOWS
 #pragma warning(disable: 4161)
 #pragma warning(disable: 4103)
@@ -58,7 +65,7 @@ namespace hfst
     if (ReadConsoleW(stdIn, buffer, hfst::size_t_to_uint(buffer_size/4), &numRead, NULL))
       {
         if (DEBUG) { std::cerr << "get_line_from_console: numRead is " << numRead << std::endl; }
-        
+
         int size_needed = WideCharToMultiByte(CP_UTF8, 0, buffer, (int)numRead, NULL, 0, NULL, NULL);
         if (DEBUG) { std::cerr << "conversions: size_needed is " << size_needed << std::endl; }
         CHAR * strbuf = new CHAR [size_needed];
@@ -66,9 +73,9 @@ namespace hfst
         delete buffer;
         strbuf[size_needed] = 0; // NULL-terminate the buffer
         str = std::string(strbuf);
-        
+
         if (DEBUG) { std::cerr << "get_line_from_console: size of str is now (1) " << str.size() << std::endl; }
-        
+
         if (str[0] == (char)26 || str[0] == (char)4) // control+Z, control+D
           return false;
 
@@ -92,7 +99,7 @@ namespace hfst
 
         str.erase(str.size()-1);
         return true;
-        
+
         if (DEBUG) { std::cerr << "get_line_from_console: size of str is now (2) " << str.size() << std::endl; }
         return true;
       }
