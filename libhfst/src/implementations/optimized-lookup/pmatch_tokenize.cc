@@ -29,6 +29,7 @@ using hfst_ol::LocationVectorVector;
 
 static const string subreading_separator = "#";
 static const string wtag = "W"; // TODO: cg-conv has an argument --wtag, allow changing here as well?
+static bool IS_CG_TAG_MODIFIER_WARNED = false; // Only warn once on skipping modifier letters
 
 void print_escaping_backslashes(std::string const & str, std::ostream & outstream)
 {
@@ -231,13 +232,27 @@ size_t u8_first_codepoint_size(const unsigned char* c) {
  *
  * If we have ICU, we check that the symbol is longer than the first
  * "character" (so characters composed of multiple codepoints are
- * treated the same as their non-composed counterparts).
+ * treated the same as their non-composed counterparts). ICU
+ * doesn't treat modifier letters of as part of the same character,
+ * but we sometimes have them on the same arc – e.g. 'k̓ʷ' where 'ʷ' is
+ * a modifier – so we skip following modifiers too (c.f. issue 497).
  */
 bool is_cg_tag(const string & str) {
 #if USE_ICU_UNICODE
     icu::UnicodeString us(str.c_str());
     characterBoundary->setText(us);
-    return us.length() > characterBoundary->following(0);
+    const int32_t i_after = characterBoundary->following(0);
+    if(u_charType(us.char32At(i_after)) == U_MODIFIER_LETTER) {
+        const bool is_tag = us.length() > characterBoundary->following(i_after);
+        if(!IS_CG_TAG_MODIFIER_WARNED && !is_tag) {
+            std::cerr << "WARNING: Skipping modifier letter for baseform letter " << str << " (to avoid this warning, ensure Modifiers are not part of the same Multichar_symbol as their preceding Character)" << std::endl;
+            IS_CG_TAG_MODIFIER_WARNED = true; // warn only once
+        }
+        return is_tag;
+    }
+    else {
+        return us.length() > i_after;
+    }
 #else
     // Note: invalid codepoints are also treated as tags;  ¯\_(ツ)_/¯
     return str.size() > u8_first_codepoint_size((const unsigned char*)str.c_str());
