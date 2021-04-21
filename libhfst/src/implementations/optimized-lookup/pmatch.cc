@@ -1614,12 +1614,14 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
             if (!try_entering_context(output)) {
                 // no context to enter, regular input epsilon
                 container->tape.write(tape_pos, 0, output);
-                
+
+                unsigned int orig_entry_stack_back;
                 // if it's an entry or exit arc, adjust entry stack
                 if (output == alphabet.get_special(entry)) {
-                    container->entry_stack.push(input_pos);
+                    container->entry_stack.push_back(input_pos);
                 } else if (output == alphabet.get_special(exit)) {
-                    container->entry_stack.pop();
+                    orig_entry_stack_back = container->entry_stack.back();
+                    container->entry_stack.pop_back();
                 } else if (alphabet.is_capture_tag(output)) {
                     // if it's a capture tag, remember where we were
                     Capture capture;
@@ -1632,6 +1634,7 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                     // captured sequence
                     std::pair<SymbolNumberVector::iterator, SymbolNumberVector::iterator> cap =
                         container->get_longest_matching_capture(alphabet.captured2capture[output], input_pos);
+
                     if (cap.second - cap.first != 0) {
                         container->tape.write(tape_pos, cap);
                         get_analyses(input_pos + (cap.second - cap.first),
@@ -1647,7 +1650,7 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                 if (output == alphabet.get_special(entry)) {
                     container->entry_stack.pop_back();
                 } else if (output == alphabet.get_special(exit)) {
-                    container->entry_stack.unpop();
+                    container->entry_stack.push_back(orig_entry_stack_back);
                 } else if (alphabet.is_capture_tag(output)) {
                     container->captures.pop_back();
                 }
@@ -1675,7 +1678,7 @@ void PmatchTransducer::check_context(unsigned int input_pos,
     if (local_stack.top().context == LC ||
         local_stack.top().context == NLC) {
         // Jump to the left-hand side of the input
-        input_pos = container->entry_stack.top() - 1;
+        input_pos = container->entry_stack.back() - 1;
     }
     get_analyses(input_pos, tape_pos, transition_table[i].get_target());
 
@@ -1772,6 +1775,7 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
                                     unsigned int tape_pos,
                                     TransitionTableIndex i)
 {
+    // std::cerr << "get_analyses " << name << " " << input_pos << " " << alphabet.string_from_symbol(container->input[input_pos]) << " " << tape_pos << std::endl;
     if (container->get_weight() > container->max_weight) { return; }
     if (container->max_time > 0.0) {
         ++container->call_counter;

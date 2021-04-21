@@ -50,16 +50,6 @@ namespace hfst_ol {
                        Pmatch_input_mark,
                        SPECIALSYMBOL_NR_ITEMS};
 
-    class PositionStack: public std::vector<unsigned int>
-    {
-        unsigned int tmp;
-    public:
-        void push(unsigned int val) { push_back(val); }
-        void pop(void) { tmp = back(); pop_back(); }
-        void unpop(void) { push_back(tmp); }
-        unsigned int top(void) { return back(); }
-    };
-
     class PmatchAlphabet: public TransducerAlphabet {
     protected:
         RtnVector rtns;
@@ -161,7 +151,7 @@ namespace hfst_ol {
         PmatchTransducer * toplevel;
         SymbolNumberVector input;
         // This tracks the ENTRY and EXIT tags
-        PositionStack entry_stack;
+        std::vector<unsigned int> entry_stack;
         RtnCallStacks rtn_stacks;
         DoubleTape tape;
         DoubleTape best_result;
