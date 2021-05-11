@@ -577,11 +577,7 @@ AC_PROG_LEX
 
 AC_PATH_PROG([GETOPT], [getopts], [false])
 
-AM_PATH_PYTHON([2.4],[],[false])
-# if flex 3.X ever comes out, this breaks :)
-LEX_VERSION=`$LEX --version`
-AS_IF([test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"],
-      [AC_MSG_WARN([Building hfst successfully requires flex newer than 2.5.33 on some platforms. Unless you are building with pre-flex-generated sources, building will probably fail.])])
+AM_PATH_PYTHON([3.0],[],[false])
 
 AC_PROG_INSTALL
 AC_PROG_LN_S
