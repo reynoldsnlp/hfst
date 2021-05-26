@@ -1,9 +1,67 @@
-57dd2e1 (HEAD -> master, origin/master, origin/HEAD) Fix off-by-one bug in checking captures
+f68fb11 (HEAD -> master, origin/master, origin/HEAD) Drop string copy function because it leads to stack corruption and is not used.
+1de31ce Fix memory leaks when input/output streams are not released.
+25becf4 Fix memory leak when parallel rule mismatch error is detected.
+f8d464d Fix memory leak in command line arguments parsing code of hfst-xfst.
+cede7aa Fix memory leak in are_equivalent method of FomaTransducer.
+afb3cfa Fix alloc-dealloc-mismatch (malloc vs operator delete) for function name variable.
+4905096 Fix memory leak in foma transducer: avoid double allocation of sigma.
+63caf31 Fix memory leak in XFST and XRE compilers undefine method.
+badaa60 Fix link typos
+4e73272 Fix memory leaks in LexcCompiler detected by address sanitizer.
+c4349fa Avoid memory leak in XfstCompiler::write_stack: free outstream after usage.
+2a454e3 Avoid segfault when regexp parsing fails in lexicon.
+fef85e4 Snip flex version warning as all supported platforms have new enough flex (closes #508); Python 3.x
+7b8eb26 Merge branch 'master' of https://github.com/hfst/hfst
+6d967ad Modify tracking of entry points to allow for RTNs in Captures()
+a274151 truncate long names, fixes #488
+2a51e9d Initialize input_mark_symbol (works around https://github.com/divvun/libdivvun/issues/43)
+3b91edb hfst-tokenise: skip modifier letters in is_cg_tag
+1eafb28 (tag: v3.15.4) Intended license was LGPLv3+ so formalize that, and explicitly mention that the SFST-derived files are used under LGPLv3+ agreement (closes #494)
+1a29cf3 Change https://kitwiki.csc.fi/twiki/bin/view/KitWiki -> https://github.com/hfst/hfst/wiki (fixes #452)
+4a10952 Allow hfst-xfst to source from absolute paths
+f7c208b Properly open input files for hfst-expand-equivalences (#495)
+be76d45 Release 3.15.4; Import Foma patches with license change to Apache-2.0 and minimal other fixes; Allow regeneration of Foma files so the generated files can be omitted; Explicit license file for SFST
+6128b1c (tag: v3.15.3) accoring -> according
+94b48cb Release 3.15.3
+ed49cfd Merge pull request #456 from hfst/440-lemma-vs-tag-vs-non-composed-single-arc
+5b231fc (origin/440-lemma-vs-tag-vs-non-composed-single-arc) ${ICU_CPPFLAGS} to AM_CPPFLAGS
+437e9eb Use ICU if possible to find characterBoundary in is_cg_tag
+c78084b escape all \ for cg output fixes #491
+fd35fa6 whitespace only
+8bc6c24 bump reqd automake in autogensh
+4e2e8be Merge pull request #489 from mr-martian/expand-help-string
+143098c I promise I can count
+321bc2d don't follow cycles in example
+0d8e021 clearer help text for hfst-expand
+5dadce4 try newer automake travis
+b01f422 git tries to modify line-endings in binaries
+6a4eeaf sedded the object references
+4748ae8 add subdir-objects fixes #486
+b7fef31 Merge pull request #471 from ftyers/free-insert
+a40be44 theres some bug in eliminate flags that overflows
+1d19c46 Priority union (#480)
+eabf040 Realign (#468)
+4d6b15a Parse wordbound blanks as normal blanks in hfst-proc (#478)
+a140e28 Travis macOS Homebrew just doesn't work
+452b728 Some files should keep crlf
+342e98a Fix Travis; Add Github Action; Force text and eol=lf
+088e48a Fix Travis; Add Github Action; Force text and eol=lf
+c1a4887 Fst2txt union (#475)
+b2129ff improve handling of input based on hfst-substitute
+323ea04 insert freely manpage
+01c5f90 add insert-freely
+265bc37 some fixes to hfst-proc (#465)
+f7e1636 Add clarifying line to help message
+78bcf55 Merge pull request #438 from mr-martian/master
+a761da1 hfst-proc: escape apertium reserved chars in lemma
+505aac3 (tag: v3.15.2) Release 3.15.2.
+57dd2e1 Fix off-by-one bug in checking captures
 95ec868 Change Travis: ccache fails for Python bindings
 dee52b3 Put Python bindings under autotools via --enable-python-bindings
 356ddd3 (tag: v3.15.1) Fix Travis
 b456e6e Release 3.15.1; Python 2 -> 3; Trusty -> Xenial
 f1dc19a Handle all-space-forms in hfst-tokenize, cf. #443
+0a79676 fix typo in HfstBasicTransducer.write_xfst()
 6a31890 HFST does not need nightly
 12a1695 EL7 has ICU 50
 5a25971 icu-config is gone in newer distros
@@ -3390,7 +3448,7 @@ c930115 Fixed hanging hfst-ol conversion, still doesn't get written
 0382dde Documentation added.
 3210012 Documentation added.
 94820cd Intersecting composition functionalities removed, they will be implemented using HfstBasicTransducer format in the future.
-90253d69 Updated configure.ac to reflect dropping of tools/src/parsers/Makefile.am
+90253d6 Updated configure.ac to reflect dropping of tools/src/parsers/Makefile.am
 081c986 Deleted unneeded Makefile.am in tools/src/parsers
 aa3fcaa Substituting unknowns and identities now works correctly in composition.
 3e96e8f A bug in reading transducers in AT&T format fixed. Also an alphabet bug in converting HfstBasicTransducers into SFST transducers fixed.

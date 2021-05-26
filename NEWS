@@ -5,6 +5,36 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.15.5
+----------------------------
+
+* Fixes to pmatch:
+
+  * Modify tracking of entry points to allow for RTNs in Captures()
+
+  * Fix off-by-one bug in checking captures
+
+* Fixes to other issues: #508, #488, #486, #452, #491, #494
+
+* Fix memory leaks
+
+
+Noteworthy changes in 3.15.4
+----------------------------
+
+* Import Foma patches with license change to Apache-2.0 and minimal other fixes
+
+* Allow regeneration of Foma files so the generated files can be omitted
+
+* Explicit license file for SFST
+
+
+Noteworthy changes in 3.15.3
+----------------------------
+
+* Numerous improvements to command line tools, e.g. substitute, insert-freely, proc, fst2txt, expand
+
+
 Noteworthy changes in 3.15.2
 ----------------------------
 
