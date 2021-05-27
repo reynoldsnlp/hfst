@@ -61,4 +61,5 @@ endif
 
 hfst_foma_SOURCES=foma.c stack.c iface.c lex.interface.c lex.cmatrix.c
 
-EXTRA_DIST = foma.h fomalibconf.h fomalib.h lexc.h regex.h
+EXTRA_DIST = foma.h fomalibconf.h fomalib.h lexc.h regex.h \
+	cmatrix.l interface.l lexc.l regex.l regex.y
