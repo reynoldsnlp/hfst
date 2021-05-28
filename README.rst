@@ -272,7 +272,7 @@ Troubleshooting
 ===============
 
 In this section we list the errors that pop up commonly on `our support channel
-<irc://FreeNode/#hfst>`_ or in `our issue tracker
+<irc://irc.oftc.net/hfst>`_ or in `our issue tracker
 <https://github.com/hfst/hfst/issues>`_,
 
 \::malloc has not been declared

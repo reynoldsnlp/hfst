@@ -23,10 +23,10 @@ script:
 notifications:
     irc:
         channels:
-            - secure: "FWjUrhqWeVjjJnLQb7CwxxztJgE6OgL5h39MRzF9LKjGML1kd2GEBrJBITzdWhLvwJhkhY1so4zZ73MuxUJGSNOKagvt2qamliGIx/IbgAwlTlwQtR8ya0qdV6ITWMXa5pm86RoFrpnD+45Bitu7R0sPgHNNFImBbWmTKntiIw6xvvHklIsIvxWvMNny/FNEl95ZCTz8SkPeFYyRbdM2krRsKoPefI8kbCAaBdbXgo6zSboGkZinkDCXDJbn9cOeb06nBSeMd9SWzZSyx2DP1L8KhGvCnegwahN6bVYAcWZ5cCYDkB35pW0Of81siJzYMjr7yLggL27eROG3CgCeK8x9jg5rJW2IhZkxECYzAKftQPPALXkBOiEtFABhAdtBa316W5uz+XasIG9COvUSzh2f7s7M1cqkhmLTi3PLP8JcjViyV9PgH54sP+pjGilaXEGkAH++Rtj/0Jc3edTapZipEnZnAPO/3idCloJ7+goWzXcIJeLtQA8pgqi3wFlHguzvMDJIAjlrj7WM5Lzi4ZEzudlggdq3VE2K4jlBOqt3jKCwYOxdpsnzXi9dX/4mPzFnAM7AvTlankV2hg3E98zkDbUqcB56gf79S5Z4oAq71iXHyilPZ9EDf/RaUm+7tENAxB8WUVjLUpUcEH6y5C9i/TX20mUxivEWtjsq0jQ="
+            - secure: "ZTx3qhKDRKG/HHNZVNI1XTW2jVJbQ2X/ZOMW1cTmQV9nGqqdE8uZAEKbYV+s1bydt/Kg/18B9NI1gK3az8r9ZbYLje74KvcwDmI/6T+Xz7m89GKB2B024NUiyx15RmCNjKohsZ+tuTNtZq/sSRSMtTNfoQLYGBzXwqtxbqQmOlU054komGTo+OFrseXv+1t9Qju8qNUirE8NxhTCCVhh57dwPylbFdmxnN5b1rM7qF8O7nmnbav9SZwajn3GFCUj7YSGIfGkMh3I6zyz/iTjKkD5sCKdUQ33A1spX2Evh6IdmJdqTUGMrtozarYBuFMUPYfGByNT4hOkC+Uy32x+1XlQz0chGGQ40Fsuh2Ke4PP52juaZMua+JVsSCel3vOLWkLueAwrymqEu3e65sLErsX+IASV8DkGlpiIXKp0L1hbQ/wQdreGxGsipA2oN4e9dK7jha5uIrZVTpxbijlwkUSLT7s6RRW3HOJQZkGeWcsVz6F7lYTMTqTrrw26/A2pAyuyLR+uPCRItiNzToczMGK/TiMftzQTepST5S1KHM1brJoiyQc1m59+EN6fgVD0j0piADjvdT3isPiZ4AS0t8W6HKEA5ZbXRp+6PTk2iwrEjk/QllxU15RSvUplV4MaNK0bYZUhlL+Slv0WAajQ0zaO6HpZdMV1rg0rPCn7SVM="
         on_failure: always
         on_success: never
 # The irc channel is encrypted for hfst/hfst, so build notifications from forks won't show up on the IRC channel
 # Encrypt with:
 # $ gem install --user-install travis
-# $ ~/.gem/ruby/*/bin/travis encrypt -r hfst/hfst 'chat.freenode.net#hfst'
+# $ ~/.gem/ruby/*/bin/travis encrypt -r hfst/hfst 'irc.oftc.net#hfst'
