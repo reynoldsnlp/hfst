@@ -32,10 +32,10 @@ namespace hfst { namespace implementations
 {
 
   LogWeightInputStream::LogWeightInputStream(void):
-    i_stream(),input_stream(cin)
+    i_stream(),input_stream(std::cin)
   {}
   LogWeightInputStream::LogWeightInputStream(const std::string &filename_):
-    filename(std::string(filename_)),i_stream(filename.c_str()),
+    filename(filename_),i_stream(filename.c_str()),
     input_stream(i_stream)
   {}
 
@@ -77,7 +77,7 @@ namespace hfst { namespace implementations
 
   void LogWeightInputStream::close(void)
   {
-    if (filename != string())
+    if (!filename.empty())
       { i_stream.close(); }
   }
   bool LogWeightInputStream::is_eof(void) const
@@ -86,7 +86,7 @@ namespace hfst { namespace implementations
   }
   bool LogWeightInputStream::is_bad(void) const
   {
-    if (filename == string())
+    if (filename.empty())
       { return std::cin.bad(); }
     else
       { return input_stream.bad(); }
@@ -95,7 +95,7 @@ namespace hfst { namespace implementations
   {
     if(is_eof())
       return false;
-    if (filename == string())
+    if (filename.empty())
       { return std::cin.good(); }
     else
       { return input_stream.good(); }
@@ -115,7 +115,7 @@ namespace hfst { namespace implementations
     return c == 0xd6;
   }
 
-  bool LogWeightInputStream::is_fst(istream &s)
+  bool LogWeightInputStream::is_fst(std::istream &s)
   {
     return s.good() && (s.peek() == 0xd6);
   }
@@ -135,7 +135,7 @@ namespace hfst { namespace implementations
     FstHeader header;
     try
       {
-        if (filename == string())
+        if (filename.empty())
           {
             header.Read(input_stream,"STDIN");
             t = static_cast<LogFst*>
@@ -197,7 +197,7 @@ namespace hfst { namespace implementations
 
   void LogWeightOutputStream::close(void)
   {
-    if (filename != string())
+    if (!filename.empty())
       { o_stream.close(); }
   }
 
@@ -390,7 +390,7 @@ namespace hfst { namespace implementations
     if (initial_state != 0) {
       zero_print = initial_state;
     }
-      
+
     for (fst::StateIterator<LogFst> siter(*t);
          ! siter.Done(); siter.Next())
       {
@@ -471,7 +471,7 @@ namespace hfst { namespace implementations
     if (initial_state != 0) {
       zero_print = initial_state;
     }
-      
+
     for (fst::StateIterator<LogFst> siter(*t);
          ! siter.Done(); siter.Next())
       {
@@ -553,7 +553,7 @@ namespace hfst { namespace implementations
     if (initial_state != 0) {
       zero_print = initial_state;
     }
-      
+
     for (fst::StateIterator<LogFst> siter(*t);
          ! siter.Done(); siter.Next())
       {
@@ -638,7 +638,7 @@ namespace hfst { namespace implementations
     if (initial_state != 0) {
       zero_print = initial_state;
     }
-      
+
     for (fst::StateIterator<LogFst> siter(*t);
          ! siter.Done(); siter.Next())
       {
@@ -709,7 +709,7 @@ namespace hfst { namespace implementations
         }
       }
   }
-  
+
 
   // AT&T format is handled here ------------------------------
 
@@ -917,7 +917,7 @@ namespace hfst { namespace implementations
             result->AddArc(result_s,
                            LogArc(arc.ilabel, arc.olabel,
                                   arc.weight, result_nextstate));
-            
+
           }
       }
 
@@ -948,7 +948,7 @@ namespace hfst { namespace implementations
     StringSet t2_symbols = get_alphabet(t2);
     hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
                     t2_symbols, unknown_t2);
-    
+
     // 2. Add new symbols from transducer t1 to the symbol table
     //    of transducer t2...
 
@@ -972,7 +972,7 @@ namespace hfst { namespace implementations
 
     // 3. Calculate the set of symbol pairs to which a non-identity "?:?"
     //    transition is expanded for both transducers.
-    
+
     LogFst *harmonized_t1;
     LogFst *harmonized_t2;
 
@@ -1006,7 +1006,7 @@ namespace hfst { namespace implementations
     st.AddSymbol(internal_identity, 2);
     return st;
   }
-  
+
   void LogWeightTransducer::initialize_symbol_tables(LogFst *t) {
     SymbolTable st = create_symbol_table("");
     t->SetInputSymbols(&st);
@@ -1102,7 +1102,7 @@ namespace hfst { namespace implementations
     LogFst B(encb);
     return Equivalent(A, B);
   }
-  
+
   bool LogWeightTransducer::is_automaton(LogFst * t)
   {
     for (fst::StateIterator<LogFst> siter(*t);
@@ -1327,7 +1327,7 @@ namespace hfst { namespace implementations
     t->SetFinal(state, 0.5);
     t->AddArc(initial, LogArc(1,1,0.5,state));
     t->AddArc(state, LogArc(2,2,0.5,initial));
- 
+
     // print t before minimize
     print_att_number(t, stderr);
 
@@ -1501,7 +1501,7 @@ namespace hfst { namespace implementations
   { LogFst * retval = new LogFst(ProjectFst<LogArc>(*t,PROJECT_OUTPUT));
     retval->SetInputSymbols(t->InputSymbols());
     return retval; }
-  
+
   typedef std::pair<int,int> LabelPair;
   typedef std::vector<LabelPair> LabelPairVector;
 
@@ -1538,7 +1538,7 @@ namespace hfst { namespace implementations
     RelabelFst<LogArc> t_subst(*t,v,v);
     return new LogFst(t_subst);
   }
-  
+
   LogFst * LogWeightTransducer::substitute
   (LogFst * t,
    NumberPair old_key_pair,
@@ -1638,10 +1638,10 @@ namespace hfst { namespace implementations
     assert(t->InputSymbols() != NULL);
     SymbolTable * st = t->InputSymbols()->Copy();
     // TODO: cl.exe: conversion from 'int64' to 'unsigned int'
-    pair<unsigned int, unsigned int> old_pair
+    std::pair<unsigned int, unsigned int> old_pair
       ((unsigned int)st->AddSymbol(old_symbol_pair.first),
        (unsigned int)st->AddSymbol(old_symbol_pair.second));
-    pair<unsigned int, unsigned int> new_pair
+    std::pair<unsigned int, unsigned int> new_pair
       ((unsigned int)st->AddSymbol(new_symbol_pair.first),
        (unsigned int)st->AddSymbol(new_symbol_pair.second));
     LogFst * retval = substitute(t, old_pair, new_pair);
@@ -1830,7 +1830,7 @@ namespace hfst { namespace implementations
     LogFst * t2_ = expand_arcs(t2, foo, false);
     t2_->SetInputSymbols(t1->InputSymbols());
     t1->SetOutputSymbols(t1->InputSymbols());
-    
+
     ArcSort(t1, OLabelCompare<LogArc>());
     ArcSort(t2_, ILabelCompare<LogArc>());
 
@@ -1893,7 +1893,7 @@ namespace hfst { namespace implementations
       }
 
     t->SetFinal(s,0);
-    
+
     t->SetInputSymbols(st);
     return t;
   }
@@ -2072,7 +2072,7 @@ namespace hfst { namespace implementations
           }
       }
   }
-  
+
   void LogWeightTransducer::add_sub_trie(LogFst &t1,
                   StateId t1_state,
                     const LogFst * t2,
@@ -2099,7 +2099,7 @@ namespace hfst { namespace implementations
   }
 
   // ----- TRIE FUNCTIONS END -----
-  
+
 
   static bool extract_paths
   (LogFst * t, LogArc::StateId s,
@@ -2115,7 +2115,7 @@ namespace hfst { namespace implementations
       return true;
     all_visitations[s]++;
     path_visitations[s]++;
-    
+
     /*
     if(lpos > 0 && upos > 0)
     {
@@ -2150,9 +2150,9 @@ namespace hfst { namespace implementations
           }
       }
 
-    
+
     // sort arcs by number of visitations
-    vector<const LogArc*> arcs;
+    std::vector<const LogArc*> arcs;
     for(fst::ArcIterator<LogFst> it(*t,s); !it.Done(); it.Next())
     {
       const LogArc& a = it.Value();
@@ -2165,13 +2165,13 @@ namespace hfst { namespace implementations
         arcs[k] = arcs[k-1];
       arcs[i] = &a;
     }
-    
+
     bool res = true;
     for( size_t i=0; i<arcs.size() && res == true; i++ )
     {
       const LogArc &arc = *(arcs[i]);
       bool added_fd_state = false;
-    
+
       if (fd_state_stack) {
         if(fd_state_stack->back().get_table().get_operation(arc.ilabel)
            != NULL) {
@@ -2184,7 +2184,7 @@ namespace hfst { namespace implementations
           }
         }
       }
-      
+
       /* Handle spv here. Special symbols (flags, epsilons) are
          always inserted. */
 
@@ -2200,39 +2200,39 @@ namespace hfst { namespace implementations
         ostring = t->InputSymbols()->Find(arc.olabel);
 
       spv.push_back(StringPair(istring, ostring));
-      
+
       res = extract_paths
         (t, arc.nextstate, all_visitations, path_visitations,
          /*lbuffer,lp, ubuffer,up,*/ weight_sum+arc.weight.Value(), callback,
          cycles, fd_state_stack, filter_fd,
          /*include_spv,*/ spv);
-     
+
       spv.pop_back();
- 
+
       if(added_fd_state)
         fd_state_stack->pop_back();
     }
-    
+
     path_visitations[s]--;
     return res;
   }
-  
+
   static const int BUFFER_START_SIZE = 64;
-  
+
   void LogWeightTransducer::extract_paths
   (LogFst * t, hfst::ExtractStringsCb& callback,
    int cycles, FdTable<int64>* fd, bool filter_fd/*, bool include_spv*/)
   {
     if (t->Start() == -1)
       return;
-    
+
     //vector<char> lbuffer(BUFFER_START_SIZE, 0);
     //vector<char> ubuffer(BUFFER_START_SIZE, 0);
-    map<StateId, unsigned short> all_visitations;
-    map<StateId, unsigned short> path_visitations;
+    std::map<StateId, unsigned short> all_visitations;
+    std::map<StateId, unsigned short> path_visitations;
     std::vector<hfst::FdState<int64> >* fd_state_stack = (fd==NULL) ? NULL :
       new std::vector<hfst::FdState<int64> >(1, hfst::FdState<int64>(*fd));
-    
+
     StringPairVector spv;
     hfst::implementations::extract_paths
       (t,t->Start(),all_visitations,path_visitations,
@@ -2248,7 +2248,7 @@ namespace hfst { namespace implementations
     (void)max_num;
     HFST_THROW(FunctionNotImplementedException);
   }
-  
+
   FdTable<int64>* LogWeightTransducer::get_flag_diacritics(LogFst * t)
   {
     FdTable<int64>* table = new FdTable<int64>();
