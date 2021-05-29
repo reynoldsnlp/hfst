@@ -21,6 +21,7 @@ extern "C" {
 #include <stdio.h>
 #include <inttypes.h>
 #include <string.h>
+#include <stdbool.h>
 #ifdef ORIGINAL
 #include "zlib.h"
 #else // #ifdef ORIGINAL
@@ -210,6 +211,14 @@ int remove_defined (struct defined_networks *def, char *string);
 /********************/
 
 FEXPORT char *fsm_get_library_version_string();
+
+typedef enum {
+	FSMO_SKIP_WORD_BOUNDARY_MARKER, // _Bool
+	FSMO_NUM_OPTIONS
+} FSM_OPTIONS;
+inline _Bool fsm_set_option(unsigned long long option, void *value) {
+	return 1;
+}
 
 FEXPORT struct fsm *fsm_determinize(struct fsm *net);
 FEXPORT struct fsm *fsm_epsilon_remove(struct fsm *net);

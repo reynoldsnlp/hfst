@@ -15,8 +15,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS=dlfcn sfst foma
+SUBDIRS=dlfcn sfst
 if ! WANT_OPENFST_UPSTREAM
 SUBDIRS += openfst openfstwin
+endif
+if ! WANT_FOMA_UPSTREAM
+SUBDIRS += foma
 endif
 AUTOMAKE_OPTIONS=subdir-objects

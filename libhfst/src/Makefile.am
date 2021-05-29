@@ -41,7 +41,11 @@ endif
 endif
 
 if WANT_FOMA
+if WANT_FOMA_UPSTREAM
+  libhfst_la_LIBADD += -lfoma
+else
   libhfst_la_LIBADD += $(top_builddir)/back-ends/foma/libfoma.la
+endif
 endif
 
 if WANT_MINGW

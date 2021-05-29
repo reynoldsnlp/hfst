@@ -117,6 +117,15 @@ AS_IF([test "x$with_foma" != xno], [AC_DEFINE([HAVE_FOMA], [1],
                                               [Define to compile foma support in HFST])])
 AM_CONDITIONAL([WANT_FOMA], [test x$with_foma != xno])
 
+AC_ARG_WITH([foma-upstream],
+            [AS_HELP_STRING([--with-foma-upstream],
+                            [Use upstream Foma @<:@default=no@:>@])],
+            [],
+            [with_foma_upstream=no])
+AS_IF([test "x$with_foma_upstream" != xno], [AC_DEFINE([HAVE_FOMA_UPSTREAM], [1],
+                                              [Use upstream Foma])])
+AM_CONDITIONAL([WANT_FOMA_UPSTREAM], [test x$with_foma_upstream != xno])
+
 AC_ARG_WITH([xfsm],
             [AS_HELP_STRING([--with-xfsm],
                             [process unweighted fsts with xfsm @<:@default=no@:>@])],
@@ -711,14 +720,13 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h]
 
 AC_LANG_PUSH([C++])
 
-# Always use c++11 (flag 'c++0x' is understood also by older compilers) unless --with-c++11=no or --without-c++11 is requested
-# Checks for highest supported C++ standard
-# But, clang++ does not accept invalid OpenFST code, so limit to C++11 for now
-AS_IF([test "x$with_cplusplus_11" != "xno"],[
-AX_CHECK_COMPILE_FLAG([-std=c++11], [CXXFLAGS="$CXXFLAGS -std=c++11"], [
- AS_IF([echo "$CXXFLAGS" | grep '\-std' | grep -E '((gnu\+\+)|(c\+\+))((11)|(0x)|(14)|(1y)|(17)|(1z))' > /dev/null 2> /dev/null], [], [CXXFLAGS="$CXXFLAGS -std=c++0x"])
-])
-])
+# If we're using upstream OpenFST then use C++17, otherwise limit to C++11
+AM_COND_IF([WANT_OPENFST_UPSTREAM], [CXXFLAGS="$CXXFLAGS -std=c++17"], [CXXFLAGS="$CXXFLAGS -std=c++11"])
+
+# On 32bit x86, we need to use SSE for precise floating point arithmetics in OpenFST
+AX_CHECK_COMPILE_FLAG([-msse], [CXXFLAGS="$CXXFLAGS -msse"], [])
+AX_CHECK_COMPILE_FLAG([-msse2], [CXXFLAGS="$CXXFLAGS -msse2"], [])
+AX_CHECK_COMPILE_FLAG([-mfpmath=sse], [CXXFLAGS="$CXXFLAGS -mfpmath=sse"], [])
 
 AC_CHECK_HEADERS([unordered_map], [], [],
 [#ifdef HAVE_UNORDERED_MAP

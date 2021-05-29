@@ -17,7 +17,11 @@
 
 #ifndef _FOMALIB_H_
   #define _FOMALIB_H_
-  #include "back-ends/foma/fomalib.h"
+  #ifdef HAVE_FOMA_UPSTREAM
+    #include <fomalib.h>
+  #else
+    #include "back-ends/foma/fomalib.h"
+  #endif
 #endif
 
 #include "ConvertTransducerFormat.h"
@@ -35,9 +39,9 @@ namespace hfst { namespace implementations
 
 
   /* -----------------------------------------------------------------
-     
+
      Internal functions used by the actual conversion functions.
-     
+
      ----------------------------------------------------------------- */
 
   /* Get the number of transitions in state \a fsm */
@@ -56,7 +60,7 @@ namespace hfst { namespace implementations
 
   /*
      Handle a start state in a foma transducer.
-     
+
      @param fsm            The start state.
      @param start_state_id The number of the start state, the value -1 means
                            not defined.
@@ -119,11 +123,11 @@ namespace hfst { namespace implementations
   }
 
 
-  
+
   /* ----------------------------------------------------------------------
 
      Create an HfstBasicTransducer equivalent to foma transducer \a t.
-     
+
      ---------------------------------------------------------------------- */
 
   HfstBasicTransducer * ConversionFunctions::
@@ -146,7 +150,7 @@ namespace hfst { namespace implementations
     StringVector symbol_vector = FomaTransducer::get_symbol_vector(t);
     std::vector<unsigned int> harmonization_vector
       = HfstTropicalTransducerTransitionData::get_harmonization_vector(symbol_vector);
-    
+
     HfstBasicTransducer * net = new HfstBasicTransducer();
     struct fsm_state *fsm;
     fsm = t->states;
@@ -183,13 +187,13 @@ namespace hfst { namespace implementations
             harmonization_vector.at((fsm+i)->out),
             0, false), false);
       }
-    
+
     // 3. If the source state is final in foma,
     if ((fsm+i)->final_state == 1) {
       // set the state as final.
       net->set_final_weight((fsm+i)->state_no, 0);
     }
-    
+
   }
 
   // If there was not an initial state in foma transducer,
@@ -201,7 +205,7 @@ namespace hfst { namespace implementations
       (HfstFatalException,
       "Foma transducer has no start state");*/
   }
-  
+
   /* If start state number (N) is not zero, swap state numbers N and zero
      in internal transducer. TODO */
   if (start_state_id != 0) {
@@ -246,7 +250,7 @@ namespace hfst { namespace implementations
 
 
   /* ------------------------------------------------------------------------
-     
+
      Create a foma transducer equivalent to HfstBasicTransducer \a hfst_fsm.
 
      ------------------------------------------------------------------------ */
@@ -266,7 +270,7 @@ namespace hfst { namespace implementations
     const char * emptystr = "";
     h = fsm_construct_init(const_cast<char*>(emptystr));
     //free(emptystr);
-    
+
     // ----- Go through all states -----
     unsigned int source_state=0;
     for (HfstBasicTransducer::const_iterator it = hfst_fsm->begin();
@@ -292,7 +296,7 @@ namespace hfst { namespace implementations
         source_state++;
       }
     // ----- all states gone through -----
-    
+
 
     // ----- Go through the final states -----
     for (HfstBasicTransducer::FinalWeightMap::const_iterator it
@@ -304,10 +308,10 @@ namespace hfst { namespace implementations
       }
     // ----- final states gone through -----
 
-    
+
     // Copy the alphabet
     copy_alphabet(hfst_fsm, h);
-    
+
     fsm_construct_set_initial(h, 0);
     net = fsm_construct_done(h);
     fsm_count(net);
@@ -339,7 +343,7 @@ namespace hfst { namespace implementations
 int main(int argc, char * argv[])
 {
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
-    
+
     std::cout << "ok" << std::endl;
     return 0;
 }

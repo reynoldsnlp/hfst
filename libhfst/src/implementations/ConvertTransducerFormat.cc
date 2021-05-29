@@ -11,17 +11,6 @@
 #  include <config.h>
 #endif
 
-//#if HAVE_SFST || HAVE_LEAN_SFST
-//#include "back-ends/sfst/fst.h"
-//#endif // HAVE_SFST || HAVE_LEAN_SFST
-
-//#if HAVE_FOMA
-//#ifndef _FOMALIB_H_
-//#define _FOMALIB_H_
-//#include "back-ends/foma/fomalib.h"
-//#endif // _FOMALIB_H_
-//#endif // HAVE_FOMA
-
 #include "ConvertTransducerFormat.h"
 #include "optimized-lookup/convert.h"
 #include "HfstBasicTransducer.h"
@@ -46,7 +35,7 @@ namespace hfst { namespace implementations
       return std::string(""); } // number not found
     return number_to_string_vector[number];
   }
-  
+
   unsigned int ConversionFunctions::get_number(const std::string &str)
   {
     String2NumberMap::iterator it =
@@ -59,7 +48,7 @@ namespace hfst { namespace implementations
     }
     return it->second;
   }
-  
+
   ConversionFunctions::NumberVector
     ConversionFunctions::get_harmonization_vector
       (const StringVector &coding_vector)
@@ -103,7 +92,7 @@ namespace hfst { namespace implementations
     }
 #endif
 #endif // HAVE_OPENFST
-    
+
 #if HAVE_FOMA
     if (t.type == FOMA_TYPE) {
       HfstBasicTransducer * retval = foma_to_hfst_basic_transducer(t.implementation.foma);
@@ -120,7 +109,7 @@ namespace hfst { namespace implementations
     }
 #endif // HAVE_FOMA
 
-    
+
     /* Add here your implementation. */
     //#if HAVE_MY_TRANSDUCER_LIBRARY
     //    if (t.type == MY_TRANSDUCER_LIBRARY_TYPE)
@@ -182,18 +171,18 @@ int main(void)
             HfstTokenizer tok;
             HfstTransducer fsm1("cat", "dog", tok, types[i]);
             fsm1.set_final_weights(4);
-            
+
             HfstBasicTransducer * fsm1_converted =
               ConversionFunctions::hfst_transducer_to_hfst_basic_transducer(fsm1);
-            
+
             HfstTransducer fsm1_converted_twice(*fsm1_converted, types[i]);
             delete fsm1_converted;
-            
+
             if (! fsm1.compare(fsm1_converted_twice))
               return 1;
           }
       }
-    
+
     return 0;
   }
 #endif // MAIN_TEST

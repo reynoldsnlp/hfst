@@ -3,9 +3,6 @@
 #include "hfst-commandline.h"
 #include <cstdlib>
 
-//#include <stdbool.h>
-//#include "../../back-ends/foma/fomalib.h" // todo: find the exact header where xxmalloc is defined
-
 char * hfst_stdin_to_mem()
 {
   size_t maxbytes = 1000000;
