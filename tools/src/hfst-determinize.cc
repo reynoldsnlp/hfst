@@ -27,6 +27,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include <cstdio>
 #include <cstdlib>
@@ -181,20 +182,20 @@ int main( int argc, char **argv ) {
         inputfilename, outfilename);
 
     // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
+    std::unique_ptr<HfstInputStream> instream;
     try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
+      instream.reset((inputfile != stdin) ?
+        new HfstInputStream(inputfilename) : new HfstInputStream());
     } catch(const HfstException e)    {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
     }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, instream->get_type()) :
-        new HfstOutputStream(instream->get_type());
+    auto outstream = (outfile != stdout) ?
+        std::make_unique<HfstOutputStream>(outfilename, instream->get_type()) :
+        std::make_unique<HfstOutputStream>(instream->get_type());
     
-    if ( is_input_stream_in_ol_format(instream, "hfst-determinize"))
+    if ( is_input_stream_in_ol_format(*instream, "hfst-determinize"))
       {
         return EXIT_FAILURE;
       }
@@ -206,8 +207,6 @@ int main( int argc, char **argv ) {
         hfst::set_encode_weights(enc);
       }
 
-    delete instream;
-    delete outstream;
     free(inputfilename);
     free(outfilename);
     return retval;

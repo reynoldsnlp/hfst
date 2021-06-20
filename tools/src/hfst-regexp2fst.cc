@@ -28,7 +28,7 @@
 
 #include <iostream>
 #include <fstream>
-
+#include <memory>
 #include <vector>
 #include <map>
 #include <string>
@@ -461,11 +461,10 @@ int main( int argc, char **argv )
   verbose_printf("Reading from %s, writing to %s\n",
                  inputfilename, outfilename);
   // here starts the buffer handling part
-  HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, output_format) :
-        new HfstOutputStream(output_format);
+  auto outstream = (outfile != stdout) ?
+      std::make_unique<HfstOutputStream>(outfilename, output_format) :
+      std::make_unique<HfstOutputStream>(output_format);
   process_stream(*outstream);
-  delete outstream;
 
     if (encode_weights)
       {

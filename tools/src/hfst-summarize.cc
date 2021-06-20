@@ -27,6 +27,7 @@
 
 
 #include <fstream>
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -602,10 +603,10 @@ int main( int argc, char **argv ) {
     verbose_printf("Reading from %s, writing to %s\n",
         inputfilename, outfilename);
     // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
+    std::unique_ptr<HfstInputStream> instream;
     try {
-        instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
+        instream.reset((inputfile != stdin) ?
+        new HfstInputStream(inputfilename) : new HfstInputStream());
     } // NotTransducerStreamException
     catch (const HfstException e) {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
@@ -620,7 +621,6 @@ int main( int argc, char **argv ) {
     }
     free(inputfilename);
     free(outfilename);
-    delete instream;
     return EXIT_SUCCESS;
 }
 

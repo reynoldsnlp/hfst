@@ -27,6 +27,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include <cstdio>
 #include <cstdlib>
@@ -2017,12 +2018,12 @@ int main( int argc, char **argv ) {
             infinite_begin_setf, infinite_lookupf, infinite_end_setf,
             epsilon_format, space_format, show_flags);
     // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
+    std::unique_ptr<HfstInputStream> instream;
     try
       {
-        instream = (inputfile != stdin) ?
+        instream.reset((inputfile != stdin) ?
           new HfstInputStream(inputfilename) :
-          new HfstInputStream();
+          new HfstInputStream());
       }
     catch(const HfstException e)
       {
@@ -2035,7 +2036,6 @@ int main( int argc, char **argv ) {
     {
         fclose(outfile);
     }
-    delete instream;
     free(inputfilename);
     free(outfilename);
     return EXIT_SUCCESS;

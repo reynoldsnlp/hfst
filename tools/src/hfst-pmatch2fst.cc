@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include <vector>
 #include <map>
@@ -384,9 +385,9 @@ int main( int argc, char **argv )
     verbose_printf("Reading from %s, writing to %s\n",
                    inputfilename, outfilename);
     // here starts the buffer handling part
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, hfst::HFST_OLW_TYPE) :
-        new HfstOutputStream(hfst::HFST_OLW_TYPE);
+    auto outstream = (outfile != stdout) ?
+        std::make_unique<HfstOutputStream>(outfilename, hfst::HFST_OLW_TYPE) :
+        std::make_unique<HfstOutputStream>(hfst::HFST_OLW_TYPE);
     process_stream(*outstream);
     free(inputfilename);
     free(outfilename);

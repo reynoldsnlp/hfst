@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include <cstdio>
 #include <cstdlib>
@@ -47,7 +48,6 @@ using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::ImplementationType;
-
 using hfst::lexc::LexcCompiler;
 
 #include "hfst-commandline.h"
@@ -350,9 +350,9 @@ int main( int argc, char **argv ) {
       }
     verbose_printf("writing to %s\n", outfilename);
     // here starts the buffer handling part
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, format) :
-        new HfstOutputStream(format);
+    auto outstream = (outfile != stdout) ?
+        std::make_unique<HfstOutputStream>(outfilename, format) :
+        std::make_unique<HfstOutputStream>(format);
     hfst::set_xerox_composition(xerox_composition);
     LexcCompiler lexc(format, with_flags, align_strings);
     lexc.setMinimizeFlags(minimize_flags);
@@ -371,7 +371,6 @@ int main( int argc, char **argv ) {
         lexc.setTreatWarningsAsErrors(true);
       }
     retval = lexc_streams(lexc, *outstream);
-    delete outstream;
     for (unsigned int i = 0; i < lexccount; i++)
       {
         free(lexcfilenames[i]);
@@ -380,4 +379,3 @@ int main( int argc, char **argv ) {
     free(outfilename);
     return retval;
 }
-

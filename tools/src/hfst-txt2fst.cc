@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include <cstdio>
 #include <cstdlib>
@@ -380,9 +381,9 @@ int main( int argc, char **argv )
 
 
     // here starts the buffer handling part
-    HfstOutputStream* outstream = (outfile != stdout) ?
-                new HfstOutputStream(outfilename, output_format) :
-                new HfstOutputStream(output_format);
+    auto outstream = (outfile != stdout) ?
+        std::make_unique<HfstOutputStream>(outfilename, output_format) :
+        std::make_unique<HfstOutputStream>(output_format);
     process_stream(*outstream);
     if (inputfile != stdin)
       {
@@ -390,7 +391,6 @@ int main( int argc, char **argv )
       }
     free(inputfilename);
     free(outfilename);
-    delete outstream;
     return EXIT_SUCCESS;
 }
 
