@@ -33,8 +33,8 @@ namespace hfst_ol {
     typedef std::vector<Location> LocationVector;
     typedef std::vector<LocationVector> LocationVectorVector;
     typedef std::vector<WeightedDoubleTape> WeightedDoubleTapeVector;
-            
-    
+
+
     enum SpecialSymbol{entry,
                        exit,
                        LC_entry,
@@ -91,7 +91,7 @@ namespace hfst_ol {
         PmatchAlphabet(TransducerAlphabet const & a, PmatchContainer * cont);
         PmatchAlphabet(void);
         ~PmatchAlphabet(void);
-        virtual void add_symbol(const std::string & symbol);
+        void add_symbol(const std::string & symbol) override;
         static bool is_end_tag(const std::string & symbol);
         static bool is_capture_tag(const std::string & symbol);
         static bool is_captured_tag(const std::string & symbol);
@@ -153,6 +153,8 @@ namespace hfst_ol {
         // This tracks the ENTRY and EXIT tags
         std::vector<unsigned int> entry_stack;
         RtnCallStacks rtn_stacks;
+        hfst_ol::Transducer* uncompose_left;
+        hfst_ol::Transducer* uncompose_right;
         DoubleTape tape;
         DoubleTape best_result;
         DoubleTape result;
@@ -165,7 +167,7 @@ namespace hfst_ol {
         // The flag state for global flags
         hfst::FdState<SymbolNumber> global_flag_state;
         bool verbose;
-        
+
         bool count_patterns;
         bool delete_patterns;
         bool extract_patterns;
@@ -175,6 +177,7 @@ namespace hfst_ol {
         size_t max_recursion;
         bool need_separators;
         bool xerox_composition;
+        bool uncomposable;
 
         unsigned long line_number;
         std::map<std::string, size_t> pattern_counts;
@@ -204,9 +207,9 @@ namespace hfst_ol {
 
     public:
 
-        PmatchContainer(std::istream & is);
-        PmatchContainer(Transducer * toplevel);
-        PmatchContainer(std::vector<hfst::HfstTransducer> transducers);
+        explicit PmatchContainer(std::istream & is);
+        explicit PmatchContainer(Transducer * toplevel);
+        explicit PmatchContainer(std::vector<hfst::HfstTransducer> transducers);
         PmatchContainer(void);
         ~PmatchContainer(void);
 
@@ -301,6 +304,8 @@ namespace hfst_ol {
         void unrecurse(void) { ++recursion_depth_left; }
         void reset_recursion(void) { recursion_depth_left = (unsigned int)max_recursion; }
 
+        void uncompose(Location& loc);
+
         friend class PmatchTransducer;
         friend class PmatchAlphabet;
     };
@@ -310,6 +315,7 @@ namespace hfst_ol {
         unsigned int start;
         unsigned int length;
         std::string input;
+        std::string middle; // composted middle tape
         std::string output;
         std::string tag;
         Weight weight;
@@ -325,7 +331,7 @@ namespace hfst_ol {
     struct ContextMatchedTrap
     {
         bool polarity;
-    ContextMatchedTrap(bool p): polarity(p) {}
+    explicit ContextMatchedTrap(bool p): polarity(p) {}
     };
 
     class PmatchTransducer
@@ -353,7 +359,7 @@ namespace hfst_ol {
         };
 
         std::stack<LocalVariables> local_stack;
-    
+
         std::vector<TransitionW> transition_table;
         std::vector<TransitionWIndex> index_table;
 
@@ -401,12 +407,12 @@ namespace hfst_ol {
         void check_context(unsigned int input_pos,
                            unsigned int tape_pos,
                            TransitionTableIndex i);
-  
+
         void take_flag(SymbolNumber input,
                        unsigned int input_pos,
                        unsigned int tape_pos,
                        TransitionTableIndex i);
-  
+
         void take_transitions(SymbolNumber input,
                               unsigned int input_pos,
                               unsigned int tape_pos,

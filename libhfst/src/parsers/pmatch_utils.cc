@@ -87,6 +87,7 @@ std::map<std::string, std::string> variables;
 std::vector<std::map<std::string, PmatchObject*> > call_stack;
 std::map<std::string, PmatchObject*> def_insed_expressions;
 std::set<std::string> inserted_names;
+std::set<std::string> uncomposed;
 std::set<std::string> unsatisfied_insertions;
 std::set<std::string> used_definitions;
 std::set<std::string> function_names;
@@ -1232,7 +1233,9 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         timer = clock();
     }
 
-    if (inserted_names.size() > 0 || def_insed_expressions.size() > 0) {
+    unsigned int uncount = 0;
+    if (inserted_names.size() > 0 || def_insed_expressions.size() > 0 ||
+            uncomposed.size() > 0) {
         HfstTransducer dummy(format);
         // We keep TOP and any inserted transducers
         std::map<std::string, PmatchObject *>::iterator defs_it;
@@ -1240,7 +1243,9 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
              ++defs_it) {
             if (defs_it->first.compare("TOP") == 0 ||
                 inserted_names.count(defs_it->first) != 0 ||
-                def_insed_expressions.count(defs_it->first) != 0) {
+                def_insed_expressions.count(defs_it->first) != 0 ||
+                uncomposed.count(defs_it->first) != 0)
+              {
                 HfstTransducer * tmp = NULL;
                 if (def_insed_expressions.count(defs_it->first) != 0) {
                     tmp = def_insed_expressions[defs_it->first]->evaluate();
@@ -1250,10 +1255,30 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
                 tmp->minimize();
                 dummy.harmonize(*tmp);
                 // This is what it will be called in the archive
-                tmp->set_name(defs_it->first);
-                retval[defs_it->first] = tmp;
+                // XXX: seems to use the index not the name...)
+                if (uncomposed.count(defs_it->first) != 0) {
+                    if (uncount == 0) {
+                        tmp->set_name("UNCOMPOSE LEFT " + defs_it->first);
+                        retval["UNCOMPOSE LEFT " + defs_it->first] = tmp;
+                        uncount++;
+                    } else if (uncount == 1) {
+                        tmp->set_name("UNCOMPOSE RIGHT " + defs_it->first);
+                        retval["UNCOMPOSE RIGHT " + defs_it->first] = tmp;
+                        uncount++;
+                    } else {
+                        std::cerr << "Uncompose only works once so far..." <<
+                          std::endl;
+                        uncount++;
+                    }
+                }
+                else
+                  {
+                    tmp->set_name(defs_it->first);
+                    retval[defs_it->first] = tmp;
+                  }
             }
         }
+
         // Now that dummy is harmonized with everything, we harmonize everything
         // with dummy and minimize the results
         std::map<std::string, HfstTransducer *>::iterator tr_it;
@@ -2952,6 +2977,11 @@ HfstTransducer * PmatchTernaryOperation::evaluate(void)
             retval->substitute(middle_pair, *tmp);
             delete tmp;
         }
+    }
+    else if (op == Uncompose) {
+        retval = left->evaluate();
+        HfstTransducer* unc_left = middle->evaluate();
+        HfstTransducer* unc_right = right->evaluate();
     }
     retval->set_final_weights(hfst::double_to_float(weight), true);
     if (cache == NULL && should_use_cache() == true) {

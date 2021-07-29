@@ -46,7 +46,7 @@ private:
   //! @brief Construct compiler for unknown format transducers.
   PmatchCompiler();
   //! @brief Create compiler for @a impl format transducers
-  PmatchCompiler(hfst::ImplementationType impl);
+  explicit PmatchCompiler(hfst::ImplementationType impl);
 
   void set_flatten(bool val) { flatten = val; }
   void set_verbose(bool val) { verbose = val; }
