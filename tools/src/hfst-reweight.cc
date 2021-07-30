@@ -417,6 +417,10 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     {
         transducer_n++;
         HfstTransducer trans(instream);
+        if (trans.get_type() == hfst::FOMA_TYPE) {
+            warning(0, 0, "Weighting is not supported in this automaton type;"
+                     "weights will be discarded");
+        }
         char* inputname = hfst_get_name(trans, inputfilename);
         if (transducer_n==1)
         {
@@ -551,7 +555,7 @@ int main( int argc, char **argv ) {
     try {
       instream.reset((inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream());
-    } catch(const HfstException e)  {
+    } catch(const HfstException& e)  {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
@@ -559,7 +563,7 @@ int main( int argc, char **argv ) {
     auto outstream = (outfile != stdout) ?
         std::make_unique<HfstOutputStream>(outfilename, instream->get_type()) :
         std::make_unique<HfstOutputStream>(instream->get_type());
-    
+
     if ( is_input_stream_in_ol_format(*instream, "hfst-reweight"))
       {
         return EXIT_FAILURE;
