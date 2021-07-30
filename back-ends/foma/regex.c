@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.5.1.  */
+/* A Bison parser, made by GNU Bison 3.7.3.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
@@ -34,6 +34,10 @@
 /* C LALR(1) parser skeleton written by Richard Stallman, by
    simplifying the original so-called "semantic" parser.  */
 
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
+
 /* All symbols defined below should begin with yy or YY, to avoid
    infringing on user name space.  This should be done even for local
    variables, as they might otherwise be expanded by user macros.
@@ -41,14 +45,11 @@
    define necessary library symbols; they are noted "INFRINGES ON
    USER NAME SPACE" below.  */
 
-/* Undocumented macros, especially those whose name start with YY_,
-   are private implementation details.  Do not rely on them.  */
-
 /* Identify Bison output.  */
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "3.5.1"
+#define YYBISON_VERSION "3.7.3"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -246,7 +247,7 @@ void add_rule(struct fsm *L, struct fsm *R, struct fsm *R2, int type) {
 
 
 
-#line 250 "regex.c"
+#line 251 "regex.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -269,240 +270,124 @@ void add_rule(struct fsm *L, struct fsm *R, struct fsm *R2, int type) {
 #  endif
 # endif
 
-/* Enabling verbose error messages.  */
-#ifdef YYERROR_VERBOSE
-# undef YYERROR_VERBOSE
-# define YYERROR_VERBOSE 1
-#else
-# define YYERROR_VERBOSE 0
-#endif
-
-/* Use api.header.include to #include this header
-   instead of duplicating it here.  */
-#ifndef YY_YY_REGEX_H_INCLUDED
-# define YY_YY_REGEX_H_INCLUDED
-/* Debug traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
-
-/* Token type.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-  enum yytokentype
-  {
-    NET = 258,
-    END = 259,
-    LBRACKET = 260,
-    RBRACKET = 261,
-    LPAREN = 262,
-    RPAREN = 263,
-    ENDM = 264,
-    ENDD = 265,
-    CRESTRICT = 266,
-    CONTAINS = 267,
-    CONTAINS_OPT_ONE = 268,
-    CONTAINS_ONE = 269,
-    XUPPER = 270,
-    XLOWER = 271,
-    FLAG_ELIMINATE = 272,
-    IGNORE_ALL = 273,
-    IGNORE_INTERNAL = 274,
-    CONTEXT = 275,
-    NCONCAT = 276,
-    MNCONCAT = 277,
-    MORENCONCAT = 278,
-    LESSNCONCAT = 279,
-    DOUBLE_COMMA = 280,
-    COMMA = 281,
-    SHUFFLE = 282,
-    PRECEDES = 283,
-    FOLLOWS = 284,
-    RIGHT_QUOTIENT = 285,
-    LEFT_QUOTIENT = 286,
-    INTERLEAVE_QUOTIENT = 287,
-    UQUANT = 288,
-    EQUANT = 289,
-    VAR = 290,
-    IN = 291,
-    IMPLIES = 292,
-    BICOND = 293,
-    EQUALS = 294,
-    NEQ = 295,
-    SUBSTITUTE = 296,
-    SUCCESSOR_OF = 297,
-    PRIORITY_UNION_U = 298,
-    PRIORITY_UNION_L = 299,
-    LENIENT_COMPOSE = 300,
-    TRIPLE_DOT = 301,
-    LDOT = 302,
-    RDOT = 303,
-    FUNCTION = 304,
-    SUBVAL = 305,
-    ISUNAMBIGUOUS = 306,
-    ISIDENTITY = 307,
-    ISFUNCTIONAL = 308,
-    NOTID = 309,
-    LOWERUNIQ = 310,
-    LOWERUNIQEPS = 311,
-    ALLFINAL = 312,
-    UNAMBIGUOUSPART = 313,
-    AMBIGUOUSPART = 314,
-    AMBIGUOUSDOMAIN = 315,
-    EQSUBSTRINGS = 316,
-    LETTERMACHINE = 317,
-    MARKFSMTAIL = 318,
-    MARKFSMTAILLOOP = 319,
-    MARKFSMMIDLOOP = 320,
-    MARKFSMLOOP = 321,
-    ADDSINK = 322,
-    LEFTREWR = 323,
-    FLATTEN = 324,
-    SUBLABEL = 325,
-    CLOSESIGMA = 326,
-    CLOSESIGMAUNK = 327,
-    ARROW = 328,
-    DIRECTION = 329,
-    COMPOSE = 330,
-    CROSS_PRODUCT = 331,
-    HIGH_CROSS_PRODUCT = 332,
-    UNION = 333,
-    INTERSECT = 334,
-    MINUS = 335,
-    COMPLEMENT = 336,
-    KLEENE_STAR = 337,
-    KLEENE_PLUS = 338,
-    REVERSE = 339,
-    INVERSE = 340,
-    TERM_NEGATION = 341
-  };
-#endif
-/* Tokens.  */
-#define NET 258
-#define END 259
-#define LBRACKET 260
-#define RBRACKET 261
-#define LPAREN 262
-#define RPAREN 263
-#define ENDM 264
-#define ENDD 265
-#define CRESTRICT 266
-#define CONTAINS 267
-#define CONTAINS_OPT_ONE 268
-#define CONTAINS_ONE 269
-#define XUPPER 270
-#define XLOWER 271
-#define FLAG_ELIMINATE 272
-#define IGNORE_ALL 273
-#define IGNORE_INTERNAL 274
-#define CONTEXT 275
-#define NCONCAT 276
-#define MNCONCAT 277
-#define MORENCONCAT 278
-#define LESSNCONCAT 279
-#define DOUBLE_COMMA 280
-#define COMMA 281
-#define SHUFFLE 282
-#define PRECEDES 283
-#define FOLLOWS 284
-#define RIGHT_QUOTIENT 285
-#define LEFT_QUOTIENT 286
-#define INTERLEAVE_QUOTIENT 287
-#define UQUANT 288
-#define EQUANT 289
-#define VAR 290
-#define IN 291
-#define IMPLIES 292
-#define BICOND 293
-#define EQUALS 294
-#define NEQ 295
-#define SUBSTITUTE 296
-#define SUCCESSOR_OF 297
-#define PRIORITY_UNION_U 298
-#define PRIORITY_UNION_L 299
-#define LENIENT_COMPOSE 300
-#define TRIPLE_DOT 301
-#define LDOT 302
-#define RDOT 303
-#define FUNCTION 304
-#define SUBVAL 305
-#define ISUNAMBIGUOUS 306
-#define ISIDENTITY 307
-#define ISFUNCTIONAL 308
-#define NOTID 309
-#define LOWERUNIQ 310
-#define LOWERUNIQEPS 311
-#define ALLFINAL 312
-#define UNAMBIGUOUSPART 313
-#define AMBIGUOUSPART 314
-#define AMBIGUOUSDOMAIN 315
-#define EQSUBSTRINGS 316
-#define LETTERMACHINE 317
-#define MARKFSMTAIL 318
-#define MARKFSMTAILLOOP 319
-#define MARKFSMMIDLOOP 320
-#define MARKFSMLOOP 321
-#define ADDSINK 322
-#define LEFTREWR 323
-#define FLATTEN 324
-#define SUBLABEL 325
-#define CLOSESIGMA 326
-#define CLOSESIGMAUNK 327
-#define ARROW 328
-#define DIRECTION 329
-#define COMPOSE 330
-#define CROSS_PRODUCT 331
-#define HIGH_CROSS_PRODUCT 332
-#define UNION 333
-#define INTERSECT 334
-#define MINUS 335
-#define COMPLEMENT 336
-#define KLEENE_STAR 337
-#define KLEENE_PLUS 338
-#define REVERSE 339
-#define INVERSE 340
-#define TERM_NEGATION 341
-
-/* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-union YYSTYPE
+#include "regex.h"
+/* Symbol kind.  */
+enum yysymbol_kind_t
 {
-#line 198 "regex.y"
-
-     char *string;
-     struct fsm *net;
-     int  type;
-
-#line 480 "regex.c"
-
+  YYSYMBOL_YYEMPTY = -2,
+  YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
+  YYSYMBOL_YYerror = 1,                    /* error  */
+  YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
+  YYSYMBOL_NET = 3,                        /* NET  */
+  YYSYMBOL_END = 4,                        /* END  */
+  YYSYMBOL_LBRACKET = 5,                   /* LBRACKET  */
+  YYSYMBOL_RBRACKET = 6,                   /* RBRACKET  */
+  YYSYMBOL_LPAREN = 7,                     /* LPAREN  */
+  YYSYMBOL_RPAREN = 8,                     /* RPAREN  */
+  YYSYMBOL_ENDM = 9,                       /* ENDM  */
+  YYSYMBOL_ENDD = 10,                      /* ENDD  */
+  YYSYMBOL_CRESTRICT = 11,                 /* CRESTRICT  */
+  YYSYMBOL_CONTAINS = 12,                  /* CONTAINS  */
+  YYSYMBOL_CONTAINS_OPT_ONE = 13,          /* CONTAINS_OPT_ONE  */
+  YYSYMBOL_CONTAINS_ONE = 14,              /* CONTAINS_ONE  */
+  YYSYMBOL_XUPPER = 15,                    /* XUPPER  */
+  YYSYMBOL_XLOWER = 16,                    /* XLOWER  */
+  YYSYMBOL_FLAG_ELIMINATE = 17,            /* FLAG_ELIMINATE  */
+  YYSYMBOL_IGNORE_ALL = 18,                /* IGNORE_ALL  */
+  YYSYMBOL_IGNORE_INTERNAL = 19,           /* IGNORE_INTERNAL  */
+  YYSYMBOL_CONTEXT = 20,                   /* CONTEXT  */
+  YYSYMBOL_NCONCAT = 21,                   /* NCONCAT  */
+  YYSYMBOL_MNCONCAT = 22,                  /* MNCONCAT  */
+  YYSYMBOL_MORENCONCAT = 23,               /* MORENCONCAT  */
+  YYSYMBOL_LESSNCONCAT = 24,               /* LESSNCONCAT  */
+  YYSYMBOL_DOUBLE_COMMA = 25,              /* DOUBLE_COMMA  */
+  YYSYMBOL_COMMA = 26,                     /* COMMA  */
+  YYSYMBOL_SHUFFLE = 27,                   /* SHUFFLE  */
+  YYSYMBOL_PRECEDES = 28,                  /* PRECEDES  */
+  YYSYMBOL_FOLLOWS = 29,                   /* FOLLOWS  */
+  YYSYMBOL_RIGHT_QUOTIENT = 30,            /* RIGHT_QUOTIENT  */
+  YYSYMBOL_LEFT_QUOTIENT = 31,             /* LEFT_QUOTIENT  */
+  YYSYMBOL_INTERLEAVE_QUOTIENT = 32,       /* INTERLEAVE_QUOTIENT  */
+  YYSYMBOL_UQUANT = 33,                    /* UQUANT  */
+  YYSYMBOL_EQUANT = 34,                    /* EQUANT  */
+  YYSYMBOL_VAR = 35,                       /* VAR  */
+  YYSYMBOL_IN = 36,                        /* IN  */
+  YYSYMBOL_IMPLIES = 37,                   /* IMPLIES  */
+  YYSYMBOL_BICOND = 38,                    /* BICOND  */
+  YYSYMBOL_EQUALS = 39,                    /* EQUALS  */
+  YYSYMBOL_NEQ = 40,                       /* NEQ  */
+  YYSYMBOL_SUBSTITUTE = 41,                /* SUBSTITUTE  */
+  YYSYMBOL_SUCCESSOR_OF = 42,              /* SUCCESSOR_OF  */
+  YYSYMBOL_PRIORITY_UNION_U = 43,          /* PRIORITY_UNION_U  */
+  YYSYMBOL_PRIORITY_UNION_L = 44,          /* PRIORITY_UNION_L  */
+  YYSYMBOL_LENIENT_COMPOSE = 45,           /* LENIENT_COMPOSE  */
+  YYSYMBOL_TRIPLE_DOT = 46,                /* TRIPLE_DOT  */
+  YYSYMBOL_LDOT = 47,                      /* LDOT  */
+  YYSYMBOL_RDOT = 48,                      /* RDOT  */
+  YYSYMBOL_FUNCTION = 49,                  /* FUNCTION  */
+  YYSYMBOL_SUBVAL = 50,                    /* SUBVAL  */
+  YYSYMBOL_ISUNAMBIGUOUS = 51,             /* ISUNAMBIGUOUS  */
+  YYSYMBOL_ISIDENTITY = 52,                /* ISIDENTITY  */
+  YYSYMBOL_ISFUNCTIONAL = 53,              /* ISFUNCTIONAL  */
+  YYSYMBOL_NOTID = 54,                     /* NOTID  */
+  YYSYMBOL_LOWERUNIQ = 55,                 /* LOWERUNIQ  */
+  YYSYMBOL_LOWERUNIQEPS = 56,              /* LOWERUNIQEPS  */
+  YYSYMBOL_ALLFINAL = 57,                  /* ALLFINAL  */
+  YYSYMBOL_UNAMBIGUOUSPART = 58,           /* UNAMBIGUOUSPART  */
+  YYSYMBOL_AMBIGUOUSPART = 59,             /* AMBIGUOUSPART  */
+  YYSYMBOL_AMBIGUOUSDOMAIN = 60,           /* AMBIGUOUSDOMAIN  */
+  YYSYMBOL_EQSUBSTRINGS = 61,              /* EQSUBSTRINGS  */
+  YYSYMBOL_LETTERMACHINE = 62,             /* LETTERMACHINE  */
+  YYSYMBOL_MARKFSMTAIL = 63,               /* MARKFSMTAIL  */
+  YYSYMBOL_MARKFSMTAILLOOP = 64,           /* MARKFSMTAILLOOP  */
+  YYSYMBOL_MARKFSMMIDLOOP = 65,            /* MARKFSMMIDLOOP  */
+  YYSYMBOL_MARKFSMLOOP = 66,               /* MARKFSMLOOP  */
+  YYSYMBOL_ADDSINK = 67,                   /* ADDSINK  */
+  YYSYMBOL_LEFTREWR = 68,                  /* LEFTREWR  */
+  YYSYMBOL_FLATTEN = 69,                   /* FLATTEN  */
+  YYSYMBOL_SUBLABEL = 70,                  /* SUBLABEL  */
+  YYSYMBOL_CLOSESIGMA = 71,                /* CLOSESIGMA  */
+  YYSYMBOL_CLOSESIGMAUNK = 72,             /* CLOSESIGMAUNK  */
+  YYSYMBOL_ARROW = 73,                     /* ARROW  */
+  YYSYMBOL_DIRECTION = 74,                 /* DIRECTION  */
+  YYSYMBOL_COMPOSE = 75,                   /* COMPOSE  */
+  YYSYMBOL_CROSS_PRODUCT = 76,             /* CROSS_PRODUCT  */
+  YYSYMBOL_HIGH_CROSS_PRODUCT = 77,        /* HIGH_CROSS_PRODUCT  */
+  YYSYMBOL_UNION = 78,                     /* UNION  */
+  YYSYMBOL_INTERSECT = 79,                 /* INTERSECT  */
+  YYSYMBOL_MINUS = 80,                     /* MINUS  */
+  YYSYMBOL_COMPLEMENT = 81,                /* COMPLEMENT  */
+  YYSYMBOL_KLEENE_STAR = 82,               /* KLEENE_STAR  */
+  YYSYMBOL_KLEENE_PLUS = 83,               /* KLEENE_PLUS  */
+  YYSYMBOL_REVERSE = 84,                   /* REVERSE  */
+  YYSYMBOL_INVERSE = 85,                   /* INVERSE  */
+  YYSYMBOL_TERM_NEGATION = 86,             /* TERM_NEGATION  */
+  YYSYMBOL_YYACCEPT = 87,                  /* $accept  */
+  YYSYMBOL_start = 88,                     /* start  */
+  YYSYMBOL_regex = 89,                     /* regex  */
+  YYSYMBOL_network = 90,                   /* network  */
+  YYSYMBOL_networkA = 91,                  /* networkA  */
+  YYSYMBOL_n0 = 92,                        /* n0  */
+  YYSYMBOL_network1 = 93,                  /* network1  */
+  YYSYMBOL_network2 = 94,                  /* network2  */
+  YYSYMBOL_network3 = 95,                  /* network3  */
+  YYSYMBOL_network4 = 96,                  /* network4  */
+  YYSYMBOL_network5 = 97,                  /* network5  */
+  YYSYMBOL_network6 = 98,                  /* network6  */
+  YYSYMBOL_network7 = 99,                  /* network7  */
+  YYSYMBOL_network8 = 100,                 /* network8  */
+  YYSYMBOL_network9 = 101,                 /* network9  */
+  YYSYMBOL_network10 = 102,                /* network10  */
+  YYSYMBOL_network11 = 103,                /* network11  */
+  YYSYMBOL_sub1 = 104,                     /* sub1  */
+  YYSYMBOL_sub2 = 105,                     /* sub2  */
+  YYSYMBOL_network12 = 106,                /* network12  */
+  YYSYMBOL_fstart = 107,                   /* fstart  */
+  YYSYMBOL_fmid = 108,                     /* fmid  */
+  YYSYMBOL_fend = 109                      /* fend  */
 };
-typedef union YYSTYPE YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
-#endif
+typedef enum yysymbol_kind_t yysymbol_kind_t;
 
-/* Location type.  */
-#if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
-typedef struct YYLTYPE YYLTYPE;
-struct YYLTYPE
-{
-  int first_line;
-  int first_column;
-  int last_line;
-  int last_column;
-};
-# define YYLTYPE_IS_DECLARED 1
-# define YYLTYPE_IS_TRIVIAL 1
-#endif
-
-
-
-int yyparse (void *scanner, struct defined_networks *defined_nets, struct defined_functions *defined_funcs);
-
-#endif /* !YY_YY_REGEX_H_INCLUDED  */
 
 
 
@@ -602,6 +487,7 @@ typedef int yytype_uint16;
 
 #define YYSIZEOF(X) YY_CAST (YYPTRDIFF_T, sizeof (X))
 
+
 /* Stored state numbers (used for stacks). */
 typedef yytype_int16 yy_state_t;
 
@@ -619,6 +505,7 @@ typedef int yy_state_fast_t;
 #  define YY_(Msgid) Msgid
 # endif
 #endif
+
 
 #ifndef YY_ATTRIBUTE_PURE
 # if defined __GNUC__ && 2 < __GNUC__ + (96 <= __GNUC_MINOR__)
@@ -677,7 +564,7 @@ typedef int yy_state_fast_t;
 
 #define YY_ASSERT(E) ((void) (0 && (E)))
 
-#if ! defined yyoverflow || YYERROR_VERBOSE
+#if !defined yyoverflow
 
 /* The parser invokes alloca or malloc; define the necessary symbols.  */
 
@@ -742,8 +629,7 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
 # endif
-#endif /* ! defined yyoverflow || YYERROR_VERBOSE */
-
+#endif /* !defined yyoverflow */
 
 #if (! defined yyoverflow \
      && (! defined __cplusplus \
@@ -822,14 +708,16 @@ union yyalloc
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  291
 
-#define YYUNDEFTOK  2
+/* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   341
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
    as returned by yylex, with out-of-bounds checking.  */
-#define YYTRANSLATE(YYX)                                                \
-  (0 <= (YYX) && (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
+#define YYTRANSLATE(YYX)                                \
+  (0 <= (YYX) && (YYX) <= YYMAXUTOK                     \
+   ? YY_CAST (yysymbol_kind_t, yytranslate[YYX])        \
+   : YYSYMBOL_YYUNDEF)
 
 /* YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to TOKEN-NUM
    as returned by yylex.  */
@@ -893,17 +781,24 @@ static const yytype_int16 yyrline[] =
 };
 #endif
 
-#if YYDEBUG || YYERROR_VERBOSE || 0
+/** Accessing symbol of state STATE.  */
+#define YY_ACCESSING_SYMBOL(State) YY_CAST (yysymbol_kind_t, yystos[State])
+
+#if YYDEBUG || 0
+/* The user-facing name of the symbol whose (internal) number is
+   YYSYMBOL.  No bounds checking.  */
+static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
+
 /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "NET", "END", "LBRACKET", "RBRACKET",
-  "LPAREN", "RPAREN", "ENDM", "ENDD", "CRESTRICT", "CONTAINS",
-  "CONTAINS_OPT_ONE", "CONTAINS_ONE", "XUPPER", "XLOWER", "FLAG_ELIMINATE",
-  "IGNORE_ALL", "IGNORE_INTERNAL", "CONTEXT", "NCONCAT", "MNCONCAT",
-  "MORENCONCAT", "LESSNCONCAT", "DOUBLE_COMMA", "COMMA", "SHUFFLE",
-  "PRECEDES", "FOLLOWS", "RIGHT_QUOTIENT", "LEFT_QUOTIENT",
+  "\"end of file\"", "error", "\"invalid token\"", "NET", "END",
+  "LBRACKET", "RBRACKET", "LPAREN", "RPAREN", "ENDM", "ENDD", "CRESTRICT",
+  "CONTAINS", "CONTAINS_OPT_ONE", "CONTAINS_ONE", "XUPPER", "XLOWER",
+  "FLAG_ELIMINATE", "IGNORE_ALL", "IGNORE_INTERNAL", "CONTEXT", "NCONCAT",
+  "MNCONCAT", "MORENCONCAT", "LESSNCONCAT", "DOUBLE_COMMA", "COMMA",
+  "SHUFFLE", "PRECEDES", "FOLLOWS", "RIGHT_QUOTIENT", "LEFT_QUOTIENT",
   "INTERLEAVE_QUOTIENT", "UQUANT", "EQUANT", "VAR", "IN", "IMPLIES",
   "BICOND", "EQUALS", "NEQ", "SUBSTITUTE", "SUCCESSOR_OF",
   "PRIORITY_UNION_U", "PRIORITY_UNION_L", "LENIENT_COMPOSE", "TRIPLE_DOT",
@@ -920,9 +815,15 @@ static const char *const yytname[] =
   "network6", "network7", "network8", "network9", "network10", "network11",
   "sub1", "sub2", "network12", "fstart", "fmid", "fend", YY_NULLPTR
 };
+
+static const char *
+yysymbol_name (yysymbol_kind_t yysymbol)
+{
+  return yytname[yysymbol];
+}
 #endif
 
-# ifdef YYPRINT
+#ifdef YYPRINT
 /* YYTOKNUM[NUM] -- (External) token number corresponding to the
    (internal) symbol number NUM (which must be that of a token).  */
 static const yytype_int16 yytoknum[] =
@@ -937,7 +838,7 @@ static const yytype_int16 yytoknum[] =
      325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
      335,   336,   337,   338,   339,   340,   341
 };
-# endif
+#endif
 
 #define YYPACT_NINF (-42)
 
@@ -1362,10 +1263,10 @@ static const yytype_int8 yyr2[] =
 };
 
 
+enum { YYENOMEM = -2 };
+
 #define yyerrok         (yyerrstatus = 0)
 #define yyclearin       (yychar = YYEMPTY)
-#define YYEMPTY         (-2)
-#define YYEOF           0
 
 #define YYACCEPT        goto yyacceptlab
 #define YYABORT         goto yyabortlab
@@ -1391,10 +1292,9 @@ static const yytype_int8 yyr2[] =
       }                                                           \
   while (0)
 
-/* Error token number */
-#define YYTERROR        1
-#define YYERRCODE       256
-
+/* Backward compatibility with an undocumented macro.
+   Use YYerror or YYUNDEF. */
+#define YYERRCODE YYUNDEF
 
 /* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
    If N is 0, then set CURRENT to the empty location which ends
@@ -1442,8 +1342,8 @@ do {                                            \
    This macro was not mandated originally: define only if we know
    we won't break user code: when these are the locations we know.  */
 
-#ifndef YY_LOCATION_PRINT
-# if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
+# ifndef YY_LOCATION_PRINT
+#  if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
 
 /* Print *YYLOCP on YYO.  Private, do not rely on its existence. */
 
@@ -1473,22 +1373,22 @@ yy_location_print_ (FILE *yyo, YYLTYPE const * const yylocp)
   return res;
  }
 
-#  define YY_LOCATION_PRINT(File, Loc)          \
+#   define YY_LOCATION_PRINT(File, Loc)          \
   yy_location_print_ (File, &(Loc))
 
-# else
-#  define YY_LOCATION_PRINT(File, Loc) ((void) 0)
-# endif
-#endif
+#  else
+#   define YY_LOCATION_PRINT(File, Loc) ((void) 0)
+#  endif
+# endif /* !defined YY_LOCATION_PRINT */
 
 
-# define YY_SYMBOL_PRINT(Title, Type, Value, Location)                    \
+# define YY_SYMBOL_PRINT(Title, Kind, Value, Location)                    \
 do {                                                                      \
   if (yydebug)                                                            \
     {                                                                     \
       YYFPRINTF (stderr, "%s ", Title);                                   \
       yy_symbol_print (stderr,                                            \
-                  Type, Value, Location, scanner, defined_nets, defined_funcs); \
+                  Kind, Value, Location, scanner, defined_nets, defined_funcs); \
       YYFPRINTF (stderr, "\n");                                           \
     }                                                                     \
 } while (0)
@@ -1499,7 +1399,8 @@ do {                                                                      \
 `-----------------------------------*/
 
 static void
-yy_symbol_value_print (FILE *yyo, int yytype, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp, void *scanner, struct defined_networks *defined_nets, struct defined_functions *defined_funcs)
+yy_symbol_value_print (FILE *yyo,
+                       yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp, void *scanner, struct defined_networks *defined_nets, struct defined_functions *defined_funcs)
 {
   FILE *yyoutput = yyo;
   YYUSE (yyoutput);
@@ -1510,11 +1411,11 @@ yy_symbol_value_print (FILE *yyo, int yytype, YYSTYPE const * const yyvaluep, YY
   if (!yyvaluep)
     return;
 # ifdef YYPRINT
-  if (yytype < YYNTOKENS)
-    YYPRINT (yyo, yytoknum[yytype], *yyvaluep);
+  if (yykind < YYNTOKENS)
+    YYPRINT (yyo, yytoknum[yykind], *yyvaluep);
 # endif
   YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-  YYUSE (yytype);
+  YYUSE (yykind);
   YY_IGNORE_MAYBE_UNINITIALIZED_END
 }
 
@@ -1524,14 +1425,15 @@ yy_symbol_value_print (FILE *yyo, int yytype, YYSTYPE const * const yyvaluep, YY
 `---------------------------*/
 
 static void
-yy_symbol_print (FILE *yyo, int yytype, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp, void *scanner, struct defined_networks *defined_nets, struct defined_functions *defined_funcs)
+yy_symbol_print (FILE *yyo,
+                 yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp, void *scanner, struct defined_networks *defined_nets, struct defined_functions *defined_funcs)
 {
   YYFPRINTF (yyo, "%s %s (",
-             yytype < YYNTOKENS ? "token" : "nterm", yytname[yytype]);
+             yykind < YYNTOKENS ? "token" : "nterm", yysymbol_name (yykind));
 
   YY_LOCATION_PRINT (yyo, *yylocationp);
   YYFPRINTF (yyo, ": ");
-  yy_symbol_value_print (yyo, yytype, yyvaluep, yylocationp, scanner, defined_nets, defined_funcs);
+  yy_symbol_value_print (yyo, yykind, yyvaluep, yylocationp, scanner, defined_nets, defined_funcs);
   YYFPRINTF (yyo, ")");
 }
 
@@ -1564,7 +1466,8 @@ do {                                                            \
 `------------------------------------------------*/
 
 static void
-yy_reduce_print (yy_state_t *yyssp, YYSTYPE *yyvsp, YYLTYPE *yylsp, int yyrule, void *scanner, struct defined_networks *defined_nets, struct defined_functions *defined_funcs)
+yy_reduce_print (yy_state_t *yyssp, YYSTYPE *yyvsp, YYLTYPE *yylsp,
+                 int yyrule, void *scanner, struct defined_networks *defined_nets, struct defined_functions *defined_funcs)
 {
   int yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
@@ -1576,9 +1479,9 @@ yy_reduce_print (yy_state_t *yyssp, YYSTYPE *yyvsp, YYLTYPE *yylsp, int yyrule, 
     {
       YYFPRINTF (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr,
-                       yystos[+yyssp[yyi + 1 - yynrhs]],
-                       &yyvsp[(yyi + 1) - (yynrhs)]
-                       , &(yylsp[(yyi + 1) - (yynrhs)])                       , scanner, defined_nets, defined_funcs);
+                       YY_ACCESSING_SYMBOL (+yyssp[yyi + 1 - yynrhs]),
+                       &yyvsp[(yyi + 1) - (yynrhs)],
+                       &(yylsp[(yyi + 1) - (yynrhs)]), scanner, defined_nets, defined_funcs);
       YYFPRINTF (stderr, "\n");
     }
 }
@@ -1593,8 +1496,8 @@ do {                                    \
    multiple parsers can coexist.  */
 int yydebug;
 #else /* !YYDEBUG */
-# define YYDPRINTF(Args)
-# define YY_SYMBOL_PRINT(Title, Type, Value, Location)
+# define YYDPRINTF(Args) ((void) 0)
+# define YY_SYMBOL_PRINT(Title, Kind, Value, Location)
 # define YY_STACK_PRINT(Bottom, Top)
 # define YY_REDUCE_PRINT(Rule)
 #endif /* !YYDEBUG */
@@ -1617,244 +1520,17 @@ int yydebug;
 #endif
 
 
-#if YYERROR_VERBOSE
 
-# ifndef yystrlen
-#  if defined __GLIBC__ && defined _STRING_H
-#   define yystrlen(S) (YY_CAST (YYPTRDIFF_T, strlen (S)))
-#  else
-/* Return the length of YYSTR.  */
-static YYPTRDIFF_T
-yystrlen (const char *yystr)
-{
-  YYPTRDIFF_T yylen;
-  for (yylen = 0; yystr[yylen]; yylen++)
-    continue;
-  return yylen;
-}
-#  endif
-# endif
 
-# ifndef yystpcpy
-#  if defined __GLIBC__ && defined _STRING_H && defined _GNU_SOURCE
-#   define yystpcpy stpcpy
-#  else
-/* Copy YYSRC to YYDEST, returning the address of the terminating '\0' in
-   YYDEST.  */
-static char *
-yystpcpy (char *yydest, const char *yysrc)
-{
-  char *yyd = yydest;
-  const char *yys = yysrc;
 
-  while ((*yyd++ = *yys++) != '\0')
-    continue;
-
-  return yyd - 1;
-}
-#  endif
-# endif
-
-# ifndef yytnamerr
-/* Copy to YYRES the contents of YYSTR after stripping away unnecessary
-   quotes and backslashes, so that it's suitable for yyerror.  The
-   heuristic is that double-quoting is unnecessary unless the string
-   contains an apostrophe, a comma, or backslash (other than
-   backslash-backslash).  YYSTR is taken from yytname.  If YYRES is
-   null, do not copy; instead, return the length of what the result
-   would have been.  */
-static YYPTRDIFF_T
-yytnamerr (char *yyres, const char *yystr)
-{
-  if (*yystr == '"')
-    {
-      YYPTRDIFF_T yyn = 0;
-      char const *yyp = yystr;
-
-      for (;;)
-        switch (*++yyp)
-          {
-          case '\'':
-          case ',':
-            goto do_not_strip_quotes;
-
-          case '\\':
-            if (*++yyp != '\\')
-              goto do_not_strip_quotes;
-            else
-              goto append;
-
-          append:
-          default:
-            if (yyres)
-              yyres[yyn] = *yyp;
-            yyn++;
-            break;
-
-          case '"':
-            if (yyres)
-              yyres[yyn] = '\0';
-            return yyn;
-          }
-    do_not_strip_quotes: ;
-    }
-
-  if (yyres)
-    return yystpcpy (yyres, yystr) - yyres;
-  else
-    return yystrlen (yystr);
-}
-# endif
-
-/* Copy into *YYMSG, which is of size *YYMSG_ALLOC, an error message
-   about the unexpected token YYTOKEN for the state stack whose top is
-   YYSSP.
-
-   Return 0 if *YYMSG was successfully written.  Return 1 if *YYMSG is
-   not large enough to hold the message.  In that case, also set
-   *YYMSG_ALLOC to the required number of bytes.  Return 2 if the
-   required number of bytes is too large to store.  */
-static int
-yysyntax_error (YYPTRDIFF_T *yymsg_alloc, char **yymsg,
-                yy_state_t *yyssp, int yytoken)
-{
-  enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
-  /* Internationalized format string. */
-  const char *yyformat = YY_NULLPTR;
-  /* Arguments of yyformat: reported tokens (one for the "unexpected",
-     one per "expected"). */
-  char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
-  /* Actual size of YYARG. */
-  int yycount = 0;
-  /* Cumulated lengths of YYARG.  */
-  YYPTRDIFF_T yysize = 0;
-
-  /* There are many possibilities here to consider:
-     - If this state is a consistent state with a default action, then
-       the only way this function was invoked is if the default action
-       is an error action.  In that case, don't check for expected
-       tokens because there are none.
-     - The only way there can be no lookahead present (in yychar) is if
-       this state is a consistent state with a default action.  Thus,
-       detecting the absence of a lookahead is sufficient to determine
-       that there is no unexpected or expected token to report.  In that
-       case, just report a simple "syntax error".
-     - Don't assume there isn't a lookahead just because this state is a
-       consistent state with a default action.  There might have been a
-       previous inconsistent state, consistent state with a non-default
-       action, or user semantic action that manipulated yychar.
-     - Of course, the expected token list depends on states to have
-       correct lookahead information, and it depends on the parser not
-       to perform extra reductions after fetching a lookahead from the
-       scanner and before detecting a syntax error.  Thus, state merging
-       (from LALR or IELR) and default reductions corrupt the expected
-       token list.  However, the list is correct for canonical LR with
-       one exception: it will still contain any token that will not be
-       accepted due to an error action in a later state.
-  */
-  if (yytoken != YYEMPTY)
-    {
-      int yyn = yypact[+*yyssp];
-      YYPTRDIFF_T yysize0 = yytnamerr (YY_NULLPTR, yytname[yytoken]);
-      yysize = yysize0;
-      yyarg[yycount++] = yytname[yytoken];
-      if (!yypact_value_is_default (yyn))
-        {
-          /* Start YYX at -YYN if negative to avoid negative indexes in
-             YYCHECK.  In other words, skip the first -YYN actions for
-             this state because they are default actions.  */
-          int yyxbegin = yyn < 0 ? -yyn : 0;
-          /* Stay within bounds of both yycheck and yytname.  */
-          int yychecklim = YYLAST - yyn + 1;
-          int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
-          int yyx;
-
-          for (yyx = yyxbegin; yyx < yyxend; ++yyx)
-            if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR
-                && !yytable_value_is_error (yytable[yyx + yyn]))
-              {
-                if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
-                  {
-                    yycount = 1;
-                    yysize = yysize0;
-                    break;
-                  }
-                yyarg[yycount++] = yytname[yyx];
-                {
-                  YYPTRDIFF_T yysize1
-                    = yysize + yytnamerr (YY_NULLPTR, yytname[yyx]);
-                  if (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM)
-                    yysize = yysize1;
-                  else
-                    return 2;
-                }
-              }
-        }
-    }
-
-  switch (yycount)
-    {
-# define YYCASE_(N, S)                      \
-      case N:                               \
-        yyformat = S;                       \
-      break
-    default: /* Avoid compiler warnings. */
-      YYCASE_(0, YY_("syntax error"));
-      YYCASE_(1, YY_("syntax error, unexpected %s"));
-      YYCASE_(2, YY_("syntax error, unexpected %s, expecting %s"));
-      YYCASE_(3, YY_("syntax error, unexpected %s, expecting %s or %s"));
-      YYCASE_(4, YY_("syntax error, unexpected %s, expecting %s or %s or %s"));
-      YYCASE_(5, YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s"));
-# undef YYCASE_
-    }
-
-  {
-    /* Don't count the "%s"s in the final size, but reserve room for
-       the terminator.  */
-    YYPTRDIFF_T yysize1 = yysize + (yystrlen (yyformat) - 2 * yycount) + 1;
-    if (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM)
-      yysize = yysize1;
-    else
-      return 2;
-  }
-
-  if (*yymsg_alloc < yysize)
-    {
-      *yymsg_alloc = 2 * yysize;
-      if (! (yysize <= *yymsg_alloc
-             && *yymsg_alloc <= YYSTACK_ALLOC_MAXIMUM))
-        *yymsg_alloc = YYSTACK_ALLOC_MAXIMUM;
-      return 1;
-    }
-
-  /* Avoid sprintf, as that infringes on the user's name space.
-     Don't have undefined behavior even if the translation
-     produced a string with the wrong number of "%s"s.  */
-  {
-    char *yyp = *yymsg;
-    int yyi = 0;
-    while ((*yyp = *yyformat) != '\0')
-      if (*yyp == '%' && yyformat[1] == 's' && yyi < yycount)
-        {
-          yyp += yytnamerr (yyp, yyarg[yyi++]);
-          yyformat += 2;
-        }
-      else
-        {
-          ++yyp;
-          ++yyformat;
-        }
-  }
-  return 0;
-}
-#endif /* YYERROR_VERBOSE */
 
 /*-----------------------------------------------.
 | Release the memory associated to this symbol.  |
 `-----------------------------------------------*/
 
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocationp, void *scanner, struct defined_networks *defined_nets, struct defined_functions *defined_funcs)
+yydestruct (const char *yymsg,
+            yysymbol_kind_t yykind, YYSTYPE *yyvaluep, YYLTYPE *yylocationp, void *scanner, struct defined_networks *defined_nets, struct defined_functions *defined_funcs)
 {
   YYUSE (yyvaluep);
   YYUSE (yylocationp);
@@ -1863,12 +1539,14 @@ yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocatio
   YYUSE (defined_funcs);
   if (!yymsg)
     yymsg = "Deleting";
-  YY_SYMBOL_PRINT (yymsg, yytype, yyvaluep, yylocationp);
+  YY_SYMBOL_PRINT (yymsg, yykind, yyvaluep, yylocationp);
 
   YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-  YYUSE (yytype);
+  YYUSE (yykind);
   YY_IGNORE_MAYBE_UNINITIALIZED_END
 }
+
+
 
 
 
@@ -1880,7 +1558,7 @@ yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocatio
 int
 yyparse (void *scanner, struct defined_networks *defined_nets, struct defined_functions *defined_funcs)
 {
-/* The lookahead symbol.  */
+/* Lookahead token kind.  */
 int yychar;
 
 
@@ -1899,55 +1577,47 @@ static YYLTYPE yyloc_default
 YYLTYPE yylloc = yyloc_default;
 
     /* Number of syntax errors so far.  */
-    int yynerrs;
+    int yynerrs = 0;
 
-    yy_state_fast_t yystate;
+    yy_state_fast_t yystate = 0;
     /* Number of tokens to shift before error messages enabled.  */
-    int yyerrstatus;
+    int yyerrstatus = 0;
 
-    /* The stacks and their tools:
-       'yyss': related to states.
-       'yyvs': related to semantic values.
-       'yyls': related to locations.
-
-       Refer to the stacks through separate pointers, to allow yyoverflow
+    /* Refer to the stacks through separate pointers, to allow yyoverflow
        to reallocate them elsewhere.  */
 
-    /* The state stack.  */
+    /* Their size.  */
+    YYPTRDIFF_T yystacksize = YYINITDEPTH;
+
+    /* The state stack: array, bottom, top.  */
     yy_state_t yyssa[YYINITDEPTH];
-    yy_state_t *yyss;
-    yy_state_t *yyssp;
+    yy_state_t *yyss = yyssa;
+    yy_state_t *yyssp = yyss;
 
-    /* The semantic value stack.  */
+    /* The semantic value stack: array, bottom, top.  */
     YYSTYPE yyvsa[YYINITDEPTH];
-    YYSTYPE *yyvs;
-    YYSTYPE *yyvsp;
+    YYSTYPE *yyvs = yyvsa;
+    YYSTYPE *yyvsp = yyvs;
 
-    /* The location stack.  */
+    /* The location stack: array, bottom, top.  */
     YYLTYPE yylsa[YYINITDEPTH];
-    YYLTYPE *yyls;
-    YYLTYPE *yylsp;
-
-    /* The locations where the error started and ended.  */
-    YYLTYPE yyerror_range[3];
-
-    YYPTRDIFF_T yystacksize;
+    YYLTYPE *yyls = yylsa;
+    YYLTYPE *yylsp = yyls;
 
   int yyn;
+  /* The return value of yyparse.  */
   int yyresult;
-  /* Lookahead token as an internal (translated) token number.  */
-  int yytoken = 0;
+  /* Lookahead symbol kind.  */
+  yysymbol_kind_t yytoken = YYSYMBOL_YYEMPTY;
   /* The variables used to return semantic value and location from the
      action routines.  */
   YYSTYPE yyval;
   YYLTYPE yyloc;
 
-#if YYERROR_VERBOSE
-  /* Buffer for error messages, and its allocated size.  */
-  char yymsgbuf[128];
-  char *yymsg = yymsgbuf;
-  YYPTRDIFF_T yymsg_alloc = sizeof yymsgbuf;
-#endif
+  /* The locations where the error started and ended.  */
+  YYLTYPE yyerror_range[3];
+
+
 
 #define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N), yylsp -= (N))
 
@@ -1955,16 +1625,8 @@ YYLTYPE yylloc = yyloc_default;
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
 
-  yyssp = yyss = yyssa;
-  yyvsp = yyvs = yyvsa;
-  yylsp = yyls = yylsa;
-  yystacksize = YYINITDEPTH;
-
   YYDPRINTF ((stderr, "Starting parse\n"));
 
-  yystate = 0;
-  yyerrstatus = 0;
-  yynerrs = 0;
   yychar = YYEMPTY; /* Cause a token to be read.  */
 
 /* User initialization code.  */
@@ -1979,7 +1641,7 @@ YYLTYPE yylloc = yyloc_default;
     substituting = 0;
 }
 
-#line 1983 "regex.c"
+#line 1645 "regex.c"
 
   yylsp[0] = yylloc;
   goto yysetstate;
@@ -2003,6 +1665,7 @@ yysetstate:
   YY_IGNORE_USELESS_CAST_BEGIN
   *yyssp = YY_CAST (yy_state_t, yystate);
   YY_IGNORE_USELESS_CAST_END
+  YY_STACK_PRINT (yyss, yyssp);
 
   if (yyss + yystacksize - 1 <= yyssp)
 #if !defined yyoverflow && !defined YYSTACK_RELOCATE
@@ -2052,7 +1715,7 @@ yysetstate:
         YYSTACK_RELOCATE (yyss_alloc, yyss);
         YYSTACK_RELOCATE (yyvs_alloc, yyvs);
         YYSTACK_RELOCATE (yyls_alloc, yyls);
-# undef YYSTACK_RELOCATE
+#  undef YYSTACK_RELOCATE
         if (yyss1 != yyssa)
           YYSTACK_FREE (yyss1);
       }
@@ -2092,17 +1755,29 @@ yybackup:
 
   /* Not known => get a lookahead token if don't already have one.  */
 
-  /* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
+  /* YYCHAR is either empty, or end-of-input, or a valid lookahead.  */
   if (yychar == YYEMPTY)
     {
-      YYDPRINTF ((stderr, "Reading a token: "));
+      YYDPRINTF ((stderr, "Reading a token\n"));
       yychar = yylex (&yylval, &yylloc, scanner);
     }
 
   if (yychar <= YYEOF)
     {
-      yychar = yytoken = YYEOF;
+      yychar = YYEOF;
+      yytoken = YYSYMBOL_YYEOF;
       YYDPRINTF ((stderr, "Now at end of input.\n"));
+    }
+  else if (yychar == YYerror)
+    {
+      /* The scanner already issued an error message, process directly
+         to error recovery.  But do not keep the error token as
+         lookahead, it is too special and may lead us to an endless
+         loop in error recovery. */
+      yychar = YYUNDEF;
+      yytoken = YYSYMBOL_YYerror;
+      yyerror_range[1] = yylloc;
+      goto yyerrlab1;
     }
   else
     {
@@ -2175,806 +1850,806 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 4:
+  case 4: /* regex: network END  */
 #line 256 "regex.y"
                                    { current_parse = (yyvsp[-1].net);              }
-#line 2182 "regex.c"
+#line 1857 "regex.c"
     break;
 
-  case 5:
+  case 5: /* network: networkA  */
 #line 258 "regex.y"
                   { }
-#line 2188 "regex.c"
+#line 1863 "regex.c"
     break;
 
-  case 6:
+  case 6: /* network: network COMPOSE networkA  */
 #line 259 "regex.y"
                                    { (yyval.net) = fsm_compose((yyvsp[-2].net),(yyvsp[0].net));         }
-#line 2194 "regex.c"
+#line 1869 "regex.c"
     break;
 
-  case 7:
+  case 7: /* network: network LENIENT_COMPOSE networkA  */
 #line 260 "regex.y"
                                    { (yyval.net) = fsm_lenient_compose((yyvsp[-2].net),(yyvsp[0].net)); }
-#line 2200 "regex.c"
+#line 1875 "regex.c"
     break;
 
-  case 8:
+  case 8: /* network: network CROSS_PRODUCT networkA  */
 #line 261 "regex.y"
                                    { (yyval.net) = fsm_cross_product((yyvsp[-2].net),(yyvsp[0].net));   }
-#line 2206 "regex.c"
+#line 1881 "regex.c"
     break;
 
-  case 9:
+  case 9: /* networkA: n0  */
 #line 263 "regex.y"
              { if (rewrite) { add_rewrite_rule(); (yyval.net) = fsm_rewrite(rewrite_rules); clear_rewrite_ruleset(rewrite_rules); } rewrite = 0; contexts = NULL; rules = NULL; rewrite_rules = NULL; }
-#line 2212 "regex.c"
+#line 1887 "regex.c"
     break;
 
-  case 10:
+  case 10: /* n0: network1  */
 #line 265 "regex.y"
              { }
-#line 2218 "regex.c"
+#line 1893 "regex.c"
     break;
 
-  case 11:
+  case 11: /* n0: n0 CONTEXT n0  */
 #line 266 "regex.y"
                          { (yyval.net) = NULL; add_context_pair((yyvsp[-2].net),(yyvsp[0].net));}
-#line 2224 "regex.c"
+#line 1899 "regex.c"
     break;
 
-  case 12:
+  case 12: /* n0: n0 CONTEXT  */
 #line 267 "regex.y"
                          { add_context_pair((yyvsp[-1].net),fsm_empty_string()); }
-#line 2230 "regex.c"
+#line 1905 "regex.c"
     break;
 
-  case 13:
+  case 13: /* n0: n0 CONTEXT COMMA n0  */
 #line 268 "regex.y"
                          { add_context_pair((yyvsp[-3].net),fsm_empty_string()); }
-#line 2236 "regex.c"
+#line 1911 "regex.c"
     break;
 
-  case 14:
+  case 14: /* n0: CONTEXT  */
 #line 269 "regex.y"
                          { add_context_pair(fsm_empty_string(),fsm_empty_string());}
-#line 2242 "regex.c"
+#line 1917 "regex.c"
     break;
 
-  case 15:
+  case 15: /* n0: CONTEXT DOUBLE_COMMA n0  */
 #line 270 "regex.y"
                           { add_rewrite_rule(); add_context_pair(fsm_empty_string(),fsm_empty_string());}
-#line 2248 "regex.c"
+#line 1923 "regex.c"
     break;
 
-  case 16:
+  case 16: /* n0: n0 CONTEXT DOUBLE_COMMA n0  */
 #line 271 "regex.y"
                              { add_rewrite_rule(); add_context_pair((yyvsp[-3].net),fsm_empty_string());}
-#line 2254 "regex.c"
+#line 1929 "regex.c"
     break;
 
-  case 17:
+  case 17: /* n0: CONTEXT COMMA n0  */
 #line 272 "regex.y"
                          { add_context_pair(fsm_empty_string(),fsm_empty_string());}
-#line 2260 "regex.c"
+#line 1935 "regex.c"
     break;
 
-  case 18:
+  case 18: /* n0: CONTEXT n0  */
 #line 273 "regex.y"
                          { add_context_pair(fsm_empty_string(),(yyvsp[0].net)); }
-#line 2266 "regex.c"
+#line 1941 "regex.c"
     break;
 
-  case 19:
+  case 19: /* n0: CONTEXT n0 COMMA n0  */
 #line 274 "regex.y"
                          { add_context_pair(fsm_empty_string(),(yyvsp[-2].net)); }
-#line 2272 "regex.c"
+#line 1947 "regex.c"
     break;
 
-  case 20:
+  case 20: /* n0: n0 CONTEXT n0 COMMA n0  */
 #line 275 "regex.y"
                          { add_context_pair((yyvsp[-4].net),(yyvsp[-2].net)); }
-#line 2278 "regex.c"
+#line 1953 "regex.c"
     break;
 
-  case 21:
+  case 21: /* n0: n0 CRESTRICT n0  */
 #line 276 "regex.y"
                          { (yyval.net) = fsm_context_restrict((yyvsp[-2].net),contexts); fsm_clear_contexts(contexts);}
-#line 2284 "regex.c"
+#line 1959 "regex.c"
     break;
 
-  case 22:
+  case 22: /* n0: n0 ARROW n0  */
 #line 277 "regex.y"
                          { add_rule((yyvsp[-2].net),(yyvsp[0].net),NULL,(yyvsp[-1].type)); if ((yyvsp[-2].net)->arity == 2) { printf("Error: LHS is transducer\n"); YYERROR;}}
-#line 2290 "regex.c"
+#line 1965 "regex.c"
     break;
 
-  case 23:
+  case 23: /* n0: n0 ARROW  */
 #line 278 "regex.y"
                          { add_rule((yyvsp[-1].net),NULL,NULL,(yyvsp[0].type)); }
-#line 2296 "regex.c"
+#line 1971 "regex.c"
     break;
 
-  case 24:
+  case 24: /* n0: LDOT n0 RDOT ARROW n0  */
 #line 280 "regex.y"
                          { add_rule((yyvsp[-3].net),(yyvsp[0].net),NULL,(yyvsp[-1].type)|ARROW_DOTTED); if ((yyvsp[0].net) == NULL) { YYERROR;}}
-#line 2302 "regex.c"
+#line 1977 "regex.c"
     break;
 
-  case 25:
+  case 25: /* n0: LDOT RDOT ARROW n0  */
 #line 281 "regex.y"
                       { add_eprule((yyvsp[0].net),NULL,(yyvsp[-1].type)|ARROW_DOTTED); if ((yyvsp[0].net) == NULL) { YYERROR;}}
-#line 2308 "regex.c"
+#line 1983 "regex.c"
     break;
 
-  case 26:
+  case 26: /* n0: LDOT n0 RDOT ARROW n0 COMMA n0  */
 #line 282 "regex.y"
                                  { add_rule((yyvsp[-5].net),(yyvsp[-2].net),NULL,(yyvsp[-3].type)|ARROW_DOTTED);}
-#line 2314 "regex.c"
+#line 1989 "regex.c"
     break;
 
-  case 27:
+  case 27: /* n0: LDOT RDOT ARROW n0 COMMA n0  */
 #line 283 "regex.y"
                               { add_eprule((yyvsp[-2].net),NULL,(yyvsp[-3].type)|ARROW_DOTTED);}
-#line 2320 "regex.c"
+#line 1995 "regex.c"
     break;
 
-  case 28:
+  case 28: /* n0: LDOT n0 RDOT ARROW n0 DIRECTION n0  */
 #line 284 "regex.y"
                                      { add_rule((yyvsp[-5].net),(yyvsp[-2].net),NULL,(yyvsp[-3].type)|ARROW_DOTTED); rule_direction = (yyvsp[-1].type);}
-#line 2326 "regex.c"
+#line 2001 "regex.c"
     break;
 
-  case 29:
+  case 29: /* n0: LDOT RDOT ARROW n0 DIRECTION n0  */
 #line 285 "regex.y"
                                   { add_eprule((yyvsp[-2].net),NULL,(yyvsp[-3].type)|ARROW_DOTTED); rule_direction = (yyvsp[-1].type);}
-#line 2332 "regex.c"
+#line 2007 "regex.c"
     break;
 
-  case 30:
+  case 30: /* n0: n0 ARROW n0 COMMA n0  */
 #line 286 "regex.y"
                        { add_rule((yyvsp[-4].net),(yyvsp[-2].net),NULL,(yyvsp[-3].type));}
-#line 2338 "regex.c"
+#line 2013 "regex.c"
     break;
 
-  case 31:
+  case 31: /* n0: n0 ARROW COMMA n0  */
 #line 287 "regex.y"
                     { add_rule((yyvsp[-3].net),NULL,NULL,(yyvsp[-2].type));}
-#line 2344 "regex.c"
+#line 2019 "regex.c"
     break;
 
-  case 32:
+  case 32: /* n0: n0 ARROW n0 DIRECTION n0  */
 #line 288 "regex.y"
                            { add_rule((yyvsp[-4].net),(yyvsp[-2].net),NULL,(yyvsp[-3].type)); rule_direction = (yyvsp[-1].type);}
-#line 2350 "regex.c"
+#line 2025 "regex.c"
     break;
 
-  case 33:
+  case 33: /* n0: n0 ARROW DIRECTION n0  */
 #line 289 "regex.y"
                         { add_rule((yyvsp[-3].net),NULL,NULL,(yyvsp[-2].type)); rule_direction = (yyvsp[-1].type);}
-#line 2356 "regex.c"
+#line 2031 "regex.c"
     break;
 
-  case 34:
+  case 34: /* n0: n0 DOUBLE_COMMA n0  */
 #line 291 "regex.y"
                       { add_rewrite_rule();}
-#line 2362 "regex.c"
+#line 2037 "regex.c"
     break;
 
-  case 35:
+  case 35: /* n0: n0 ARROW TRIPLE_DOT  */
 #line 293 "regex.y"
                           { add_rule((yyvsp[-2].net),fsm_empty_string(),fsm_empty_string(),(yyvsp[-1].type));}
-#line 2368 "regex.c"
+#line 2043 "regex.c"
     break;
 
-  case 36:
+  case 36: /* n0: n0 ARROW TRIPLE_DOT n0  */
 #line 294 "regex.y"
                           { add_rule((yyvsp[-3].net),fsm_empty_string(),(yyvsp[0].net),(yyvsp[-2].type));}
-#line 2374 "regex.c"
+#line 2049 "regex.c"
     break;
 
-  case 37:
+  case 37: /* n0: n0 ARROW n0 TRIPLE_DOT  */
 #line 295 "regex.y"
                           { add_rule((yyvsp[-3].net),(yyvsp[-1].net),fsm_empty_string(),(yyvsp[-2].type));}
-#line 2380 "regex.c"
+#line 2055 "regex.c"
     break;
 
-  case 38:
+  case 38: /* n0: n0 ARROW n0 TRIPLE_DOT n0  */
 #line 296 "regex.y"
                             { add_rule((yyvsp[-4].net),(yyvsp[-2].net),(yyvsp[0].net),(yyvsp[-3].type));}
-#line 2386 "regex.c"
+#line 2061 "regex.c"
     break;
 
-  case 39:
+  case 39: /* n0: n0 ARROW n0 TRIPLE_DOT n0 COMMA n0  */
 #line 297 "regex.y"
                                      { add_rule((yyvsp[-6].net),(yyvsp[-4].net),(yyvsp[-2].net),(yyvsp[-5].type));}
-#line 2392 "regex.c"
+#line 2067 "regex.c"
     break;
 
-  case 40:
+  case 40: /* n0: n0 ARROW n0 TRIPLE_DOT COMMA n0  */
 #line 298 "regex.y"
                                   { add_rule((yyvsp[-5].net),(yyvsp[-3].net),fsm_empty_string(),(yyvsp[-4].type));}
-#line 2398 "regex.c"
+#line 2073 "regex.c"
     break;
 
-  case 41:
+  case 41: /* n0: n0 ARROW TRIPLE_DOT n0 COMMA n0  */
 #line 299 "regex.y"
                                   { add_rule((yyvsp[-5].net),fsm_empty_string(),(yyvsp[-2].net),(yyvsp[-4].type));}
-#line 2404 "regex.c"
+#line 2079 "regex.c"
     break;
 
-  case 42:
+  case 42: /* n0: n0 ARROW TRIPLE_DOT COMMA n0  */
 #line 300 "regex.y"
                                 { add_rule((yyvsp[-4].net),fsm_empty_string(),fsm_empty_string(),(yyvsp[-3].type));}
-#line 2410 "regex.c"
+#line 2085 "regex.c"
     break;
 
-  case 43:
+  case 43: /* n0: n0 ARROW n0 TRIPLE_DOT n0 DIRECTION n0  */
 #line 301 "regex.y"
                                          { add_rule((yyvsp[-6].net),(yyvsp[-4].net),(yyvsp[-2].net),(yyvsp[-5].type)); rule_direction = (yyvsp[-1].type);}
-#line 2416 "regex.c"
+#line 2091 "regex.c"
     break;
 
-  case 44:
+  case 44: /* n0: n0 ARROW TRIPLE_DOT n0 DIRECTION n0  */
 #line 302 "regex.y"
                                       { add_rule((yyvsp[-5].net),fsm_empty_string(),(yyvsp[-2].net),(yyvsp[-4].type)); rule_direction = (yyvsp[-1].type);}
-#line 2422 "regex.c"
+#line 2097 "regex.c"
     break;
 
-  case 45:
+  case 45: /* n0: n0 ARROW n0 TRIPLE_DOT DIRECTION n0  */
 #line 303 "regex.y"
                                       { add_rule((yyvsp[-5].net),(yyvsp[-3].net),fsm_empty_string(),(yyvsp[-4].type)); rule_direction = (yyvsp[-1].type);}
-#line 2428 "regex.c"
+#line 2103 "regex.c"
     break;
 
-  case 46:
+  case 46: /* n0: n0 ARROW TRIPLE_DOT DIRECTION n0  */
 #line 304 "regex.y"
                                    { add_rule((yyvsp[-4].net),fsm_empty_string(),fsm_empty_string(),(yyvsp[-3].type)); rule_direction = (yyvsp[-1].type);}
-#line 2434 "regex.c"
+#line 2109 "regex.c"
     break;
 
-  case 47:
+  case 47: /* network1: network2  */
 #line 307 "regex.y"
                    { }
-#line 2440 "regex.c"
+#line 2115 "regex.c"
     break;
 
-  case 48:
+  case 48: /* network1: network1 SHUFFLE network2  */
 #line 308 "regex.y"
                               { (yyval.net) = fsm_shuffle((yyvsp[-2].net),(yyvsp[0].net));  }
-#line 2446 "regex.c"
+#line 2121 "regex.c"
     break;
 
-  case 49:
+  case 49: /* network1: network1 PRECEDES network2  */
 #line 309 "regex.y"
                               { (yyval.net) = fsm_precedes((yyvsp[-2].net),(yyvsp[0].net)); }
-#line 2452 "regex.c"
+#line 2127 "regex.c"
     break;
 
-  case 50:
+  case 50: /* network1: network1 FOLLOWS network2  */
 #line 310 "regex.y"
                               { (yyval.net) = fsm_follows((yyvsp[-2].net),(yyvsp[0].net));  }
-#line 2458 "regex.c"
+#line 2133 "regex.c"
     break;
 
-  case 51:
+  case 51: /* network2: network3  */
 #line 312 "regex.y"
                    { }
-#line 2464 "regex.c"
+#line 2139 "regex.c"
     break;
 
-  case 52:
+  case 52: /* network3: network4  */
 #line 314 "regex.y"
                    { }
-#line 2470 "regex.c"
+#line 2145 "regex.c"
     break;
 
-  case 53:
+  case 53: /* network4: network5  */
 #line 316 "regex.y"
                    { }
-#line 2476 "regex.c"
+#line 2151 "regex.c"
     break;
 
-  case 54:
+  case 54: /* network4: network4 UNION network5  */
 #line 317 "regex.y"
                                      { (yyval.net) = fsm_union((yyvsp[-2].net),(yyvsp[0].net));                     }
-#line 2482 "regex.c"
+#line 2157 "regex.c"
     break;
 
-  case 55:
+  case 55: /* network4: network4 PRIORITY_UNION_U network5  */
 #line 318 "regex.y"
                                      { (yyval.net) = fsm_priority_union_upper((yyvsp[-2].net),(yyvsp[0].net));      }
-#line 2488 "regex.c"
+#line 2163 "regex.c"
     break;
 
-  case 56:
+  case 56: /* network4: network4 PRIORITY_UNION_L network5  */
 #line 319 "regex.y"
                                      { (yyval.net) = fsm_priority_union_lower((yyvsp[-2].net),(yyvsp[0].net));      }
-#line 2494 "regex.c"
+#line 2169 "regex.c"
     break;
 
-  case 57:
+  case 57: /* network4: network4 INTERSECT network5  */
 #line 320 "regex.y"
                                      { (yyval.net) = fsm_intersect((yyvsp[-2].net),(yyvsp[0].net));                 }
-#line 2500 "regex.c"
+#line 2175 "regex.c"
     break;
 
-  case 58:
+  case 58: /* network4: network4 MINUS network5  */
 #line 321 "regex.y"
                                      { (yyval.net) = fsm_minus((yyvsp[-2].net),(yyvsp[0].net));                     }
-#line 2506 "regex.c"
+#line 2181 "regex.c"
     break;
 
-  case 59:
+  case 59: /* network4: network4 IMPLIES network5  */
 #line 322 "regex.y"
                                      { (yyval.net) = fsm_union(fsm_complement((yyvsp[-2].net)),(yyvsp[0].net));     }
-#line 2512 "regex.c"
+#line 2187 "regex.c"
     break;
 
-  case 60:
+  case 60: /* network4: network4 BICOND network5  */
 #line 323 "regex.y"
                                      { (yyval.net) = fsm_intersect(fsm_union(fsm_complement(fsm_copy((yyvsp[-2].net))),fsm_copy((yyvsp[0].net))), fsm_union(fsm_complement(fsm_copy((yyvsp[0].net))),fsm_copy((yyvsp[-2].net)))); fsm_destroy((yyvsp[-2].net)); fsm_destroy((yyvsp[0].net));}
-#line 2518 "regex.c"
+#line 2193 "regex.c"
     break;
 
-  case 61:
+  case 61: /* network5: network6  */
 #line 325 "regex.y"
                     { }
-#line 2524 "regex.c"
+#line 2199 "regex.c"
     break;
 
-  case 62:
+  case 62: /* network5: network5 network6  */
 #line 326 "regex.y"
                     { (yyval.net) = fsm_concat((yyvsp[-1].net),(yyvsp[0].net)); }
-#line 2530 "regex.c"
+#line 2205 "regex.c"
     break;
 
-  case 63:
+  case 63: /* network5: VAR IN network5  */
 #line 327 "regex.y"
                     { (yyval.net) = fsm_ignore(fsm_contains(fsm_concat(fsm_symbol((yyvsp[-2].string)),fsm_concat((yyvsp[0].net),fsm_symbol((yyvsp[-2].string))))),union_quantifiers(),OP_IGNORE_ALL); }
-#line 2536 "regex.c"
+#line 2211 "regex.c"
     break;
 
-  case 64:
+  case 64: /* network5: VAR EQUALS VAR  */
 #line 329 "regex.y"
                     { (yyval.net) = fsm_logical_eq((yyvsp[-2].string),(yyvsp[0].string)); }
-#line 2542 "regex.c"
+#line 2217 "regex.c"
     break;
 
-  case 65:
+  case 65: /* network5: VAR NEQ VAR  */
 #line 330 "regex.y"
                     { (yyval.net) = fsm_complement(fsm_logical_eq((yyvsp[-2].string),(yyvsp[0].string))); }
-#line 2548 "regex.c"
+#line 2223 "regex.c"
     break;
 
-  case 66:
+  case 66: /* network5: VAR PRECEDES VAR  */
 #line 331 "regex.y"
                     { (yyval.net) = fsm_logical_precedence((yyvsp[-2].string),(yyvsp[0].string)); }
-#line 2554 "regex.c"
+#line 2229 "regex.c"
     break;
 
-  case 67:
+  case 67: /* network5: VAR FOLLOWS VAR  */
 #line 332 "regex.y"
                     { (yyval.net) = fsm_logical_precedence((yyvsp[0].string),(yyvsp[-2].string)); }
-#line 2560 "regex.c"
+#line 2235 "regex.c"
     break;
 
-  case 68:
+  case 68: /* network6: network7  */
 #line 334 "regex.y"
                    { }
-#line 2566 "regex.c"
+#line 2241 "regex.c"
     break;
 
-  case 69:
+  case 69: /* network6: network6 IGNORE_ALL network7  */
 #line 335 "regex.y"
                                          { (yyval.net) = fsm_ignore((yyvsp[-2].net),(yyvsp[0].net), OP_IGNORE_ALL);          }
-#line 2572 "regex.c"
+#line 2247 "regex.c"
     break;
 
-  case 70:
+  case 70: /* network6: network6 IGNORE_INTERNAL network7  */
 #line 336 "regex.y"
                                          { (yyval.net) = fsm_ignore((yyvsp[-2].net),(yyvsp[0].net), OP_IGNORE_INTERNAL);     }
-#line 2578 "regex.c"
+#line 2253 "regex.c"
     break;
 
-  case 71:
+  case 71: /* network6: network6 RIGHT_QUOTIENT network7  */
 #line 337 "regex.y"
                                          { (yyval.net) = fsm_quotient_right((yyvsp[-2].net),(yyvsp[0].net));                 }
-#line 2584 "regex.c"
+#line 2259 "regex.c"
     break;
 
-  case 72:
+  case 72: /* network6: network6 LEFT_QUOTIENT network7  */
 #line 338 "regex.y"
                                          { (yyval.net) = fsm_quotient_left((yyvsp[-2].net),(yyvsp[0].net));                  }
-#line 2590 "regex.c"
+#line 2265 "regex.c"
     break;
 
-  case 73:
+  case 73: /* network6: network6 INTERLEAVE_QUOTIENT network7  */
 #line 339 "regex.y"
                                          { (yyval.net) = fsm_quotient_interleave((yyvsp[-2].net),(yyvsp[0].net));            }
-#line 2596 "regex.c"
+#line 2271 "regex.c"
     break;
 
-  case 74:
+  case 74: /* network7: network8  */
 #line 341 "regex.y"
                    { }
-#line 2602 "regex.c"
+#line 2277 "regex.c"
     break;
 
-  case 75:
+  case 75: /* network7: COMPLEMENT network7  */
 #line 342 "regex.y"
                               { (yyval.net) = fsm_complement((yyvsp[0].net));       }
-#line 2608 "regex.c"
+#line 2283 "regex.c"
     break;
 
-  case 76:
+  case 76: /* network7: CONTAINS network7  */
 #line 343 "regex.y"
                               { (yyval.net) = fsm_contains((yyvsp[0].net));         }
-#line 2614 "regex.c"
+#line 2289 "regex.c"
     break;
 
-  case 77:
+  case 77: /* network7: CONTAINS_ONE network7  */
 #line 344 "regex.y"
                               { (yyval.net) = fsm_contains_one((yyvsp[0].net));     }
-#line 2620 "regex.c"
+#line 2295 "regex.c"
     break;
 
-  case 78:
+  case 78: /* network7: CONTAINS_OPT_ONE network7  */
 #line 345 "regex.y"
                               { (yyval.net) = fsm_contains_opt_one((yyvsp[0].net)); }
-#line 2626 "regex.c"
+#line 2301 "regex.c"
     break;
 
-  case 79:
+  case 79: /* network8: network9  */
 #line 347 "regex.y"
                    { }
-#line 2632 "regex.c"
+#line 2307 "regex.c"
     break;
 
-  case 80:
+  case 80: /* network9: network10  */
 #line 349 "regex.y"
                     { }
-#line 2638 "regex.c"
+#line 2313 "regex.c"
     break;
 
-  case 81:
+  case 81: /* network9: network9 KLEENE_STAR  */
 #line 350 "regex.y"
                                         { (yyval.net) = fsm_kleene_star(fsm_minimize((yyvsp[-1].net))); }
-#line 2644 "regex.c"
+#line 2319 "regex.c"
     break;
 
-  case 82:
+  case 82: /* network9: network9 KLEENE_PLUS  */
 #line 351 "regex.y"
                                         { (yyval.net) = fsm_kleene_plus((yyvsp[-1].net)); }
-#line 2650 "regex.c"
+#line 2325 "regex.c"
     break;
 
-  case 83:
+  case 83: /* network9: network9 REVERSE  */
 #line 352 "regex.y"
                                         { (yyval.net) = fsm_determinize(fsm_reverse((yyvsp[-1].net))); }
-#line 2656 "regex.c"
+#line 2331 "regex.c"
     break;
 
-  case 84:
+  case 84: /* network9: network9 INVERSE  */
 #line 353 "regex.y"
                                         { (yyval.net) = fsm_invert((yyvsp[-1].net)); }
-#line 2662 "regex.c"
+#line 2337 "regex.c"
     break;
 
-  case 85:
+  case 85: /* network9: network9 XUPPER  */
 #line 354 "regex.y"
                                         { (yyval.net) = fsm_upper((yyvsp[-1].net)); }
-#line 2668 "regex.c"
+#line 2343 "regex.c"
     break;
 
-  case 86:
+  case 86: /* network9: network9 XLOWER  */
 #line 355 "regex.y"
                                         { (yyval.net) = fsm_lower((yyvsp[-1].net)); }
-#line 2674 "regex.c"
+#line 2349 "regex.c"
     break;
 
-  case 87:
+  case 87: /* network9: network9 FLAG_ELIMINATE  */
 #line 356 "regex.y"
                                         { (yyval.net) = flag_eliminate((yyvsp[-1].net), NULL); }
-#line 2680 "regex.c"
+#line 2355 "regex.c"
     break;
 
-  case 88:
+  case 88: /* network9: network9 HIGH_CROSS_PRODUCT network10  */
 #line 357 "regex.y"
                                         { (yyval.net) = fsm_cross_product((yyvsp[-2].net),(yyvsp[0].net)); }
-#line 2686 "regex.c"
+#line 2361 "regex.c"
     break;
 
-  case 89:
+  case 89: /* network9: network9 NCONCAT  */
 #line 359 "regex.y"
                           { (yyval.net) = fsm_concat_n((yyvsp[-1].net),atoi((yyvsp[0].string))); }
-#line 2692 "regex.c"
+#line 2367 "regex.c"
     break;
 
-  case 90:
+  case 90: /* network9: network9 MORENCONCAT  */
 #line 360 "regex.y"
                           { (yyval.net) = fsm_concat(fsm_concat_n(fsm_copy((yyvsp[-1].net)), atoi((yyvsp[0].string))),fsm_kleene_plus(fsm_copy((yyvsp[-1].net)))); fsm_destroy((yyvsp[-1].net)); }
-#line 2698 "regex.c"
+#line 2373 "regex.c"
     break;
 
-  case 91:
+  case 91: /* network9: network9 LESSNCONCAT  */
 #line 361 "regex.y"
                           { (yyval.net) = fsm_concat_m_n((yyvsp[-1].net),0,atoi((yyvsp[0].string))-1); }
-#line 2704 "regex.c"
+#line 2379 "regex.c"
     break;
 
-  case 92:
+  case 92: /* network9: network9 MNCONCAT  */
 #line 362 "regex.y"
                           { (yyval.net) = fsm_concat_m_n((yyvsp[-1].net),atoi((yyvsp[0].string)),atoi(strstr((yyvsp[0].string),",")+1)); }
-#line 2710 "regex.c"
+#line 2385 "regex.c"
     break;
 
-  case 93:
+  case 93: /* network10: network11  */
 #line 364 "regex.y"
                      { }
-#line 2716 "regex.c"
+#line 2391 "regex.c"
     break;
 
-  case 94:
+  case 94: /* network10: TERM_NEGATION network10  */
 #line 365 "regex.y"
                           { (yyval.net) = fsm_term_negation((yyvsp[0].net)); }
-#line 2722 "regex.c"
+#line 2397 "regex.c"
     break;
 
-  case 95:
+  case 95: /* network11: NET  */
 #line 367 "regex.y"
                { (yyval.net) = (yyvsp[0].net);}
-#line 2728 "regex.c"
+#line 2403 "regex.c"
     break;
 
-  case 96:
+  case 96: /* network11: network12  */
 #line 368 "regex.y"
             { (yyval.net) = (yyvsp[0].net); }
-#line 2734 "regex.c"
+#line 2409 "regex.c"
     break;
 
-  case 97:
+  case 97: /* network11: UQUANT LPAREN network RPAREN  */
 #line 369 "regex.y"
                                { (yyval.net) = fsm_complement(fsm_substitute_symbol(fsm_intersect(fsm_quantifier((yyvsp[-3].string)),fsm_complement((yyvsp[-1].net))),(yyvsp[-3].string),"@_EPSILON_SYMBOL_@")); purge_quantifier((yyvsp[-3].string)); }
-#line 2740 "regex.c"
+#line 2415 "regex.c"
     break;
 
-  case 98:
+  case 98: /* network11: EQUANT network  */
 #line 370 "regex.y"
                  {  (yyval.net) = fsm_substitute_symbol(fsm_intersect(fsm_quantifier((yyvsp[-1].string)),(yyvsp[0].net)),(yyvsp[-1].string),"@_EPSILON_SYMBOL_@"); purge_quantifier((yyvsp[-1].string)); }
-#line 2746 "regex.c"
+#line 2421 "regex.c"
     break;
 
-  case 99:
+  case 99: /* network11: LPAREN network RPAREN  */
 #line 371 "regex.y"
                         { if (count_quantifiers()) (yyval.net) = (yyvsp[-1].net); else {(yyval.net) = fsm_optionality((yyvsp[-1].net));} }
-#line 2752 "regex.c"
+#line 2427 "regex.c"
     break;
 
-  case 100:
+  case 100: /* network11: LBRACKET network RBRACKET  */
 #line 372 "regex.y"
                             { (yyval.net) = (yyvsp[-1].net); }
-#line 2758 "regex.c"
+#line 2433 "regex.c"
     break;
 
-  case 101:
+  case 101: /* network11: SUCCESSOR_OF VAR COMMA VAR RPAREN  */
 #line 373 "regex.y"
                                     {(yyval.net) = fsm_concat(fsm_universal(),fsm_concat(fsm_symbol((yyvsp[-3].string)),fsm_concat(fsm_universal(),fsm_concat(fsm_symbol((yyvsp[-3].string)),fsm_concat(union_quantifiers(),fsm_concat(fsm_symbol((yyvsp[-1].string)),fsm_concat(fsm_universal(),fsm_concat(fsm_symbol((yyvsp[-1].string)),fsm_universal())))))))); }
-#line 2764 "regex.c"
+#line 2439 "regex.c"
     break;
 
-  case 102:
+  case 102: /* network11: SUCCESSOR_OF VAR COMMA network RPAREN  */
 #line 374 "regex.y"
                                         {(yyval.net) = fsm_concat(fsm_universal(),fsm_concat(fsm_symbol((yyvsp[-3].string)),fsm_concat(fsm_universal(),fsm_concat(fsm_symbol((yyvsp[-3].string)),fsm_concat(fsm_ignore((yyvsp[-1].net),union_quantifiers(),OP_IGNORE_ALL),fsm_universal()))))); }
-#line 2770 "regex.c"
+#line 2445 "regex.c"
     break;
 
-  case 103:
+  case 103: /* network11: SUCCESSOR_OF network COMMA VAR RPAREN  */
 #line 375 "regex.y"
                                         {(yyval.net) = fsm_concat(fsm_universal(),fsm_concat(fsm_ignore((yyvsp[-3].net),union_quantifiers(),OP_IGNORE_ALL),fsm_concat(fsm_symbol((yyvsp[-1].string)),fsm_concat(fsm_universal(),fsm_concat(fsm_symbol((yyvsp[-1].string)),fsm_universal()))))); }
-#line 2776 "regex.c"
+#line 2451 "regex.c"
     break;
 
-  case 104:
+  case 104: /* network11: sub1 sub2  */
 #line 376 "regex.y"
             {(yyval.net) = fsm_substitute_symbol((yyvsp[-1].net),subval1,subval2); substituting = 0; xxfree(subval1); xxfree(subval2); subval1 = subval2 = NULL;}
-#line 2782 "regex.c"
+#line 2457 "regex.c"
     break;
 
-  case 105:
+  case 105: /* sub1: SUBSTITUTE LBRACKET network COMMA  */
 #line 378 "regex.y"
                                         { (yyval.net) = (yyvsp[-1].net); substituting = 1;                      }
-#line 2788 "regex.c"
+#line 2463 "regex.c"
     break;
 
-  case 106:
+  case 106: /* sub2: SUBVAL COMMA SUBVAL RBRACKET  */
 #line 379 "regex.y"
                                         { subval1 = (yyvsp[-2].string); subval2 = (yyvsp[0].string); }
-#line 2794 "regex.c"
+#line 2469 "regex.c"
     break;
 
-  case 107:
+  case 107: /* network12: fend  */
 #line 381 "regex.y"
                    { (yyval.net) = (yyvsp[0].net); }
-#line 2800 "regex.c"
+#line 2475 "regex.c"
     break;
 
-  case 108:
+  case 108: /* network12: ISIDENTITY network RPAREN  */
 #line 382 "regex.y"
                                         { (yyval.net) = fsm_boolean(fsm_isidentity((yyvsp[-1].net)));   }
-#line 2806 "regex.c"
+#line 2481 "regex.c"
     break;
 
-  case 109:
+  case 109: /* network12: ISFUNCTIONAL network RPAREN  */
 #line 383 "regex.y"
                                         { (yyval.net) = fsm_boolean(fsm_isfunctional((yyvsp[-1].net))); }
-#line 2812 "regex.c"
+#line 2487 "regex.c"
     break;
 
-  case 110:
+  case 110: /* network12: ISUNAMBIGUOUS network RPAREN  */
 #line 384 "regex.y"
                                         { (yyval.net) = fsm_boolean(fsm_isunambiguous((yyvsp[-1].net))); }
-#line 2818 "regex.c"
+#line 2493 "regex.c"
     break;
 
-  case 111:
+  case 111: /* network12: NOTID network RPAREN  */
 #line 385 "regex.y"
                                         { (yyval.net) = fsm_extract_nonidentity(fsm_copy((yyvsp[-1].net))); }
-#line 2824 "regex.c"
+#line 2499 "regex.c"
     break;
 
-  case 112:
+  case 112: /* network12: LOWERUNIQ network RPAREN  */
 #line 386 "regex.y"
                                         { (yyval.net) = fsm_lowerdet(fsm_copy((yyvsp[-1].net))); }
-#line 2830 "regex.c"
+#line 2505 "regex.c"
     break;
 
-  case 113:
+  case 113: /* network12: LOWERUNIQEPS network RPAREN  */
 #line 387 "regex.y"
                                         { (yyval.net) = fsm_lowerdeteps(fsm_copy((yyvsp[-1].net))); }
-#line 2836 "regex.c"
+#line 2511 "regex.c"
     break;
 
-  case 114:
+  case 114: /* network12: ALLFINAL network RPAREN  */
 #line 388 "regex.y"
                                         { (yyval.net) = fsm_markallfinal(fsm_copy((yyvsp[-1].net))); }
-#line 2842 "regex.c"
+#line 2517 "regex.c"
     break;
 
-  case 115:
+  case 115: /* network12: UNAMBIGUOUSPART network RPAREN  */
 #line 389 "regex.y"
                                         { (yyval.net) = fsm_extract_unambiguous(fsm_copy((yyvsp[-1].net)));      }
-#line 2848 "regex.c"
+#line 2523 "regex.c"
     break;
 
-  case 116:
+  case 116: /* network12: AMBIGUOUSPART network RPAREN  */
 #line 390 "regex.y"
                                         { (yyval.net) = fsm_extract_ambiguous(fsm_copy((yyvsp[-1].net)));        }
-#line 2854 "regex.c"
+#line 2529 "regex.c"
     break;
 
-  case 117:
+  case 117: /* network12: AMBIGUOUSDOMAIN network RPAREN  */
 #line 391 "regex.y"
                                         { (yyval.net) = fsm_extract_ambiguous_domain(fsm_copy((yyvsp[-1].net))); }
-#line 2860 "regex.c"
+#line 2535 "regex.c"
     break;
 
-  case 118:
+  case 118: /* network12: LETTERMACHINE network RPAREN  */
 #line 392 "regex.y"
                                         { (yyval.net) = fsm_letter_machine(fsm_copy((yyvsp[-1].net))); }
-#line 2866 "regex.c"
+#line 2541 "regex.c"
     break;
 
-  case 119:
+  case 119: /* network12: MARKFSMTAIL network COMMA network RPAREN  */
 #line 393 "regex.y"
                                                   { (yyval.net) = fsm_mark_fsm_tail((yyvsp[-3].net),(yyvsp[-1].net)); }
-#line 2872 "regex.c"
+#line 2547 "regex.c"
     break;
 
-  case 120:
+  case 120: /* network12: MARKFSMTAILLOOP network COMMA network RPAREN  */
 #line 394 "regex.y"
                                                       { (yyval.net) = fsm_add_loop((yyvsp[-3].net),(yyvsp[-1].net),1); }
-#line 2878 "regex.c"
+#line 2553 "regex.c"
     break;
 
-  case 121:
+  case 121: /* network12: MARKFSMMIDLOOP network COMMA network RPAREN  */
 #line 395 "regex.y"
                                                      { (yyval.net) = fsm_add_loop((yyvsp[-3].net),(yyvsp[-1].net),0); }
-#line 2884 "regex.c"
+#line 2559 "regex.c"
     break;
 
-  case 122:
+  case 122: /* network12: MARKFSMLOOP network COMMA network RPAREN  */
 #line 396 "regex.y"
                                                   { (yyval.net) = fsm_add_loop((yyvsp[-3].net),(yyvsp[-1].net),2); }
-#line 2890 "regex.c"
+#line 2565 "regex.c"
     break;
 
-  case 123:
+  case 123: /* network12: ADDSINK network RPAREN  */
 #line 397 "regex.y"
                                 { (yyval.net) = fsm_add_sink((yyvsp[-1].net),1); }
-#line 2896 "regex.c"
+#line 2571 "regex.c"
     break;
 
-  case 124:
+  case 124: /* network12: LEFTREWR network COMMA network RPAREN  */
 #line 398 "regex.y"
                                                { (yyval.net) = fsm_left_rewr((yyvsp[-3].net),(yyvsp[-1].net)); }
-#line 2902 "regex.c"
+#line 2577 "regex.c"
     break;
 
-  case 125:
+  case 125: /* network12: FLATTEN network COMMA network RPAREN  */
 #line 399 "regex.y"
                                               { (yyval.net) = fsm_flatten((yyvsp[-3].net),(yyvsp[-1].net)); }
-#line 2908 "regex.c"
+#line 2583 "regex.c"
     break;
 
-  case 126:
+  case 126: /* network12: SUBLABEL network COMMA network COMMA network RPAREN  */
 #line 400 "regex.y"
                                                              { (yyval.net) = fsm_substitute_label((yyvsp[-5].net), fsm_network_to_char((yyvsp[-3].net)), (yyvsp[-1].net)); }
-#line 2914 "regex.c"
+#line 2589 "regex.c"
     break;
 
-  case 127:
+  case 127: /* network12: CLOSESIGMA network RPAREN  */
 #line 401 "regex.y"
                                       { (yyval.net) = fsm_close_sigma(fsm_copy((yyvsp[-1].net)), 0); }
-#line 2920 "regex.c"
+#line 2595 "regex.c"
     break;
 
-  case 128:
+  case 128: /* network12: CLOSESIGMAUNK network RPAREN  */
 #line 402 "regex.y"
                                       { (yyval.net) = fsm_close_sigma(fsm_copy((yyvsp[-1].net)), 1); }
-#line 2926 "regex.c"
+#line 2601 "regex.c"
     break;
 
-  case 129:
+  case 129: /* network12: EQSUBSTRINGS network COMMA network COMMA network RPAREN  */
 #line 403 "regex.y"
                                                                  { (yyval.net) = fsm_equal_substrings((yyvsp[-5].net),(yyvsp[-3].net),(yyvsp[-1].net)); }
-#line 2932 "regex.c"
+#line 2607 "regex.c"
     break;
 
-  case 130:
+  case 130: /* fstart: FUNCTION network COMMA  */
 #line 406 "regex.y"
 { frec++; fargptr[frec] = 0 ;declare_function_name((yyvsp[-2].string)) ; add_function_argument((yyvsp[-1].net)); }
-#line 2938 "regex.c"
+#line 2613 "regex.c"
     break;
 
-  case 131:
+  case 131: /* fstart: FUNCTION network  */
 #line 408 "regex.y"
 { frec++; fargptr[frec] = 0 ;declare_function_name((yyvsp[-1].string)) ; add_function_argument((yyvsp[0].net)); }
-#line 2944 "regex.c"
+#line 2619 "regex.c"
     break;
 
-  case 132:
+  case 132: /* fmid: fstart network COMMA  */
 #line 410 "regex.y"
                                { add_function_argument((yyvsp[-1].net)); }
-#line 2950 "regex.c"
+#line 2625 "regex.c"
     break;
 
-  case 133:
+  case 133: /* fmid: fmid network COMMA  */
 #line 411 "regex.y"
                                { add_function_argument((yyvsp[-1].net)); }
-#line 2956 "regex.c"
+#line 2631 "regex.c"
     break;
 
-  case 134:
+  case 134: /* fend: fmid network RPAREN  */
 #line 414 "regex.y"
 { add_function_argument((yyvsp[-1].net)); if (((yyval.net) = function_apply(defined_nets, defined_funcs)) == NULL) YYERROR; }
-#line 2962 "regex.c"
+#line 2637 "regex.c"
     break;
 
-  case 135:
+  case 135: /* fend: fstart network RPAREN  */
 #line 416 "regex.y"
 { add_function_argument((yyvsp[-1].net)); if (((yyval.net) = function_apply(defined_nets, defined_funcs)) == NULL) YYERROR; }
-#line 2968 "regex.c"
+#line 2643 "regex.c"
     break;
 
-  case 136:
+  case 136: /* fend: fstart RPAREN  */
 #line 418 "regex.y"
 { if (((yyval.net) = function_apply(defined_nets, defined_funcs)) == NULL) YYERROR;}
-#line 2974 "regex.c"
+#line 2649 "regex.c"
     break;
 
 
-#line 2978 "regex.c"
+#line 2653 "regex.c"
 
       default: break;
     }
@@ -2989,11 +2664,10 @@ yyreduce:
      case of YYERROR or YYBACKUP, subsequent parser actions might lead
      to an incorrect destructor call or verbose syntax error message
      before the lookahead is translated.  */
-  YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
+  YY_SYMBOL_PRINT ("-> $$ =", YY_CAST (yysymbol_kind_t, yyr1[yyn]), &yyval, &yyloc);
 
   YYPOPSTACK (yylen);
   yylen = 0;
-  YY_STACK_PRINT (yyss, yyssp);
 
   *++yyvsp = yyval;
   *++yylsp = yyloc;
@@ -3018,50 +2692,15 @@ yyreduce:
 yyerrlab:
   /* Make sure we have latest lookahead translation.  See comments at
      user semantic actions for why this is necessary.  */
-  yytoken = yychar == YYEMPTY ? YYEMPTY : YYTRANSLATE (yychar);
-
+  yytoken = yychar == YYEMPTY ? YYSYMBOL_YYEMPTY : YYTRANSLATE (yychar);
   /* If not already recovering from an error, report this error.  */
   if (!yyerrstatus)
     {
       ++yynerrs;
-#if ! YYERROR_VERBOSE
       yyerror (&yylloc, scanner, defined_nets, defined_funcs, YY_("syntax error"));
-#else
-# define YYSYNTAX_ERROR yysyntax_error (&yymsg_alloc, &yymsg, \
-                                        yyssp, yytoken)
-      {
-        char const *yymsgp = YY_("syntax error");
-        int yysyntax_error_status;
-        yysyntax_error_status = YYSYNTAX_ERROR;
-        if (yysyntax_error_status == 0)
-          yymsgp = yymsg;
-        else if (yysyntax_error_status == 1)
-          {
-            if (yymsg != yymsgbuf)
-              YYSTACK_FREE (yymsg);
-            yymsg = YY_CAST (char *, YYSTACK_ALLOC (YY_CAST (YYSIZE_T, yymsg_alloc)));
-            if (!yymsg)
-              {
-                yymsg = yymsgbuf;
-                yymsg_alloc = sizeof yymsgbuf;
-                yysyntax_error_status = 2;
-              }
-            else
-              {
-                yysyntax_error_status = YYSYNTAX_ERROR;
-                yymsgp = yymsg;
-              }
-          }
-        yyerror (&yylloc, scanner, defined_nets, defined_funcs, yymsgp);
-        if (yysyntax_error_status == 2)
-          goto yyexhaustedlab;
-      }
-# undef YYSYNTAX_ERROR
-#endif
     }
 
   yyerror_range[1] = yylloc;
-
   if (yyerrstatus == 3)
     {
       /* If just tried and failed to reuse lookahead token after an
@@ -3110,13 +2749,14 @@ yyerrorlab:
 yyerrlab1:
   yyerrstatus = 3;      /* Each real token shifted decrements this.  */
 
+  /* Pop stack until we find a state that shifts the error token.  */
   for (;;)
     {
       yyn = yypact[yystate];
       if (!yypact_value_is_default (yyn))
         {
-          yyn += YYTERROR;
-          if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
+          yyn += YYSYMBOL_YYerror;
+          if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYSYMBOL_YYerror)
             {
               yyn = yytable[yyn];
               if (0 < yyn)
@@ -3130,7 +2770,7 @@ yyerrlab1:
 
       yyerror_range[1] = *yylsp;
       yydestruct ("Error: popping",
-                  yystos[yystate], yyvsp, yylsp, scanner, defined_nets, defined_funcs);
+                  YY_ACCESSING_SYMBOL (yystate), yyvsp, yylsp, scanner, defined_nets, defined_funcs);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -3141,13 +2781,11 @@ yyerrlab1:
   YY_IGNORE_MAYBE_UNINITIALIZED_END
 
   yyerror_range[2] = yylloc;
-  /* Using YYLLOC is tempting, but would change the location of
-     the lookahead.  YYLOC is available though.  */
-  YYLLOC_DEFAULT (yyloc, yyerror_range, 2);
-  *++yylsp = yyloc;
+  ++yylsp;
+  YYLLOC_DEFAULT (*yylsp, yyerror_range, 2);
 
   /* Shift the error token.  */
-  YY_SYMBOL_PRINT ("Shifting", yystos[yyn], yyvsp, yylsp);
+  YY_SYMBOL_PRINT ("Shifting", YY_ACCESSING_SYMBOL (yyn), yyvsp, yylsp);
 
   yystate = yyn;
   goto yynewstate;
@@ -3169,20 +2807,20 @@ yyabortlab:
   goto yyreturn;
 
 
-#if !defined yyoverflow || YYERROR_VERBOSE
+#if !defined yyoverflow
 /*-------------------------------------------------.
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
   yyerror (&yylloc, scanner, defined_nets, defined_funcs, YY_("memory exhausted"));
   yyresult = 2;
-  /* Fall through.  */
+  goto yyreturn;
 #endif
 
 
-/*-----------------------------------------------------.
-| yyreturn -- parsing is finished, return the result.  |
-`-----------------------------------------------------*/
+/*-------------------------------------------------------.
+| yyreturn -- parsing is finished, clean up and return.  |
+`-------------------------------------------------------*/
 yyreturn:
   if (yychar != YYEMPTY)
     {
@@ -3199,18 +2837,16 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-                  yystos[+*yyssp], yyvsp, yylsp, scanner, defined_nets, defined_funcs);
+                  YY_ACCESSING_SYMBOL (+*yyssp), yyvsp, yylsp, scanner, defined_nets, defined_funcs);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
   if (yyss != yyssa)
     YYSTACK_FREE (yyss);
 #endif
-#if YYERROR_VERBOSE
-  if (yymsg != yymsgbuf)
-    YYSTACK_FREE (yymsg);
-#endif
+
   return yyresult;
 }
+
 #line 420 "regex.y"
 
