@@ -460,15 +460,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                 const char* tab = strstr(line, "\t");
                 if (NULL == tab)
                   {
-                    if (*line == '#')
-                      {
-                        continue;
-                      }
-                    else
-                      {
-                        error_at_line(EXIT_FAILURE, 0, tsv_file_name, linen,
-                                      "at least one tab required per line");
-                      }
+                    error_at_line(EXIT_FAILURE, 0, tsv_file_name, linen,
+                                  "at least one tab required per line");
                   }
                 const char* endstr = tab + 1;
                 while ((*endstr != '\0') && (*endstr != '\n'))
