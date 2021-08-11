@@ -372,12 +372,10 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
           (void)e; break;
         }
         if (transducer_name.rfind("UNCOMPOSE LEFT", 0) == 0) {
-            std::cerr << transducer_name << std::endl;
             uncompose_left = new Transducer(inputstream);
             uncomposable = true;
         }
         else if (transducer_name.rfind("UNCOMPOSE RIGHT", 0) == 0) {
-            std::cerr << transducer_name << std::endl;
             uncompose_right = new Transducer(inputstream);
             uncomposable = true;
         } else
