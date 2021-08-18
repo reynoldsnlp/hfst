@@ -639,21 +639,9 @@ AC_LANG_PUSH([C])
 
 AC_LANG_POP
 
-AS_IF([test "x$with_unicode_handler" = "xglib"],
-      [AC_CHECK_LIB([glib-2.0], [main])
-if test x$ac_cv_lib_glib_2_0_main != xyes ; then
-   AC_MSG_FAILURE([--with-unicode-handler=glib requested but glib-2.0 not found])
-fi
-       AC_DEFINE([USE_GLIB_UNICODE], 1, [if using glib for unicode string handling])])
-AS_IF([test "x$with_unicode_handler" = "xicu"],
-    [AC_CHECK_ICU([50],
-                  [AC_DEFINE([USE_ICU_UNICODE], 1, [if using icu for unicode string handling])],
-                  [AC_MSG_FAILURE([--with-unicode-handler=icu requested but icu>=50 not found])])
-     ])
-AS_IF([test "x$with_unicode_handler" = "xyes"],
-      [AC_MSG_FAILURE([--with-unicode-handler=yes; unicode handler 'yes' not recognized])])
-AS_IF([test "x$with_unicode_handler" = "xno"],
-      [AC_MSG_FAILURE([--with-unicode-handler=no; unicode handler 'no' not recognized])])
+AC_CHECK_ICU([50], [AC_DEFINE([USE_ICU_UNICODE], 1, 
+                    [if using icu for unicode string handling])],
+             [AC_MSG_FAILURE([ICU-50 or newer is required])])
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_SEARCH_LIBS([readline], [readline editline],
                       [AC_DEFINE([HAVE_READLINE], 1, [if readline can be used])],
@@ -842,8 +830,6 @@ AS_IF([test "x$with_openfst" == "xno"],
       [AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])])
 dnl HFST's case mapping in corpus tools is mainly MES-2 set with other characters
 dnl added as we go
-AS_IF([test "x$with_unicode_handler" = "xhfst"],
-      [AC_MSG_WARN([HFST only supports basic unicode handling with limited case mapping tables etc.; for better support consider using glib or ICU --with-unicode-handler])])
 AS_IF([test "x$with_readline" == "xno"],
       [AC_MSG_WARN([HFST tools will be compiled without readline; editing user input on command line is not supported; for better support consider using --with-readline])])
 dnl warn about missing "important" tools

@@ -135,17 +135,10 @@ Compilation requirements
 
   - the *hfst-xfst* frontend does not require foma binary or foma library
 
-- For proper Unicode support in corpus tools:
+- **ICU** version 50 or newer
 
-  - Glib version 2.16 or newer; configure ``--with-unicode-handler=glib``
-
-  - Pkg-config 0.14 or newer
-
-  - Without unicode libraries the corpus tools may be unable to handle
-    operations such as *case-folding* properly (default)
-
-  - To compile corpus processing tool ``hfst-proc``, you need to use the
-    ``configure`` switch ``--enable-proc`` (or ``--enable-all-tools``)
+- To compile corpus processing tool ``hfst-proc``, you need to use the
+``configure`` switch ``--enable-proc`` (or ``--enable-all-tools``)
 
 - To use the Python interface:
 
@@ -167,21 +160,21 @@ to your home directory instead of using your system's package manager
 If you are building a development version you *loaded from the version control
 system*, you must have new brand of GNU development tools installed:
 
- - autoconf >=2.62
+- autoconf >=2.62
 
- - automake >=1.11.1
+- automake >=1.11.1
 
- - libtool >=2.2
+- libtool >=2.2
 
- - >=gettext-0.17
+- >=gettext-0.17
 
- - GNU tool-chain is also needed with distributed packages if the user wishes to
-   modify Makefile.am or configure.ac files.
+- GNU tool-chain is also needed with distributed packages if the user wishes to
+modify Makefile.am or configure.ac files.
 
- - Mac OS X users are advised to use MacPorts; Mac OS X 10.6 with
-   XCode 2.3.2 at least is not sufficient
+- Mac OS X users are advised to use MacPorts; Mac OS X 10.6 with
+XCode 2.3.2 at least is not sufficient
 
- - A package loaded from hfst web site does *not* have these requirements
+- A package loaded from hfst web site does *not* have these requirements
 
 The source codes *loaded from the version controls system* will also require
 parse generator system:
