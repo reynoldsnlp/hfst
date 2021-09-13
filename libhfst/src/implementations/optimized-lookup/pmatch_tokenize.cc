@@ -410,7 +410,7 @@ print_reading_giellacg(const Location *loc,
                        const TokenizeSettings& s)
 {
     SplitPoints bt_its;
-    if(loc->output.empty()) {
+    if(loc->output.empty() || (loc->output.find(" ??") != string::npos)) {
         return make_pair(bt_its, indent);
     }
     typedef hfst::StringVector::const_iterator PartIt;
@@ -558,8 +558,11 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
     outstream << "\"<";
     print_escaping_backslashes(locations.at(0).input, outstream);
     outstream << ">\"" << std::endl;
-    if(locations.size() == 1 && locations.at(0).output.empty()) {
+    if(locations.size() == 1 && (locations.at(0).output.empty() ||
+                                 locations.at(0).output.find(" ??") !=
+                                 string::npos)) {
         // Treat empty analyses as unknown-but-tokenised:
+        // and ??
         outstream << "\t\"";
         print_escaping_backslashes(locations.at(0).input, outstream);
         outstream << "\" ?" << std::endl;
