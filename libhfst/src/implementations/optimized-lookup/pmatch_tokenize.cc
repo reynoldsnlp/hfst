@@ -410,7 +410,9 @@ print_reading_giellacg(const Location *loc,
                        const TokenizeSettings& s)
 {
     SplitPoints bt_its;
-    if(loc->output.empty() || (loc->output.find(" ??") != string::npos)) {
+    if(loc->output.empty()) {
+        return make_pair(bt_its, indent);
+    } else if ((loc->output.find(" ??") != string::npos) && (indent == 1)) {
         return make_pair(bt_its, indent);
     }
     typedef hfst::StringVector::const_iterator PartIt;
@@ -425,7 +427,6 @@ print_reading_giellacg(const Location *loc,
     }
     size_t part = loc->input_parts.size();
     while(true) {
-        string inpart;
         bool sub_found = false;
         size_t out_part = part > 0 ? loc->output_parts.at(part-1) : 0;
         while(out_part > 0 && loc->output_symbol_strings.at(out_part-1) == "@PMATCH_BACKTRACK@") {
@@ -538,7 +539,8 @@ const LocationVector locate_fullmatch(hfst_ol::PmatchContainer & container,
         for (LocationVector::iterator loc_it = loc.begin();
              loc_it != loc.end(); ++loc_it) {
             if(!loc_it->output.empty()
-               && loc_it->weight < std::numeric_limits<float>::max()) {
+               && loc_it->weight < std::numeric_limits<float>::max() &&
+               (loc_it->output.find(" ??") == string::npos)) {
                 // TODO: why aren't the <W:inf> excluded earlier?
                 if (s.hack_uncompose) {
                     container.uncompose(*loc_it);
@@ -652,6 +654,7 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
             if(depth == bottom) {
                 for(vector<std::ostringstream>::const_iterator it = out.begin(); it != out.end(); ++it) {
                     outstream << it->str();
+
                 }
             }
             if(depth < bottom) {
