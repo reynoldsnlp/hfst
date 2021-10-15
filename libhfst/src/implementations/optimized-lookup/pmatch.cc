@@ -145,6 +145,8 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
         special_symbols[Pmatch_passthrough] = symbol_number;
     } else if (str == "@BOUNDARY@") {
         special_symbols[boundary] = symbol_number;
+    } else if (str == "@UNICODE_ALPHA@") {
+        special_symbols[UnicodeAlpha] = symbol_number;
     } else if (is_end_tag(str)) {
         // Fetch the part between @PMATCH_ENDTAG_ and @
         end_tag_map[symbol_number] = str.substr(
@@ -672,7 +674,7 @@ bool PmatchAlphabet::is_special(const std::string & symbol)
     if (symbol == "@PMATCH_INPUT_MARK@" || symbol == "@PMATCH_BACKTRACK@") { // seems like is_special symbols can't be referred to in pmatch scripts
         return false;
     }
-    if (is_insertion(symbol) || symbol == "@BOUNDARY@") {
+    if (is_insertion(symbol) || symbol == "@BOUNDARY@" || symbol == "@UNICODE_ALPHA@") {
 //        || symbol == "@_UNKNOWN_SYMBOL_@" || symbol == "@_IDENTITY_SYMBOL_@"
         return true;
     } else {

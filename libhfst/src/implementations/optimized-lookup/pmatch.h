@@ -48,6 +48,7 @@ namespace hfst_ol {
                        Pmatch_passthrough,
                        boundary,
                        Pmatch_input_mark,
+                       UnicodeAlpha,
                        SPECIALSYMBOL_NR_ITEMS};
 
     class PmatchAlphabet: public TransducerAlphabet {
@@ -82,6 +83,7 @@ namespace hfst_ol {
         bool is_guard(const SymbolNumber symbol) const;
         bool is_counter(const SymbolNumber symbol) const;
         bool is_global_flag(const SymbolNumber symbol) const;
+        bool is_unicode_alpha(const SymbolNumber symbol) const;
         std::string end_tag(const SymbolNumber symbol);
         std::string start_tag(const SymbolNumber symbol);
         PmatchContainer * container;
