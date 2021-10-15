@@ -29,6 +29,7 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <memory>
 
 using std::string;
 using std::map;
@@ -160,7 +161,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
   //instream.open();
   //outstream.open();
-    
+
     size_t transducer_n=0;
     while(instream.is_good())
     {
@@ -180,7 +181,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
             verbose_printf("Metadata %s..." SIZE_T_SPECIFIER "\n",
                    inputfilename, transducer_n);
           }
-        
+
         HfstTransducer trans(instream);
         if (!print_all_properties && (print_property == NULL)) {
             for (map<string,string>::const_iterator prop = properties.begin();
@@ -277,24 +278,21 @@ int main( int argc, char **argv ) {
     verbose_printf("Reading from %s, writing to %s\n",
         inputfilename, outfilename);
     // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
+    std::unique_ptr<HfstInputStream> instream;
     try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
+      instream.reset((inputfile != stdin) ?
+        new HfstInputStream(inputfilename) : new HfstInputStream());
     } catch(const HfstException e)  {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
     }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, instream->get_type()) :
-        new HfstOutputStream(instream->get_type());
-    
+    auto outstream = (outfile != stdout) ?
+        std::make_unique<HfstOutputStream>(outfilename, instream->get_type()) :
+        std::make_unique<HfstOutputStream>(instream->get_type());
+
     retval = process_stream(*instream, *outstream);
-    delete instream;
-    delete outstream;
     free(inputfilename);
     free(outfilename);
     return retval;
 }
-

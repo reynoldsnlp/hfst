@@ -87,6 +87,7 @@ std::map<std::string, std::string> variables;
 std::vector<std::map<std::string, PmatchObject*> > call_stack;
 std::map<std::string, PmatchObject*> def_insed_expressions;
 std::set<std::string> inserted_names;
+std::set<std::string> uncomposed;
 std::set<std::string> unsatisfied_insertions;
 std::set<std::string> used_definitions;
 std::set<std::string> function_names;
@@ -525,7 +526,7 @@ PmatchObject * compile_like_arc(std::string word,
             break;
         }
     }
-    if (this_word.word == "") {
+    if (this_word.word.empty()) {
         // got no matches
         PmatchString * word_o = new PmatchString(word);
         word_o->multichar = true;
@@ -561,7 +562,7 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
     WordVector this_word2;
     for (std::vector<WordVector>::iterator it = word_vectors.begin();
          (it != word_vectors.end() &&
-          (this_word1.word == "" || this_word2.word == "")); ++it) {
+          (this_word1.word.empty() || this_word2.word.empty())); ++it) {
         if (word1 == it->word) {
             this_word1 = *it;
         }
@@ -569,7 +570,7 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
             this_word2 = *it;
         }
     }
-    if (this_word1.word == "" && this_word2.word == "") {
+    if (this_word1.word.empty() && this_word2.word.empty()) {
         // got no matches
         PmatchString * word1_o = new PmatchString(word1);
         PmatchString * word2_o = new PmatchString(word2);
@@ -578,10 +579,10 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
         return new PmatchBinaryOperation(Disjunct, word1_o, word2_o);
     }
 
-    if (this_word1.word == "" || this_word2.word == "") {
+    if (this_word1.word.empty() || this_word2.word.empty()) {
         // just one match
         pmatchwarning("only one match for arguments to Like() operation, using nearest neighbours");
-        WordVector this_word = (this_word1.word == "" ? this_word2 : this_word1);
+        WordVector this_word = (this_word1.word.empty() ? this_word2 : this_word1);
         std::vector<std::pair<WordVector, WordVecFloat> > top_n = get_top_n(nwords, word_vectors, this_word);
         HfstTokenizer tok;
         HfstTransducer * retval = new HfstTransducer(format);
@@ -1232,7 +1233,9 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         timer = clock();
     }
 
-    if (inserted_names.size() > 0 || def_insed_expressions.size() > 0) {
+    unsigned int uncount = 0;
+    if (inserted_names.size() > 0 || def_insed_expressions.size() > 0 ||
+            uncomposed.size() > 0) {
         HfstTransducer dummy(format);
         // We keep TOP and any inserted transducers
         std::map<std::string, PmatchObject *>::iterator defs_it;
@@ -1240,7 +1243,9 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
              ++defs_it) {
             if (defs_it->first.compare("TOP") == 0 ||
                 inserted_names.count(defs_it->first) != 0 ||
-                def_insed_expressions.count(defs_it->first) != 0) {
+                def_insed_expressions.count(defs_it->first) != 0 ||
+                uncomposed.count(defs_it->first) != 0)
+              {
                 HfstTransducer * tmp = NULL;
                 if (def_insed_expressions.count(defs_it->first) != 0) {
                     tmp = def_insed_expressions[defs_it->first]->evaluate();
@@ -1250,10 +1255,30 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
                 tmp->minimize();
                 dummy.harmonize(*tmp);
                 // This is what it will be called in the archive
-                tmp->set_name(defs_it->first);
-                retval[defs_it->first] = tmp;
+                // XXX: seems to use the index not the name...)
+                if (uncomposed.count(defs_it->first) != 0) {
+                    if (uncount == 0) {
+                        tmp->set_name("UNCOMPOSE LEFT " + defs_it->first);
+                        retval["UNCOMPOSE LEFT " + defs_it->first] = tmp;
+                        uncount++;
+                    } else if (uncount == 1) {
+                        tmp->set_name("UNCOMPOSE RIGHT " + defs_it->first);
+                        retval["UNCOMPOSE RIGHT " + defs_it->first] = tmp;
+                        uncount++;
+                    } else {
+                        std::cerr << "Uncompose only works once so far..." <<
+                          std::endl;
+                        uncount++;
+                    }
+                }
+                else
+                  {
+                    tmp->set_name(defs_it->first);
+                    retval[defs_it->first] = tmp;
+                  }
             }
         }
+
         // Now that dummy is harmonized with everything, we harmonize everything
         // with dummy and minimize the results
         std::map<std::string, HfstTransducer *>::iterator tr_it;
@@ -1517,11 +1542,7 @@ void read_vec(std::string filename)
             }
             // there can be one more from pos to the newline if there isn't a
             // separator at the end
-#if defined(NO_CPLUSPLUS_11)
-            if (*(line.rbegin()) != separator) {
-#else
             if (line.back() != separator) {
-#endif
 #if defined _MSC_VER && 1200 <= _MSC_VER
                 components.push_back((float)strtod(line.substr(pos + 1).c_str(), NULL));
             }
@@ -2956,6 +2977,11 @@ HfstTransducer * PmatchTernaryOperation::evaluate(void)
             retval->substitute(middle_pair, *tmp);
             delete tmp;
         }
+    }
+    else if (op == Uncompose) {
+        retval = left->evaluate();
+        HfstTransducer* unc_left = middle->evaluate();
+        HfstTransducer* unc_right = right->evaluate();
     }
     retval->set_final_weights(hfst::double_to_float(weight), true);
     if (cache == NULL && should_use_cache() == true) {

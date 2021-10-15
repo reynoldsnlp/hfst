@@ -27,6 +27,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include <cstdio>
 #include <cstdlib>
@@ -197,7 +198,7 @@ std::string check_all_symbols(const HfstTransducer &lexicon,
             { return output_symbol; }
         }
     }
-  
+
   return "";
 }
 
@@ -242,7 +243,7 @@ std::string check_multi_char_symbols
             }
         }
     }
-  
+
   return "";
 }
 
@@ -298,8 +299,8 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
     bool bothInputs = firststream.is_good() && secondstream.is_good();
     (void)bothInputs;
 
-    if ( is_input_stream_in_ol_format(&firststream, "hfst-compose-intersect") ||
-         is_input_stream_in_ol_format(&secondstream, "hfst-compose-intersect") )
+    if ( is_input_stream_in_ol_format(firststream, "hfst-compose-intersect") ||
+         is_input_stream_in_ol_format(secondstream, "hfst-compose-intersect") )
       {
         return EXIT_FAILURE;
       }
@@ -343,9 +344,9 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
         lexicon.convert(output_type);
         char* lexiconname = hfst_get_name(lexicon, firstfilename);
         verbose_printf(" %s read\n", lexiconname);
-     
+
         verbose_printf("Computing intersecting composition...\n");
-        
+
         if (rules.size() > 0)
           {
             std::string symbol;
@@ -367,7 +368,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
                         symbol.c_str(), firstfilename, secondfilename);
               }
           }
-        
+
         if (harmonize)
           {
             harmonize_rules(lexicon, rules);
@@ -378,13 +379,13 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
             // To hopefully speed up stuff: Compose intersect the output
             // of the lexicon with the rules and then compose the original
             // lexicon with the result.
-            
+
             if (invert)
               {
                 HfstTransducer lexicon_input(lexicon);
                 lexicon_input.input_project().minimize();
                 lexicon_input.compose_intersect(rules,true);
-                
+
                 lexicon_input.compose(lexicon);
                 lexicon = lexicon_input;
               }
@@ -451,26 +452,24 @@ int main( int argc, char **argv ) {
     verbose_printf("Reading from %s and %s, writing to %s\n",
         firstfilename, secondfilename, outfilename);
     // here starts the buffer handling part
-    HfstInputStream* firststream = NULL;
-    HfstInputStream* secondstream = NULL;
+    std::unique_ptr<HfstInputStream> firststream;
+    std::unique_ptr<HfstInputStream> secondstream;
     try {
-        firststream = (firstfile != stdin) ?
-            new HfstInputStream(firstfilename) : new HfstInputStream();
-    } catch(const HfstException e)   {
+        firststream.reset(firstfile != stdin ?
+            new HfstInputStream(firstfilename) : new HfstInputStream());
+    } catch(const HfstException e) {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               firstfilename);
     }
     try {
-        secondstream = (secondfile != stdin) ?
-            new HfstInputStream(secondfilename) : new HfstInputStream();
-    } catch(const HfstException e)   {
+        secondstream.reset((secondfile != stdin) ?
+            new HfstInputStream(secondfilename) : new HfstInputStream());
+    } catch(const HfstException e) {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               secondfilename);
     }
 
     retval = compose_streams(*firststream, *secondstream);
-    delete firststream;
-    delete secondstream;
     free(firstfilename);
     free(secondfilename);
     free(outfilename);

@@ -95,7 +95,7 @@ void hfst_set_program_name(const char* argv0, const char* version,
                            const char* wikipage);
 
 
-bool is_input_stream_in_ol_format(const hfst::HfstInputStream * is, const char * program);
+bool is_input_stream_in_ol_format(const hfst::HfstInputStream & is, const char * program);
 
 /* Common format into which transducers of types \a type1 and \a type2 will be converted,
    when convert_transducers will be called. Possible return values are:
@@ -216,8 +216,8 @@ long hfst_strtol(char* s, int base);
  */
 hfst::ImplementationType hfst_parse_format_name(const char* s);
 
-/** @brief allocate new string describing type of transducer format */
-char* hfst_strformat(hfst::ImplementationType format);
+/** @brief return string describing type of transducer format */
+const char* hfst_strformat(hfst::ImplementationType format);
 
 #ifndef HAVE_STRNDUP
 char* strndup(const char* s, size_t n);

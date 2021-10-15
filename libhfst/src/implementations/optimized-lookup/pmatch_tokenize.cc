@@ -328,6 +328,78 @@ void print_cg_subreading(size_t const & indent,
     outstream << std::endl;
 }
 
+void print_cg_subreading_ex(size_t const & indent,
+                         hfst::StringVector::const_iterator & out_beg,
+                         hfst::StringVector::const_iterator & out_end,
+                         hfst_ol::Weight const & weight,
+                         hfst::StringVector::const_iterator & in_beg,
+                         hfst::StringVector::const_iterator & in_end,
+                         std::string const & middle,
+                         std::ostream & outstream,
+                         const TokenizeSettings& s)
+{
+    outstream << string(indent, '\t');
+    bool in_lemma = false;
+    for(hfst::StringVector::const_iterator it = out_beg;
+        it != out_end; ++it) {
+        if(it->compare("@PMATCH_BACKTRACK@") == 0) {
+            continue;
+        }
+        bool is_tag = is_cg_tag(*it);
+        if(in_lemma) {
+            if(is_tag) {
+                in_lemma = false;
+                outstream << "\"";
+            }
+        }
+        else {
+            if(!is_tag) {
+                in_lemma = true;
+                outstream << "\"";
+            }
+        }
+        print_escaping_backslashes(*it, outstream);
+    }
+    if(in_lemma) {
+        outstream << "\"";
+    }
+    if ((s.hack_uncompose) && (!middle.empty())) {
+        outstream << " \"" << middle << "\"MIDTAPE";
+    }
+    if (s.print_weights) {
+        std::ostringstream w;
+        w << std::fixed << std::setprecision(9) << weight;
+        std::string rounded = w.str();
+        bool seendot = false;
+        bool inzeroes = true;
+        size_t firstzero = rounded.length();
+        for(size_t i = rounded.length(); i > 0; --i) {
+            if(inzeroes && rounded[i-1] == '0') {
+                firstzero = i;  // not i-1, keep one zero
+            }
+            else {
+                inzeroes = false;
+            }
+            if(rounded[i-1] == '.') {
+                seendot = true;
+                break;
+            }
+        }
+        if(seendot) {
+            rounded = rounded.substr(0, firstzero);
+        }
+        outstream << " <" << wtag << ":" << rounded << ">";
+    }
+    if (in_beg != in_end) {
+        std::ostringstream form;
+        std::copy(in_beg, in_end, std::ostream_iterator<string>(form, ""));
+        outstream << " \"<";
+        print_escaping_backslashes(form.str(), outstream);
+        outstream << ">\"";
+    }
+    outstream << std::endl;
+}
+
 typedef std::set<size_t> SplitPoints;
 
 pair<SplitPoints, size_t>
@@ -339,6 +411,8 @@ print_reading_giellacg(const Location *loc,
 {
     SplitPoints bt_its;
     if(loc->output.empty()) {
+        return make_pair(bt_its, indent);
+    } else if ((loc->output.find(" ??") != string::npos) && (indent == 1)) {
         return make_pair(bt_its, indent);
     }
     typedef hfst::StringVector::const_iterator PartIt;
@@ -353,7 +427,6 @@ print_reading_giellacg(const Location *loc,
     }
     size_t part = loc->input_parts.size();
     while(true) {
-        string inpart;
         bool sub_found = false;
         size_t out_part = part > 0 ? loc->output_parts.at(part-1) : 0;
         while(out_part > 0 && loc->output_symbol_strings.at(out_part-1) == "@PMATCH_BACKTRACK@") {
@@ -387,12 +460,13 @@ print_reading_giellacg(const Location *loc,
                 }
             }
         }
-        print_cg_subreading(indent,
+        print_cg_subreading_ex(indent,
                             out_beg,
                             out_end,
                             loc->weight,
                             in_beg,
                             in_end,
+                            loc->middle,
                             outstream,
                             s);
         if(out_beg == loc->output_symbol_strings.begin()) {
@@ -462,11 +536,15 @@ const LocationVector locate_fullmatch(hfst_ol::PmatchContainer & container,
             continue;
         }
         LocationVector loc = keep_n_best_weight(dedupe_locations(*it, s), s);
-        for (LocationVector::const_iterator loc_it = loc.begin();
+        for (LocationVector::iterator loc_it = loc.begin();
              loc_it != loc.end(); ++loc_it) {
             if(!loc_it->output.empty()
-               && loc_it->weight < std::numeric_limits<float>::max()) {
+               && loc_it->weight < std::numeric_limits<float>::max() &&
+               (loc_it->output.find(" ??") == string::npos)) {
                 // TODO: why aren't the <W:inf> excluded earlier?
+                if (s.hack_uncompose) {
+                    container.uncompose(*loc_it);
+                }
                 loc_filtered.push_back(*loc_it);
             }
         }
@@ -482,8 +560,11 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
     outstream << "\"<";
     print_escaping_backslashes(locations.at(0).input, outstream);
     outstream << ">\"" << std::endl;
-    if(locations.size() == 1 && locations.at(0).output.empty()) {
+    if(locations.size() == 1 && (locations.at(0).output.empty() ||
+                                 locations.at(0).output.find(" ??") !=
+                                 string::npos)) {
         // Treat empty analyses as unknown-but-tokenised:
+        // and ??
         outstream << "\t\"";
         print_escaping_backslashes(locations.at(0).input, outstream);
         outstream << "\" ?" << std::endl;
@@ -493,10 +574,16 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
     std::set<SplitPoints> backtrack;
     for (LocationVector::const_iterator loc_it = locations.begin();
          loc_it != locations.end(); ++loc_it) {
-        SplitPoints bt_points = print_reading_giellacg(&(*loc_it), 1, false, outstream, s).first;
+        // Check for uncompose
+        Location* hack = new Location(*loc_it);
+                if (s.hack_uncompose) {
+                    container.uncompose(*hack);
+                }
+        SplitPoints bt_points = print_reading_giellacg(hack, 1, false, outstream, s).first;
         if(!bt_points.empty()) {
             backtrack.insert(bt_points);
         }
+        delete hack;
     }
     if(backtrack.empty()) {
 	return;
@@ -567,6 +654,7 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
             if(depth == bottom) {
                 for(vector<std::ostringstream>::const_iterator it = out.begin(); it != out.end(); ++it) {
                     outstream << it->str();
+
                 }
             }
             if(depth < bottom) {

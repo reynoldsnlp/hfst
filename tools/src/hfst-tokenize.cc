@@ -148,7 +148,7 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer * dictionary)
     right_context->concatenate(*right_context_exit);
     delete left_context_exit; delete right_context_exit;
     std::string dict_name = dictionary->get_name();
-    if (dict_name == "") {
+    if (dict_name.empty()) {
         dict_name = "unknown_pmatch_tokenized_dict";
         dictionary->set_name(dict_name);
     }
@@ -504,6 +504,7 @@ int parse_options(int argc, char** argv)
             settings.print_weights = true;
             settings.print_all = true;
             settings.dedupe = true;
+            settings.hack_uncompose = true;
             settings.verbose = false;
             if(settings.max_weight_classes == std::numeric_limits<int>::max()) {
                 settings.max_weight_classes = 2;

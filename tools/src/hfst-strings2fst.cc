@@ -28,7 +28,7 @@
 
 #include <iostream>
 #include <fstream>
-
+#include <memory>
 #include <vector>
 #include <map>
 
@@ -277,7 +277,6 @@ process_stream(HfstOutputStream& outstream)
       transducer_n++;
       line_n++;
       verbose_printf("Parsing line %u...\n", line_n);
-      char* orig_line = hfst_strdup(line);
       // parse line end and weight
       char* tab = strstr(line, "\t");
       char* string_end = tab;
@@ -371,7 +370,6 @@ process_stream(HfstOutputStream& outstream)
           HfstTransducer res(tr, output_format);
           hfst_set_name(res, "", "string");
           outstream << res;
-          free(orig_line);
         }
       else // disjunct all strings into a single transducer
         {
@@ -449,11 +447,10 @@ int main( int argc, char **argv )
   verbose_printf("Reading from %s, writing to %s\n",
                  inputfilename, outfilename);
   // here starts the buffer handling part
-  HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, output_format) :
-        new HfstOutputStream(output_format);
+  auto outstream = (outfile != stdout) ?
+      std::make_unique<HfstOutputStream>(outfilename, output_format) :
+      std::make_unique<HfstOutputStream>(output_format);
   process_stream(*outstream);
-  delete outstream;
   free(inputfilename);
   free(outfilename);
   return EXIT_SUCCESS;

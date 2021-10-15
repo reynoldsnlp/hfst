@@ -113,6 +113,8 @@ class XfstCompiler
   XfstCompiler& define(const char* name, const char* xre);
   //! @brief Define regex macro
   XfstCompiler& define(const char* name);
+  //! @brief Define transducer
+  void define(const char* name, HfstTransducer * transducer);
   //! @brief Define regex macro function
   //! @todo Regex parser does not support macro functions
   XfstCompiler& define_function(const char* prototype, const char* xre);
@@ -452,10 +454,10 @@ class XfstCompiler
   /* Compile a regex string starting from \a indata, store the resulting
      transducer to variable XfstCompiler::latest_regex_compiled and
      store the number of characters read from \a indata to \a chars_read.
-     
+
      This function is used by the xfst lexer to determine where a regex
      starting from \a indata ends. For example, if we have the input
-     
+
      regex foo:bar ! this is a comment with a semicolon;
      baz;
      print net
@@ -509,7 +511,7 @@ class XfstCompiler
   XfstCompiler& setRestrictedMode(bool value);
   //! @brief Whether restricted mode is on.
   bool getRestrictedMode() const;
-  
+
   //! @brief Whether it has been requested to quit the program.
   //  Needed in interactive mode where user input is read line by line.
   bool quit_requested() const;
@@ -554,7 +556,7 @@ class XfstCompiler
   void flush(std::ostream * oss);
 
   bool check_filename(const char * filename);
-  
+
  protected:
   //! @brief Get the prompt that is used when applying up or down
   //! (as specified by \a direction).
@@ -672,12 +674,9 @@ class XfstCompiler
   //! @brief Get next line from \a file. Return NULL if end of file is reached.
   //! Use \a promptstr as prompt for readline, or print it to stderr if readline is not in use.
   char * xfst_getline(FILE * file, const std::string & promptstr = "");
-  
+
   //! @brief Remove newline ('\n' and '\r') from the end of \a str.
   char * remove_newline(char * str);
-
-  //! @brief Print weight.
-  //int hfst_print_weight(FILE * stream, float weight);
 
   //! @brief Get current readline history index.
   int current_history_index();
@@ -687,7 +686,7 @@ class XfstCompiler
 
   //! @brief Get the precision that is used when printing weights.
   int get_precision();
-  
+
   private:
   /* */
   const XfstCompiler& error(const char* message) const;
@@ -702,8 +701,7 @@ class XfstCompiler
   XfstCompiler& apply_med_line(char* line);
 
   XfstCompiler& print_bool(bool value);
-  XfstCompiler& read_prop_line(char* line);
-  
+
   /* A wrapper around stream objects, see flush(std::ostream *) for more information. */
   std::ostream * get_stream(std::ostream * oss);
 
@@ -769,5 +767,3 @@ extern XfstCompiler* xfst_;
 }}
 // vim:set ft=cpp.doxygen:
 #endif
-
-

@@ -35,7 +35,7 @@ namespace hfst { namespace implementations {
     SfstInputStream::SfstInputStream(const std::string &filename_):
       filename(std::string(filename_)), is_minimal(false)
   {
-    if (filename == std::string())
+    if (filename.empty())
       { input_file = stdin; }
     else {
       input_file = hfst::hfst_fopen(filename.c_str(),"r");
@@ -775,7 +775,8 @@ namespace hfst { namespace implementations {
       HfstTwoLevelPath epsilon_path(0, empty_spv);
       callback(epsilon_path, true /* final*/);
     }
-
+    if (fd_state_stack != NULL)
+      { delete fd_state_stack; }
   }
 
   /* Get a random path from transducer \a t. */

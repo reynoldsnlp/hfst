@@ -30,6 +30,7 @@
 #include <fstream>
 #include <set>
 #include <map>
+#include <memory>
 
 using std::set;
 using std::map;
@@ -198,14 +199,14 @@ process_stream(HfstInputStream& instream, FILE* outf)
           {
             error(EXIT_FAILURE, 0, "input transducers do not have the same type");
           }
-        char* inputname = strdup(t->get_name().c_str());
-        if (strlen(inputname) <= 0)
+        string inputname = t->get_name();
+        if (inputname.length() == 0)
           {
-            inputname = strdup(inputfilename);
+            inputname = inputfilename;
           }
         if (transducer_n == 1)
         {
-          verbose_printf("Converting %s...\n", inputname);
+          verbose_printf("Converting %s...\n", inputname.c_str());
         }
         else
         {
@@ -214,11 +215,9 @@ process_stream(HfstInputStream& instream, FILE* outf)
                   "use [hfst-head|hfst-tail|hfst-split] to extract individual transducers from input");
             return EXIT_FAILURE;
           }
-          verbose_printf("Converting %s..." SIZE_T_SPECIFIER "\n", inputname,
+          verbose_printf("Converting %s..." SIZE_T_SPECIFIER "\n", inputname.c_str(),
                          transducer_n);
         }
-        free(inputname);
-
 
         if(transducer_n > 1)
             fprintf(outf, "--\n");
@@ -267,7 +266,7 @@ process_stream(HfstInputStream& instream, FILE* outf)
                 ostr << transducer_n;
                 std::string alt_namestr = "NO_NAME_" + ostr.str();
 
-                if (namestr == "") {
+                if (namestr.empty()) {
                   namestr = alt_namestr;
                   if (!silent) {
                     fprintf(stderr, "Transducer has no name, giving it a name '%s'...\n", namestr.c_str()); }
@@ -322,10 +321,10 @@ int main( int argc, char **argv )
     verbose_printf("Reading from %s, writing to %s\n",
         inputfilename, outfilename);
     // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
+    std::unique_ptr<HfstInputStream> instream;
     try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
+      instream.reset((inputfile != stdin) ?
+        new HfstInputStream(inputfilename) : new HfstInputStream());
     } catch(const HfstException e)  {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
@@ -364,7 +363,6 @@ int main( int argc, char **argv )
     
     retval = process_stream(*instream, outfile);
 
-    delete instream;
     free(inputfilename);
     free(outfilename);
     return retval;

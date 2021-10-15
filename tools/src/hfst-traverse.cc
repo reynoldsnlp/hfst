@@ -27,6 +27,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 using std::multimap;
 using std::string;
@@ -267,7 +268,7 @@ process_stream(HfstInputStream& instream)
         transducer_n++;
         HfstTransducer trans(instream);
         string trans_name = trans.get_name();
-        if (trans_name == "")
+        if (trans_name.empty())
           {
             trans_name = inputfilename;
           }
@@ -335,22 +336,20 @@ int main( int argc, char **argv ) {
     verbose_printf("Reading from %s, writing to %s\n",
         inputfilename, outfilename);
     // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
+    std::unique_ptr<HfstInputStream> instream;
     try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
+      instream.reset((inputfile != stdin) ?
+        new HfstInputStream(inputfilename) : new HfstInputStream());
     } catch(const HfstException e)    {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
     }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, instream->get_type()) :
-        new HfstOutputStream(instream->get_type());
+    auto outstream = (outfile != stdout) ?
+        std::make_unique<HfstOutputStream>(outfilename, instream->get_type()) :
+        std::make_unique<HfstOutputStream>(instream->get_type());
     
     retval = process_stream(*instream);
-    delete instream;
-    delete outstream;
     free(inputfilename);
     free(outfilename);
     return retval;

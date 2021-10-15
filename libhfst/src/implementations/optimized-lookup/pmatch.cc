@@ -6,6 +6,7 @@
 // version 3 of the License, or (at your option) any later version.
 // See the file COPYING included with this distribution for more
 // information.
+
 #include "pmatch.h"
 #include "hfst.h"
 
@@ -45,7 +46,7 @@ PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
                     std::string feature =  hfst::FdOperation::get_feature(symbol_table[i])
                         .substr(14, std::string::npos);
                     std::string value = hfst::FdOperation::get_value(symbol_table[i]);
-                    std::string new_diacritic = s.substr(0, 3) + feature + (value == "" ? "" : "." + value) + "@";
+                    std::string new_diacritic = s.substr(0, 3) + feature + (value.empty() ? "" : "." + value) + "@";
                     fd_table.define_diacritic(i, new_diacritic);
                     // finally go over all other known flag diacritics with the non-globalized feature and
                     // mark them global too
@@ -84,7 +85,8 @@ PmatchAlphabet::PmatchAlphabet(TransducerAlphabet const & a,
 }
 
 PmatchAlphabet::PmatchAlphabet(void):
-    TransducerAlphabet()
+    TransducerAlphabet(),
+    container(0)
 {}
 
 void PmatchAlphabet::add_symbol(const std::string & symbol)
@@ -100,15 +102,9 @@ void PmatchAlphabet::add_symbol(const std::string & symbol)
         symbol2lists[symbol_table.size()] = hfst::size_t_to_ushort(symbol_lists.size());
         symbol_lists.push_back(SymbolNumberVector(exclusionary_lists.begin(),
                                                   exclusionary_lists.end()));
-#if defined(_MSC_VER) || defined(NO_CPLUSPLUS_11)
-        for (SymbolNumberVector::const_iterator exc = exclusionary_lists.begin(); exc != exclusionary_lists.end(); exc++) {
-          symbol_list_members[list2symbols[*exc]].push_back(hfst::size_t_to_uint(symbol_table.size()));
-        }
-#else
 	for(const auto & exc: exclusionary_lists) {
           symbol_list_members[list2symbols[exc]].push_back(symbol_table.size());
         }
-#endif
     }
     TransducerAlphabet::add_symbol(symbol);
 }
@@ -362,7 +358,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
     if (properties.count("initial-symbols") == 1) {
         collect_first_symbols(properties["initial-symbols"]);
     }
-    
+
     toplevel = new hfst_ol::PmatchTransducer(
         inputstream,
         header.index_table_size(),
@@ -377,21 +373,31 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
         } catch (TransducerHeaderException & e) {
           (void)e; break;
         }
-        header = TransducerHeader(inputstream);
-        TransducerAlphabet dummy = TransducerAlphabet(
-            inputstream, header.symbol_count());
-        hfst_ol::PmatchTransducer * rtn =
-            new hfst_ol::PmatchTransducer(inputstream,
+        if (transducer_name.rfind("UNCOMPOSE LEFT", 0) == 0) {
+            uncompose_left = new Transducer(inputstream);
+            uncomposable = true;
+        }
+        else if (transducer_name.rfind("UNCOMPOSE RIGHT", 0) == 0) {
+            uncompose_right = new Transducer(inputstream);
+            uncomposable = true;
+        } else
+          {
+            header = TransducerHeader(inputstream);
+            TransducerAlphabet dummy = TransducerAlphabet(
+                inputstream, header.symbol_count());
+            hfst_ol::PmatchTransducer * rtn =
+                new hfst_ol::PmatchTransducer(inputstream,
                                           header.index_table_size(),
                                           header.target_table_size(),
                                           alphabet,
                                           transducer_name,
                                           this);
-        if (!alphabet.has_rtn(transducer_name)) {
-            alphabet.add_rtn(rtn, transducer_name);
-        } else {
-            delete rtn;
-        }
+            if (!alphabet.has_rtn(transducer_name)) {
+                alphabet.add_rtn(rtn, transducer_name);
+            } else {
+                delete rtn;
+            }
+          }
     }
 }
 
@@ -733,7 +739,7 @@ std::string PmatchAlphabet::start_tag(const SymbolNumber symbol)
     } else {
         return "<" + end_tag_map[symbol] + ">";
     }
-    
+
 }
 
 PmatchContainer::~PmatchContainer(void)
@@ -838,18 +844,8 @@ bool PmatchAlphabet::has_rtn(std::string const & name) const
     if (name == "TOP") {
         return true;
     }
-#ifdef NO_CPLUSPLUS_11
-    hfst_ol::RtnNameMap::const_iterator it = rtn_names.find(name);
-    if (it != rtn_names.end())
-    {
-        return it->second < rtns.size() && rtns[it->second] != NULL;
-    } else {
-        return false;
-    }
-#else	
     return rtn_names.count(name) != 0 &&
         rtn_names.at(name) < rtns.size() && rtns[rtn_names.at(name)] != NULL;
-#endif
 }
 
 bool PmatchAlphabet::has_rtn(SymbolNumber symbol) const
@@ -1217,8 +1213,8 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
                                    PmatchAlphabet & alpha,
                                    std::string _name,
                                    PmatchContainer * cont):
-    alphabet(alpha),
     name(_name),
+    alphabet(alpha),
     container(cont)
 {
     orig_symbol_count = hfst::size_t_to_uint(alphabet.get_symbol_table().size());
@@ -1262,10 +1258,10 @@ PmatchTransducer::PmatchTransducer(std::vector<TransitionW> transition_vector,
                                    PmatchAlphabet & alpha,
                                    std::string _name,
                                    PmatchContainer * cont):
+    name(_name),
     transition_table(transition_vector),
     index_table(index_vector),
     alphabet(alpha),
-    name(_name),
     container(cont)
 {
     orig_symbol_count = hfst::size_t_to_uint(alphabet.get_symbol_table().size());
@@ -1293,6 +1289,7 @@ void PmatchContainer::set_properties(void)
     max_recursion = 5000;
     need_separators = true;
     xerox_composition = true;
+    uncomposable = false;
 }
 
 void PmatchContainer::set_properties(std::map<std::string, std::string> & properties)
@@ -1585,7 +1582,7 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
         if (input != 0 && !alphabet.is_flag_diacritic(input) && !alphabet.has_rtn(input)) {
             return;
         }
-        
+
         SymbolNumber output = transition_table[i].get_output_symbol();
         TransitionTableIndex target = transition_table[i].get_target();
         Weight old_weight = container->get_weight();
@@ -1646,9 +1643,9 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                     container->set_weight(old_weight);
                     continue;
                 }
-                
+
                 get_analyses(input_pos, tape_pos + 1, target);
-                
+
                 if (output == alphabet.get_special(entry)) {
                     container->entry_stack.pop_back();
                 } else if (output == alphabet.get_special(exit)) {
@@ -1732,7 +1729,7 @@ void PmatchTransducer::take_transitions(SymbolNumber input,
                                         TransitionTableIndex i)
 {
     i = make_transition_table_index(i, input);
-    
+
     while (is_good(i)) {
         SymbolNumber this_input = transition_table[i].get_input_symbol();
         SymbolNumber this_output = transition_table[i].get_output_symbol();
@@ -1812,7 +1809,7 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
         handle_final_state(input_pos, tape_pos);
         container->set_weight(old_weight);
     }
-    
+
     SymbolNumber input;
     if (!container->has_queued_input(input_pos)) {
         container->unrecurse();
@@ -1922,4 +1919,47 @@ void PmatchTransducer::exit_context(void)
     local_stack.push(new_top);
 }
 
-}
+
+void PmatchContainer::uncompose(Location& loc)
+  {
+    if (!uncomposable) {
+        return;
+    }
+    auto middle_left = uncompose_left->lookup_fd(loc.input);
+    if (middle_left->empty()) {
+        // ambig problems
+        return;
+    }
+    std::set<std::string> midforms;
+    for (auto& lpath : *middle_left) {
+        std::stringstream mids;
+        for (auto& symbol : lpath.second) {
+            if (!hfst::FdOperation::is_diacritic(symbol)) {
+                mids << symbol;
+            }
+        }
+        auto middle_right = uncompose_right->lookup_fd(mids.str());
+        if (middle_right->empty()) {
+            continue;
+        }
+        for (auto& rpath : *middle_right) {
+            std::stringstream lows;
+            for (auto& rsym : rpath.second) {
+                if (!hfst::FdOperation::is_diacritic(rsym)) {
+                    lows << rsym;
+                }
+            }
+            if (lows.str() == loc.output) {
+                midforms.insert(mids.str());
+            }
+        }
+    }
+    if (midforms.size() > 1) {
+        // ambig problems
+    }
+    for (auto& form : midforms) {
+        loc.middle = form;
+    }
+  }
+
+};

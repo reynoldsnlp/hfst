@@ -233,10 +233,10 @@ convert_transducers(hfst::HfstTransducer & first, hfst::HfstTransducer & second)
 }
 
 bool
-is_input_stream_in_ol_format(const hfst::HfstInputStream * is, const char * program)
+is_input_stream_in_ol_format(const hfst::HfstInputStream & is, const char * program)
 {
-  if ( is->get_type() == hfst::HFST_OL_TYPE ||
-       is->get_type() == hfst::HFST_OLW_TYPE )
+  if ( is.get_type() == hfst::HFST_OL_TYPE ||
+       is.get_type() == hfst::HFST_OLW_TYPE )
     {
       fprintf(stderr, "Error: %s cannot process transducers that are in optimized lookup format.\n", program);
       return true;
@@ -392,39 +392,39 @@ hfst_parse_format_name(const char* s)
     return rv;
 }
 
-char*
+const char*
 hfst_strformat(hfst::ImplementationType format)
 {
   switch (format)
     {
     case hfst::SFST_TYPE:
-      return strdup("SFST (1.4 compatible)");
+      return "SFST (1.4 compatible)";
       break;
     case hfst::TROPICAL_OPENFST_TYPE:
-      return strdup("OpenFST, std arc, tropical semiring");
+      return "OpenFST, std arc, tropical semiring";
       break;
     case hfst::LOG_OPENFST_TYPE:
-      return strdup("OpenFST, std arc, log semiring");
+      return "OpenFST, std arc, log semiring";
       break;
     case hfst::FOMA_TYPE:
-      return strdup("foma");
+      return "foma";
       break;
     case hfst::XFSM_TYPE:
-      return strdup("xfsm");
+      return "xfsm";
       break;
     case hfst::HFST_OL_TYPE:
-      return strdup("Hfst's lookup optimized, unweighted");
+      return "Hfst's lookup optimized, unweighted";
       break;
     case hfst::HFST_OLW_TYPE:
-      return strdup("Hfst's lookup optimized, weighted");
+      return "Hfst's lookup optimized, weighted";
       break;
     case hfst::HFST2_TYPE:
-      return strdup("Hfst 2 legacy (deprecated)");
+      return "Hfst 2 legacy (deprecated)";
       break;
     case hfst::ERROR_TYPE:
     case hfst::UNSPECIFIED_TYPE:
     default:
-      return strdup("ERROR (not a HFST supported transducer)");
+      return "ERROR (not a HFST supported transducer)";
       exit(1);
     }
 

@@ -102,6 +102,7 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 "Counter(" { return COUNTER_LEFT; }
 [Dd]"efine(" { return DEFINE_LEFT; }
 "DefIns" { return DEFINS; }
+"Uncompose(" { return UNCOMPOSE_LEFT; }
 
 "Alpha" { return ALPHA; }
 "UppercaseAlpha" { return UPPERALPHA; }
@@ -351,3 +352,4 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 }
 
 %%
+/* vim: set ft=lex: */

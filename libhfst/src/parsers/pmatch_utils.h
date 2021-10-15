@@ -18,6 +18,7 @@
 #define GUARD_pmatch_utils_h
 
 #include <map>
+#include <vector>
 #include <set>
 #include <time.h>
 #include <iomanip>
@@ -54,6 +55,7 @@ extern std::map<std::string, std::string> variables;
 extern std::vector<std::map<std::string, PmatchObject*> > call_stack;
 extern std::map<std::string, PmatchObject*> def_insed_expressions;
 extern std::set<std::string> inserted_names;
+extern std::set<std::string> uncomposed;
 extern std::set<std::string> unsatisfied_insertions;
 extern std::set<std::string> used_definitions;
 extern std::set<std::string> function_names;
@@ -419,7 +421,7 @@ struct PmatchUtilityTransducers
     HfstTransducer get_lowercase_acceptor_from_transducer(HfstTransducer & t);
     HfstTransducer uppercaser_from_transducer(HfstTransducer & t);
     HfstTransducer lowercaser_from_transducer(HfstTransducer & t);
-    
+
     HfstTransducer * cap(HfstTransducer & t, Side side = Both,
                          bool optional = false);
     HfstTransducer * tolower(HfstTransducer & t, Side side = Both,
@@ -581,8 +583,10 @@ enum PmatchBinaryOp {
 };
 
 enum PmatchTernaryOp {
-    Substitute
+    Substitute,
+    Uncompose
 };
+
 
 enum PmatchNumericOp {
     RepeatN,

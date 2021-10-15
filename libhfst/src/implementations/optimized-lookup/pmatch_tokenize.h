@@ -39,13 +39,14 @@ struct TokenizeSettings {
     bool verbose = true;
     float beam = -1.0;
     bool tokenize_multichar = false;
+    bool hack_uncompose = false;
 };
 
 void print_nonmatching_sequence(std::string const & str, std::ostream & outstream, const TokenizeSettings& s);
 
 void match_and_print(hfst_ol::PmatchContainer & container,
                      std::ostream & outstream,
-                     const string & input_text,
+                     const std::string & input_text,
                      const TokenizeSettings& s);
 
 void process_input(hfst_ol::PmatchContainer & container,

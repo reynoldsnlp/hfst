@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.5.1.  */
+/* A Bison parser, made by GNU Bison 3.7.3.  */
 
 /* Bison interface for Yacc-like parsers in C
 
@@ -31,8 +31,9 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Undocumented macros, especially those whose name start with YY_,
-   are private implementation details.  Do not rely on them.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
 
 #ifndef YY_YY_REGEX_H_INCLUDED
 # define YY_YY_REGEX_H_INCLUDED
@@ -44,98 +45,106 @@
 extern int yydebug;
 #endif
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    NET = 258,
-    END = 259,
-    LBRACKET = 260,
-    RBRACKET = 261,
-    LPAREN = 262,
-    RPAREN = 263,
-    ENDM = 264,
-    ENDD = 265,
-    CRESTRICT = 266,
-    CONTAINS = 267,
-    CONTAINS_OPT_ONE = 268,
-    CONTAINS_ONE = 269,
-    XUPPER = 270,
-    XLOWER = 271,
-    FLAG_ELIMINATE = 272,
-    IGNORE_ALL = 273,
-    IGNORE_INTERNAL = 274,
-    CONTEXT = 275,
-    NCONCAT = 276,
-    MNCONCAT = 277,
-    MORENCONCAT = 278,
-    LESSNCONCAT = 279,
-    DOUBLE_COMMA = 280,
-    COMMA = 281,
-    SHUFFLE = 282,
-    PRECEDES = 283,
-    FOLLOWS = 284,
-    RIGHT_QUOTIENT = 285,
-    LEFT_QUOTIENT = 286,
-    INTERLEAVE_QUOTIENT = 287,
-    UQUANT = 288,
-    EQUANT = 289,
-    VAR = 290,
-    IN = 291,
-    IMPLIES = 292,
-    BICOND = 293,
-    EQUALS = 294,
-    NEQ = 295,
-    SUBSTITUTE = 296,
-    SUCCESSOR_OF = 297,
-    PRIORITY_UNION_U = 298,
-    PRIORITY_UNION_L = 299,
-    LENIENT_COMPOSE = 300,
-    TRIPLE_DOT = 301,
-    LDOT = 302,
-    RDOT = 303,
-    FUNCTION = 304,
-    SUBVAL = 305,
-    ISUNAMBIGUOUS = 306,
-    ISIDENTITY = 307,
-    ISFUNCTIONAL = 308,
-    NOTID = 309,
-    LOWERUNIQ = 310,
-    LOWERUNIQEPS = 311,
-    ALLFINAL = 312,
-    UNAMBIGUOUSPART = 313,
-    AMBIGUOUSPART = 314,
-    AMBIGUOUSDOMAIN = 315,
-    EQSUBSTRINGS = 316,
-    LETTERMACHINE = 317,
-    MARKFSMTAIL = 318,
-    MARKFSMTAILLOOP = 319,
-    MARKFSMMIDLOOP = 320,
-    MARKFSMLOOP = 321,
-    ADDSINK = 322,
-    LEFTREWR = 323,
-    FLATTEN = 324,
-    SUBLABEL = 325,
-    CLOSESIGMA = 326,
-    CLOSESIGMAUNK = 327,
-    ARROW = 328,
-    DIRECTION = 329,
-    COMPOSE = 330,
-    CROSS_PRODUCT = 331,
-    HIGH_CROSS_PRODUCT = 332,
-    UNION = 333,
-    INTERSECT = 334,
-    MINUS = 335,
-    COMPLEMENT = 336,
-    KLEENE_STAR = 337,
-    KLEENE_PLUS = 338,
-    REVERSE = 339,
-    INVERSE = 340,
-    TERM_NEGATION = 341
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    NET = 258,                     /* NET  */
+    END = 259,                     /* END  */
+    LBRACKET = 260,                /* LBRACKET  */
+    RBRACKET = 261,                /* RBRACKET  */
+    LPAREN = 262,                  /* LPAREN  */
+    RPAREN = 263,                  /* RPAREN  */
+    ENDM = 264,                    /* ENDM  */
+    ENDD = 265,                    /* ENDD  */
+    CRESTRICT = 266,               /* CRESTRICT  */
+    CONTAINS = 267,                /* CONTAINS  */
+    CONTAINS_OPT_ONE = 268,        /* CONTAINS_OPT_ONE  */
+    CONTAINS_ONE = 269,            /* CONTAINS_ONE  */
+    XUPPER = 270,                  /* XUPPER  */
+    XLOWER = 271,                  /* XLOWER  */
+    FLAG_ELIMINATE = 272,          /* FLAG_ELIMINATE  */
+    IGNORE_ALL = 273,              /* IGNORE_ALL  */
+    IGNORE_INTERNAL = 274,         /* IGNORE_INTERNAL  */
+    CONTEXT = 275,                 /* CONTEXT  */
+    NCONCAT = 276,                 /* NCONCAT  */
+    MNCONCAT = 277,                /* MNCONCAT  */
+    MORENCONCAT = 278,             /* MORENCONCAT  */
+    LESSNCONCAT = 279,             /* LESSNCONCAT  */
+    DOUBLE_COMMA = 280,            /* DOUBLE_COMMA  */
+    COMMA = 281,                   /* COMMA  */
+    SHUFFLE = 282,                 /* SHUFFLE  */
+    PRECEDES = 283,                /* PRECEDES  */
+    FOLLOWS = 284,                 /* FOLLOWS  */
+    RIGHT_QUOTIENT = 285,          /* RIGHT_QUOTIENT  */
+    LEFT_QUOTIENT = 286,           /* LEFT_QUOTIENT  */
+    INTERLEAVE_QUOTIENT = 287,     /* INTERLEAVE_QUOTIENT  */
+    UQUANT = 288,                  /* UQUANT  */
+    EQUANT = 289,                  /* EQUANT  */
+    VAR = 290,                     /* VAR  */
+    IN = 291,                      /* IN  */
+    IMPLIES = 292,                 /* IMPLIES  */
+    BICOND = 293,                  /* BICOND  */
+    EQUALS = 294,                  /* EQUALS  */
+    NEQ = 295,                     /* NEQ  */
+    SUBSTITUTE = 296,              /* SUBSTITUTE  */
+    SUCCESSOR_OF = 297,            /* SUCCESSOR_OF  */
+    PRIORITY_UNION_U = 298,        /* PRIORITY_UNION_U  */
+    PRIORITY_UNION_L = 299,        /* PRIORITY_UNION_L  */
+    LENIENT_COMPOSE = 300,         /* LENIENT_COMPOSE  */
+    TRIPLE_DOT = 301,              /* TRIPLE_DOT  */
+    LDOT = 302,                    /* LDOT  */
+    RDOT = 303,                    /* RDOT  */
+    FUNCTION = 304,                /* FUNCTION  */
+    SUBVAL = 305,                  /* SUBVAL  */
+    ISUNAMBIGUOUS = 306,           /* ISUNAMBIGUOUS  */
+    ISIDENTITY = 307,              /* ISIDENTITY  */
+    ISFUNCTIONAL = 308,            /* ISFUNCTIONAL  */
+    NOTID = 309,                   /* NOTID  */
+    LOWERUNIQ = 310,               /* LOWERUNIQ  */
+    LOWERUNIQEPS = 311,            /* LOWERUNIQEPS  */
+    ALLFINAL = 312,                /* ALLFINAL  */
+    UNAMBIGUOUSPART = 313,         /* UNAMBIGUOUSPART  */
+    AMBIGUOUSPART = 314,           /* AMBIGUOUSPART  */
+    AMBIGUOUSDOMAIN = 315,         /* AMBIGUOUSDOMAIN  */
+    EQSUBSTRINGS = 316,            /* EQSUBSTRINGS  */
+    LETTERMACHINE = 317,           /* LETTERMACHINE  */
+    MARKFSMTAIL = 318,             /* MARKFSMTAIL  */
+    MARKFSMTAILLOOP = 319,         /* MARKFSMTAILLOOP  */
+    MARKFSMMIDLOOP = 320,          /* MARKFSMMIDLOOP  */
+    MARKFSMLOOP = 321,             /* MARKFSMLOOP  */
+    ADDSINK = 322,                 /* ADDSINK  */
+    LEFTREWR = 323,                /* LEFTREWR  */
+    FLATTEN = 324,                 /* FLATTEN  */
+    SUBLABEL = 325,                /* SUBLABEL  */
+    CLOSESIGMA = 326,              /* CLOSESIGMA  */
+    CLOSESIGMAUNK = 327,           /* CLOSESIGMAUNK  */
+    ARROW = 328,                   /* ARROW  */
+    DIRECTION = 329,               /* DIRECTION  */
+    COMPOSE = 330,                 /* COMPOSE  */
+    CROSS_PRODUCT = 331,           /* CROSS_PRODUCT  */
+    HIGH_CROSS_PRODUCT = 332,      /* HIGH_CROSS_PRODUCT  */
+    UNION = 333,                   /* UNION  */
+    INTERSECT = 334,               /* INTERSECT  */
+    MINUS = 335,                   /* MINUS  */
+    COMPLEMENT = 336,              /* COMPLEMENT  */
+    KLEENE_STAR = 337,             /* KLEENE_STAR  */
+    KLEENE_PLUS = 338,             /* KLEENE_PLUS  */
+    REVERSE = 339,                 /* REVERSE  */
+    INVERSE = 340,                 /* INVERSE  */
+    TERM_NEGATION = 341            /* TERM_NEGATION  */
   };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Tokens.  */
+/* Token kinds.  */
+#define YYEOF 0
+#define YYerror 256
+#define YYUNDEF 257
 #define NET 258
 #define END 259
 #define LBRACKET 260
@@ -231,7 +240,7 @@ union YYSTYPE
      struct fsm *net;
      int  type;
 
-#line 235 "regex.h"
+#line 244 "regex.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

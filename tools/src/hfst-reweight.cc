@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include <cstdio>
 #include <cstdlib>
@@ -416,6 +417,10 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     {
         transducer_n++;
         HfstTransducer trans(instream);
+        if (trans.get_type() == hfst::FOMA_TYPE) {
+            warning(0, 0, "Weighting is not supported in this automaton type;"
+                     "weights will be discarded");
+        }
         char* inputname = hfst_get_name(trans, inputfilename);
         if (transducer_n==1)
         {
@@ -455,15 +460,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                 const char* tab = strstr(line, "\t");
                 if (NULL == tab)
                   {
-                    if (*line == '#')
-                      {
-                        continue;
-                      }
-                    else
-                      {
-                        error_at_line(EXIT_FAILURE, 0, tsv_file_name, linen,
-                                      "at least one tab required per line");
-                      }
+                    error_at_line(EXIT_FAILURE, 0, tsv_file_name, linen,
+                                  "at least one tab required per line");
                   }
                 const char* endstr = tab + 1;
                 while ((*endstr != '\0') && (*endstr != '\n'))
@@ -546,27 +544,25 @@ int main( int argc, char **argv ) {
         verbose_printf("only on arc weights, no end states\n");
       }
     // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
+    std::unique_ptr<HfstInputStream> instream;
     try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)  {
+      instream.reset((inputfile != stdin) ?
+        new HfstInputStream(inputfilename) : new HfstInputStream());
+    } catch(const HfstException& e)  {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
     }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, instream->get_type()) :
-        new HfstOutputStream(instream->get_type());
-    
-    if ( is_input_stream_in_ol_format(instream, "hfst-reweight"))
+    auto outstream = (outfile != stdout) ?
+        std::make_unique<HfstOutputStream>(outfilename, instream->get_type()) :
+        std::make_unique<HfstOutputStream>(instream->get_type());
+
+    if ( is_input_stream_in_ol_format(*instream, "hfst-reweight"))
       {
         return EXIT_FAILURE;
       }
 
     retval = process_stream(*instream, *outstream);
-    delete instream;
-    delete outstream;
     free(inputfilename);
     free(outfilename);
     return retval;

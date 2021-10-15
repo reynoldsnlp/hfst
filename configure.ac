@@ -175,16 +175,6 @@ AC_ARG_WITH([readline],
             [with_readline=$withval],
             [with_readline=no])
 AM_CONDITIONAL([WANT_READLINE], [test x$with_readline != xno])
-# make c++11 features optional; this will disable some functions and make compilation slower
-AC_ARG_WITH([c++11],
-            [AS_HELP_STRING([--with-c++11],
-                            [enable c++11 features @<:@default=yes@:>@])],
-            [with_cplusplus_11=$withval],
-            [with_cplusplus_11=yes])
-AS_IF([test "x$with_cplusplus_11" == "xno"], [AC_DEFINE([NO_CPLUSPLUS_11], [1],
-                                              [Define not to have c++11 support])])
-AS_IF([test "x$with_cplusplus_11" == "xno"], [AC_DEFINE([INCLUDE_TR1_UNORDERED_MAP_AND_SET], [1], [Define unordered container header])])
-AS_IF([test "x$with_cplusplus_11" == "xno"], [AC_DEFINE([USE_TR1_UNORDERED_MAP_AND_SET], [1], [Define unordered container namespace])])
 # make it possible to disable loading entries from shared object (openfst back-end feature),
 # since this adds a dependecy on dl library
 AC_ARG_ENABLE([load_so_entries],
@@ -649,21 +639,9 @@ AC_LANG_PUSH([C])
 
 AC_LANG_POP
 
-AS_IF([test "x$with_unicode_handler" = "xglib"],
-      [AC_CHECK_LIB([glib-2.0], [main])
-if test x$ac_cv_lib_glib_2_0_main != xyes ; then
-   AC_MSG_FAILURE([--with-unicode-handler=glib requested but glib-2.0 not found])
-fi
-       AC_DEFINE([USE_GLIB_UNICODE], 1, [if using glib for unicode string handling])])
-AS_IF([test "x$with_unicode_handler" = "xicu"],
-    [AC_CHECK_ICU([50],
-                  [AC_DEFINE([USE_ICU_UNICODE], 1, [if using icu for unicode string handling])],
-                  [AC_MSG_FAILURE([--with-unicode-handler=icu requested but icu>=50 not found])])
-     ])
-AS_IF([test "x$with_unicode_handler" = "xyes"],
-      [AC_MSG_FAILURE([--with-unicode-handler=yes; unicode handler 'yes' not recognized])])
-AS_IF([test "x$with_unicode_handler" = "xno"],
-      [AC_MSG_FAILURE([--with-unicode-handler=no; unicode handler 'no' not recognized])])
+AC_CHECK_ICU([50], [AC_DEFINE([USE_ICU_UNICODE], 1, 
+                    [if using icu for unicode string handling])],
+             [AC_MSG_FAILURE([ICU-50 or newer is required])])
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_SEARCH_LIBS([readline], [readline editline],
                       [AC_DEFINE([HAVE_READLINE], 1, [if readline can be used])],
@@ -679,31 +657,13 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h]
 
 AC_LANG_PUSH([C++])
 
-# If we're using upstream OpenFST then use C++17, otherwise limit to C++11
-AM_COND_IF([WANT_OPENFST_UPSTREAM], [CXXFLAGS="$CXXFLAGS -std=c++17"], [CXXFLAGS="$CXXFLAGS -std=c++11"])
+# If we're using upstream OpenFST then use C++17, otherwise limit to C++14
+AM_COND_IF([WANT_OPENFST_UPSTREAM], [CXXFLAGS="$CXXFLAGS -std=c++17"], [CXXFLAGS="$CXXFLAGS -std=c++14"])
 
 # On 32bit x86, we need to use SSE for precise floating point arithmetics in OpenFST
 AX_CHECK_COMPILE_FLAG([-msse], [CXXFLAGS="$CXXFLAGS -msse"], [])
 AX_CHECK_COMPILE_FLAG([-msse2], [CXXFLAGS="$CXXFLAGS -msse2"], [])
 AX_CHECK_COMPILE_FLAG([-mfpmath=sse], [CXXFLAGS="$CXXFLAGS -mfpmath=sse"], [])
-
-AC_CHECK_HEADERS([unordered_map], [], [],
-[#ifdef HAVE_UNORDERED_MAP
-#include <unordered_map>
-#endif
-])
-AC_CHECK_HEADERS([unordered_set], [], [],
-[#ifdef HAVE_UNORDERED_SET
-#include <unordered_set>
-#endif
-])
-
-AS_IF([test "x$with_cplusplus_11" != "xno"],[
-AS_IF([test "x$ac_cv_header_unordered_map" = "xno"],
-            [AC_MSG_ERROR(["<unordered_map> not found, it is needed in c++ standard 11 (or higher)"])])
-AS_IF([test "x$ac_cv_header_unordered_set" = "xno"],
-            [AC_MSG_ERROR(["<unordered_set> not found, it is needed in c++ standard 11 (or higher)"])])
-])
 
 AC_CHECK_HEADERS([ext/slist])
 
@@ -870,12 +830,8 @@ AS_IF([test "x$with_openfst" == "xno"],
       [AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])])
 dnl HFST's case mapping in corpus tools is mainly MES-2 set with other characters
 dnl added as we go
-AS_IF([test "x$with_unicode_handler" = "xhfst"],
-      [AC_MSG_WARN([HFST only supports basic unicode handling with limited case mapping tables etc.; for better support consider using glib or ICU --with-unicode-handler])])
 AS_IF([test "x$with_readline" == "xno"],
       [AC_MSG_WARN([HFST tools will be compiled without readline; editing user input on command line is not supported; for better support consider using --with-readline])])
-AS_IF([test "x$with_cplusplus_11" == "xno"],
-      [AC_MSG_WARN([HFST tools will be compiled without C++11 support; some features will be disabled; for better support consider using --with-c++11])])
 dnl warn about missing "important" tools
 AS_IF([test "x$enable_lexc" == "xno"],
       [AC_MSG_WARN([hfst-lexc is not enabled; enable with --enable-lexc])])
