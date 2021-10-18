@@ -718,6 +718,11 @@ bool PmatchAlphabet::is_input_mark(const SymbolNumber symbol) const
     return input_mark_symbol == symbol;
 }
 
+bool PmatchAlphabet::is_meta_arc(const SymbolNumber symbol) const
+{
+    return TransducerAlphabet::is_meta_arc(symbol) || symbol == get_special(UnicodeAlpha);
+}
+
 std::string PmatchAlphabet::name_from_insertion(const std::string & symbol)
 {
     return symbol.substr(sizeof("@I.") - 1, symbol.size() - (sizeof("@I.@") - 1));
@@ -1826,6 +1831,12 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
             take_transitions(*it, input_pos, tape_pos, i+1);
         }
     }
+    if (alphabet.get_special(UnicodeAlpha) != NO_SYMBOL_NUMBER) {
+        if (alphabet.is_unicode_alpha(input)) {
+                take_transitions(alphabet.get_special(UnicodeAlpha), input_pos, tape_pos, i+1);
+            }
+    }
+    
     // The "normal" case where we have a regular input symbol
     if (input < orig_symbol_count) {
         take_transitions(input, input_pos, tape_pos, i+1);
