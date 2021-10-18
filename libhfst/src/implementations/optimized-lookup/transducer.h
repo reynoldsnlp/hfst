@@ -36,6 +36,11 @@
 #include "../../HfstSymbolDefs.h"
 #include "../../HfstDataTypes.h"
 
+#if USE_ICU_UNICODE
+#include <unicode/unistr.h>
+#include <unicode/uchar.h>
+#endif
+
 #ifdef _MSC_VER
  #include <BaseTsd.h>
  typedef SSIZE_T ssize_t;
@@ -411,7 +416,8 @@ public:
     bool is_flag_diacritic(SymbolNumber symbol) const
         { return fd_table.is_diacritic(symbol); }
     bool is_like_epsilon(SymbolNumber symbol) const;
-    bool is_meta_arc(SymbolNumber symbol) const;
+    virtual bool is_meta_arc(SymbolNumber symbol) const;
+    bool is_unicode_alpha(SymbolNumber symbol) const;
     
     const SymbolTable& get_symbol_table() const
         { return symbol_table; }

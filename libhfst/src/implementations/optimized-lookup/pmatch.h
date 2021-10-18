@@ -83,7 +83,6 @@ namespace hfst_ol {
         bool is_guard(const SymbolNumber symbol) const;
         bool is_counter(const SymbolNumber symbol) const;
         bool is_global_flag(const SymbolNumber symbol) const;
-        bool is_unicode_alpha(const SymbolNumber symbol) const;
         std::string end_tag(const SymbolNumber symbol);
         std::string start_tag(const SymbolNumber symbol);
         PmatchContainer * container;
@@ -109,6 +108,7 @@ namespace hfst_ol {
             const std::string & symbol);
         bool is_printable(SymbolNumber symbol);
         bool is_global_flag(SymbolNumber symbol);
+        bool is_meta_arc(SymbolNumber symbol) const;
         void add_special_symbol(const std::string & str, SymbolNumber symbol_number);
         void process_underscored_symbol_list(const std::string & str, SymbolNumber sym);
         void process_symbol_list(const std::string & str, SymbolNumber sym);
