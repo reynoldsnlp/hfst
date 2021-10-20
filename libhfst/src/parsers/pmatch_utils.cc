@@ -3035,14 +3035,24 @@ HfstTransducer * PmatchAcceptor::evaluate(void)
         if (variables["use-character-classes"] == "on") {
             retval = new HfstTransducer("@UNICODE_ALPHA@", format);
         } else {
-            retval = new HfstTransducer(* get_utils()->latin1_alpha_acceptor);
+            retval = new HfstTransducer(*get_utils()->latin1_alpha_acceptor);
         }
         break;
     case UppercaseAlpha:
-        retval = new HfstTransducer(* get_utils()->latin1_uppercase_acceptor);
+        if (variables["use-character-classes"] == "on") {
+            retval = new HfstTransducer("@UNICODE_UPPERALPHA@", format);
+        } else {
+            retval = new HfstTransducer(
+                *get_utils()->latin1_uppercase_acceptor);
+        }
         break;
     case LowercaseAlpha:
-        retval = new HfstTransducer(* get_utils()->latin1_lowercase_acceptor);
+        if (variables["use-character-classes"] == "on") {
+            retval = new HfstTransducer("@UNICODE_LOWERALPHA@", format);
+        } else {
+            retval = new HfstTransducer(
+                *get_utils()->latin1_lowercase_acceptor);
+        }
         break;
     case Numeral:
         retval = new HfstTransducer(* get_utils()->latin1_numeral_acceptor);
@@ -3051,7 +3061,12 @@ HfstTransducer * PmatchAcceptor::evaluate(void)
         retval = new HfstTransducer(* get_utils()->latin1_punct_acceptor);
         break;
     case Whitespace:
-        retval = new HfstTransducer(* get_utils()->latin1_whitespace_acceptor);
+        if (variables["use-character-classes"] == "on") {
+            retval = new HfstTransducer("@UNICODE_WHITESPACE@", format);
+        } else {
+            retval = new HfstTransducer(
+                *get_utils()->latin1_whitespace_acceptor);
+        }
     }
     retval->set_final_weights(hfst::double_to_float(weight), true);
     report_time();

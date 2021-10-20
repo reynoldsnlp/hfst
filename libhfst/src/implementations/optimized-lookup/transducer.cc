@@ -144,6 +144,48 @@ bool TransducerAlphabet::is_unicode_alpha(SymbolNumber symbol) const
 #endif
 }
 
+bool TransducerAlphabet::is_unicode_upperalpha(SymbolNumber symbol) const
+{
+#if USE_ICU_UNICODE
+    icu::UnicodeString us = icu::UnicodeString::fromUTF8(symbol_table[symbol]);
+    if (us.countChar32() > 0) {
+        return u_isupper(us.char32At(0));
+    } else {
+        return false;
+    }
+#else
+    return false;
+#endif
+}
+
+bool TransducerAlphabet::is_unicode_loweralpha(SymbolNumber symbol) const
+{
+#if USE_ICU_UNICODE
+    icu::UnicodeString us = icu::UnicodeString::fromUTF8(symbol_table[symbol]);
+    if (us.countChar32() > 0) {
+        return u_islower(us.char32At(0));
+    } else {
+        return false;
+    }
+#else
+    return false;
+#endif
+}
+
+bool TransducerAlphabet::is_unicode_whitespace(SymbolNumber symbol) const
+{
+#if USE_ICU_UNICODE
+    icu::UnicodeString us = icu::UnicodeString::fromUTF8(symbol_table[symbol]);
+    if (us.countChar32() > 0) {
+        return u_isUWhiteSpace(us.char32At(0));
+    } else {
+        return false;
+    }
+#else
+    return false;
+#endif
+}
+
 void TransducerAlphabet::display() const
 {
     std::cout << "Transducer alphabet:" << std::endl;

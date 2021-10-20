@@ -143,6 +143,12 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
         special_symbols[boundary] = symbol_number;
     } else if (str == "@UNICODE_ALPHA@") {
         special_symbols[UnicodeAlpha] = symbol_number;
+    } else if (str == "@UNICODE_UPPERALPHA@") {
+        special_symbols[UnicodeUpperAlpha] = symbol_number;
+    } else if (str == "@UNICODE_LOWERALPHA@") {
+        special_symbols[UnicodeLowerAlpha] = symbol_number;
+    } else if (str == "@UNICODE_WHITESPACE@") {
+        special_symbols[UnicodeWhitespace] = symbol_number;
     } else if (is_end_tag(str)) {
         // Fetch the part between @PMATCH_ENDTAG_ and @
         end_tag_map[symbol_number] = str.substr(
@@ -720,7 +726,11 @@ bool PmatchAlphabet::is_input_mark(const SymbolNumber symbol) const
 
 bool PmatchAlphabet::is_meta_arc(const SymbolNumber symbol) const
 {
-    return TransducerAlphabet::is_meta_arc(symbol) || symbol == get_special(UnicodeAlpha);
+    return TransducerAlphabet::is_meta_arc(symbol) ||
+        symbol == get_special(UnicodeAlpha) ||
+        symbol == get_special(UnicodeUpperAlpha) ||
+        symbol == get_special(UnicodeLowerAlpha) ||
+        symbol == get_special(UnicodeWhitespace);
 }
 
 std::string PmatchAlphabet::name_from_insertion(const std::string & symbol)
@@ -1834,6 +1844,21 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
     if (alphabet.get_special(UnicodeAlpha) != NO_SYMBOL_NUMBER) {
         if (alphabet.is_unicode_alpha(input)) {
                 take_transitions(alphabet.get_special(UnicodeAlpha), input_pos, tape_pos, i+1);
+            }
+    }
+    if (alphabet.get_special(UnicodeUpperAlpha) != NO_SYMBOL_NUMBER) {
+        if (alphabet.is_unicode_alpha(input)) {
+                take_transitions(alphabet.get_special(UnicodeUpperAlpha), input_pos, tape_pos, i+1);
+            }
+    }
+    if (alphabet.get_special(UnicodeLowerAlpha) != NO_SYMBOL_NUMBER) {
+        if (alphabet.is_unicode_alpha(input)) {
+                take_transitions(alphabet.get_special(UnicodeLowerAlpha), input_pos, tape_pos, i+1);
+            }
+    }
+    if (alphabet.get_special(UnicodeWhitespace) != NO_SYMBOL_NUMBER) {
+        if (alphabet.is_unicode_alpha(input)) {
+                take_transitions(alphabet.get_special(UnicodeWhitespace), input_pos, tape_pos, i+1);
             }
     }
     

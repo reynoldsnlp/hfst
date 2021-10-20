@@ -49,6 +49,9 @@ namespace hfst_ol {
                        boundary,
                        Pmatch_input_mark,
                        UnicodeAlpha,
+                       UnicodeUpperAlpha,
+                       UnicodeLowerAlpha,
+                       UnicodeWhitespace,
                        SPECIALSYMBOL_NR_ITEMS};
 
     class PmatchAlphabet: public TransducerAlphabet {
