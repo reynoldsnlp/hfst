@@ -102,6 +102,7 @@ bool include_cosine_distances;
 std::string includedir;
 clock_t timer;
 int minimization_guard_count;
+int named_object_evaluation_stack_depth;
 bool need_delimiters;
 WordVecFloat vector_similarity_projection_factor;
 
@@ -1107,6 +1108,7 @@ void init_globals(void)
     function_names.clear();
     capture_names.clear();
     zero_minimization_guard();
+    named_object_evaluation_stack_depth = 0;
     need_delimiters = false;
     pmatchnerrs = 0;
 }
@@ -1309,7 +1311,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         double duration = (clock() - hfst::pmatch::timer) /
             (double) CLOCKS_PER_SEC;
         hfst::pmatch::timer = clock();
-        std::cerr << "compiled and harmonized in " << duration << " seconds\n";
+        std::cerr << "Everything compiled and harmonized in " << duration << " seconds\n";
     }
 
     StringSet allowed_initial_symbols;
@@ -1390,7 +1392,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
                 double duration = (clock() - hfst::pmatch::timer) /
                     (double) CLOCKS_PER_SEC;
                 hfst::pmatch::timer = clock();
-                std::cerr << "added automatic context separators in " << duration << " seconds\n";
+                std::cerr << "Added automatic context separators in " << duration << " seconds\n";
             }
         }
     }
@@ -1403,11 +1405,8 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     return retval;
 }
 
-void print_size_info(HfstTransducer * net)
+std::string get_size_info(HfstTransducer * net)
 {
-    if (!hfst::pmatch::verbose) {
-        return;
-    }
     HfstBasicTransducer tmp(*net);
     size_t states = 0;
     size_t arcs = 0;
@@ -1419,8 +1418,9 @@ void print_size_info(HfstTransducer * net)
             ++arcs;
         }
     }
-    std::cerr << states <<
-        " states and " << arcs << " arcs" << std::endl;
+    std::ostringstream ss;
+    ss << states << " states and " << arcs << " arcs";
+    return ss.str();
 }
 
 HfstTransducer * read_text(std::string filename, ImplementationType type,
@@ -2409,6 +2409,7 @@ void PmatchSymbol::collect_strings_into(StringVector & strings)
 
 HfstTransducer * PmatchString::evaluate(void) {
     if (cache != NULL) {
+        report_cache();
         return new HfstTransducer(*cache);
     }
     start_timing();
@@ -2426,7 +2427,7 @@ HfstTransducer * PmatchString::evaluate(void) {
         report_time();
         return new HfstTransducer(*cache);
     }
-        report_time();
+    report_time();
     return tmp;
 }
 
@@ -2516,6 +2517,7 @@ HfstTransducer * PmatchBuiltinFunction::evaluate(void)
 HfstTransducer * PmatchNumericOperation::evaluate(void)
 {
     if (cache != NULL) {
+        report_cache();
         return new HfstTransducer(*cache);
     }
     HfstTransducer * tmp;
@@ -2544,6 +2546,7 @@ HfstTransducer * PmatchNumericOperation::evaluate(void)
 HfstTransducer * PmatchUnaryOperation::evaluate(void)
 {
     if (cache != NULL) {
+        report_cache();
         return new HfstTransducer(*cache);
     }
     HfstTransducer * retval = NULL;
@@ -2566,8 +2569,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(void)
         retval->set_final_weights(hfst::double_to_float(weight), true);
         if (cache == NULL && should_use_cache() == true) {
             cache = retval;
-            report_time();
-            print_size_info(cache);
+            report_time(" with " + get_size_info(cache));
             return new HfstTransducer(*cache);
         }
         report_time();
@@ -2589,8 +2591,6 @@ HfstTransducer * PmatchUnaryOperation::evaluate(void)
         retval->set_final_weights(hfst::double_to_float(weight), true);
         if (cache == NULL && should_use_cache() == true) {
             cache = retval;
-            report_time();
-            print_size_info(cache);
             return new HfstTransducer(*cache);
         }
         report_time();
@@ -2813,8 +2813,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(void)
     if (cache == NULL && should_use_cache() == true) {
         cache = retval;
         cache->minimize();
-        report_time();
-        print_size_info(cache);
+        report_time(" with " + get_size_info(cache));
         return new HfstTransducer(*cache);
     }
     report_time();
@@ -2824,6 +2823,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(void)
 HfstTransducer * PmatchBinaryOperation::evaluate(void)
 {
     if (cache != NULL) {
+        report_cache();
         return new HfstTransducer(*cache);
     }
     start_timing();
@@ -2846,8 +2846,7 @@ HfstTransducer * PmatchBinaryOperation::evaluate(void)
             if (cache == NULL && should_use_cache() == true) {
                 cache = retval;
                 // No minimization because we did it the clever way!
-                print_size_info(cache);
-                report_time();
+                report_time(" with " + get_size_info(cache));
                 return new HfstTransducer(*cache);
             }
             report_time();
@@ -2932,8 +2931,7 @@ HfstTransducer * PmatchBinaryOperation::evaluate(void)
     if (cache == NULL && should_use_cache() == true) {
         cache = retval;
         cache->minimize();
-        print_size_info(cache);
-        report_time();
+        report_time(" with " + get_size_info(cache));
         return new HfstTransducer(*cache);
     }
     report_time();
@@ -2962,6 +2960,7 @@ bool PmatchBinaryOperation::is_unweighted_disjunction_of_strings(void)
 HfstTransducer * PmatchTernaryOperation::evaluate(void)
 {
     if (cache != NULL) {
+        report_cache();
         return new HfstTransducer(*cache);
     }
     start_timing();
@@ -3025,6 +3024,7 @@ HfstTransducer * PmatchAcceptor::evaluate(void)
 HfstTransducer * PmatchParallelRulesContainer::evaluate(void)
 {
     if (cache != NULL) {
+        report_cache();
         return new HfstTransducer(*cache);
     }
     start_timing();
@@ -3083,6 +3083,7 @@ std::vector<hfst::xeroxRules::Rule> PmatchParallelRulesContainer::make_mappings(
 HfstTransducer * PmatchReplaceRuleContainer::evaluate(void)
 {
     if (cache != NULL) {
+        report_cache();
         return new HfstTransducer(*cache);
     }
     start_timing();
@@ -3166,6 +3167,7 @@ HfstTransducer * PmatchQuestionMark::evaluate(void)
 HfstTransducer * PmatchRestrictionContainer::evaluate(void)
 {
     if (cache != NULL) {
+        report_cache();
         return new HfstTransducer(*cache);
     }
     start_timing();

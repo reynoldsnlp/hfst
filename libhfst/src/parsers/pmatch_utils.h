@@ -68,6 +68,7 @@ extern bool include_cosine_distances;
 extern std::string includedir;
 extern clock_t timer;
 extern int minimization_guard_count;
+extern int named_object_evaluation_stack_depth;
 extern bool need_delimiters;
 extern WordVecFloat vector_similarity_projection_factor;
 
@@ -227,7 +228,7 @@ std::map<std::string, HfstTransducer*>
             bool include_cosine_distances = false,
             std::string includedir = "");
 
-void print_size_info(HfstTransducer * net);
+std::string get_size_info(HfstTransducer * net);
 
 /**
  * @brief Given a text file, read it line by line and return an acceptor
@@ -443,15 +444,46 @@ struct PmatchObject {
         {
             if (verbose && name != "") {
                 my_timer = clock();
+                ++named_object_evaluation_stack_depth;
+                // Visually indicate nested definitions
+                for (int i = 1; i < named_object_evaluation_stack_depth; ++i) {
+                    std::cerr << "|";
+                }
+                if (named_object_evaluation_stack_depth > 1) {
+                    std::cerr << " ";
+                }
+                std::cerr << "Compiling " << name << "...\n";
             }
         }
-    void report_time()
+    void report_time(std::string extra_info = "")
         {
             if (verbose && name != "") {
                 double duration = (clock() - my_timer) /
                     (double) CLOCKS_PER_SEC;
-                std::cerr << name << " compiled in " << duration << " seconds\n";
-
+                // Visually indicate nested definitions
+                for (int i = 1; i < named_object_evaluation_stack_depth; ++i) {
+                    std::cerr << "|";
+                }
+                if (named_object_evaluation_stack_depth > 1) {
+                    std::cerr << " ";
+                }
+                std::cerr << name << " compiled in " << duration << " seconds" << extra_info << std::endl;
+                --named_object_evaluation_stack_depth;
+            }
+        }
+    void report_cache(std::string extra_info = "")
+        {
+            if (verbose) {
+                ++named_object_evaluation_stack_depth;
+                // Visually indicate nested definitions
+                for (int i = 1; i < named_object_evaluation_stack_depth; ++i) {
+                    std::cerr << "|";
+                }
+                if (named_object_evaluation_stack_depth > 1) {
+                    std::cerr << " ";
+                }
+                std::cerr << name << " fetched from cache" << extra_info << std::endl;
+                --named_object_evaluation_stack_depth;
             }
         }
     bool should_use_cache()
