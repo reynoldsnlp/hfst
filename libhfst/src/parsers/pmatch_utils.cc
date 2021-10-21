@@ -2900,6 +2900,10 @@ HfstTransducer * PmatchBinaryOperation::evaluate(void)
     } else if (op == Intersect) {
         lhs->intersect(*rhs);
     } else if (op == Subtract) {
+        if (verbose) {
+            warn_on_nonsubtractable_symbols(lhs);
+            warn_on_nonsubtractable_symbols(rhs);
+        }
         lhs->subtract(*rhs);
     } else if (op == UpperSubtract) {
         pmatcherror("Upper subtraction not implemented.");
@@ -3080,6 +3084,18 @@ bool transducer_has_context_symbol(HfstTransducer * t)
         ss.count(NLC_ENTRY_SYMBOL) == 1 ||
         ss.count(RC_ENTRY_SYMBOL) == 1 ||
         ss.count(NRC_ENTRY_SYMBOL) == 1;
+}
+
+void warn_on_nonsubtractable_symbols(HfstTransducer * t)
+{
+    StringSet alphabet = t->get_alphabet();
+    for (StringSet::const_iterator it = alphabet.begin(); it != alphabet.end(); ++it) {
+        if (it->size() < 3) {
+            continue;
+        } else if (it->find("@PMATCH") == 0 || it->find("@I") == 0 || it->find("@L") == 0) {
+            std::cerr << "Warning: subtracting with nonsubtractable symbol " << *it << std::endl;
+        }
+    }
 }
 
 HfstTransducer * PmatchParallelRulesContainer::evaluate(void)
