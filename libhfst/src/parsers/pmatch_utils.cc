@@ -1423,6 +1423,17 @@ std::string get_size_info(HfstTransducer * net)
     return ss.str();
 }
 
+void write_compilation_stack_indentation_to_err(void)
+{
+    // Visually indicate nested definitions
+    for (int i = 1; i < named_object_evaluation_stack_depth; ++i) {
+        std::cerr << "|";
+    }
+    if (named_object_evaluation_stack_depth > 1) {
+        std::cerr << " ";
+    }
+}
+
 HfstTransducer * read_text(std::string filename, ImplementationType type,
                            bool spaced_text)
 {
@@ -2439,6 +2450,9 @@ HfstTransducer * PmatchFunction::evaluate(std::vector<PmatchObject *> funargs)
 {
     if (verbose) {
         my_timer = clock();
+        ++named_object_evaluation_stack_depth;
+        write_compilation_stack_indentation_to_err();
+        std::cerr << "Evaluating call to " << name << "..." << std::endl;
     }
     if (funargs.size() != args.size()) {
         std::stringstream errstring;
@@ -2459,7 +2473,9 @@ HfstTransducer * PmatchFunction::evaluate(std::vector<PmatchObject *> funargs)
     if (verbose) {
         double duration = (clock() - my_timer) /
             (double) CLOCKS_PER_SEC;
+        write_compilation_stack_indentation_to_err();
         std::cerr << "Call to " << name << " evaluated in " << duration << " seconds\n";
+        --named_object_evaluation_stack_depth;
     }
     return retval;
 }

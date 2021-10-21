@@ -229,6 +229,7 @@ std::map<std::string, HfstTransducer*>
             std::string includedir = "");
 
 std::string get_size_info(HfstTransducer * net);
+void write_compilation_stack_indentation_to_err(void);
 
 /**
  * @brief Given a text file, read it line by line and return an acceptor
@@ -445,13 +446,7 @@ struct PmatchObject {
             if (verbose && name != "") {
                 my_timer = clock();
                 ++named_object_evaluation_stack_depth;
-                // Visually indicate nested definitions
-                for (int i = 1; i < named_object_evaluation_stack_depth; ++i) {
-                    std::cerr << "|";
-                }
-                if (named_object_evaluation_stack_depth > 1) {
-                    std::cerr << " ";
-                }
+                write_compilation_stack_indentation_to_err();
                 std::cerr << "Compiling " << name << "...\n";
             }
         }
@@ -460,28 +455,16 @@ struct PmatchObject {
             if (verbose && name != "") {
                 double duration = (clock() - my_timer) /
                     (double) CLOCKS_PER_SEC;
-                // Visually indicate nested definitions
-                for (int i = 1; i < named_object_evaluation_stack_depth; ++i) {
-                    std::cerr << "|";
-                }
-                if (named_object_evaluation_stack_depth > 1) {
-                    std::cerr << " ";
-                }
+                write_compilation_stack_indentation_to_err();
                 std::cerr << name << " compiled in " << duration << " seconds" << extra_info << std::endl;
                 --named_object_evaluation_stack_depth;
             }
         }
     void report_cache(std::string extra_info = "")
         {
-            if (verbose) {
+            if (verbose && name != "TOP") {
                 ++named_object_evaluation_stack_depth;
-                // Visually indicate nested definitions
-                for (int i = 1; i < named_object_evaluation_stack_depth; ++i) {
-                    std::cerr << "|";
-                }
-                if (named_object_evaluation_stack_depth > 1) {
-                    std::cerr << " ";
-                }
+                write_compilation_stack_indentation_to_err();
                 std::cerr << name << " fetched from cache" << extra_info << std::endl;
                 --named_object_evaluation_stack_depth;
             }
