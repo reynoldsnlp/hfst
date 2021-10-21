@@ -686,8 +686,8 @@ bool PmatchAlphabet::is_special(const std::string & symbol)
     if (symbol == "@PMATCH_INPUT_MARK@" || symbol == "@PMATCH_BACKTRACK@") { // seems like is_special symbols can't be referred to in pmatch scripts
         return false;
     }
-    if (is_insertion(symbol) || symbol == "@BOUNDARY@" || symbol == "@UNICODE_ALPHA@") {
-//        || symbol == "@_UNKNOWN_SYMBOL_@" || symbol == "@_IDENTITY_SYMBOL_@"
+    if (is_insertion(symbol) || symbol == "@BOUNDARY@" || symbol == "@UNICODE_ALPHA@"
+        || symbol == "@UNICODE_UPPERALPHA@" || symbol == "@UNICODE_LOWERALPHA@" || symbol == "@UNICODE_WHITESPACE@") {
         return true;
     } else {
         return (symbol.find("@PMATCH") == 0 && symbol.at(symbol.size() - 1) == '@')
