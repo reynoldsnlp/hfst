@@ -3093,6 +3093,7 @@ void warn_on_nonsubtractable_symbols(HfstTransducer * t)
         if (it->size() < 3) {
             continue;
         } else if (it->find("@PMATCH") == 0 || it->find("@I") == 0 || it->find("@L") == 0) {
+            write_compilation_stack_indentation_to_err();
             std::cerr << "Warning: subtracting with nonsubtractable symbol " << *it << std::endl;
         }
     }
