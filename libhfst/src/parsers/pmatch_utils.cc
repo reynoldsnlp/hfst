@@ -85,6 +85,7 @@ char* data;
 std::map<std::string, hfst::pmatch::PmatchObject*> definitions;
 std::map<std::string, std::string> variables;
 std::vector<std::map<std::string, PmatchObject*> > call_stack;
+std::vector<std::string> eval_stack;
 std::map<std::string, PmatchObject*> def_insed_expressions;
 std::set<std::string> inserted_names;
 std::set<std::string> uncomposed;
@@ -296,20 +297,6 @@ std::string get_Ins_transition(const char *s)
 {
     std::stringstream tmp;
     tmp << "@I." << s << "@";
-    return tmp.str();
-}
-
-std::string get_RC_transition(const char *s)
-{
-    std::stringstream tmp;
-    tmp << "@RC." << s << "@";
-    return tmp.str();
-}
-
-std::string get_LC_transition(const char *s)
-{
-    std::stringstream tmp;
-    tmp << "@LC." << s << "@";
     return tmp.str();
 }
 
@@ -1101,6 +1088,7 @@ void init_globals(void)
     variables["xerox-composition"] = "on";
     variables["vector-similarity-projection-factor"] = "1.0";
     call_stack.clear();
+    eval_stack.clear();
     def_insed_expressions.clear();
     inserted_names.clear();
     unsatisfied_insertions.clear();
@@ -2071,7 +2059,6 @@ PmatchObject::PmatchObject(void)
     weight = 0.0;
     line_defined = pmatchlineno;
     cache = (HfstTransducer*) (NULL);
-    parent_is_context = false;
 }
 
 HfstTransducer * PmatchObject::evaluate(std::vector<PmatchObject *> args)
@@ -2361,6 +2348,7 @@ void PmatchBinaryOperation::collect_strings_into(StringVector & strings)
 
 HfstTransducer * PmatchSymbol::evaluate(void)
 {
+    if (name != "") { eval_stack.push_back(name); }
     start_timing();
     HfstTransducer * retval = NULL;
     if (symbol_in_local_context(sym)) {
@@ -2382,6 +2370,7 @@ HfstTransducer * PmatchSymbol::evaluate(void)
     retval->set_final_weights(hfst::double_to_float(weight), true);
     retval->minimize();
     report_time();
+    if (name != "") { eval_stack.pop_back(); }
     return retval;
 }
 
@@ -2467,7 +2456,9 @@ HfstTransducer * PmatchFunction::evaluate(std::vector<PmatchObject *> funargs)
         local_env[args[i]] = funargs[i];
     }
     call_stack.push_back(local_env);
+    if (name != "") { eval_stack.push_back(name); }
     HfstTransducer * retval = root->evaluate();
+    if (name != "") { eval_stack.pop_back(); }
     retval->set_final_weights(hfst::double_to_float(weight), true);
     call_stack.pop_back();
     if (verbose) {
@@ -2488,6 +2479,7 @@ HfstTransducer * PmatchFunction::evaluate(void)
 
 HfstTransducer * PmatchFuncall::evaluate(void)
 {
+    if (name != "") { eval_stack.push_back(name); }
     std::vector<PmatchObject * > evaluated_args;
     for (std::vector<PmatchObject *>::iterator it = args->begin();
          it != args->end(); ++it) {
@@ -2500,11 +2492,13 @@ HfstTransducer * PmatchFuncall::evaluate(void)
          ++it) {
         delete *it;
     }
+    if (name != "") { eval_stack.pop_back(); }
     return retval;
 }
 
 HfstTransducer * PmatchBuiltinFunction::evaluate(void)
 {
+    if (name != "") { eval_stack.push_back(name); }
     start_timing();
     HfstTransducer * retval = NULL;
     if (type == Interpolate) {
@@ -2527,6 +2521,7 @@ HfstTransducer * PmatchBuiltinFunction::evaluate(void)
     }
     retval->set_final_weights(hfst::double_to_float(weight), true);
     report_time();
+    if (name != "") { eval_stack.pop_back(); }
     return retval;
 }
 
@@ -2538,6 +2533,7 @@ HfstTransducer * PmatchNumericOperation::evaluate(void)
     }
     HfstTransducer * tmp;
     start_timing();
+    if (name != "") { eval_stack.push_back(name); }
     tmp = root->evaluate();
     if (op == RepeatN) {
         tmp->repeat_n(values[0]);
@@ -2549,6 +2545,7 @@ HfstTransducer * PmatchNumericOperation::evaluate(void)
         tmp->repeat_n_to_k(values[0], values[1]);
     }
     tmp->set_final_weights(hfst::double_to_float(weight), true);
+    if (name != "") { eval_stack.pop_back(); }
     if (cache == NULL && should_use_cache() == true) {
         cache = tmp;
         cache->minimize();
@@ -2568,6 +2565,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(void)
     HfstTransducer * retval = NULL;
     start_timing();
 
+    
     // Special optimization cases
     if (op == Implode) {
         std::vector<std::string> strings;
@@ -2613,6 +2611,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(void)
         return retval;
     }
 
+    if (name != "") { eval_stack.push_back(name); }
     retval = root->evaluate();
     if (op == AddDelimiters) {
         retval = add_pmatch_delimiters(retval);
@@ -2776,7 +2775,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(void)
         delete retval;
         retval = tmp;
     } else if (op == LC) {
-        if (!parent_is_context) {
+        if (!transducer_has_context_symbol(retval)) {
             retval->reverse();
             HfstTransducer * tmp = new HfstTransducer(hfst::internal_epsilon, LC_ENTRY_SYMBOL, format);
             tmp->concatenate(*retval);
@@ -2784,9 +2783,12 @@ HfstTransducer * PmatchUnaryOperation::evaluate(void)
             tmp->concatenate(lc_exit);
             delete retval;
             retval = tmp;
-            }
+        } else if (verbose) {
+            write_compilation_stack_indentation_to_err();
+            std::cerr << "** Warning: ignoring nested context condition when compiling " << eval_stack.back() << std::endl;
+        }
     } else if (op == NLC) {
-        if (!parent_is_context) {
+        if (!transducer_has_context_symbol(retval)) {
             retval->reverse();
             PmatchTransducerContainer * tmp = make_minimization_guard();
             HfstTransducer * head = tmp->evaluate(); delete tmp;
@@ -2799,18 +2801,24 @@ HfstTransducer * PmatchUnaryOperation::evaluate(void)
             head->concatenate(nlc_entry);
             delete retval;
             retval = head;
-            }
+        } else if (verbose) {
+            write_compilation_stack_indentation_to_err();
+            std::cerr << "** Warning: ignoring nested context condition when compiling " << eval_stack.back() << std::endl;
+        }
     } else if (op == RC) {
-        if (!parent_is_context) {
+        if (!transducer_has_context_symbol(retval)) {
             HfstTransducer * tmp = new HfstTransducer(hfst::internal_epsilon, RC_ENTRY_SYMBOL, format);
             tmp->concatenate(*retval);
             HfstTransducer rc_exit(hfst::internal_epsilon, RC_EXIT_SYMBOL, format);
             tmp->concatenate(rc_exit);
             delete retval;
             retval = tmp;
+        } else if (verbose) {
+            write_compilation_stack_indentation_to_err();
+            std::cerr << "** Warning: ignoring nested context condition when compiling " << eval_stack.back() << std::endl;
         }
     } else if (op == NRC) {
-        if (!parent_is_context) {
+        if (!transducer_has_context_symbol(retval)) {
             PmatchTransducerContainer * tmp = make_minimization_guard();
             HfstTransducer * head = tmp->evaluate(); delete tmp;
             HfstTransducer passthrough(PASSTHROUGH_SYMBOL, format);
@@ -2822,10 +2830,14 @@ HfstTransducer * PmatchUnaryOperation::evaluate(void)
             head->concatenate(nrc_entry);
             delete retval;
             retval = head;
-            }
+        } else if (verbose) {
+            write_compilation_stack_indentation_to_err();
+            std::cerr << "** Warning: ignoring nested context condition when compiling " << eval_stack.back() << std::endl;
+        }
     }
-
     retval->set_final_weights(hfst::double_to_float(weight), true);
+
+    if (name != "") { eval_stack.pop_back(); }
     if (cache == NULL && should_use_cache() == true) {
         cache = retval;
         cache->minimize();
@@ -2870,6 +2882,7 @@ HfstTransducer * PmatchBinaryOperation::evaluate(void)
         }
     }
 
+    if (name != "") { eval_stack.push_back(name); }
     // General cases
     HfstTransducer * lhs = left->evaluate();
     HfstTransducer * rhs = right->evaluate();
@@ -2943,6 +2956,7 @@ HfstTransducer * PmatchBinaryOperation::evaluate(void)
     }
     delete rhs;
     lhs->set_final_weights(hfst::double_to_float(weight), true);
+    if (name != "") { eval_stack.pop_back(); }
     retval = lhs;
     if (cache == NULL && should_use_cache() == true) {
         cache = retval;
@@ -2980,6 +2994,7 @@ HfstTransducer * PmatchTernaryOperation::evaluate(void)
         return new HfstTransducer(*cache);
     }
     start_timing();
+    if (name != "") { eval_stack.push_back(name); }
     HfstTransducer * retval = NULL;
     if (op == Substitute) {
         retval = left->evaluate();
@@ -3006,6 +3021,7 @@ HfstTransducer * PmatchTernaryOperation::evaluate(void)
         return new HfstTransducer(*cache);
     }
     report_time();
+    if (name != "") { eval_stack.pop_back(); }
     return retval;
 }
 
@@ -3035,6 +3051,15 @@ HfstTransducer * PmatchAcceptor::evaluate(void)
     retval->set_final_weights(hfst::double_to_float(weight), true);
     report_time();
     return retval;
+}
+
+bool transducer_has_context_symbol(HfstTransducer * t)
+{
+    StringSet ss = t->get_alphabet();
+    return ss.count(LC_ENTRY_SYMBOL) == 1 ||
+        ss.count(NLC_ENTRY_SYMBOL) == 1 ||
+        ss.count(RC_ENTRY_SYMBOL) == 1 ||
+        ss.count(NRC_ENTRY_SYMBOL) == 1;
 }
 
 HfstTransducer * PmatchParallelRulesContainer::evaluate(void)

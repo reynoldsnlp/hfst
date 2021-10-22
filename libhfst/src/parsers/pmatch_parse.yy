@@ -800,22 +800,18 @@ PMATCH_CONTEXT COMMA PMATCH_CONTEXTS {
 };
 
 PMATCH_RIGHT_CONTEXT: RC_LEFT EXPRESSION2 RIGHT_PARENTHESIS {
-    $2->mark_context_children();
     $$ = new PmatchUnaryOperation(RC, $2);
 };
 
 PMATCH_NEGATIVE_RIGHT_CONTEXT: NRC_LEFT EXPRESSION2 RIGHT_PARENTHESIS {
-    $2->mark_context_children();
     $$ = new PmatchUnaryOperation(NRC, $2);
 };
 
 PMATCH_LEFT_CONTEXT: LC_LEFT EXPRESSION2 RIGHT_PARENTHESIS {
-    $2->mark_context_children();
     $$ = new PmatchUnaryOperation(LC, $2);
 };
 
 PMATCH_NEGATIVE_LEFT_CONTEXT: NLC_LEFT EXPRESSION2 RIGHT_PARENTHESIS {
-    $2->mark_context_children();
     $$ = new PmatchUnaryOperation(NLC, $2);
 };
 

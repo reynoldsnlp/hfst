@@ -53,6 +53,7 @@ extern size_t len;
 extern std::map<std::string, PmatchObject*> definitions;
 extern std::map<std::string, std::string> variables;
 extern std::vector<std::map<std::string, PmatchObject*> > call_stack;
+extern std::vector<std::string> eval_stack;
 extern std::map<std::string, PmatchObject*> def_insed_expressions;
 extern std::set<std::string> inserted_names;
 extern std::set<std::string> uncomposed;
@@ -438,7 +439,6 @@ struct PmatchObject {
     int line_defined;
     clock_t my_timer;
     HfstTransducer * cache;
-    bool parent_is_context;
     PmatchObject();
     virtual ~PmatchObject() throw() = default;
     void start_timing()
@@ -491,7 +491,6 @@ struct PmatchObject {
     virtual HfstTransducer * evaluate() = 0;
     virtual HfstTransducer * evaluate(std::vector<PmatchObject *> args);
     virtual PmatchObject * evaluate_as_arg();
-    virtual void mark_context_children() { parent_is_context = true; }
     virtual std::string as_string() { return ""; }
     virtual StringPair as_string_pair()
         { return StringPair("", ""); }
@@ -504,7 +503,7 @@ struct PmatchSymbol: public PmatchObject {
     PmatchSymbol(std::string str): sym(str) { }
     HfstTransducer * evaluate();
     void collect_strings_into(StringVector & strings);
-    PmatchObject * evaluate_as_arg(void);
+    PmatchObject * evaluate_as_arg();
     std::string as_string(void) { return sym; }
 };
 
@@ -630,11 +629,6 @@ struct PmatchNumericOperation: public PmatchObject{
     PmatchNumericOperation(PmatchNumericOp _op, PmatchObject * _root):
         op(_op), root(_root) {}
     HfstTransducer * evaluate();
-    void mark_context_children()
-        {
-            parent_is_context = true;
-            root->mark_context_children();
-        }
 };
 
 struct PmatchUnaryOperation: public PmatchObject{
@@ -648,11 +642,6 @@ struct PmatchUnaryOperation: public PmatchObject{
     bool is_context();
     bool is_delimiter();
     StringSet get_initial_symbols_from_unary_root();
-    void mark_context_children()
-        {
-            parent_is_context = true;
-            root->mark_context_children();
-        }
 };
 
 struct PmatchBinaryOperation: public PmatchObject{
@@ -669,12 +658,6 @@ struct PmatchBinaryOperation: public PmatchObject{
     bool is_left_concatenation_with_context();
     StringSet get_initial_RC_initial_symbols();
     StringSet get_initial_NRC_initial_symbols();
-    void mark_context_children()
-        {
-            parent_is_context = true;
-            left->mark_context_children();
-            right->mark_context_children();
-        }
 };
 
 struct PmatchTernaryOperation: public PmatchObject{
@@ -685,13 +668,6 @@ struct PmatchTernaryOperation: public PmatchObject{
     PmatchTernaryOperation(PmatchTernaryOp _op, PmatchObject * _left, PmatchObject * _middle, PmatchObject * _right):
         op(_op), left(_left), middle(_middle), right(_right) {}
     HfstTransducer * evaluate();
-    void mark_context_children()
-        {
-            parent_is_context = true;
-            left->mark_context_children();
-            middle->mark_context_children();
-            right->mark_context_children();
-        }
 };
 
 struct PmatchTransducerContainer: public PmatchObject{
@@ -732,14 +708,6 @@ struct PmatchFuncall: public PmatchObject {
                   PmatchFunction * function): args(argument_vector),
                                               fun(function) { }
     HfstTransducer * evaluate();
-    void mark_context_children()
-        {
-            for (std::vector<PmatchObject *>::iterator it = args->begin();
-                 it != args->end(); ++it) {
-                (*it)->mark_context_children();
-            }
-            parent_is_context = true;
-        }
 };
 
 struct PmatchBuiltinFunction: public PmatchObject {
@@ -749,15 +717,9 @@ struct PmatchBuiltinFunction: public PmatchObject {
                           std::vector<PmatchObject*>* argument_vector):
     args(argument_vector), type(_type) {}
     HfstTransducer * evaluate();
-    void mark_context_children()
-        {
-            parent_is_context = true;
-            for (std::vector<PmatchObject *>::iterator it = args->begin();
-                 it != args->end(); ++it) {
-                (*it)->mark_context_children();
-            }
-        }
 };
+
+bool transducer_has_context_symbol(HfstTransducer * t);
 
 using hfst::xeroxRules::ReplaceArrow;
 using hfst::xeroxRules::ReplaceType;
@@ -787,11 +749,6 @@ struct PmatchRestrictionContainer: public PmatchObject
     PmatchRestrictionContainer(PmatchObject * l, MappingPairVector * c):
         left(l), contexts(c) { }
     HfstTransducer * evaluate();
-    void mark_context_children()
-        {
-            parent_is_context = true;
-            left->mark_context_children();
-        }
 };
 
 struct PmatchMarkupContainer: public PmatchObjectPair
