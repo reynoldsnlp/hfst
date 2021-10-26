@@ -87,7 +87,7 @@ static bool handle_hfst3_header(std::istream& is)
     is.putback(c); // first the non-matching character
     for(int i=header_loc-1; i>=0; i--) // then the characters that did match (if any)
       is.putback(header1[i]);
-    
+
     return false;
   }
 }
@@ -172,7 +172,7 @@ int main(int argc, char **argv)
   int capitalization = 0;
   bool filter_compound_analyses = true;
   bool null_flush = false;
-  
+
   while (true)
   {
     static struct option long_options[] =
@@ -206,7 +206,7 @@ int main(int argc, char **argv)
       {"raw",            no_argument,       0, 'X'},
       {0,                0,                 0,  0 }
     };
-    
+
     int option_index = 0;
     int c = getopt_long(argc, argv, "hVvqjsagndtpxCkeWrN:l:cwzX", long_options, &option_index);
 
@@ -219,22 +219,22 @@ int main(int argc, char **argv)
       print_usage();
       return EXIT_SUCCESS;
       break;
-      
+
     case 'V':
       print_version();
       return EXIT_SUCCESS;
       break;
-      
+
     case 'v':
   #ifdef DEBUG
       printDebuggingInformationFlag = true;
       preserveDiacriticRepresentationsFlag = true;
   #endif
-      
+
       verboseFlag = true;
       silentFlag = false;
       break;
-      
+
     case 'q':
     case 's':
   #ifdef DEBUG
@@ -245,7 +245,7 @@ int main(int argc, char **argv)
       silentFlag = true;
       displayWeightsFlag = true;
       break;
-    
+
     case 'a':
     case 'g':
     case 'n':
@@ -260,7 +260,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
       }
       break;
-      
+
     case 'p':
     case 'C':
     case 'x':
@@ -274,19 +274,19 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
       }
       break;
-      
+
     case 'k':
       filter_compound_analyses = false;
       break;
-      
+
     case 'W':
       displayWeightsFlag = true;
       break;
-      
+
     case 'r':
       displayRawAnalysisInCG = true;
       break;
-      
+
     case 'N':
       maxAnalyses = atoi(optarg);
       if (maxAnalyses < 1)
@@ -295,7 +295,7 @@ int main(int argc, char **argv)
           return EXIT_FAILURE;
         }
       break;
-    
+
     case 'l':
       maxWeightClasses = atoi(optarg);
       if (maxWeightClasses < 1)
@@ -304,7 +304,7 @@ int main(int argc, char **argv)
           return EXIT_FAILURE;
         }
       break;
-    
+
     case 'e':
       processCompounds = true;
       break;
@@ -317,11 +317,11 @@ int main(int argc, char **argv)
     case 'X':
       capitalization=c;
       break;
-    
+
     case 'z':
       null_flush = true;
       break;
-      
+
     default:
       std::cerr << "Invalid option\n\n";
       print_short_help();
@@ -329,11 +329,11 @@ int main(int argc, char **argv)
       break;
     }
   }
-  
+
   std::istream* input = &std::cin;
   std::ostream* output = &std::cout;
   int fst_arg = optind, in_arg = optind+1, out_arg = optind+2;
-  
+
   if(optind == (argc-2))
     out_arg = -1;
   else if(optind == (argc-1))
@@ -343,14 +343,14 @@ int main(int argc, char **argv)
     print_short_help();
     return EXIT_FAILURE;
   }
-  
+
   std::ifstream in(argv[(fst_arg)], std::ios::in | std::ios::binary);
   if(!in)
   {
     std::cerr << "Could not open transducer file " << argv[(optind)] << std::endl;
     return EXIT_FAILURE;
   }
-  
+
   if(in_arg != -1)
   {
     input = new std::ifstream(argv[in_arg], std::ios::in | std::ios::binary);
@@ -371,7 +371,7 @@ int main(int argc, char **argv)
     }
   }
 #endif
-  
+
   if(out_arg != -1)
   {
     output = new std::ofstream(argv[out_arg], std::ios::out | std::ios::binary);
@@ -394,7 +394,7 @@ int main(int argc, char **argv)
 #endif
 
 
-  
+
   CapitalizationMode capitalization_mode;
   switch(capitalization)
   {
@@ -414,6 +414,10 @@ int main(int argc, char **argv)
       else
         capitalization_mode = IgnoreCase;
   }
+  if (output_type == 'x')
+    {
+      rawMode = true;
+    }
   try
   {
     try {
@@ -465,9 +469,9 @@ int main(int argc, char **argv)
         applicator = new AnalysisApplicator(t, token_stream, *output_formatter, capitalization_mode);
         break;
     }
-    
+
     applicator->apply();
-    
+
     delete applicator;
     if(output_formatter != NULL)
       delete output_formatter;
@@ -477,7 +481,7 @@ int main(int argc, char **argv)
     std::cerr << e.what() << std::endl;
     return EXIT_FAILURE;
   }
-  
+
   if(in_arg != -1)
   {
     dynamic_cast<std::ifstream*>(input)->close();
@@ -488,6 +492,6 @@ int main(int argc, char **argv)
     dynamic_cast<std::ofstream*>(output)->close();
     delete output;
   }
-  
+
   return EXIT_SUCCESS;
 }

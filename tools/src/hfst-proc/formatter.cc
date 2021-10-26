@@ -153,13 +153,13 @@ TransliterateOutputFormatter::print_word(const TokenVector& surface_form,
       output_surface_form.push_back(Token::as_symbol(token_stream.to_symbol(*it)));
       superblanks.push_back(it->superblank_index);
     }
-    else 
+    else
     {
       output_surface_form.push_back(*it);
     }
   }
 
-  if(printDebuggingInformationFlag) 
+  if(printDebuggingInformationFlag)
   {
     std::cout << "surface_form consists of " << output_surface_form.size() << " tokens" << std::endl;
   }
@@ -167,7 +167,7 @@ TransliterateOutputFormatter::print_word(const TokenVector& surface_form,
   bool first = true;
   for(ProcResult::const_iterator it=analyzed_forms.begin(); it!=analyzed_forms.end(); it++)
   {
-    if(!first) 
+    if(!first)
     {
       token_stream.ostream() << "/" ;
     }
@@ -383,7 +383,7 @@ XeroxOutputFormatter::process_finals(const LookupPathSet& finals, Capitalization
   for(LookupPathSet::const_iterator it=new_finals.begin(); it!=new_finals.end(); it++)
   {
     std::ostringstream res;
-    res << token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols(), caps);
+    res << token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols(), caps, true);
     if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
       res << "\t" << dynamic_cast<const LookupPathW*>(*it)->get_weight();
 

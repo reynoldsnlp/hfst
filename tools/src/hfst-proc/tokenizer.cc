@@ -187,7 +187,7 @@ TokenIOStream::read_delimited(const char delim)
   std::string result;
   int c = EOF;
   bool is_wblank = false;
-  
+
   if(is && c != delim)
   {
     c = is.get();
@@ -206,7 +206,7 @@ TokenIOStream::read_delimited(const char delim)
       }
     }
   }
-  
+
   while(is && c != delim)
   {
     c = is.get();
@@ -219,7 +219,7 @@ TokenIOStream::read_delimited(const char delim)
     if(null_flush && c == '\0')
       do_null_flush();
   }
-  
+
   if(is_wblank)
   {
     c = is.get();
@@ -391,7 +391,7 @@ TokenIOStream::token_to_string(const Token& t, bool raw) const
   switch(t.type)
   {
     case Symbol:
-      if(t.escaped) {
+      if(t.escaped && !raw) {
         return "\\" + alphabet.symbol_to_string(t.symbol);
       }
       else {

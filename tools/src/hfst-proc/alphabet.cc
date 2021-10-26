@@ -66,7 +66,7 @@ LetterTrie::find_symbol(const char* c) const
 {
   if(strlen(c) == 1)
     return symbols[(unsigned char)(c[0])];
-  
+
   if(letters[(unsigned char)(c[0])] == NULL)
     return NO_SYMBOL_NUMBER;
   else
@@ -79,14 +79,14 @@ LetterTrie::extract_symbol(std::istream& is) const
   int c = is.get();
   if(c == EOF)
     return 0;
-    
+
   if(letters[c] == NULL)
   {
     if(symbols[c] == NO_SYMBOL_NUMBER)
       is.putback(c);
     return symbols[c];
   }
-  
+
   SymbolNumber s = letters[c]->extract_symbol(is);
   if(s == NO_SYMBOL_NUMBER)
   {
@@ -104,7 +104,7 @@ void
 Symbolizer::add_symbol(const std::string& symbol_str)
 {
   std::string p = symbol_str;
-  
+
   if(p.length() > 0)
   {
     unsigned char first = p.at(0);
@@ -148,7 +148,7 @@ Symbolizer::extract_symbol(std::istream& is) const
   if(ascii_symbols[c] == NO_SYMBOL_NUMBER ||
      ascii_symbols[c] == 0)
     return letters.extract_symbol(is);
-  
+
   return ascii_symbols[is.get()];
 }
 
@@ -168,15 +168,16 @@ ProcTransducerAlphabet::ProcTransducerAlphabet(std::istream& is,
       symbol_table[k] = "";
     symbolizer.add_symbol(symbol_table[k]);
   }
-  
+
   // assume the first symbol is epsilon which we don't want to print
   symbol_table[0] = "";
-  
+
   check_for_overlapping();
   setup_blank_symbol();
   calculate_caps();
   if(printDebuggingInformationFlag)
     print_table();
+
 
   escaped_symbols.insert(symbolizer.find_symbol("["));
   escaped_symbols.insert(symbolizer.find_symbol("]"));
@@ -189,6 +190,7 @@ ProcTransducerAlphabet::ProcTransducerAlphabet(std::istream& is,
   escaped_symbols.insert(symbolizer.find_symbol("@"));
   escaped_symbols.insert(symbolizer.find_symbol("<"));
   escaped_symbols.insert(symbolizer.find_symbol(">"));
+
 }
 
 void
@@ -203,7 +205,7 @@ ProcTransducerAlphabet::setup_blank_symbol()
       break;
     }
   }
-  
+
   if(blank_symbol == NO_SYMBOL_NUMBER)
   {
     blank_symbol = symbol_table.size();
@@ -218,14 +220,14 @@ void
 ProcTransducerAlphabet::check_for_overlapping() const
 {
   std::vector<std::string> overlapping;
-  
+
   for(size_t i=0;i<symbol_table.size();i++)
   {
     std::string str = symbol_table[i];
     if(str.length() > 1 && !is_punctuation(std::string(1, str[0]).c_str()))
     {
       std::istringstream s(str);
-      
+
       // divide the symbol into UTF8 characters
       std::vector<std::string> chars;
       while(true)
@@ -238,7 +240,7 @@ ProcTransducerAlphabet::check_for_overlapping() const
       }
       if(chars.size() < 2)
         continue;
-      
+
       bool overlaps = true;
       for(size_t j=0;j<chars.size();j++)
       {
@@ -249,12 +251,12 @@ ProcTransducerAlphabet::check_for_overlapping() const
           break;
         }
       }
-      
+
       if(overlaps)
         overlapping.push_back(str);
     }
   }
-  
+
   if(!overlapping.empty())
   {
       if (! silentFlag)
@@ -291,12 +293,12 @@ ProcTransducerAlphabet::print_table() const
     }
     else
       std::cout << "no case";
-    
+
     if(fd_op != NULL)
       std::cout << " FD - feature: " << fd_op->Feature() << ", value: " << fd_op->Value();
     std::cout << std::endl;
   }
-  
+
   if(fd_table.num_features()>0)
     std::cout << "Alphabet contains " << fd_table.num_features() << " flag diacritic feature(s)" << std::endl;
 }
@@ -326,7 +328,7 @@ ProcTransducerAlphabet::calculate_caps()
       switched = caps_helper(symbol_table[i].c_str(), case_res);
     else
       case_res = 0;
-    
+
     if(case_res < 0)
     {
       symbol_properties_table[i].lower = i;
@@ -339,7 +341,7 @@ ProcTransducerAlphabet::calculate_caps()
     }
     else
       symbol_properties_table[i].lower=symbol_properties_table[i].upper=NO_SYMBOL_NUMBER;
-    
+
     if(to_lower(i) == to_upper(i) && symbol_properties_table[i].lower != NO_SYMBOL_NUMBER)
     {
       if(switched != "")
@@ -369,8 +371,8 @@ ProcTransducerAlphabet::calculate_caps()
           std::cout << "Symbol " << i << "'s alternate case is unknown" << std::endl;
       }
     }
-    
-    
+
+
     if(printDebuggingInformationFlag &&
        symbol_properties_table[i].lower != NO_SYMBOL_NUMBER && symbol_properties_table[i].upper != NO_SYMBOL_NUMBER &&
        symbol_to_string(symbol_properties_table[i].lower).length() != symbol_to_string(symbol_properties_table[i].upper).length())
@@ -567,14 +569,14 @@ ProcTransducerAlphabet::caps_helper(const char* in, int& case_res)
   std::string out;
   case_res = 0;
   int tmp = -2; // -2 indicates first time through the loop
-  
+
   std::vector<std::string> chars;
   while(true)
   {
     std::string c = TokenIOStream::read_utf8_char(str);
     if(c.empty())
       break;
-    
+
     std::string switched = caps_helper_single(c.c_str(), (tmp==-2?case_res:tmp));
     tmp=0;
     out.append((switched==""?c:switched));
@@ -620,13 +622,14 @@ ProcTransducerAlphabet::utf8_int_to_str(int c)
 }
 
 std::string
-ProcTransducerAlphabet::symbols_to_string(const SymbolNumberVector& symbols, CapitalizationState caps) const
+ProcTransducerAlphabet::symbols_to_string(const SymbolNumberVector& symbols, CapitalizationState caps, bool raw) const
 {
   std::string str="";
   bool first=true;
   for(SymbolNumberVector::const_iterator it=symbols.begin(); it!=symbols.end(); it++, first=false)
   {
-      if(!is_tag(*it) && escaped_symbols.find(*it) != escaped_symbols.end()) {
+      if(!is_tag(*it) && escaped_symbols.find(*it) != escaped_symbols.end() &&
+         !raw) {
           str += "\\";
       }
       if(caps==UpperCase || (caps==FirstUpperCase && first==true)) {
@@ -665,7 +668,7 @@ ProcTransducerAlphabet::is_punctuation(const char* c) const
       return true;
     }
   }
-  
+
   return (strstr(individual_chars, c) != NULL);
 }
 
