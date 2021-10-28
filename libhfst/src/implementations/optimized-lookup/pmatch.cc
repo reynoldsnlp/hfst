@@ -1847,17 +1847,17 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
             }
     }
     if (alphabet.get_special(UnicodeUpperAlpha) != NO_SYMBOL_NUMBER) {
-        if (alphabet.is_unicode_alpha(input)) {
+        if (alphabet.is_unicode_upperalpha(input)) {
                 take_transitions(alphabet.get_special(UnicodeUpperAlpha), input_pos, tape_pos, i+1);
             }
     }
     if (alphabet.get_special(UnicodeLowerAlpha) != NO_SYMBOL_NUMBER) {
-        if (alphabet.is_unicode_alpha(input)) {
+        if (alphabet.is_unicode_loweralpha(input)) {
                 take_transitions(alphabet.get_special(UnicodeLowerAlpha), input_pos, tape_pos, i+1);
             }
     }
     if (alphabet.get_special(UnicodeWhitespace) != NO_SYMBOL_NUMBER) {
-        if (alphabet.is_unicode_alpha(input)) {
+        if (alphabet.is_unicode_whitespace(input)) {
                 take_transitions(alphabet.get_special(UnicodeWhitespace), input_pos, tape_pos, i+1);
             }
     }
