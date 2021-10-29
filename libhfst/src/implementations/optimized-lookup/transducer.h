@@ -383,6 +383,11 @@ protected:
     SymbolNumber default_symbol;
     SymbolNumber identity_symbol;
     SymbolNumber orig_symbol_count;
+
+#if USE_ICU_UNICODE
+    enum UnicodeClassCacheValue { upperalpha, loweralpha, whitespace, no_value, other };
+    std::vector<UnicodeClassCacheValue> unicode_cache;
+#endif
   
 public:
     TransducerAlphabet()
@@ -417,10 +422,15 @@ public:
         { return fd_table.is_diacritic(symbol); }
     bool is_like_epsilon(SymbolNumber symbol) const;
     virtual bool is_meta_arc(SymbolNumber symbol) const;
-    bool is_unicode_alpha(SymbolNumber symbol) const;
-    bool is_unicode_upperalpha(SymbolNumber symbol) const;
-    bool is_unicode_loweralpha(SymbolNumber symbol) const;
-    bool is_unicode_whitespace(SymbolNumber symbol) const;
+    
+#if USE_ICU_UNICODE
+    void cache_unicode_class(SymbolNumber symbol);
+#endif
+    
+    bool is_unicode_alpha(SymbolNumber symbol);
+    bool is_unicode_upperalpha(SymbolNumber symbol);
+    bool is_unicode_loweralpha(SymbolNumber symbol);
+    bool is_unicode_whitespace(SymbolNumber symbol);
     
     const SymbolTable& get_symbol_table() const
         { return symbol_table; }
