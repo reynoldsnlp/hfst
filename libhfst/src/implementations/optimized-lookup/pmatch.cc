@@ -659,12 +659,12 @@ bool PmatchAlphabet::is_counter(const std::string & symbol)
 
 bool PmatchAlphabet::is_list(const std::string & symbol)
 {
-    return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("@") == symbol.size() - 1;
+    return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("@") == symbol.size() - 1 && symbol.size() > 4;
 }
 
 bool PmatchAlphabet::is_underscored_list(const std::string & symbol)
 {
-    return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("_@") == symbol.size() - 2;
+    return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("_@") == symbol.size() - 2 && symbol.size() > 5;
 }
 
 bool PmatchAlphabet::is_global_flag(const std::string & symbol)
