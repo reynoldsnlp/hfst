@@ -393,6 +393,9 @@ public:
                        bool preserve_diacritic_strings = true);
     TransducerAlphabet(const SymbolTable& st);
     virtual ~TransducerAlphabet() {}
+
+    static void fake_read_alphabet(std::istream& is,
+                                   SymbolNumber symbol_count);
   
     void display() const;
   

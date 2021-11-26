@@ -52,6 +52,15 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
     orig_symbol_count = hfst::size_t_to_uint(symbol_table.size());
 }
 
+void TransducerAlphabet::fake_read_alphabet(std::istream& is,
+                                            SymbolNumber symbol_count)
+{
+    for(SymbolNumber i=0; i<symbol_count; i++) {
+        std::string str;
+        std::getline(is, str, '\0');
+    }
+}
+
 void TransducerAlphabet::add_symbol(char * symbol)
 {
     symbol_table.push_back(symbol);

@@ -383,7 +383,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
         } else
           {
             header = TransducerHeader(inputstream);
-            TransducerAlphabet dummy = TransducerAlphabet(
+            TransducerAlphabet::fake_read_alphabet(
                 inputstream, header.symbol_count());
             hfst_ol::PmatchTransducer * rtn =
                 new hfst_ol::PmatchTransducer(inputstream,
