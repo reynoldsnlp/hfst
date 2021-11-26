@@ -338,12 +338,12 @@ process_stream(HfstOutputStream& outstream)
             harmonized_tmp = hfst::implementations::ConversionFunctions::
                 hfst_basic_transducer_to_hfst_ol(intermediate_tmp,
                                                  true, // weighted
-                                                 "", // no special options
+                                                 "empty_alphabet", // empty alphabet in RTNs, they'll use the main one
                                                  &harmonizer); // harmonize with this
             output_tmp = hfst::implementations::ConversionFunctions::
                 hfst_ol_to_hfst_transducer(harmonized_tmp);
             output_tmp->set_name(it->first);
-            outstream << *output_tmp;;
+            outstream << *output_tmp;
             delete it->second;
             delete intermediate_tmp;
             delete output_tmp;
