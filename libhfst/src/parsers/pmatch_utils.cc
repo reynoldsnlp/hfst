@@ -1085,7 +1085,7 @@ void init_globals(void)
     variables["max-context-length"] = "254";
     variables["max-recursion"] =  "5000";
     variables["need-separators"] = "on";
-    variables["use-character-classes"] = "off";
+    variables["unicode-character-classes"] = "off";
     variables["xerox-composition"] = "on";
     variables["vector-similarity-projection-factor"] = "1.0";
     call_stack.clear();
@@ -3036,14 +3036,14 @@ HfstTransducer * PmatchAcceptor::evaluate(void)
     HfstTransducer * retval = NULL;
     switch(set) {
     case Alpha:
-        if (variables["use-character-classes"] == "on") {
+        if (variables["unicode-character-classes"] == "on") {
             retval = new HfstTransducer("@UNICODE_ALPHA@", format);
         } else {
             retval = new HfstTransducer(*get_utils()->latin1_alpha_acceptor);
         }
         break;
     case UppercaseAlpha:
-        if (variables["use-character-classes"] == "on") {
+        if (variables["unicode-character-classes"] == "on") {
             retval = new HfstTransducer("@UNICODE_UPPERALPHA@", format);
         } else {
             retval = new HfstTransducer(
@@ -3051,7 +3051,7 @@ HfstTransducer * PmatchAcceptor::evaluate(void)
         }
         break;
     case LowercaseAlpha:
-        if (variables["use-character-classes"] == "on") {
+        if (variables["unicode-character-classes"] == "on") {
             retval = new HfstTransducer("@UNICODE_LOWERALPHA@", format);
         } else {
             retval = new HfstTransducer(
@@ -3065,7 +3065,7 @@ HfstTransducer * PmatchAcceptor::evaluate(void)
         retval = new HfstTransducer(* get_utils()->latin1_punct_acceptor);
         break;
     case Whitespace:
-        if (variables["use-character-classes"] == "on") {
+        if (variables["unicode-character-classes"] == "on") {
             retval = new HfstTransducer("@UNICODE_WHITESPACE@", format);
         } else {
             retval = new HfstTransducer(
