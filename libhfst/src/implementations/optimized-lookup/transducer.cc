@@ -138,6 +138,68 @@ bool TransducerAlphabet::is_meta_arc(SymbolNumber symbol) const
         (symbol == identity_symbol);
 }
 
+#if USE_ICU_UNICODE
+void TransducerAlphabet::cache_unicode_class(SymbolNumber symbol)
+{
+    while (unicode_cache.size() <= symbol) {
+        unicode_cache.push_back(no_value);
+    }
+    if (unicode_cache[symbol] != no_value) { return; }
+    icu::UnicodeString us = icu::UnicodeString::fromUTF8(symbol_table[symbol]);
+    if (us.countChar32() > 0) {
+        if (u_islower(us.char32At(0))) {
+         unicode_cache[symbol] = loweralpha;
+        } else if (u_isupper(us.char32At(0))) {
+            unicode_cache[symbol] = upperalpha;
+        } else if (u_isUWhiteSpace(us.char32At(0))) {
+            unicode_cache[symbol] = whitespace;
+        } else {
+            unicode_cache[symbol] = other;
+        }
+    }
+}
+#endif
+
+bool TransducerAlphabet::is_unicode_alpha(SymbolNumber symbol)
+{
+#if USE_ICU_UNICODE
+    cache_unicode_class(symbol);
+    return unicode_cache[symbol] == loweralpha || unicode_cache[symbol] == upperalpha;
+#else
+    return false;
+#endif
+}
+
+bool TransducerAlphabet::is_unicode_upperalpha(SymbolNumber symbol)
+{
+#if USE_ICU_UNICODE
+    cache_unicode_class(symbol);
+    return unicode_cache[symbol] == upperalpha;
+#else
+    return false;
+#endif
+}
+
+bool TransducerAlphabet::is_unicode_loweralpha(SymbolNumber symbol)
+{
+#if USE_ICU_UNICODE
+    cache_unicode_class(symbol);
+    return unicode_cache[symbol] == loweralpha;
+#else
+    return false;
+#endif
+}
+
+bool TransducerAlphabet::is_unicode_whitespace(SymbolNumber symbol)
+{
+#if USE_ICU_UNICODE
+    cache_unicode_class(symbol);
+    return unicode_cache[symbol] == whitespace;
+#else
+    return false;
+#endif
+}
+
 void TransducerAlphabet::display() const
 {
     std::cout << "Transducer alphabet:" << std::endl;

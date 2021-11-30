@@ -135,6 +135,10 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
     pmatchlval.label = strcpy((char *) malloc(strlen("need-separators") + 1), "need-separators");
     return VARIABLE_NAME;
 }
+"use-character-classes" {
+    pmatchlval.label = strcpy((char *) malloc(strlen("use-character-classes") + 1), "use-character-classes");
+    return VARIABLE_NAME;
+}
 "max-context-length" {
     pmatchlval.label = strcpy((char *) malloc(strlen("max-context_length") + 1), "max-context-length");
     return VARIABLE_NAME;

@@ -720,6 +720,7 @@ struct PmatchBuiltinFunction: public PmatchObject {
 };
 
 bool transducer_has_context_symbol(HfstTransducer * t);
+void warn_on_nonsubtractable_symbols(HfstTransducer * t);
 
 using hfst::xeroxRules::ReplaceArrow;
 using hfst::xeroxRules::ReplaceType;

@@ -143,6 +143,12 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
         special_symbols[boundary] = symbol_number;
     } else if (str == "@UNICODE_ALPHA@") {
         special_symbols[UnicodeAlpha] = symbol_number;
+    } else if (str == "@UNICODE_UPPERALPHA@") {
+        special_symbols[UnicodeUpperAlpha] = symbol_number;
+    } else if (str == "@UNICODE_LOWERALPHA@") {
+        special_symbols[UnicodeLowerAlpha] = symbol_number;
+    } else if (str == "@UNICODE_WHITESPACE@") {
+        special_symbols[UnicodeWhitespace] = symbol_number;
     } else if (is_end_tag(str)) {
         // Fetch the part between @PMATCH_ENDTAG_ and @
         end_tag_map[symbol_number] = str.substr(
@@ -653,12 +659,12 @@ bool PmatchAlphabet::is_counter(const std::string & symbol)
 
 bool PmatchAlphabet::is_list(const std::string & symbol)
 {
-    return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("@") == symbol.size() - 1;
+    return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("@") == symbol.size() - 1 && symbol.size() > 4;
 }
 
 bool PmatchAlphabet::is_underscored_list(const std::string & symbol)
 {
-    return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("_@") == symbol.size() - 2;
+    return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("_@") == symbol.size() - 2 && symbol.size() > 5;
 }
 
 bool PmatchAlphabet::is_global_flag(const std::string & symbol)
@@ -680,8 +686,8 @@ bool PmatchAlphabet::is_special(const std::string & symbol)
     if (symbol == "@PMATCH_INPUT_MARK@" || symbol == "@PMATCH_BACKTRACK@") { // seems like is_special symbols can't be referred to in pmatch scripts
         return false;
     }
-    if (is_insertion(symbol) || symbol == "@BOUNDARY@" || symbol == "@UNICODE_ALPHA@") {
-//        || symbol == "@_UNKNOWN_SYMBOL_@" || symbol == "@_IDENTITY_SYMBOL_@"
+    if (is_insertion(symbol) || symbol == "@BOUNDARY@" || symbol == "@UNICODE_ALPHA@"
+        || symbol == "@UNICODE_UPPERALPHA@" || symbol == "@UNICODE_LOWERALPHA@" || symbol == "@UNICODE_WHITESPACE@") {
         return true;
     } else {
         return (symbol.find("@PMATCH") == 0 && symbol.at(symbol.size() - 1) == '@')
@@ -716,6 +722,16 @@ bool PmatchAlphabet::is_counter(const SymbolNumber symbol) const
 bool PmatchAlphabet::is_input_mark(const SymbolNumber symbol) const
 {
     return input_mark_symbol == symbol;
+}
+
+bool PmatchAlphabet::is_meta_arc(const SymbolNumber symbol) const
+{
+    return TransducerAlphabet::is_meta_arc(symbol) ||
+        symbol == get_special(UnicodeAlpha) ||
+        symbol == get_special(UnicodeUpperAlpha) ||
+        symbol == get_special(UnicodeLowerAlpha) ||
+        symbol == get_special(UnicodeWhitespace);
+    return TransducerAlphabet::is_meta_arc(symbol) || symbol == get_special(UnicodeAlpha);
 }
 
 std::string PmatchAlphabet::name_from_insertion(const std::string & symbol)
@@ -1826,6 +1842,27 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
             take_transitions(*it, input_pos, tape_pos, i+1);
         }
     }
+    if (alphabet.get_special(UnicodeAlpha) != NO_SYMBOL_NUMBER) {
+        if (alphabet.is_unicode_alpha(input)) {
+                take_transitions(alphabet.get_special(UnicodeAlpha), input_pos, tape_pos, i+1);
+            }
+    }
+    if (alphabet.get_special(UnicodeUpperAlpha) != NO_SYMBOL_NUMBER) {
+        if (alphabet.is_unicode_upperalpha(input)) {
+                take_transitions(alphabet.get_special(UnicodeUpperAlpha), input_pos, tape_pos, i+1);
+            }
+    }
+    if (alphabet.get_special(UnicodeLowerAlpha) != NO_SYMBOL_NUMBER) {
+        if (alphabet.is_unicode_loweralpha(input)) {
+                take_transitions(alphabet.get_special(UnicodeLowerAlpha), input_pos, tape_pos, i+1);
+            }
+    }
+    if (alphabet.get_special(UnicodeWhitespace) != NO_SYMBOL_NUMBER) {
+        if (alphabet.is_unicode_whitespace(input)) {
+                take_transitions(alphabet.get_special(UnicodeWhitespace), input_pos, tape_pos, i+1);
+            }
+    }
+    
     // The "normal" case where we have a regular input symbol
     if (input < orig_symbol_count) {
         take_transitions(input, input_pos, tape_pos, i+1);

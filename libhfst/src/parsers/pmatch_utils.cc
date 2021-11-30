@@ -1085,6 +1085,7 @@ void init_globals(void)
     variables["max-context-length"] = "254";
     variables["max-recursion"] =  "5000";
     variables["need-separators"] = "on";
+    variables["use-character-classes"] = "off";
     variables["xerox-composition"] = "on";
     variables["vector-similarity-projection-factor"] = "1.0";
     call_stack.clear();
@@ -2899,6 +2900,10 @@ HfstTransducer * PmatchBinaryOperation::evaluate(void)
     } else if (op == Intersect) {
         lhs->intersect(*rhs);
     } else if (op == Subtract) {
+        if (verbose) {
+            warn_on_nonsubtractable_symbols(lhs);
+            warn_on_nonsubtractable_symbols(rhs);
+        }
         lhs->subtract(*rhs);
     } else if (op == UpperSubtract) {
         pmatcherror("Upper subtraction not implemented.");
@@ -3031,13 +3036,27 @@ HfstTransducer * PmatchAcceptor::evaluate(void)
     HfstTransducer * retval = NULL;
     switch(set) {
     case Alpha:
-        retval = new HfstTransducer(* get_utils()->latin1_alpha_acceptor);
+        if (variables["use-character-classes"] == "on") {
+            retval = new HfstTransducer("@UNICODE_ALPHA@", format);
+        } else {
+            retval = new HfstTransducer(*get_utils()->latin1_alpha_acceptor);
+        }
         break;
     case UppercaseAlpha:
-        retval = new HfstTransducer(* get_utils()->latin1_uppercase_acceptor);
+        if (variables["use-character-classes"] == "on") {
+            retval = new HfstTransducer("@UNICODE_UPPERALPHA@", format);
+        } else {
+            retval = new HfstTransducer(
+                *get_utils()->latin1_uppercase_acceptor);
+        }
         break;
     case LowercaseAlpha:
-        retval = new HfstTransducer(* get_utils()->latin1_lowercase_acceptor);
+        if (variables["use-character-classes"] == "on") {
+            retval = new HfstTransducer("@UNICODE_LOWERALPHA@", format);
+        } else {
+            retval = new HfstTransducer(
+                *get_utils()->latin1_lowercase_acceptor);
+        }
         break;
     case Numeral:
         retval = new HfstTransducer(* get_utils()->latin1_numeral_acceptor);
@@ -3046,7 +3065,12 @@ HfstTransducer * PmatchAcceptor::evaluate(void)
         retval = new HfstTransducer(* get_utils()->latin1_punct_acceptor);
         break;
     case Whitespace:
-        retval = new HfstTransducer(* get_utils()->latin1_whitespace_acceptor);
+        if (variables["use-character-classes"] == "on") {
+            retval = new HfstTransducer("@UNICODE_WHITESPACE@", format);
+        } else {
+            retval = new HfstTransducer(
+                *get_utils()->latin1_whitespace_acceptor);
+        }
     }
     retval->set_final_weights(hfst::double_to_float(weight), true);
     report_time();
@@ -3060,6 +3084,19 @@ bool transducer_has_context_symbol(HfstTransducer * t)
         ss.count(NLC_ENTRY_SYMBOL) == 1 ||
         ss.count(RC_ENTRY_SYMBOL) == 1 ||
         ss.count(NRC_ENTRY_SYMBOL) == 1;
+}
+
+void warn_on_nonsubtractable_symbols(HfstTransducer * t)
+{
+    StringSet alphabet = t->get_alphabet();
+    for (StringSet::const_iterator it = alphabet.begin(); it != alphabet.end(); ++it) {
+        if (it->size() < 3) {
+            continue;
+        } else if (it->find("@PMATCH") == 0 || it->find("@I") == 0 || it->find("@L") == 0) {
+            write_compilation_stack_indentation_to_err();
+            std::cerr << "Warning: subtracting with nonsubtractable symbol " << *it << std::endl;
+        }
+    }
 }
 
 HfstTransducer * PmatchParallelRulesContainer::evaluate(void)
