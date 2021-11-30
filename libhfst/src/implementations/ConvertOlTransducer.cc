@@ -83,7 +83,10 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       bool weighted = t->get_header().probe_flag(hfst_ol::Weighted);
       const hfst_ol::SymbolTable& symbols
         = t->get_alphabet().get_symbol_table();
-      
+      for (hfst_ol::SymbolTable::const_iterator it = symbols.begin();
+           it != symbols.end(); ++it) {
+          basic->add_symbol_to_alphabet(*it);
+      }
       
       /* This contains indices to either (1) the start of a set of entries
          in the transition index table, or (2) the boundary before a set
@@ -201,6 +204,16 @@ void get_states_and_symbols(
             }
         }
         ++state_number;
+    }
+
+    // We finally add symbols from the source alphabet that don't appear in any
+    // transitions to "other symbols".
+    StringSet source_alphabet = t->get_alphabet();
+    for (StringSet::iterator it = source_alphabet.begin();
+         it != source_alphabet.end(); ++it) {
+        if (input_symbols->count(*it) == 0 && flag_diacritics->count(*it) == 0) {
+            other_symbols->insert(*it);
+        }
     }
 
     std::map<std::string, SymbolNumber> string_symbol_map;
