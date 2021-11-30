@@ -295,7 +295,9 @@ void get_states_and_symbols(
   {
       const float packing_aggression = (float)0.85; // double -> const float
       const int floor_jump_threshold = 4; // a packing aggression parameter
-      //bool quick = options == "quick";
+
+      bool empty_alphabet = (options.find("empty_alphabet") != std::string::npos);
+      
       // The transition array is indexed starting from this constant
       const unsigned int TA_OFFSET = 2147483648u;
 
@@ -441,6 +443,11 @@ void get_states_and_symbols(
         state_placeholders,
         flag_symbols);
 
+    if (empty_alphabet) {
+        symbol_table.clear();
+        seen_input_symbols = 0;
+    }
+    
     hfst_ol::TransducerAlphabet alphabet(symbol_table);
     hfst_ol::TransducerHeader header(seen_input_symbols,
                                      hfst::size_t_to_ushort(symbol_table.size()),
