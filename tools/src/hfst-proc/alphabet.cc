@@ -14,12 +14,8 @@
 #  include <config.h>
 #endif
 
-#if USE_GLIB_UNICODE
-#  include <glib.h>
-#elif USE_ICU_UNICODE
-#  include <unicode/unistr.h>
-#  include <unicode/uchar.h>
-#endif
+#include <unicode/unistr.h>
+#include <unicode/uchar.h>
 
 #include <cstring>
 #include <cstdio>
@@ -385,7 +381,6 @@ ProcTransducerAlphabet::calculate_caps()
 std::string
 ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
 {
-#if USE_ICU_UNICODE
     icu::UnicodeString us(c);
     if (us.countChar32() == 1) {
         UChar32 uc = us.char32At(0);
@@ -406,160 +401,6 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
     }
     case_res = 0;
     return "";
-#elif USE_GLIB_UNICODE
-  glong readed = 0;
-  glong written = 0;
-  GError** gerrno;
-  gunichar* s = g_utf8_to_ucs4(c, -1, &readed, &written, gerrno);
-  gchar* cased = 0;
-  if (g_unichar_isupper(*s))
-    {
-      case_res = 1;
-      cased = g_utf8_strdown(c, -1);
-    }
-  else if (g_unichar_islower(*s))
-    {
-      case_res = -1;
-      cased = g_utf8_strup(c, -1);
-    }
-  else
-    {
-      case_res = 0;
-      cased = g_strdup("");
-    }
-  g_free(s);
-  string rv(cased);
-  return cased;
-#else
-  static const char* override_upper[21][2] = {{"Ə", "ə"},
-                                             {"Р", "р"},
-                                             {"А", "а"},
-                                             {"Ч", "ч"},
-                                             {"Ы", "ы"},
-                                             {"У", "у"},
-                                             {"Ю", "ю"},
-                                             {"Т", "т"},
-                                             {"С", "с"},
-                                             {"К", "к"},
-                                             {"Ш", "ш"},
-                                             {"Ө", "ө"},
-                                             {"Ф", "ф"},
-                                             {"Я", "я"},
-                                             {"Ц", "ц"},
-                                             {"М", "м"},
-                                             {"Е", "е"},
-                                             {"Х", "х"},
-                                             {"Ҡ", "ҡ"},
-                                             {"Һ", "һ"},
-                                             {"Э", "э"}};
-
-  static const char* override_lower[21][2] = {{"ə", "Ə"},
-                                             {"р", "Р"},
-                                             {"а", "А"},
-                                             {"ч", "Ч"},
-                                             {"ы", "Ы"},
-                                             {"у", "У"},
-                                             {"ю", "Ю"},
-                                             {"т", "Т"},
-                                             {"с", "С"},
-                                             {"к", "К"},
-                                             {"ш", "Ш"},
-                                             {"ө", "Ө"},
-                                             {"ф", "Ф"},
-                                             {"я", "Я"},
-                                             {"е", "Е"},
-                                             {"м", "М"},
-                                             {"ҡ", "Ҡ"},
-                                             {"ц", "Ц"},
-                                             {"х", "Х"},
-                                             {"һ", "Һ"},
-                                             {"э", "Э"}};
-
-  static const char* parallel_ranges[5][2][2] = {{{"A","Z"},{"a","z"}}, // Basic Latin
-                                                 {{"À","Þ"},{"à","þ"}}, // Latin-1 Supplement
-                                                 {{"Α","Ϋ"},{"α","ϋ"}}, // Greek and Coptic
-                                                 {{"А","Я"},{"а","я"}}, // Cyrillic
-                                                 {{"Ѐ","Џ"},{"ѐ","џ"}}};// Cyrillic
-  /**
-   * These letters in Latin Extended A have no corresponding
-   * capital/small, and thus shift the range by one:
-   U+0138 	ĸ	LATIN SMALL LETTER KRA (between ķ and Ĺ)
-   U+0149 	ŉ	LATIN SMALL LETTER N PRECEDED BY APOSTROPHE (between ň and Ŋ)
-   U+0178 	Ÿ	LATIN CAPITAL LETTER Y WITH DIAERESIS (U+0178) (between ŷ and Ź)
-   U+017F 	ſ	LATIN SMALL LETTER LONG S (U+017F) (between ž and the end of the block)
-   */
-  static const char* serial_ranges[13][3] = {{"Ā","ķ"}, // Latin Extended A
-                                             {"Ĺ","ň"}, // Latin Extended A
-                                             {"Ŋ","ŷ"}, // Latin Extended A
-                                             {"Ź","ž"}, // Latin Extended A
-                                             {"Ǎ","ǜ"}, // Latin Extended B
-                                             {"Ǟ","ǯ"}, // Latin Extended B
-                                             {"Ǵ","ȳ"}, // Latin Extended B
-                                             {"Ϙ","ϯ"}, // Greek and Coptic
-                                             {"Ѡ","ҿ"}, // Cyrillic
-                                             {"Ӂ","ӎ"}, // Cyrillic
-                                             {"Ӑ","ӿ"}, // Cyrillic
-                                             {"Ԁ","ԥ"}, // Cyrillic Supplement
-                                             {"Ḁ","ỿ"}}; //Latin Extended Additional
-
-  for(int i = 0; i < 21; i++)
-  {
-    if(strcmp(c,override_upper[i][0]) == 0)
-    {
-      case_res = 1;
-      return override_upper[i][1];
-    }
-  }
-
-  for(int i = 0; i < 21; i++)
-  {
-    if(strcmp(c,override_lower[i][0]) == 0)
-    {
-      case_res = -1;
-      return override_lower[i][1];
-    }
-  }
-
-  for(int i=0;i<5;i++) // check parallel ranges
-  {
-    if(strcmp(c,parallel_ranges[i][0][0]) >= 0 &&
-       strcmp(c,parallel_ranges[i][0][1]) <= 0) // in the uppercase section
-    {
-      case_res = 1;
-      int diff = utf8_str_to_int(parallel_ranges[i][1][0]) -
-                 utf8_str_to_int(parallel_ranges[i][0][0]);
-      return utf8_int_to_str(utf8_str_to_int(c)+diff);
-    }
-    else if(strcmp(c,parallel_ranges[i][1][0]) >= 0 &&
-            strcmp(c,parallel_ranges[i][1][1]) <= 0) // in the lowercase section
-    {
-      case_res = -1;
-      int diff = utf8_str_to_int(parallel_ranges[i][1][0]) -
-                 utf8_str_to_int(parallel_ranges[i][0][0]);
-      return utf8_int_to_str(utf8_str_to_int(c)-diff);
-    }
-  }
-  for(int i=0;i<12;i++) // check serial ranges
-  {
-    if(strcmp(c,serial_ranges[i][0]) >= 0 &&
-       strcmp(c,serial_ranges[i][1]) <= 0)
-    {
-      int c_int = utf8_str_to_int(c);
-      if((c_int-utf8_str_to_int(serial_ranges[i][0]))%2 == 0) // uppercase
-      {
-        case_res = 1;
-        return utf8_int_to_str(c_int+1);
-      }
-      else // lowercase
-      {
-        case_res = -1;
-        return utf8_int_to_str(c_int-1);
-      }
-    }
-  }
-  case_res = 0;
-  return "";
-#endif // HFST_UNICODE
 }
 
 std::string

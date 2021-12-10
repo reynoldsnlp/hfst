@@ -247,18 +247,12 @@ int main (int argc, char * argv[])
       else if ((*f == "glib") || (*f == "USE_GLIB_UNICODE"))
         {
           verbose_printf("Requiring Unicode parsed by Glib");
-#ifndef USE_GLIB_UNICODE
           error(EXIT_FAILURE, 0,
                 "Required GLIB-based Unicode handling not present");
-#endif
         }
       else if ((*f == "icu") || (*f == "USE_ICU_UNICODE"))
         {
           verbose_printf("Requiring Unicode parsed by ICU");
-#ifndef USE_ICU_UNICODE
-          error(EXIT_FAILURE, 0,
-                "Required ICU-based Unicode handling not present");
-#endif
         }
       else
         {
@@ -292,13 +286,7 @@ int main (int argc, char * argv[])
 #if HAVE_XFSM
   verbose_printf("xfsm supported\n");
 #endif
-#if USE_GLIB_UNICODE
-  verbose_printf("Unicode support: glib\n");
-#elif USE_ICU_UNICODE
   verbose_printf("Unicode support: ICU\n");
-#else
-  verbose_printf("Unicode support: no (hfst)\n");
-#endif
 
   return EXIT_SUCCESS;
 }

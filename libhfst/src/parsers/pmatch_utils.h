@@ -28,12 +28,8 @@
 #include "HfstXeroxRules.h"
 #include "xre_utils.h"
 
-#if USE_GLIB_UNICODE
-#include <glib.h>
-#elif USE_ICU_UNICODE
 #include <unicode/unistr.h>
 #include <unicode/uchar.h>
-#endif
 
 void pmatchwarning(const char *msg);
 
@@ -416,10 +412,6 @@ struct PmatchUtilityTransducers
     HfstTransducer * make_capify(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
 
-    // Unicode handling, if available
-    #if USE_GLIB_UNICODE
-    std::string string_from_g_unichar(gunichar ch);
-    #endif
     HfstTransducer get_uppercase_acceptor_from_transducer(HfstTransducer & t);
     HfstTransducer get_lowercase_acceptor_from_transducer(HfstTransducer & t);
     HfstTransducer uppercaser_from_transducer(HfstTransducer & t);

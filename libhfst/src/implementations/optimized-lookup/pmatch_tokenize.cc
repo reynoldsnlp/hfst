@@ -9,13 +9,10 @@
 
 #include "pmatch_tokenize.h"
 
-
-#if USE_ICU_UNICODE
 #include <unicode/unistr.h>
 #include <unicode/brkiter.h>
 static UErrorCode characterBoundaryStatus = U_ZERO_ERROR;
 static icu::BreakIterator* characterBoundary = icu::BreakIterator::createCharacterInstance(NULL, characterBoundaryStatus);
-#endif
 
 namespace hfst_ol_tokenize {
 
@@ -238,7 +235,6 @@ size_t u8_first_codepoint_size(const unsigned char* c) {
  * a modifier – so we skip following modifiers too (c.f. issue 497).
  */
 bool is_cg_tag(const string & str) {
-#if USE_ICU_UNICODE
     icu::UnicodeString us(str.c_str());
     characterBoundary->setText(us);
     const int32_t i_after = characterBoundary->following(0);
@@ -253,10 +249,6 @@ bool is_cg_tag(const string & str) {
     else {
         return us.length() > i_after;
     }
-#else
-    // Note: invalid codepoints are also treated as tags;  ¯\_(ツ)_/¯
-    return str.size() > u8_first_codepoint_size((const unsigned char*)str.c_str());
-#endif
 }
 
 void print_cg_subreading(size_t const & indent,
