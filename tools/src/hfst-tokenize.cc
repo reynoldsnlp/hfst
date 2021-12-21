@@ -276,7 +276,7 @@ int process_input_0delim(hfst_ol::PmatchContainer & container,
     ssize_t len = -1;
     while ((len = hfst_getdelim(&line, &bufsize, '\0', inputfile)) > 0) {
         bool escaped = false; // beginning of line is necessarily unescaped
-        for(size_t i = 0; i < len; ++i) {
+        for(ssize_t i = 0; i < len; ++i) {
             if(escaped) {
                 cur << line[i];
                 escaped = false;
