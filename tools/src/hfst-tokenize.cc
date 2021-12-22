@@ -303,9 +303,17 @@ int process_input_0delim(hfst_ol::PmatchContainer & container,
             }
             else if(!in_blank && line[i] == '\n') {
                 cur << line[i];
+                if (verbose) {
+                    std::cout << "processing: " << cur.str() << "\\n" <<
+                                 std::endl;
+                }
                 process_input_0delim_print(container, outstream, cur);
             }
             else if(line[i] == '\0') {
+                if (verbose) {
+                    std::cout << "processing: " << cur.str() << "\\0" <<
+                                 std::endl;
+                }
                 process_input_0delim_print(container, outstream, cur);
                 outstream << "<STREAMCMD:FLUSH>" << std::endl; // CG format uses this instead of \0
                 outstream.flush();
@@ -523,7 +531,9 @@ int parse_options(int argc, char** argv)
 #include "inc/getopt-cases-error.h"
         }
 
-
+    if (verbose) {
+        settings.verbose = true;
+    }
 
     }
 

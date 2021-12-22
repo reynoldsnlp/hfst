@@ -948,8 +948,8 @@ void PmatchContainer::process(const std::string & input_str)
                 LocationVector ls;
                 for (WeightedDoubleTapeVector::iterator it = tape_locations.begin();
                      it != tape_locations.end(); ++it) {
-                    ls.push_back(alphabet.locatefy(printable_input_pos,
-                                                   *it));
+                    Location l = alphabet.locatefy(printable_input_pos, *it);
+                    ls.push_back(l);
                 }
                 sort(ls.begin(), ls.end());
                 locations.push_back(ls);
@@ -1772,9 +1772,14 @@ void PmatchTransducer::take_transitions(SymbolNumber input,
             } else {
                 // Checking context so don't touch output
                 if (local_stack.top().max_context_length_remaining > 0) {
-                    local_stack.top().max_context_length_remaining -= 1;
-                    get_analyses(input_pos + local_stack.top().tape_step, tape_pos, target);
-                    local_stack.top().max_context_length_remaining += 1;
+                    if ((local_stack.top().tape_step < 0 ) && (input_pos == 0)) {
+                        // FIXME: prevents segfault but
+                        get_analyses(input_pos, tape_pos, target); // awkward
+                    } else {
+                        local_stack.top().max_context_length_remaining -= 1;
+                        get_analyses(input_pos + local_stack.top().tape_step, tape_pos, target);
+                        local_stack.top().max_context_length_remaining += 1;
+                    }
                 }
             }
             local_stack.top().default_symbol_trap = false;
@@ -1790,7 +1795,6 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
                                     unsigned int tape_pos,
                                     TransitionTableIndex i)
 {
-    // std::cerr << "get_analyses " << name << " " << input_pos << " " << alphabet.string_from_symbol(container->input[input_pos]) << " " << tape_pos << std::endl;
     if (container->get_weight() > container->max_weight) { return; }
     if (container->max_time > 0.0) {
         ++container->call_counter;
@@ -1862,7 +1866,7 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
                 take_transitions(alphabet.get_special(UnicodeWhitespace), input_pos, tape_pos, i+1);
             }
     }
-    
+
     // The "normal" case where we have a regular input symbol
     if (input < orig_symbol_count) {
         take_transitions(input, input_pos, tape_pos, i+1);
