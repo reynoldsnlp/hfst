@@ -19,7 +19,7 @@
 InputReader::InputReader(size_t &counter):
   input_stream(NULL),
   counter(counter),
-  buffer_size(500000),
+  buffer_size(HTWOLCBUFFERSIZE),
   buffer_index(0),
   warning_stream(NULL),
   error_stream(NULL)
@@ -29,7 +29,7 @@ void InputReader::reset()
 {
   input_stream = NULL;
   // counter is a reference, so it must be reset separately
-  buffer_size = 500000;
+  buffer_size = HTWOLCBUFFERSIZE;
   buffer_index = 0;
   warning_stream = NULL;
   error_stream = NULL;
@@ -81,6 +81,7 @@ char InputReader::input(void)
   if (buffer[buffer_index] == 0)
     {
       input_stream->getline(buffer,buffer_size);
+      // XXX?
       if (input_stream->gcount() == 0)
     { return 0; }
       buffer_index = 0;

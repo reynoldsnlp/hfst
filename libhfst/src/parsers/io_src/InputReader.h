@@ -33,6 +33,8 @@
 #include <string>
 #include <cstdlib>
 
+#define HTWOLCBUFFERSIZE 1000000
+
 //! @brief Throw when an @a InputStream is used without first setting its
 //! @a std::istream.
 class InputNotSet
@@ -48,7 +50,7 @@ class InputReader
 private:
   std::istream * input_stream;
   size_t &counter;
-  char buffer[500000];
+  char buffer[HTWOLCBUFFERSIZE];
   size_t buffer_size;
   size_t buffer_index;
   std::ostream * warning_stream;
@@ -59,7 +61,7 @@ public:
   //!
   //! @param counter would usually be a reference to @a yylineno which is
   //! maintained by Bison.
-  InputReader(size_t &counter);
+  explicit InputReader(size_t &counter);
 
   void reset();
 
@@ -77,7 +79,7 @@ public:
 
   //! @brief Display the error message @a err and exit with signal 1.
   void error(const std::string &err);
-  
+
   //! @brief Read next input char.
   //!
   //! @return The next input character or 0 if end of file was reached.
