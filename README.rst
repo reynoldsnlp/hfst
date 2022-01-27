@@ -420,6 +420,21 @@ it is an unexpected error situation. Usual suspects are still: missing library
 in configure, empty file, reading error, writing error...
 
 
+Exception: HfstException in file: htwolcpre3-parser.yy on line: XXX
+-------------------------------------------------------------------
+
+**During program execution**::
+
+  syntax error
+  on line 1:
+  
+  Aborted.
+  
+  This is an hfst interface bug:
+  Exception: HfstException in file: htwolcpre3-parser.yy on line: XXX
+
+This can be caused by buffer size limit in hfst-twolc, a rule file larger than 10 megabytes (after pre-processing) will not be parsed properly. 
+
 Further information
 ===================
 
