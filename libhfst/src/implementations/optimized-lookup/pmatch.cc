@@ -731,7 +731,6 @@ bool PmatchAlphabet::is_meta_arc(const SymbolNumber symbol) const
         symbol == get_special(UnicodeUpperAlpha) ||
         symbol == get_special(UnicodeLowerAlpha) ||
         symbol == get_special(UnicodeWhitespace);
-    return TransducerAlphabet::is_meta_arc(symbol) || symbol == get_special(UnicodeAlpha);
 }
 
 std::string PmatchAlphabet::name_from_insertion(const std::string & symbol)
