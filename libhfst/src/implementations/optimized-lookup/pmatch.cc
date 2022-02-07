@@ -241,10 +241,11 @@ void PmatchAlphabet::process_underscored_symbol_list(const std::string & str, Sy
                 find(list_symbols.begin(), list_symbols.end(), candidate_for_list) == list_symbols.end()) {
                 excl_symbols.push_back(candidate_for_list);
                 if (symbol2lists[candidate_for_list] == NO_SYMBOL_NUMBER) {
+                    // This symbol is not yet associated with any list
                   symbol2lists[candidate_for_list] = hfst::size_t_to_ushort(symbol_lists.size());
                     symbol_lists.push_back(SymbolNumberVector(1, sym));
                 } else {
-                    symbol_lists[symbol2lists[sym]].push_back(sym);
+                    symbol_lists[symbol2lists[candidate_for_list]].push_back(sym);
                 }
             }
         }
