@@ -5,6 +5,52 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.16.0
+----------------------------
+
+* Bugfixes:
+
+  * During conversion between optimized-lookup and other formats, the alphabet
+    was not being preserved, leading to incorrect behaviour in some cases.
+    This has been fixed.
+
+  * Fix segfaults in hfst-summarize, hfst-disjunct and foma back-end.
+
+  * Force ICU, fixes #501.
+
+  * Use unique_ptr for input/ouput stream memory allocation (#547).
+
+
+* Improvements:
+
+  * hfst-pmatch archives now no longer include or parse redundant alphabets,
+    which in some cases can be a meaningful size and speed saving.
+
+  * Multiple memory leaks fixed.
+
+  * Drop support for TR1 standard assuming that C++14 is minimal requirement.
+
+  * Drop legacy wrappers for foma and lexc (#532).
+
+  * Use upstream Foma and by default upstream OpenFST.
+
+  * Use C++17, or C++14 with bundled OpenFST.
+
+  * Update external links for sfst, foma and flex.
+
+  * Add lex/yacc sources to dist (see issue #524).
+
+* Features:
+
+  * A new variable in the hfst-pmatch language, "unicode-character-classes",
+    which causes the use of built-in character sets to be interpreted at
+    runtime using a unicode library.
+
+  * Verbose output from hfst-pmatch2fst has been much improved, providing eg.
+    a call graph of the process. It also warns about use of pmatch features
+    that is likely to be incorrect and lead to errors.
+
+
 Noteworthy changes in 3.15.5
 ----------------------------
 

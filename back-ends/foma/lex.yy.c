@@ -1,5 +1,5 @@
 
-#line 2 "lex.yy.c"
+#line 3 "lex.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -1830,13 +1830,13 @@ int my_yyparse(char *my_string, int lineno, struct defined_networks *defined_net
     return yyp;
 }
 
-#line 1833 "lex.yy.c"
+#line 1834 "lex.yy.c"
 #line 149 "regex.l"
  /* Reserved multicharacter symbols are a little tricky to define */
  /* what we're doing is excluding some combinations of multibyte sequences */
  /* using the {-} construct in flex */
 
-#line 1839 "lex.yy.c"
+#line 1840 "lex.yy.c"
 
 #define INITIAL 0
 #define DEFI 1
@@ -2131,7 +2131,7 @@ YY_DECL
 
  /* we're matching braced strings */
 
-#line 2134 "lex.yy.c"
+#line 2135 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -3037,7 +3037,7 @@ YY_RULE_SETUP
 #line 463 "regex.l"
 ECHO;
 	YY_BREAK
-#line 3040 "lex.yy.c"
+#line 3041 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(DEFI):
 case YY_STATE_EOF(QTD):
