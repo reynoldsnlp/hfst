@@ -67,7 +67,8 @@ XREUNRESTRICTED [\x21-\x7e\n]{-}[- <>%!:;@0~""\\&?$+*/_{}\]\[-]
 XREALPHA {XREUNRESTRICTED}|{U8H}|{EC}
 XREOPERATOR [~\\&\-/\t |+*$_\]\[{}()0?:""]|"@\""|"$."|"$?"|"./."|"<>"|"^>"|"^<"|".#."|"."[riul]
 XREQUOTSTRING "\""([^""\n;]|"%;"|"\\\"")*"\""
-XRECHAR {XREOPERATOR}|{XREALPHA}|{XREQUOTSTRING}
+XRECOMMENT ![^\n>]*\n?
+XRECHAR {XREOPERATOR}|{XREALPHA}|{XREQUOTSTRING}|{XRECOMMENT}
 XRETOKEN {XRECHAR}+
 
 /* String entry part:
@@ -206,7 +207,7 @@ LWSP [\r\n\t ]
     return ULSTRING;
 }
 
-<LEXICONS>"<"{WSP}*{XRETOKEN}{WSP}*">" {
+<LEXICONS>"<"{LWSP}*{XRETOKEN}{LWSP}*">" {
     hfst::lexc::token_update_positions(hlexctext);
     hlexclval.name = hfst::lexc::strdup_nonconst_part(hlexctext, "<", ">", false);
     return XEROX_REGEXP;
