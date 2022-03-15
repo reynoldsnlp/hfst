@@ -357,19 +357,23 @@ int process_input(hfst_ol::PmatchContainer & container,
     }
     if(settings.output_format == giellacg || superblanks) {
         if(superblanks) {
+            verbose_printf("Processign giellacg with superblanks\n");
             return process_input_0delim<true>(container, outstream);
         }
         else {
+            verbose_printf("Processign giellacg without superblanks\n");
             return process_input_0delim<false>(container, outstream);
         }
     }
     if(settings.output_format == visl) {
+        verbose_printf("Processign VISL CG 3\n");
         return process_input_visl(container, outstream);
     }
     string input_text;
     char * line = NULL;
     size_t bufsize = 0;
     if(blankline_separated) {
+        verbose_printf("Processing blankline separated input\n");
         while (hfst_getline(&line, &bufsize, inputfile) > 0) {
             if (line[0] == '\n') {
                 maybe_erase_newline(input_text);
@@ -388,6 +392,7 @@ int process_input(hfst_ol::PmatchContainer & container,
     }
     else {
         // newline or non-separated
+        verbose_printf("Processing non-separated input\n");
         while (hfst_getline(&line, &bufsize, inputfile) > 0) {
             input_text = line;
             maybe_erase_newline(input_text);
@@ -581,6 +586,8 @@ int main(int argc, char ** argv)
     if (retval != EXIT_CONTINUE) {
         return retval;
     }
+    verbose_printf("Reading from %s, writing to %s\n",
+                   tokenizer_filename.c_str(), outfilename);
     std::ifstream instream(tokenizer_filename.c_str(),
                            std::ifstream::binary);
     if (!instream.good()) {
@@ -607,7 +614,8 @@ int main(int argc, char ** argv)
             return 1;
         }
         if (first_header_attributes.count("name") == 0 ||
-            first_header_attributes["name"] != "TOP") {
+                first_header_attributes["name"] != "TOP") {
+            verbose_printf("No TOP automaton found, using naive tokeniser?\n");
             hfst::HfstInputStream is(tokenizer_filename);
             HfstTransducer * dictionary = new HfstTransducer(is);
             instream.close();
@@ -617,6 +625,7 @@ int main(int argc, char ** argv)
             container.set_single_codepoint_tokenization(!settings.tokenize_multichar);
             return process_input(container, std::cout);
         } else {
+            verbose_printf("TOP automaton seen, treating as pmatch script...\n");
             hfst_ol::PmatchContainer container(instream);
             container.set_verbose(verbose);
             container.set_single_codepoint_tokenization(!settings.tokenize_multichar);
