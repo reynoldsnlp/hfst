@@ -162,12 +162,6 @@ AM_CONDITIONAL([WANT_HFSTOL], [test x$with_hfstol != xno])
 
 AS_IF([test "x$with_sfst" == "xno" -a "x$with_openfst" == "xno" -a "x$with_foma" == "xno" -a "x$with_hfstol" == "xno"], [AC_MSG_ERROR([must build with at least one fst backend])])
 
-# relay unicode support to which backend library
-AC_ARG_WITH([unicode_handler],
-            [AS_HELP_STRING([--with-unicode-handler=backend],
-                            [select library to use for unicode handling @<:@default=hfst@:>@])],
-            [with_unicode_handler=$withval],
-            [with_unicode_handler=hfst])
 # make readline optional since mac os x has sucky implementation of readline
 AC_ARG_WITH([readline],
             [AS_HELP_STRING([--with-readline],
@@ -678,17 +672,6 @@ AC_LANG_POP
 AC_LANG_PUSH([C])
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_CHECK_HEADERS([readline/readline.h readline/history.h])])
-AS_IF([test "x$with_unicode_handler" = "xglib"],
-      [AC_PATH_PROG([PKG_CONFIG], [pkg-config])
-       AS_IF([test "x$PKG_CONFIG" != "xno"],
-             [AC_SUBST([GLIB_CPPFLAGS], [`$PKG_CONFIG glib-2.0 --cflags`])
-              AC_SUBST([GLIB_LIBS], [`$PKG_CONFIG glib-2.0 --libs`])
-             ],
-             [AC_CHECK_HEADERS([glib.h], [],
-                        [AC_MSG_ERROR([glib headers not found; set CPPFLAGS to -I glib install directiories or use other unicode handler instead])])])])
-# remove if not needed
-AS_IF([test "x$with_unicode_handler" != "xglib"],
-      [AC_SUBST([GLIB_CFLAGS])])
 
 ### Add here your library ###
 #AS_IF([test "x$with_my_transducer_library" != "xno"],
@@ -820,7 +803,7 @@ cat <<EOF
     *                 train-tagger: $enable_train_tagger
     *                 txt2fst: $enable_txt2fst
     *                 xfst: $enable_xfst
-    * unicode parsed in corpus tools with: $with_unicode_handler
+    * unicode parsed in corpus tools with: ICU  $ICU_VERSION
 EOF
 dnl stick important warnings to bottom
 dnl important licensing information
@@ -828,8 +811,6 @@ dnl according to GNU GPLv2 strict (not plus) is incompatible with Apache
 dnl hope end users never disable ofst
 AS_IF([test "x$with_openfst" == "xno"],
       [AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])])
-dnl HFST's case mapping in corpus tools is mainly MES-2 set with other characters
-dnl added as we go
 AS_IF([test "x$with_readline" == "xno"],
       [AC_MSG_WARN([HFST tools will be compiled without readline; editing user input on command line is not supported; for better support consider using --with-readline])])
 dnl warn about missing "important" tools

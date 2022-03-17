@@ -244,12 +244,6 @@ int main (int argc, char * argv[])
           error(EXIT_FAILURE, 0, "Required OpenFst support not present");
 #endif
         }
-      else if ((*f == "glib") || (*f == "USE_GLIB_UNICODE"))
-        {
-          verbose_printf("Requiring Unicode parsed by Glib");
-          error(EXIT_FAILURE, 0,
-                "Required GLIB-based Unicode handling not present");
-        }
       else if ((*f == "icu") || (*f == "USE_ICU_UNICODE"))
         {
           verbose_printf("Requiring Unicode parsed by ICU");

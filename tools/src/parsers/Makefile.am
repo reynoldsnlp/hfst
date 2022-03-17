@@ -30,9 +30,9 @@ HFST_COMMON_SRC=../hfst-program-options.cc ../hfst-commandline.cc ../hfst-tool-m
 bin_PROGRAMS=$(MAYBE_XFST)
 
 if WANT_READLINE
-  hfst_xfst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS) $(ICU_LIBS) -lreadline
+  hfst_xfst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(ICU_LIBS) -lreadline
 else
-  hfst_xfst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS) $(ICU_LIBS)
+  hfst_xfst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(ICU_LIBS)
 endif
 
 EXTRA_DIST=init_help.cc cmd.h abbrcmd.h
