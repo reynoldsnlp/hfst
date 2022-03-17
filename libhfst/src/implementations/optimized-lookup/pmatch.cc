@@ -941,6 +941,10 @@ void PmatchContainer::process(const std::string & input_str)
                     Location nonmatching = alphabet.locatefy(printable_input_pos - hfst::size_t_to_uint(nonmatching_locations.size()),
                                                              WeightedDoubleTape(nonmatching_locations, 0.0));
                     nonmatching.output = "@_NONMATCHING_@";
+                    if (verbose) {
+                        std::cerr << "non-matching " << nonmatching.input <<
+                          std::endl;
+                    }
                     ls.push_back(nonmatching);
                     locations.push_back(ls);
                     nonmatching_locations.clear();
@@ -949,6 +953,10 @@ void PmatchContainer::process(const std::string & input_str)
                 for (WeightedDoubleTapeVector::iterator it = tape_locations.begin();
                      it != tape_locations.end(); ++it) {
                     Location l = alphabet.locatefy(printable_input_pos, *it);
+                    if (verbose) {
+                        std::cerr << "located? " << l.input << ":" << l.output
+                          << std::endl;
+                    }
                     ls.push_back(l);
                 }
                 sort(ls.begin(), ls.end());
@@ -962,6 +970,9 @@ void PmatchContainer::process(const std::string & input_str)
         }
         if (!candidate_found() || input_pos == old_input_pos) {
             // If no input was consumed, we move one position up
+            if (verbose) {
+                std::cerr << "no candidate found" << std::endl;
+            }
             copy_to_result(current_input, current_input);
             ++input_pos;
             if (locate_mode && alphabet.is_printable(current_input)) {
@@ -975,6 +986,10 @@ void PmatchContainer::process(const std::string & input_str)
         Location nonmatching = alphabet.locatefy(printable_input_pos - hfst::size_t_to_uint(nonmatching_locations.size()),
                                                  WeightedDoubleTape(nonmatching_locations, 0.0));
         nonmatching.output = "@_NONMATCHING_@";
+        if (verbose) {
+            std::cerr << "nonmatching somethign or other" << nonmatching.input
+              << std::endl;
+        }
         ls.push_back(nonmatching);
         locations.push_back(ls);
     }
@@ -1000,6 +1015,9 @@ LocationVectorVector PmatchContainer::locate(const std::string & input,
                                              double time_cutoff,
                                              Weight weight_cutoff)
 {
+    if (verbose) {
+        std::cerr << "locating " << input << std::endl;
+    }
     max_time = time_cutoff;
     max_weight = weight_cutoff;
     if (max_time > 0.0) {
@@ -1964,10 +1982,19 @@ void PmatchTransducer::exit_context(void)
 void PmatchContainer::uncompose(Location& loc)
   {
     if (!uncomposable) {
+        if (verbose) {
+            std::cerr << "uncompose disabled" << std::endl;
+        }
         return;
+    }
+    if (verbose) {
+        std::cerr << "uncomposing left " << loc.input << std::endl;
     }
     auto middle_left = uncompose_left->lookup_fd(loc.input);
     if (middle_left->empty()) {
+        if (verbose) {
+            std::cerr << "empty midleft compose" << std::endl;
+        }
         // ambig problems
         return;
     }
@@ -1979,8 +2006,14 @@ void PmatchContainer::uncompose(Location& loc)
                 mids << symbol;
             }
         }
+        if (verbose) {
+            std::cerr << "midleft composed " << mids.str() << std::endl;
+        }
         auto middle_right = uncompose_right->lookup_fd(mids.str());
         if (middle_right->empty()) {
+            if (verbose) {
+                std::cerr << "empty midright compose" << std::endl;
+            }
             continue;
         }
         for (auto& rpath : *middle_right) {
@@ -1990,8 +2023,18 @@ void PmatchContainer::uncompose(Location& loc)
                     lows << rsym;
                 }
             }
+            if (verbose) {
+                std::cerr << "midright composed " << lows.str() << std::endl;
+            }
             if (lows.str() == loc.output) {
+                if (verbose) {
+                    std::cerr << "matched " << loc.output << std::endl;
+                }
                 midforms.insert(mids.str());
+            } else {
+                if (verbose) {
+                    std::cerr << "no match " << loc.output << std::endl;
+                }
             }
         }
     }
