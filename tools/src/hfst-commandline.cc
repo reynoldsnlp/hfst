@@ -264,7 +264,9 @@ hfst_strtoweight(const char *s)
 int
 hfst_strtonumber(const char *s, bool *infinite)
 {
-    *infinite = false;
+    if (infinite != NULL) {
+        *infinite = false;
+    }
     errno = 0;
     char *endptr;
     double rv = strtod(s, &endptr);
@@ -424,7 +426,7 @@ hfst_strformat(hfst::ImplementationType format)
     case hfst::UNSPECIFIED_TYPE:
     default:
       return "ERROR (not a HFST supported transducer)";
-      exit(1);
+      //exit(1);
     }
 
 }
@@ -660,6 +662,7 @@ getdelim(char** lineptr, size_t* n, int delim, FILE* stream)
           {
             return -1;
           }
+        *n = nn;
       }
     char* currptr = *lineptr;
     *currptr = '\0';
@@ -712,6 +715,7 @@ getline(char** lineptr, size_t* n, FILE* stream)
           {
              return -1;
           }
+        *n = nn;
       }
     *lineptr = fgets(*lineptr, nn, stream);
     if (*lineptr == NULL)
