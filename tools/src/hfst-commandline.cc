@@ -855,7 +855,7 @@ print_more_info()
 {
     fprintf(message_out, "%s home page: \n"
             "<%s/%s>\n",
-            WIKI_URL, program_name, hfst_tool_wikiname);
+            program_name, WIKI_URL, hfst_tool_wikiname);
     fprintf(message_out, "General help using HFST software: \n"
             "<%s>\n", WIKI_URL);
 }
