@@ -1237,6 +1237,10 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
                 def_insed_expressions.count(defs_it->first) != 0 ||
                 uncomposed.count(defs_it->first) != 0)
               {
+                if (hfst::pmatch::verbose) {
+                    std::cerr << "\ndefinition..." << defs_it->first << "=" <<
+                      defs_it->second->name << std::endl;
+                }
                 HfstTransducer * tmp = NULL;
                 if (def_insed_expressions.count(defs_it->first) != 0) {
                     tmp = def_insed_expressions[defs_it->first]->evaluate();
@@ -1248,6 +1252,10 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
                 // This is what it will be called in the archive
                 // XXX: seems to use the index not the name...)
                 if (uncomposed.count(defs_it->first) != 0) {
+                    if (hfst::pmatch::verbose) {
+                        std::cerr << "\nUncompose" << std::endl;
+                        tmp->write_in_att_format(stderr);
+                    }
                     if (uncount == 0) {
                         tmp->set_name("UNCOMPOSE LEFT " + defs_it->first);
                         retval["UNCOMPOSE LEFT " + defs_it->first] = tmp;
@@ -2482,7 +2490,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(void)
     HfstTransducer * retval = NULL;
     start_timing();
 
-    
+
     // Special optimization cases
     if (op == Implode) {
         std::vector<std::string> strings;

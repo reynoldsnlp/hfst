@@ -258,10 +258,10 @@ process_stream(HfstOutputStream& outstream)
         timer = clock();
         std::cerr << "Building hfst-ol alphabet... ";
     }
-    
+
     // A dummy transducer with an alphabet with all the symbols
     HfstTransducer harmonizer(compilation_format);
-    
+
     // First we need to collect a unified alphabet from all the transducers.
     hfst::StringSet symbols_seen;
     for (std::map<std::string, HfstTransducer *>::const_iterator it =
@@ -280,15 +280,12 @@ process_stream(HfstOutputStream& outstream)
         std::cerr << program_name << ": Empty ruleset, nothing to write\n";
         return EXIT_FAILURE;
     }
-    
+
     // Then we convert it...
     harmonizer.convert(hfst::HFST_OLW_TYPE);
     // Use these for naughty intermediate steps to make sure
     // everything has the same alphabet
-    hfst::HfstBasicTransducer * intermediate_tmp;
-    hfst_ol::Transducer * harmonized_tmp;
-    hfst::HfstTransducer * output_tmp;
-    
+
     if (verbose) {
         double duration = (clock() - timer) /
             (double) CLOCKS_PER_SEC;
@@ -296,9 +293,12 @@ process_stream(HfstOutputStream& outstream)
         std::cerr << "built in " << duration << " seconds\n";
         std::cerr << "Converting TOP... ";
     }
-        
+
     // When done compiling everything, look for TOP and output it first.
     if (definitions.count("TOP") == 1) {
+        hfst::HfstBasicTransducer * intermediate_tmp;
+        hfst_ol::Transducer * harmonized_tmp;
+        hfst::HfstTransducer * output_tmp;
         std::map<std::string, std::string> properties = definitions["TOP"]->get_properties();
         intermediate_tmp = hfst::implementations::ConversionFunctions::
             hfst_transducer_to_hfst_basic_transducer(*definitions["TOP"]);
@@ -326,11 +326,12 @@ process_stream(HfstOutputStream& outstream)
             timer = clock();
             std::cerr << "converted in " << duration << " seconds\n";
         }
-    
+
         for (std::map<std::string, HfstTransducer *>::iterator it =
                  definitions.begin(); it != definitions.end(); ++it) {
             if (verbose) {
                 std::cerr << "Converting " << it->first << "... ";
+                it->second->write_in_att_format(stderr);
                 timer = clock();
             }
             intermediate_tmp = hfst::implementations::ConversionFunctions::
@@ -343,6 +344,10 @@ process_stream(HfstOutputStream& outstream)
             output_tmp = hfst::implementations::ConversionFunctions::
                 hfst_ol_to_hfst_transducer(harmonized_tmp);
             output_tmp->set_name(it->first);
+            if (verbose) {
+                std::cerr << "still...?" << std::endl;
+                output_tmp->write_in_att_format(stderr);
+            }
             outstream << *output_tmp;
             delete it->second;
             delete intermediate_tmp;

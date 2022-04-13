@@ -381,13 +381,18 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
           (void)e; break;
         }
         if (transducer_name.rfind("UNCOMPOSE LEFT", 0) == 0) {
+            //std::cerr << "Reading uncomposer L... ";
             uncompose_left = new Transducer(inputstream);
+            //std::cerr << "done" << std::endl;
             uncomposable = true;
         }
         else if (transducer_name.rfind("UNCOMPOSE RIGHT", 0) == 0) {
+            //std::cerr << "Reading uncomposer R... ";
             uncompose_right = new Transducer(inputstream);
+            //std::cerr << "done" << std::endl;
             uncomposable = true;
-        } else
+        }
+        else
           {
             header = TransducerHeader(inputstream);
             TransducerAlphabet::fake_read_alphabet(
