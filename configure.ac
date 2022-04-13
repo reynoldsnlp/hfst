@@ -31,7 +31,7 @@ LIBHFST_MINOR=16
 LIBHFST_EXTENSION=0
 LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR.$LIBHFST_EXTENSION
 
-AC_INIT([hfst], [3.16.0], [hfst-bugs@helsinki.fi], [hfst])
+AC_INIT([hfst],[3.16.0],[hfst-bugs@helsinki.fi],[hfst])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall std-options foreign check-news subdir-objects])
 
@@ -633,9 +633,8 @@ AC_LANG_PUSH([C])
 
 AC_LANG_POP
 
-AC_CHECK_ICU([50], [AC_DEFINE([USE_ICU_UNICODE], 1, 
-                    [if using icu for unicode string handling])],
-             [AC_MSG_FAILURE([ICU-50 or newer is required])])
+AX_CHECK_ICU([50],[AC_DEFINE([USE_ICU_UNICODE], 1, 
+                    [if using icu for unicode string handling])],[AC_MSG_FAILURE([ICU-50 or newer is required])])
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_SEARCH_LIBS([readline], [readline editline],
                       [AC_DEFINE([HAVE_READLINE], 1, [if readline can be used])],
