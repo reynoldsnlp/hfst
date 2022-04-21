@@ -75,8 +75,8 @@ using hfst::HfstTransducer;
 using hfst::pmatch::PmatchCompiler;
 
 static char *epsilonname=NULL;
-static bool disjunct_expressions=false;
-static bool line_separated = false;
+//static bool disjunct_expressions=false;
+//static bool line_separated = false;
 static bool flatten = false;
 static bool include_cosine_distances = false;
 static clock_t timer;
