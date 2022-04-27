@@ -395,7 +395,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
         else
           {
             header = TransducerHeader(inputstream);
-            TransducerAlphabet::fake_read_alphabet(
+            TransducerAlphabet dummy = TransducerAlphabet(
                 inputstream, header.symbol_count());
             hfst_ol::PmatchTransducer * rtn =
                 new hfst_ol::PmatchTransducer(inputstream,

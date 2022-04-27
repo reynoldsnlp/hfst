@@ -336,11 +336,19 @@ process_stream(HfstOutputStream& outstream)
             }
             intermediate_tmp = hfst::implementations::ConversionFunctions::
                 hfst_transducer_to_hfst_basic_transducer(*(it->second));
-            harmonized_tmp = hfst::implementations::ConversionFunctions::
-                hfst_basic_transducer_to_hfst_ol(intermediate_tmp,
-                                                 true, // weighted
-                                                 "empty_alphabet", // empty alphabet in RTNs, they'll use the main one
-                                                 &harmonizer); // harmonize with this
+            if (it->first.find("UNCOMPOSE") == string::npos) {
+                harmonized_tmp = hfst::implementations::ConversionFunctions::
+                    hfst_basic_transducer_to_hfst_ol(intermediate_tmp,
+                                                     true, // weighted
+                                                     "empty_alphabet", // empty alphabet in RTNs, they'll use the main one
+                                                     &harmonizer); // harmonize with this
+            } else {
+                harmonized_tmp = hfst::implementations::ConversionFunctions::
+                    hfst_basic_transducer_to_hfst_ol(intermediate_tmp,
+                                                     true, // weighted
+                                                     "", // alphabet in UNCs,
+                                                     &harmonizer); // harmonize with this
+            }
             output_tmp = hfst::implementations::ConversionFunctions::
                 hfst_ol_to_hfst_transducer(harmonized_tmp);
             output_tmp->set_name(it->first);
