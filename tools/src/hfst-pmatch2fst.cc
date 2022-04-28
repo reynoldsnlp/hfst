@@ -330,8 +330,7 @@ process_stream(HfstOutputStream& outstream)
         for (std::map<std::string, HfstTransducer *>::iterator it =
                  definitions.begin(); it != definitions.end(); ++it) {
             if (verbose) {
-                std::cerr << "Converting " << it->first << "... ";
-                it->second->write_in_att_format(stderr);
+                std::cerr << "Converting " << it->first << "... " << std::endl;
                 timer = clock();
             }
             intermediate_tmp = hfst::implementations::ConversionFunctions::
@@ -352,10 +351,6 @@ process_stream(HfstOutputStream& outstream)
             output_tmp = hfst::implementations::ConversionFunctions::
                 hfst_ol_to_hfst_transducer(harmonized_tmp);
             output_tmp->set_name(it->first);
-            if (verbose) {
-                std::cerr << "still...?" << std::endl;
-                output_tmp->write_in_att_format(stderr);
-            }
             outstream << *output_tmp;
             delete it->second;
             delete intermediate_tmp;

@@ -1254,7 +1254,6 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
                 if (uncomposed.count(defs_it->first) != 0) {
                     if (hfst::pmatch::verbose) {
                         std::cerr << "\nUncompose" << std::endl;
-                        tmp->write_in_att_format(stderr);
                     }
                     if (uncount == 0) {
                         tmp->set_name("UNCOMPOSE LEFT " + defs_it->first);
