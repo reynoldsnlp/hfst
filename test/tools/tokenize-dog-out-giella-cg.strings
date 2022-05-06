@@ -10,6 +10,6 @@
 	"bedog" V <W:0.0>
 : 
 "<catdog>"
-	"dog" N <W:0.0>
-		"cat" N Cmp <W:0.0>
+	"dog" N <W:0.0> "<dog>"
+		"cat" N Cmp <W:0.0> "<cat>"
 : собака\n

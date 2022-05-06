@@ -1169,6 +1169,8 @@ Location PmatchAlphabet::locatefy(unsigned int input_offset,
     retval.weight = str.weight;
     size_t input_mark = 0;
     size_t output_mark = 0;
+    size_t raw_input_mark = 0;
+    size_t raw_output_mark = 0;
 
     // We rebuild the original input without special
     // symbols but with IDENTITIES etc. replaced
@@ -1187,22 +1189,28 @@ Location PmatchAlphabet::locatefy(unsigned int input_offset,
             retval.tag = start_tag(output);
             continue;
         }
+        std::string ins = string_from_symbol(input);
+        std::string outs = string_from_symbol(output);
         if (is_printable(output)) {
-            std::string s = string_from_symbol(output);
-            retval.output.append(s);
-            retval.output_symbol_strings.push_back(s);
+            retval.output.append(outs);
+            retval.output_symbol_strings.push_back(outs);
         }
+        retval.raw_output_symbol_strings.push_back(outs);
         if (is_printable(input)) {
-            std::string s = string_from_symbol(input);
-            retval.input.append(s);
-            retval.input_symbol_strings.push_back(s);
+            retval.input.append(ins);
+            retval.input_symbol_strings.push_back(ins);
             ++input_offset;
         }
+        retval.raw_input_symbol_strings.push_back(ins);
         if (is_input_mark(output)) {
             retval.output_parts.push_back(output_mark);
             retval.input_parts.push_back(input_mark);
             output_mark = retval.output_symbol_strings.size();
             input_mark = retval.input_symbol_strings.size();
+            retval.raw_output_parts.push_back(raw_output_mark);
+            retval.raw_input_parts.push_back(raw_input_mark);
+            raw_output_mark = retval.raw_output_symbol_strings.size();
+            raw_input_mark = retval.raw_input_symbol_strings.size();
         }
     }
     if (output_mark > 0) {
@@ -1210,6 +1218,12 @@ Location PmatchAlphabet::locatefy(unsigned int input_offset,
     }
     if (input_mark > 0) {
         retval.input_parts.push_back(input_mark);
+    }
+    if (raw_output_mark > 0) {
+        retval.raw_output_parts.push_back(raw_output_mark);
+    }
+    if (raw_input_mark > 0) {
+        retval.raw_input_parts.push_back(raw_input_mark);
     }
     retval.length = input_offset - retval.start;
     return retval;

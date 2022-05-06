@@ -328,6 +328,10 @@ namespace hfst_ol {
         std::vector<size_t> output_parts; // indices in output_symbol_strings
         std::vector<std::string> input_symbol_strings;
         std::vector<std::string> output_symbol_strings;
+        std::vector<size_t> raw_input_parts; // indices in input_symbol_strings
+        std::vector<size_t> raw_output_parts; // indices in output_symbol_strings
+        std::vector<std::string> raw_input_symbol_strings;
+        std::vector<std::string> raw_output_symbol_strings;
 
         bool operator<(Location rhs) const
             { return this->weight < rhs.weight; }
