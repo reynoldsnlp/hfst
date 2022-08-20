@@ -490,9 +490,9 @@ print_reading_giellacg(const Location *loc,
             ++indent;
             out_end = out_beg;
             in_end = in_beg;
-            std::cerr << "DEBUG1" << std::endl;
+            //std::cerr << "DEBUG1" << std::endl;
             if(sub_found) {
-                std::cerr << "DEBUG2" << std::endl;
+                //std::cerr << "DEBUG2" << std::endl;
                 --out_end; // skip the subreading separator symboli
                 --in_end; // ?
             }
