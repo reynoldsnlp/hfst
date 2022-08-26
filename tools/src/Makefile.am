@@ -184,6 +184,9 @@ endif
 if WANT_SUBSTITUTE
 MAYBE_SUBSTITUTE=hfst-substitute$(EXEEXT)
 endif
+if WANT_ALPHAFIX
+MAYBE_ALPHAFIX=hfst-check-alpha$(EXEEXT)
+endif
 
 noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-program-options.h \
@@ -222,13 +225,15 @@ bin_PROGRAMS= \
 			 $(MAYBE_FORMAT)                     \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
 			 $(MAYBE_TRAVERSE) $(MAYBE_GUESSIFY) $(MAYBE_GUESS) \
-			 $(MAYBE_INFO) $(MAYBE_EXPAND_EQUIVALENCES)
+			 $(MAYBE_INFO) $(MAYBE_EXPAND_EQUIVALENCES) \
+			 $(MAYBE_ALPHAFIX)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc hfst-tool-metadata.cc
 
 # sort alphabetically
 hfst_affix_guessify_SOURCES=hfst-affix-guessify.cc $(HFST_COMMON_SRC)
 hfst_calculate_SOURCES=sfst-main.cc $(HFST_COMMON_SRC)
+hfst_check_alpha_SOURCES=hfst-check-alpha.cc $(HFST_COMMON_SRC)
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
 hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
 hfst_compose_SOURCES=hfst-compose.cc $(HFST_COMMON_SRC)

@@ -205,6 +205,12 @@ AC_ARG_ENABLE([calculate],
 			  [enable_calculate=$enableval],
 			  [if test x$enable_no_tools != xno; then enable_calculate=no; else enable_calculate=yes; fi])
 AM_CONDITIONAL([WANT_CALCULATE], [test x$enable_calculate != xno])
+AC_ARG_ENABLE([check-alpha],
+			  [AS_HELP_STRING([--enable-check-alpha],
+							  [build alpha tool @<:@default=yes@:>@])],
+			  [enable_compare=$enableval],
+			  [if test x$enable_no_tools != xno; then enable_check_alpha=no; else enable_check_alpha=yes; fi])
+AM_CONDITIONAL([WANT_ALPHAFIX], [test x$enable_check_alpha != xno])
 AC_ARG_ENABLE([compare],
 			  [AS_HELP_STRING([--enable-compare],
 							  [build compare tool @<:@default=yes@:>@])],
