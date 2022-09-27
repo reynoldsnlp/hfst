@@ -610,7 +610,7 @@ yacc_use_parser_h_extension=false
 automake_version=`automake --version | head -n 1 | cut '-d ' -f 4`
 AC_DEFINE_UNQUOTED([AUTOMAKE_VERSION], [$automake_version], [Defines automake version])
 
-AC_PROG_LEX([yywrap])
+AC_PROG_LEX([noyywrap])
 
 AC_PATH_PROG([GETOPT], [getopts], [false])
 
