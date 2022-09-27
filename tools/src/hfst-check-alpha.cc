@@ -86,7 +86,7 @@ fprint_stringset (FILE *outfile, const StringSet &strings)
         {
           fprintf (outfile, ", ");
         }
-      fprintf (outfile, s.c_str ());
+      fprintf (outfile, "%s", s.c_str ());
       first = false;
     }
 }
