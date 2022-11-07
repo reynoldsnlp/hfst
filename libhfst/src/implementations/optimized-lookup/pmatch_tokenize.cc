@@ -178,10 +178,6 @@ const LocationVector keep_n_best_weight(LocationVector const & locations, const 
             continue;
         }
         hfst_ol::Weight current_weight = it->weight;
-        // XXX: giella-tokenise specific handling
-        if (it->output.empty() || it->output.find(" ??") != string::npos) {
-            current_weight = std::numeric_limits<float>::max();
-        }
         if (classes_found == -1) // we're just starting
         {
             classes_found = 1;
@@ -339,19 +335,6 @@ void print_cg_subreading_ex(size_t const & indent,
     for(hfst::StringVector::const_iterator it = out_beg;
         it != out_end; ++it) {
         if(it->compare("@PMATCH_BACKTRACK@") == 0) {
-            //std::cerr << "DEBUG " << *it << std::endl;
-            continue;
-        } else if (it->compare("@PMATCH_ENTRY@") == 0) {
-            //std::cerr << "DEBUG " << *it << std::endl;
-            continue;
-        } else if (it->compare("@PMATCH_INPUT_MARK@") == 0) {
-            //std::cerr << "DEBUG " << *it << std::endl;
-            continue;
-        } else if (it->compare("@PMATCH_EXIT@") == 0) {
-            //std::cerr << "DEBUG " << *it << std::endl;
-            break; // continue;
-        } else if (it->compare("") == 0) {
-            //std::cerr << "DEBUG " << *it << std::endl;
             continue;
         }
         bool is_tag = is_cg_tag(*it);
@@ -426,34 +409,29 @@ print_reading_giellacg(const Location *loc,
     }
     typedef hfst::StringVector::const_iterator PartIt;
     PartIt
-        out_beg = loc->raw_output_symbol_strings.begin(),
-        out_end = loc->raw_output_symbol_strings.end(),
-        in_beg = loc->raw_input_symbol_strings.begin(),
-        in_end = loc->raw_input_symbol_strings.end();
+        out_beg = loc->output_symbol_strings.begin(),
+        out_end = loc->output_symbol_strings.end(),
+        in_beg = loc->input_symbol_strings.begin(),
+        in_end = loc->input_symbol_strings.end();
     if(!always_wftag) {
         // don't print input wordform tag unless we've seen a subreading/input mark
         in_beg = in_end;
     }
     size_t part = loc->input_parts.size();
-    size_t raw_part = loc->raw_input_parts.size();
     while(true) {
         bool sub_found = false;
         size_t out_part = part > 0 ? loc->output_parts.at(part-1) : 0;
-        size_t raw_out_part = part > 0 ? loc->raw_output_parts.at(raw_part-1) : 0;
         while(out_part > 0 && loc->output_symbol_strings.at(out_part-1) == "@PMATCH_BACKTRACK@") {
             bt_its.insert(loc->input_parts.at(part-1));
-            --part; raw_part--;
+            --part;
             out_part = part > 0 ? loc->output_parts.at(part-1) : 0;
-            raw_out_part = raw_part > 0 ? loc->raw_output_parts.at(raw_part-1) : 0;
         }
-        for(PartIt it = out_end-1, it_in = in_end;
-            it > loc->raw_output_symbol_strings.begin() + raw_out_part;
+        for(PartIt it = out_end-1;
+            it > loc->output_symbol_strings.begin() + out_part;
             --it) {
-            --it_in;
             if(subreading_separator.compare(*it) == 0) {
                 // Found a sub-reading mark
                 out_beg = ++it;
-                in_beg = ++it_in;
                 sub_found = true;
                 break;
             }
@@ -461,16 +439,16 @@ print_reading_giellacg(const Location *loc,
         if(!sub_found) {
             if(out_part > 0) {
                 // Found an input mark
-                out_beg = loc->raw_output_symbol_strings.begin() + raw_out_part;
-                in_beg = loc->raw_input_symbol_strings.begin() + loc->raw_input_parts.at(part-1);
+                out_beg = loc->output_symbol_strings.begin() + out_part;
+                in_beg = loc->input_symbol_strings.begin() + loc->input_parts.at(part-1);
                 --part;
             }
             else {
                 // No remaining sub-marks or input-marks to the left
-                out_beg = loc->raw_output_symbol_strings.begin();
-                if(in_end != loc->raw_input_symbol_strings.end()) {
+                out_beg = loc->output_symbol_strings.begin();
+                if(in_end != loc->input_symbol_strings.end()) {
                     // We've seen at least one input-mark, so we need to output the remaining input as well
-                    in_beg = loc->raw_input_symbol_strings.begin();
+                    in_beg = loc->input_symbol_strings.begin();
                 }
             }
         }
@@ -483,16 +461,14 @@ print_reading_giellacg(const Location *loc,
                             loc->middle,
                             outstream,
                             s);
-        if(out_beg == loc->raw_output_symbol_strings.begin()) {
+        if(out_beg == loc->output_symbol_strings.begin()) {
             break;
         }
         else {
             ++indent;
             out_end = out_beg;
             in_end = in_beg;
-            //std::cerr << "DEBUG1" << std::endl;
             if(sub_found) {
-                //std::cerr << "DEBUG2" << std::endl;
                 --out_end; // skip the subreading separator symboli
                 --in_end; // ?
             }
