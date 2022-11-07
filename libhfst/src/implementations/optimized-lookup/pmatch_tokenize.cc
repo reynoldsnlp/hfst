@@ -470,7 +470,6 @@ print_reading_giellacg(const Location *loc,
             in_end = in_beg;
             if(sub_found) {
                 --out_end; // skip the subreading separator symboli
-                --in_end; // ?
             }
         }
     }
