@@ -8,7 +8,7 @@ if [ "$1" = "--help" -o "$1" = "-h" ]; then
     echo ""
     echo "Copy files needed for a pypi distribution on linux and OS X."
     echo ""
-    echo "--with-c-foma:   copy the C version of foma backend (instead of C++)"
+    echo "--without-c-foma:   copy the C++ version of foma backend (instead of C)"
     echo ""
     echo "NOTE: flex/bison-generated cc and hh files are copied as such to"
     echo "avoid dependency on swig. Make sure you have a fresh version of them"
@@ -17,9 +17,9 @@ if [ "$1" = "--help" -o "$1" = "-h" ]; then
     exit 0
 fi
 
-CPP_FOMA="true"
-if [ "$1" = "--with-c-foma" ]; then
-    CPP_FOMA="false"
+CPP_FOMA="false"
+if [ "$1" = "--without-c-foma" ]; then
+    CPP_FOMA="true"
 fi
 
 if ! [ -d "back-ends" ]; then mkdir back-ends; fi
@@ -33,7 +33,8 @@ cp -R ../hfst/* hfst/
 for file in hfst_extensions.cpp hfst_file_extensions.cpp hfst_lexc_extensions.cpp \
 hfst_lookup_extensions.cpp hfst_pmatch_extensions.cpp hfst_pmatch_tokenize_extensions.cpp \
 hfst_prolog_extensions.cpp hfst_regex_extensions.cpp hfst_rules_extensions.cpp \
-hfst_xfst_extensions.cpp hfst_sfst_extensions.cpp libhfst.i docstrings.i ;
+hfst_xfst_extensions.cpp hfst_sfst_extensions.cpp libhfst.i docstrings.i \
+libhfst_wrap.cpp;
 do
     cp ../$file $file
 done

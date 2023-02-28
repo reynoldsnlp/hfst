@@ -52,15 +52,15 @@ def hfst_specific_option(option):
 
 # Use C++ standard C++11 unless compiling for Python 2.7 for Windows (requires msvc 2008 which does not support C++11)
 # or for OS X (C++11 requires libc++ instead of libstdc++ and minimum version requirement 10.7 instead of 10.6).
-CPP_STD_11=True
+CPP_STD_14=True
 from sys import version_info
 if (platform == "darwin") or (platform == "win32" and version_info[0] == 2):
-    CPP_STD_11=False
+    CPP_STD_14=False
 # Override default behaviour, if requested.
 if hfst_specific_option('--with-c++11'):
-    CPP_STD_11=True
+    CPP_STD_14=True
 if hfst_specific_option('--without-c++11'):
-    CPP_STD_11=False
+    CPP_STD_14=False
 
 # By default, use the C++ version of foma backend. C++11 requires option -std=c++0x to be set for C/C++ compiler
 # (this cannot de defined for each file separately) and some compilers refuse to compile C with that option.
@@ -71,7 +71,7 @@ if hfst_specific_option('--with-c-foma'):
     CPP_FOMA=False
 
 # Experimental...
-if platform == "darwin" and CPP_STD_11:
+if platform == "darwin" and CPP_STD_14:
     import os
     os.environ["_PYTHON_HOST_PLATFORM"] = 'macosx-10.7-x86_64'
 
@@ -105,7 +105,7 @@ ext_extra_link_args = []
 if include_readline:
     ext_extra_link_args = ['-lreadline']
 # Experimental...
-if platform == "darwin" and CPP_STD_11:
+if platform == "darwin" and CPP_STD_14:
     ext_extra_link_args.extend(['-mmacosx-version-min=10.7'])
 
 
@@ -124,7 +124,8 @@ else:
 
 # Include foma implementation for OS X only when c++11 is disabled.
 include_foma_backend=True
-if platform == "linux" or platform == "linux2" or platform == "win32" or (platform == "darwin" and not CPP_STD_11):
+if platform == "linux" or platform == "linux2" or platform == "win32" or \
+        (platform == "darwin" and not CPP_STD_14):
     include_foma_backend=True
 ext_define_macros = []
 if include_foma_backend:
@@ -146,7 +147,7 @@ if platform == "win32":
         ext_define_macros.append((macro, None))
 
 # If C++11 is not supported, what features will be disabled and where unordered map and set are found.
-if (not CPP_STD_11):
+if (not CPP_STD_14):
     # Disable c++11 features.
     ext_define_macros.append(('NO_CPLUSPLUS_11', None))
     # Unordered containers are in namespace std::tr1.
@@ -163,10 +164,10 @@ ext_extra_compile_args = []
 if platform == "linux" or platform == "linux2" or platform == "darwin":
     ext_extra_compile_args = ["-Wno-sign-compare", "-Wno-strict-prototypes"]
     # C++11 standard does not need to be specifically requested for msvc compilers.
-    if CPP_STD_11:
-        ext_extra_compile_args.extend(["-std=c++0x"])
+    if CPP_STD_14:
+        ext_extra_compile_args.extend(["-std=c++14"])
 # Experimental...
-if platform == "darwin" and CPP_STD_11:
+if platform == "darwin" and CPP_STD_14:
     ext_extra_compile_args.extend(["-stdlib=libc++", "-mmacosx-version-min=10.7"])
 # define error handling mechanism on windows
 if platform == "win32":
