@@ -75,9 +75,17 @@ print_escaping_newlines(std::string const &str, std::ostream &outstream)
 {
     // TODO: inline?
     size_t i = 0, j = 0;
-    while ((j = str.find("\n", i)) != std::string::npos)
+    while ((j = str.find_first_of("\n\r", i)) != std::string::npos)
     {
-        outstream << str.substr(i, j - i) << "\\n";
+        outstream << str.substr(i, j - i);
+        if (str[j] == '\n')
+        {
+            outstream << "\\n";
+        }
+        else if (str[j] == '\r')
+        {
+            outstream << "\\r";
+        }
         i = j + 1;
     }
     outstream << str.substr(i, j - i);
