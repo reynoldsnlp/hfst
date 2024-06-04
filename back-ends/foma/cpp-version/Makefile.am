@@ -2,6 +2,7 @@ AUTOMAKE_OPTIONS=std-options
 
 .NOTPARALLEL:
 
+AM_CXXFLAGS = ${my_CXXFLAGS}
 AM_CPPFLAGS= -Wno-deprecated -D_XOPEN_SOURCE=500 -fpermissive -std=c++11
 
 if WANT_MINGW

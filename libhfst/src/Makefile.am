@@ -13,7 +13,7 @@ SUBDIRS=implementations parsers
 AUTOMAKE_OPTIONS=subdir-objects
 lib_LTLIBRARIES = libhfst.la
 
-AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -g
+AM_CXXFLAGS = ${my_CXXFLAGS} -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -g
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 
 # HFST bridge specific stuff

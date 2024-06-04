@@ -16,6 +16,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AUTOMAKE_OPTIONS=subdir-objects
+AM_CXXFLAGS = ${my_CXXFLAGS}
 AM_CPPFLAGS = -I $(srcdir)/../include -I $(srcdir)/../../../dlfcn \
                 $(ICU_CPPFLAGS) -DMSC_VER -DOPENFSTEXPORT
 

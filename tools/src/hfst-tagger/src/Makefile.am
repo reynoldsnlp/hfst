@@ -1,4 +1,4 @@
-AM_CXXFLAGS= -O3 -g -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors -Wno-sign-compare\
+AM_CXXFLAGS= ${my_CXXFLAGS} -O3 -g -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors -Wno-sign-compare\
              -I$(top_builddir)/tools/src/inc -I$(top_builddir)/tools/src
 
 if WANT_TRAIN_TAGGER

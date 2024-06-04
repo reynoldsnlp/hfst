@@ -10,6 +10,7 @@
 # information.
 
 AUTOMAKE_OPTIONS=subdir-objects
+AM_CXXFLAGS = ${my_CXXFLAGS}
 AM_CPPFLAGS = -I $(srcdir)/../include $(ICU_CPPFLAGS)
 noinst_LTLIBRARIES = libfst.la
 libfst_la_SOURCES = compat.cc flags.cc fst.cc properties.cc \
