@@ -25,7 +25,7 @@ IMPLEMENTATION_SRCS=ConvertTransducerFormat.cc \
                     compose_intersect/ComposeIntersectFst.cc \
                     compose_intersect/ComposeIntersectUtilities.cc
 
-AM_CXXFLAGS=-Wno-deprecated -g
+AM_CXXFLAGS = ${my_CXXFLAGS} -Wno-deprecated -g
 
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/back-ends ${ICU_CPPFLAGS}
 if ! WANT_FOMA_UPSTREAM

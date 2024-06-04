@@ -15,7 +15,7 @@ else
 endif
 endif
 
-AM_CXXFLAGS = -Wno-deprecated
+AM_CXXFLAGS = ${my_CXXFLAGS} -Wno-deprecated
 
 # programs to build before unit etc. testing
 check_PROGRAMS=test_rules test_constructors test_streams test_tokenizer \

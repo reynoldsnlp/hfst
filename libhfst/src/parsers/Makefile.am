@@ -9,6 +9,7 @@
 # See the file COPYING included with this distribution for more
 # information.
 
+AM_CXXFLAGS = ${my_CXXFLAGS}
 noinst_LTLIBRARIES=libhfstparsers.la
 
 XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc

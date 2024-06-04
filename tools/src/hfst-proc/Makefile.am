@@ -15,6 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+AM_CXXFLAGS = ${my_CXXFLAGS}
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib $(ICU_CPPFLAGS)
 
 if WANT_PROC

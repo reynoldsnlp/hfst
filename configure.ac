@@ -47,6 +47,8 @@ AC_SUBST([LIBHFST_MINOR],     [16])
 AC_SUBST([LIBHFST_EXTENSION], [0])
 AC_SUBST([LIBHFST_VERSION],   [3.16.0])
 AC_SUBST([LIBHFST_NAME],      [hfst])
+my_CXXFLAGS=""
+AC_SUBST([my_CXXFLAGS])
 
 # long version = version vector cast in base 10000, for automatic comparisons
 # e.g.: 3.3.2 = 0003 0000 0000 + 0003 0000 + 0002
@@ -657,12 +659,12 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h]
 AC_LANG_PUSH([C++])
 
 # If we're using upstream OpenFST then use C++17, otherwise limit to C++14
-AM_COND_IF([WANT_OPENFST_UPSTREAM], [CXXFLAGS="$CXXFLAGS -std=c++17"], [CXXFLAGS="$CXXFLAGS -std=c++14"])
+AM_COND_IF([WANT_OPENFST_UPSTREAM], [my_CXXFLAGS="-std=c++17"], [my_CXXFLAGS="-std=c++14"])
 
 # On 32bit x86, we need to use SSE for precise floating point arithmetics in OpenFST
-AX_CHECK_COMPILE_FLAG([-msse], [CXXFLAGS="$CXXFLAGS -msse"], [])
-AX_CHECK_COMPILE_FLAG([-msse2], [CXXFLAGS="$CXXFLAGS -msse2"], [])
-AX_CHECK_COMPILE_FLAG([-mfpmath=sse], [CXXFLAGS="$CXXFLAGS -mfpmath=sse"], [])
+AX_CHECK_COMPILE_FLAG([-msse], [my_CXXFLAGS="$my_CXXFLAGS -msse"], [])
+AX_CHECK_COMPILE_FLAG([-msse2], [my_CXXFLAGS="$my_CXXFLAGS -msse2"], [])
+AX_CHECK_COMPILE_FLAG([-mfpmath=sse], [my_CXXFLAGS="$my_CXXFLAGS -mfpmath=sse"], [])
 
 AC_CHECK_HEADERS([ext/slist])
 
