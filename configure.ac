@@ -351,6 +351,12 @@ AC_ARG_ENABLE([invert],
 			  [enable_invert=$enableval],
 			  [if test x$enable_no_tools != xno; then enable_invert=no; else enable_invert=yes; fi])
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
+AC_ARG_ENABLE([kill-paths],
+			  [AS_HELP_STRING([--enable-kill-paths],
+							  [build path killer tool @<:@default=yes@:>@])],
+			  [enable_compare=$enableval],
+			  [if test x$enable_no_tools != xno; then enable_kill_paths=no; else enable_kill_paths=yes; fi])
+AM_CONDITIONAL([WANT_PATHKILL], [test x$enable_kill_paths != xno])
 AC_ARG_ENABLE([twolc],
               [AS_HELP_STRING([--enable-twolc],
                               [build twolc @<:@default=yes@:>@])],
@@ -760,6 +766,7 @@ cat <<EOF
     *         with optimized lookup: $with_hfstol
     * tools including affix-guessify: $enable_affix_guessify
     *                 calculate: $enable_calculate (sfstpl2fst)
+    *                 check-alpha: $enable_check_alpha
     *                 compare: $enable_compare
     *                 compose: $enable_compose
     *                 concatenate: $enable_concatenate
@@ -778,6 +785,7 @@ cat <<EOF
     *                 head: $enable_head
     *                 invert: $enable_invert
     *                 insert-freely: $enable_insert_freely
+    *                 kill-paths: $enable_kill_paths
     *                 lexc: $enable_lexc
     *                 lookup: $enable_lookup
     *                 minimize: $enable_minimize (minimise)

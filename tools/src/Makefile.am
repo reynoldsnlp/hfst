@@ -187,6 +187,9 @@ endif
 if WANT_ALPHAFIX
 MAYBE_ALPHAFIX=hfst-check-alpha$(EXEEXT)
 endif
+if WANT_PATHKILL
+MAYBE_ALPHAFIX=hfst-kill-paths$(EXEEXT)
+endif
 
 noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-program-options.h \
@@ -257,6 +260,7 @@ hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_info_SOURCES=hfst-info.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
 hfst_insert_freely_SOURCES=hfst-insert-freely.cc $(HFST_COMMON_SRC)
+hfst_kill_paths_SOURCES=hfst-kill-paths.cc $(HFST_COMMON_SRC)
 hfst_lexc_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
 hfst_flookup_SOURCES=hfst-flookup.cc $(HFST_COMMON_SRC)
