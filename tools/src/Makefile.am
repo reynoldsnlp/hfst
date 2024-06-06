@@ -188,7 +188,7 @@ if WANT_ALPHAFIX
 MAYBE_ALPHAFIX=hfst-check-alpha$(EXEEXT)
 endif
 if WANT_PATHKILL
-MAYBE_ALPHAFIX=hfst-kill-paths$(EXEEXT)
+MAYBE_PATHKILL=hfst-kill-paths$(EXEEXT)
 endif
 
 noinst_HEADERS= \
@@ -229,7 +229,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
 			 $(MAYBE_TRAVERSE) $(MAYBE_GUESSIFY) $(MAYBE_GUESS) \
 			 $(MAYBE_INFO) $(MAYBE_EXPAND_EQUIVALENCES) \
-			 $(MAYBE_ALPHAFIX)
+			 $(MAYBE_ALPHAFIX) $(MAYBE_PATHKILL)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc hfst-tool-metadata.cc
 
