@@ -13,13 +13,11 @@
 #include "transducer.h"
 #include "pmatch.h"
 
-#ifdef HAVE_OPENFST_UPSTREAM
-  #include <fst/fst-decl.h>
-  namespace fst { template <class F> class ArcIterator; }
-#endif
+#include <fst/fst-decl.h>
+namespace fst { template <class F> class ArcIterator; }
 
 namespace hfst_ol {
-    
+
     typedef std::map<hfst_ol::TransitionTableIndex,unsigned int>
     HfstOlToBasicStateMap;
 
@@ -43,7 +41,7 @@ struct TransitionPlaceholder {
 
 struct StatePlaceholder {
     enum indexing_type {empty, simple_zero_index, simple_nonzero_index, nonsimple};
-    
+
     unsigned int state_number;
     unsigned int start_index;
     unsigned int first_transition;
@@ -72,12 +70,12 @@ struct StatePlaceholder {
     final(false),
     final_weight(0.0)
     { }
-    
+
     bool is_simple(void) const
     {
         return type != nonsimple;
     }
-    
+
     unsigned int number_of_transitions(void) const {
         unsigned int count = 0;
         for(std::vector<std::vector<TransitionPlaceholder> >::const_iterator it
@@ -140,7 +138,7 @@ struct StatePlaceholder {
         {
             return transition_placeholders[symbol_to_transition_placeholder_v[input]];
         }
-    
+
     unsigned int symbol_offset(
         SymbolNumber const symbol,
         std::set<SymbolNumber> const & flag_symbols) {
@@ -220,7 +218,7 @@ struct IndexPlaceholders
         {
             return targets[indices[index]];
         }
-    
+
     bool fits(StatePlaceholder const & state,
               std::set<SymbolNumber> const & flag_symbols,
               unsigned int const position) const
@@ -248,10 +246,10 @@ struct IndexPlaceholders
     if (used(index)) {
         return true;
     }
-    
+
     // "Perfect packing" (under this strategy)
 /*              for (unsigned int i = 0; i < symbols; ++i) {
-        
+
         if (count(index + i) == 0) {
         return true;
         }
@@ -326,10 +324,10 @@ class ConvertIdNumberMap
 private:
   typedef std::map<StateIdNumber,StateId> IdNumbersToStateIds;
   typedef std::map<StateId,StateIdNumber> StateIdsToIdNumbers;
-  
+
   IdNumbersToStateIds id_to_node;
   StateIdsToIdNumbers node_to_id;
-  
+
   StateIdNumber node_counter;
 
   void add_node(StateId n, TransduceR *tr);
@@ -344,10 +342,10 @@ public:
   ConvertIdNumberMap(TransduceR * t):
     node_counter(0)
   { set_node_maps(t); }
-  
+
   StateIdNumber get_number_of_nodes(void) const
   { return node_counter; }
-  
+
   StateIdNumber get_node_id(StateId n) const;
   StateId get_id_node(StateIdNumber i) const;
 };
@@ -359,14 +357,14 @@ class ConvertTransducerAlphabet
 {
  private:
   SymbolTable symbol_table;
-  
+
   TransduceR* transducer;
   fst::SymbolTable * ofst_symbol_table;
   // input and output symbol tables together
-  
+
   std::map<int64, SymbolNumber> input_symbols_map;
   std::map<int64, SymbolNumber> output_symbols_map;
-  
+
   void inspect_node(StateId n, StateIdSet& visited_nodes,
     OfstSymbolCountMap& symbol_count_map, SymbolSet& all_symbol_set);
   void get_symbol_info(
@@ -376,14 +374,14 @@ class ConvertTransducerAlphabet
   void set_maps();
  public:
   ConvertTransducerAlphabet(TransduceR* t);
-  
+
   void display() const;
-  
+
   const SymbolTable& get_symbol_table() const {return symbol_table;}
   SymbolNumber lookup_ofst_input_symbol(int64 s) const;
   SymbolNumber lookup_ofst_output_symbol(int64 s) const;
   bool is_flag_diacritic(SymbolNumber symbol) const;
-  
+
   TransducerAlphabet to_alphabet() const;
 };
 
@@ -400,7 +398,7 @@ private:
     TransitionTableIndex target_state_index;
   };
   Weight weight;
-  
+
   TransitionTableIndex table_index; // location in the transition table
 public:
   /*
@@ -408,22 +406,22 @@ public:
      to ConvertIdNumberMap nodes_to_id_numbers.
   */
   ConvertTransition(const StdArc &a);
-  
+
   void display() const;
-  
+
   SymbolNumber get_input_symbol(void) const
   { return input_symbol; }
-  
+
   void set_target_state_index();
-  
+
   void set_table_index(TransitionTableIndex i)
   { table_index = i; }
-  
+
   TransitionTableIndex get_table_index(void) const
   { return table_index; }
-  
+
   template<class T> T to_transition() const;
-  
+
   bool numerical_cmp( const ConvertTransition &another_transition) const;
   bool operator<(const ConvertTransition &another_index) const;
 };
@@ -442,20 +440,20 @@ private:
 public:
   ConvertTransitionIndex(SymbolNumber input, ConvertTransition* transition):
     input_symbol(input), first_transition(transition) {}
-  
+
   void display() const;
-  
+
   SymbolNumber get_input_symbol(void) const
   { return input_symbol; }
-  
+
   ConvertTransition* get_first_transition() const
   { return first_transition; }
-  
+
   void set_first_transition_index(TransitionTableIndex i)
   { first_transition_index = i; }
-  
+
   template<class T> T to_transition_index() const;
-  
+
   bool operator<(const ConvertTransitionIndex &another_index) const;
 };
 
@@ -487,7 +485,7 @@ class ConvertFstState
 private:
   ConvertTransitionSet transitions;
   ConvertTransitionIndexSet transition_indices;
-  
+
   // the location in the transition table of the state's first transition. For
   // states without transitions, this is where the first transition *would* be
   TransitionTableIndex first_transition_index;
@@ -497,35 +495,35 @@ private:
   // one input symbol, in the transition table, immediately preceding
   // the first transition
   TransitionTableIndex table_index;
-  
+
   bool final;
   Weight weight;
-  
+
   StateIdNumber id;
-  
+
   void set_transitions(StateId n, TransduceR * tr);
   void set_transition_indices(void);
-  
+
   friend class fst_state_compare;
 public:
   ConvertFstState(StateId n, TransduceR * tr);
   ~ConvertFstState();
-  
+
   void display() const;
-  
+
   TransitionTableIndex set_transition_table_indices(
       TransitionTableIndex place);
-  
+
   TransitionTableIndex get_first_transition_index() const
   { return first_transition_index; }
-  
+
   void set_table_index(TransitionTableIndex i)
   { table_index = i; }
   TransitionTableIndex get_table_index(void) const
   { return table_index; }
-    
+
   SymbolNumberSet * get_input_symbols(void) const;
-  
+
   SymbolNumber number_of_input_symbols(void) const
   { return hfst::size_t_to_uint(transition_indices.size()); }
   SymbolNumber number_of_transitions(void) const
@@ -537,14 +535,14 @@ public:
   }
   bool is_start_state(void) const {return id == 0;}
   StateIdNumber get_id(void) const {return id;}
-  
+
   // update transitions with the state's location in the tables
   void set_transition_target_indices();
-  
+
   // add this state's transition indices into the given transition index table
   template<class T>
   void insert_transition_indices(TransducerTable<T>& index_table) const;
-  
+
   template<class T>
   TransitionTableIndex append_transitions(TransducerTable<T>& transition_table,
                                           TransitionTableIndex place) const;
@@ -559,7 +557,7 @@ private:
   PlaceHolderVector::size_type lower_bound;
   unsigned int lower_bound_test_count;
   SymbolNumber number_of_input_symbols;
-  
+
   bool state_fits(SymbolNumberSet * input_symbols,
           bool final_state,
           PlaceHolderVector::size_type index);
@@ -575,7 +573,7 @@ public:
   {
     get_more_space();
   };
-  
+
   PlaceHolderVector::size_type add_state(ConvertFstState * state);
   PlaceHolderVector::size_type size(void) const
   { return indices.size(); }
@@ -608,39 +606,39 @@ private:
   ConvertIdNumberMap * id_number_map;
   ConvertTransitionTableIndices * fst_indices;
   PlaceHolderVector::size_type index_table_size;
-  
+
   TransducerHeader header;
   ConvertTransducerAlphabet alphabet;
   ConvertFstStateVector states;
-  
+
   void read_nodes(void);
   void set_transition_table_indices(void);
   void set_index_table_indices(void);
-  
+
   void add_input_symbols(StateId n,
              SymbolNumberSet &input_symbols,
              StateIdSet &visited_nodes);
   SymbolNumber number_of_input_symbols(void);
-  
+
   TransitionTableIndex count_transitions(void) const;
-  
+
   void display_states() const;
   void display_tables() const;
-  
+
   template<class T> TransducerTable<T> make_index_table(
       TransitionTableIndex index_table_size) const;
   template<class T> TransducerTable<T> make_transition_table() const;
 public:
   ConvertTransducer(TransduceR * tr, bool weighted);
   ~ConvertTransducer();
-  
+
   ConvertIdNumberMap& get_id_number_map() {return *id_number_map;}
   ConvertTransducerAlphabet& get_alphabet() {return alphabet;}
   ConvertFstState& get_state(StateIdNumber s) {return *states[s];}
   bool is_weighted() const {return header.probe_flag(Weighted);}
-  
+
   Transducer* to_transducer() const;
-  
+
   // exposed to this module during the constructor
   static ConvertTransducer* constructing_transducer;
 };

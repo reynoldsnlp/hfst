@@ -9,7 +9,6 @@
 # See the file COPYING included with this distribution for more
 # information.
 
-AM_CXXFLAGS = ${my_CXXFLAGS}
 noinst_LTLIBRARIES=libhfstparsers.la
 
 XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc
@@ -123,10 +122,6 @@ libhfstparsers_la_SOURCES=$(XRE_SRCS) $(PMATCH_SRCS) $(LEXC_SRCS) $(XFST_SRCS) $
 
 AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src \
 		-Wno-deprecated ${ICU_CPPFLAGS}
-
-if WANT_MINGW
-  AM_CPPFLAGS += -I${top_srcdir}/back-ends/dlfcn -DWINDOWS
-endif
 
 # headers of parsers
 hfstincludedir = $(includedir)/hfst

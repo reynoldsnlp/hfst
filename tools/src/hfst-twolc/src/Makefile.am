@@ -1,4 +1,4 @@
-AM_CXXFLAGS = ${my_CXXFLAGS} -Wcast-qual -Wno-deprecated -Wfatal-errors
+AM_CXXFLAGS= -Wcast-qual -Wno-deprecated -Wfatal-errors
 
 if WANT_TWOLC_SCRIPT
   bin_PROGRAMS=hfst-twolc htwolcpre1 htwolcpre2 htwolcpre3

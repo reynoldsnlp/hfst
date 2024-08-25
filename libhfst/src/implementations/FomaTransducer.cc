@@ -17,11 +17,7 @@
 
 #ifndef _FOMALIB_H_
   #define _FOMALIB_H_
-  #ifdef HAVE_FOMA_UPSTREAM
-    #include <fomalib.h>
-  #else
-    #include "back-ends/foma/fomalib.h"
-  #endif
+  #include <fomalib.h>
 #endif
 
 #include "FomaTransducer.h"

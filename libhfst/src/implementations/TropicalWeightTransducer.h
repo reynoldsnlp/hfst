@@ -24,32 +24,7 @@
 #include <sstream>
 #include <iosfwd>
 #include <fstream>
-
-#ifdef HAVE_OPENFST_UPSTREAM
-  #include <fst/fst-decl.h>
-#else
-namespace fst
-{
-  template <class W> class TropicalWeightTpl;
-  typedef TropicalWeightTpl<float> TropicalWeight;
-
-  template <class W> class LogWeightTpl;
-  typedef LogWeightTpl<float> LogWeight;
-
-  template <class W> class ArcTpl;
-  typedef ArcTpl<TropicalWeight> StdArc;
-  typedef ArcTpl<LogWeight> LogArc;
-
-  template <class A> class VectorFst;
-  typedef VectorFst<StdArc> StdVectorFst;
-  typedef VectorFst<LogArc> LogFst;
-
-  template <class F> class StateIterator;
-  template <class F> class ArcIterator;
-
-  class SymbolTable;
-}
-#endif
+#include <fst/fst-decl.h>
 
 #include <stdint.h>
 #ifdef _MSC_VER
@@ -103,7 +78,7 @@ namespace implementations
     char stream_get();
     short stream_get_short();
     void stream_unget(char c);
-    
+
     static bool is_fst(FILE * f);
     static bool is_fst(std::istream &s);
   };
@@ -214,7 +189,7 @@ namespace implementations
 
       static void write_in_att_format(StdVectorFst * t, FILE *ofile);
       static void write_in_att_format_number(StdVectorFst * t, FILE *ofile);
-      
+
       //static void test_minimize(void);
 
       static void write_in_att_format(StdVectorFst * t, std::ostream &os);
@@ -222,7 +197,7 @@ namespace implementations
         (StdVectorFst * t, std::ostream &os);
 
       static StdVectorFst * read_in_att_format(FILE *ifile);
-      
+
       static bool are_equivalent(StdVectorFst *one, StdVectorFst *another);
       static bool is_cyclic(StdVectorFst * t);
       static bool is_automaton(StdVectorFst * t);

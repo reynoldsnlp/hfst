@@ -26,29 +26,7 @@
 #include <sstream>
 #include <iosfwd>
 #include <fstream>
-
-#ifdef HAVE_OPENFST_UPSTREAM
-  #include <fst/fst-decl.h>
-#else
-namespace fst
-{
-  template <class W> class TropicalWeightTpl;
-  typedef TropicalWeightTpl<float> TropicalWeight;
-
-  template <class W> class LogWeightTpl;
-  typedef LogWeightTpl<float> LogWeight;
-
-  template <class W> class ArcTpl;
-  typedef ArcTpl<TropicalWeight> StdArc;
-  typedef ArcTpl<LogWeight> LogArc;
-
-  template <class A> class VectorFst;
-  typedef VectorFst<StdArc> StdVectorFst;
-  typedef VectorFst<LogArc> LogFst;
-
-  class SymbolTable;
-}
-#endif
+#include <fst/fst-decl.h>
 
 #include <stdint.h>
 #ifdef _MSC_VER
@@ -103,7 +81,7 @@ namespace implementations
     char stream_get();
     short stream_get_short();
     void stream_unget(char c);
-    
+
     static bool is_fst(FILE * f);
     static bool is_fst(std::istream &s);
   };
@@ -194,14 +172,14 @@ namespace implementations
 
       static void write_in_att_format(LogFst * t, FILE *ofile);
       static void write_in_att_format_number(LogFst * t, FILE *ofile);
-      
+
       static void test_minimize(void);
 
       static void write_in_att_format(LogFst * t, std::ostream &os);
       static void write_in_att_format_number(LogFst * t, std::ostream &os);
 
       static LogFst * read_in_att_format(FILE *ifile);
-      
+
       static bool are_equivalent(LogFst *one, LogFst *another);
       static bool is_cyclic(LogFst * t);
       static bool is_automaton(LogFst * t);
@@ -254,7 +232,7 @@ namespace implementations
       static fst::SymbolTable create_symbol_table(std::string name);
       static void initialize_symbol_tables(LogFst *t);
       static void remove_symbol_table(LogFst *t);
-      
+
       /* Maps state numbers in AT&T text format to state ids used by
          OpenFst transducers. */
       typedef std::map<int, StateId> StateMap;

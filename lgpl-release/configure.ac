@@ -500,14 +500,6 @@ AC_ARG_ENABLE([stress-tests],
                               [enable_stress_tests=no])
 AM_CONDITIONAL([WANT_STRESSTESTS], [test x$enable_stress_tests != xno])
 
-# Disable compiling on windows by default
-AC_ARG_ENABLE([mingw],
-		[AS_HELP_STRING([--enable-mingw],
-				[compile on MinGW @<:@default=no@:>@])],
-				[mingw_mingw=$enableval],
-				[enable_mingw=no])
-AM_CONDITIONAL([WANT_MINGW], [test x$enable_mingw != xno])
-
 # Disable fsmbook tests by default
 AC_ARG_ENABLE([fsmbook-tests],
 		[AS_HELP_STRING([--enable-fsmbook-tests],
@@ -561,7 +553,7 @@ AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 # Checks for libraries
 
 AC_LANG_PUSH([C++])
-AS_IF([test "x$with_openfst" != "xno" -a "x$enable_mingw" == "xno"],
+AS_IF([test "x$with_openfst" != "xno"],
       [AC_CHECK_LIB([dl], [main])])
 
 AS_IF([test "x$with_openfst" != "xno"],

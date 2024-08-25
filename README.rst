@@ -102,13 +102,7 @@ with configure switches and whether they are enabled or disabled by default.
 Compilation requirements
 ------------------------
 
-- To use the OpenFST_ backend (default):
-
-  - source code of OpenFST version 1.2.10 is bundled with HFST and included
-    by default when building HFST
-
-  - compiling against OpenFST library and linking may require recent
-    GCC version and pthread and m libraries
+- OpenFST_ version 1.7.9 or older (newer does not work) (default)
 
   - to disable OpenFST support, configure switch ``--without-openfst`` may
     be used (however, this seriously limits the use of HFST)
@@ -126,10 +120,7 @@ Compilation requirements
 
   - to disable SFST backend, configure switch ``--without-sfst`` must be used
 
-- To use the foma_ backend (default):
-
-  - the foma library version 0.9.18alpha is bundled with HFST and included
-    be default when building HFST
+- foma_ version 0.10.0 or newer (default)
 
   - to disable foma backend, configure switch ``--without-foma`` may be used
 
@@ -142,12 +133,12 @@ Compilation requirements
 
 - To use the Python interface:
 
-  - Compiling the bindings requires swig (tested with versions 2.0.4 and 3.0.0)
+  - Compiling the bindings requires swig
 
   - *NOTE:* the Python API is not under autotools, you must compile it yourself;
     for more information, see file ``python/README``
 
-Note that if you did install dependent libraries, such as libxml or glib
+Note that if you did install dependent libraries, such as libxml or ICU
 to your home directory instead of using your system's package manager
 (or supported default location):
 
@@ -254,10 +245,6 @@ It is common practice to keep `generated files out of version control
 
 For further installation instruction refer to file ``INSTALL``, which contains
 the standard installation instructions for GNU autoconf based software.
-
-If you are compiling HFST from source on Windows with *MinGW*, use the switch
-``--enable-mingw`` when running ``./configure``.
-Warning: Using this option with *Cygwin* will cause compilation errors.
 
 Troubleshooting
 ===============
@@ -427,13 +414,13 @@ Exception: HfstException in file: htwolcpre3-parser.yy on line: XXX
 
   syntax error
   on line 1:
-  
+
   Aborted.
-  
+
   This is an hfst interface bug:
   Exception: HfstException in file: htwolcpre3-parser.yy on line: XXX
 
-This can be caused by buffer size limit in hfst-twolc, a rule file larger than 10 megabytes (after pre-processing) will not be parsed properly. 
+This can be caused by buffer size limit in hfst-twolc, a rule file larger than 10 megabytes (after pre-processing) will not be parsed properly.
 
 Further information
 ===================
@@ -462,7 +449,7 @@ When reporting, please include at least following:
 .. _libxml2: http://www.xmlsoft.org/
 .. _libreadline: http://www.gnu.org/software/readline/
 .. _foma: https://github.com/mhulden/foma
-.. _openfst: http://www.openfst.org
+.. _openfst: https://www.openfst.org
 .. _sfst: https://www.cis.lmu.de/~schmid/tools/SFST/
 
 .. vim: set ft=rst:

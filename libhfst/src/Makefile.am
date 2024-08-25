@@ -13,7 +13,7 @@ SUBDIRS=implementations parsers
 AUTOMAKE_OPTIONS=subdir-objects
 lib_LTLIBRARIES = libhfst.la
 
-AM_CXXFLAGS = ${my_CXXFLAGS} -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -g
+AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -g
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 
 # HFST bridge specific stuff
@@ -41,22 +41,11 @@ endif
 endif
 
 if WANT_FOMA
-if WANT_FOMA_UPSTREAM
   libhfst_la_LIBADD += -lfoma
-else
-  libhfst_la_LIBADD += $(top_builddir)/back-ends/foma/libfoma.la
-endif
 endif
 
-if WANT_MINGW
-  libhfst_la_LIBADD += $(top_builddir)/back-ends/dlfcn/libdl.la \
-			$(top_builddir)/back-ends/openfstwin/src/lib/libfst.la
-else
-if WANT_OPENFST_UPSTREAM
+if WANT_OPENFST
   libhfst_la_LIBADD += -lfst
-else
-  libhfst_la_LIBADD += $(top_builddir)/back-ends/openfst/src/lib/libfst.la
-endif
 endif
 
 if WINDOWS

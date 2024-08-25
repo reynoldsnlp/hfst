@@ -18,16 +18,7 @@
 #include "ConvertTransducerFormat.h"
 #include "HfstBasicTransducer.h"
 #include "LogWeightTransducer.h"
-
-#ifdef _MSC_VER
-#include "back-ends/openfstwin/src/include/fst/fstlib.h"
-#else
-#if HAVE_OPENFST_UPSTREAM
 #include <fst/fstlib.h>
-#else
-#include "back-ends/openfst/src/include/fst/fstlib.h"
-#endif
-#endif // _MSC_VER
 
 #ifndef _MSC_VER
 #if HAVE_OPENFST_LOG // if HAVE_LEAN_OPENFST_LOG is requested, these are not defined elsewhere (?)
@@ -46,7 +37,7 @@ namespace hfst { namespace implementations
 {
 
   /* --- Conversion between log OpenFst and HfstBasicTransducer --- */
-  
+
   /* Create an HfstBasicTransducer equivalent to an OpenFst log weight
      transducer \a t. */
   HfstBasicTransducer * ConversionFunctions::
@@ -245,20 +236,20 @@ namespace hfst { namespace implementations
   LogFst * ConversionFunctions::
   hfst_basic_transducer_to_log_ofst
   (const HfstBasicTransducer * net) {
-    
+
     LogFst * t = new LogFst();
     StateId start_state = t->AddState();
     t->SetStart(start_state);
-    
+
     // The mapping between states in HfstBasicTransducer and StdVectorFst
     std::map<HfstState, StateId> state_map;
     state_map[0] = start_state;
-    
+
     fst::SymbolTable st("");
     st.AddSymbol(internal_epsilon, 0);
     st.AddSymbol(internal_unknown, 1);
     st.AddSymbol(internal_identity, 2);
-    
+
     // Go through all states
     unsigned int source_state=0;
     for (HfstBasicTransducer::const_iterator it = net->begin();
@@ -279,7 +270,7 @@ namespace hfst { namespace implementations
                           (tr_it->get_target_state(), state_map, t)) );
           }
       }
-    
+
     // Go through the final states
     for (HfstBasicTransducer::FinalWeightMap::const_iterator it
            = net->final_weight_map.begin();
@@ -288,14 +279,14 @@ namespace hfst { namespace implementations
         t->SetFinal(hfst_state_to_state_id(it->first, state_map, t),
                     it->second);
       }
-    
+
     // Add also symbols that do not occur in transitions
     for (HfstBasicTransducer::HfstAlphabet::const_iterator it
            = net->alphabet.begin();
          it != net->alphabet.end(); it++) {
         st.AddSymbol(*it);
       }
-    
+
     t->SetInputSymbols(&st);
     return t;
   }
@@ -310,7 +301,7 @@ namespace hfst { namespace implementations
 int main(int argc, char * argv[])
 {
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
-    
+
     std::cout << "ok" << std::endl;
     return 0;
 }

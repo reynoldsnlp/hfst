@@ -2,20 +2,9 @@
 LDADD = ../../libhfst/src/libhfst.la
 AM_CPPFLAGS = -I$(top_srcdir)/libhfst/src/ -I. -g
 
-AM_CPPFLAGS += -I${top_srcdir}/back-ends/foma \
-		-I${top_srcdir}/back-ends
+AM_CPPFLAGS += -I${top_srcdir}/back-ends
 
-if WANT_MINGW
-  AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfstwin/src/include \
-		-I${top_srcdir}/back-ends/dlfcn -DWINDOWS
-if WANT_OPENFST_UPSTREAM
-# Skip extra include
-else
-  AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfst/src/include
-endif
-endif
-
-AM_CXXFLAGS = ${my_CXXFLAGS} -Wno-deprecated
+AM_CXXFLAGS = -Wno-deprecated
 
 # programs to build before unit etc. testing
 check_PROGRAMS=test_rules test_constructors test_streams test_tokenizer \

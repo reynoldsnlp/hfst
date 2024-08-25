@@ -25,24 +25,9 @@ IMPLEMENTATION_SRCS=ConvertTransducerFormat.cc \
                     compose_intersect/ComposeIntersectFst.cc \
                     compose_intersect/ComposeIntersectUtilities.cc
 
-AM_CXXFLAGS = ${my_CXXFLAGS} -Wno-deprecated -g
+AM_CXXFLAGS=-Wno-deprecated -g
 
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/back-ends ${ICU_CPPFLAGS}
-if ! WANT_FOMA_UPSTREAM
-AM_CPPFLAGS +=  -I${top_srcdir}/back-ends/foma
-endif
-
-if WANT_MINGW
-  AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfstwin/src/include \
-		-I${top_srcdir}/back-ends/dlfcn -DWINDOWS
-else
-if WANT_OPENFST_UPSTREAM
-# Skip extra include
-else
-  AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfst/src/include
-endif
-endif
-
 
 # the bridges
 if WANT_SFST

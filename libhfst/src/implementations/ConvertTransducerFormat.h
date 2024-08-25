@@ -19,27 +19,8 @@
 #include <vector>
 
 #if HAVE_OPENFST
-#if HAVE_OPENFST_UPSTREAM
-  #include <fst/fst-decl.h>
-  namespace fst { typedef fst::VectorFst<LogArc> LogFst; }
-#else
-namespace fst
-{
-  template <class W> class TropicalWeightTpl;
-  typedef TropicalWeightTpl<float> TropicalWeight;
-
-  template <class W> class LogWeightTpl;
-  typedef LogWeightTpl<float> LogWeight;
-
-  template <class W> class ArcTpl;
-  typedef ArcTpl<TropicalWeight> StdArc;
-  typedef ArcTpl<LogWeight> LogArc;
-
-  template <class A> class VectorFst;
-  typedef VectorFst<StdArc> StdVectorFst;
-  typedef VectorFst<LogArc> LogFst;
-}
-#endif // OPENFST_UPSTREAM
+#include <fst/fst-decl.h>
+namespace fst { typedef fst::VectorFst<LogArc> LogFst; }
 #endif // HAVE_OPENFST
 
 #if HAVE_XFSM
@@ -118,7 +99,7 @@ namespace implementations {
   static SFST::Transducer * hfst_basic_transducer_to_sfst
     (const HfstBasicTransducer * t);
 #endif // HAVE_SFST || HAVE_LEAN_SFST
-  
+
 #if HAVE_FOMA
   static HfstBasicTransducer * foma_to_hfst_basic_transducer(fsm * t);
 
@@ -134,7 +115,7 @@ namespace implementations {
 #if HAVE_OPENFST
   static HfstBasicTransducer * tropical_ofst_to_hfst_basic_transducer
     (fst::StdVectorFst * t, bool has_hfst_header=true);
-  
+
   static StateId hfst_state_to_state_id
     (HfstState s, std::map<HfstState, StateId> &state_map,
      fst::StdVectorFst * t);
@@ -145,7 +126,7 @@ namespace implementations {
 #if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
   static HfstBasicTransducer * log_ofst_to_hfst_basic_transducer
     (fst::LogFst * t, bool had_hfst_header=true);
-  
+
   static StateId hfst_state_to_state_id
     (HfstState s, std::map<HfstState, StateId> &state_map,
      fst::LogFst * t);
@@ -155,8 +136,8 @@ namespace implementations {
 #endif
 
 #endif // HAVE_OPENFST || HAVE_LEAN_OPENFST_LOG
-  
-  
+
+
   static HfstBasicTransducer * hfst_ol_to_hfst_basic_transducer
     (hfst_ol::Transducer * t);
 
@@ -184,7 +165,7 @@ namespace implementations {
 
     friend class StringVectorInitializer;
     friend class String2NumberMapInitializer;
-  
+
   };
 
     // Initialization of static members in class

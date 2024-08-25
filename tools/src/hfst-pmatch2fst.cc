@@ -170,7 +170,7 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
-#ifndef _GNU_SOURCE
+#if !HAVE_GET_CURRENT_DIR_NAME
 char * get_current_dir_name()
 {
     size_t PATH_BUFSIZE = 1024;

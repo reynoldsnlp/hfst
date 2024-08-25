@@ -16,7 +16,7 @@ jobs:
     - name: autoreconf
       run: autoreconf -fvi
     - name: configure
-      run: ./configure --disable-static --enable-all-tools --with-readline --with-unicode-handler=icu --with-openfst-upstream --with-foma-upstream --enable-python-bindings
+      run: ./configure --disable-static --enable-all-tools --with-readline --enable-python-bindings
     - name: build
       run: make -j4 V=1 VERBOSE=1
     - name: tests

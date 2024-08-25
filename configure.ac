@@ -47,8 +47,6 @@ AC_SUBST([LIBHFST_MINOR],     [16])
 AC_SUBST([LIBHFST_EXTENSION], [0])
 AC_SUBST([LIBHFST_VERSION],   [3.16.0])
 AC_SUBST([LIBHFST_NAME],      [hfst])
-my_CXXFLAGS=""
-AC_SUBST([my_CXXFLAGS])
 
 # long version = version vector cast in base 10000, for automatic comparisons
 # e.g.: 3.3.2 = 0003 0000 0000 + 0003 0000 + 0002
@@ -88,15 +86,6 @@ AS_IF([test "x$with_openfst" != xno], [AC_DEFINE([HAVE_OPENFST], [1],
                                               [Define to compile OpenFst support in HFST])])
 AM_CONDITIONAL([WANT_OPENFST], [test x$with_openfst != xno])
 
-AC_ARG_WITH([openfst-upstream],
-            [AS_HELP_STRING([--with-openfst-upstream],
-                            [Use upstream OpenFST @<:@default=no@:>@])],
-            [],
-            [with_openfst_upstream=no])
-AS_IF([test "x$with_openfst_upstream" != xno], [AC_DEFINE([HAVE_OPENFST_UPSTREAM], [1],
-                                              [Use upstream OpenFST])])
-AM_CONDITIONAL([WANT_OPENFST_UPSTREAM], [test x$with_openfst_upstream != xno])
-
 AC_ARG_WITH([openfst-log],
             [AS_HELP_STRING([--with-openfst-log],
                             [enable logarithmic weights @<:@default=yes@:>@])],
@@ -118,15 +107,6 @@ AC_ARG_WITH([foma],
 AS_IF([test "x$with_foma" != xno], [AC_DEFINE([HAVE_FOMA], [1],
                                               [Define to compile foma support in HFST])])
 AM_CONDITIONAL([WANT_FOMA], [test x$with_foma != xno])
-
-AC_ARG_WITH([foma-upstream],
-            [AS_HELP_STRING([--with-foma-upstream],
-                            [Use upstream Foma @<:@default=no@:>@])],
-            [],
-            [with_foma_upstream=no])
-AS_IF([test "x$with_foma_upstream" != xno], [AC_DEFINE([HAVE_FOMA_UPSTREAM], [1],
-                                              [Use upstream Foma])])
-AM_CONDITIONAL([WANT_FOMA_UPSTREAM], [test x$with_foma_upstream != xno])
 
 AC_ARG_WITH([xfsm],
             [AS_HELP_STRING([--with-xfsm],
@@ -583,14 +563,6 @@ AC_ARG_ENABLE([stress-tests],
                               [enable_stress_tests=no])
 AM_CONDITIONAL([WANT_STRESSTESTS], [test x$enable_stress_tests != xno])
 
-# Disable compiling on windows by default
-AC_ARG_ENABLE([mingw],
-		[AS_HELP_STRING([--enable-mingw],
-				[compile on MinGW @<:@default=no@:>@])],
-				[mingw_mingw=$enableval],
-				[enable_mingw=no])
-AM_CONDITIONAL([WANT_MINGW], [test x$enable_mingw != xno])
-
 # Disable fsmbook tests by default
 AC_ARG_ENABLE([fsmbook-tests],
 		[AS_HELP_STRING([--enable-fsmbook-tests],
@@ -633,7 +605,7 @@ AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 # Checks for libraries
 
 AC_LANG_PUSH([C++])
-AS_IF([test "x$with_openfst" != "xno" -a "x$enable_mingw" == "xno" -a "x$enable_load_so_entries" != "xno"],
+AS_IF([test "x$with_openfst" != "xno" -a "x$enable_load_so_entries" != "xno"],
       [AC_CHECK_LIB([dl], [main])])
 
 AS_IF([test "x$with_openfst" != "xno"],
@@ -647,7 +619,7 @@ AC_LANG_PUSH([C])
 
 AC_LANG_POP
 
-AX_CHECK_ICU([50],[AC_DEFINE([USE_ICU_UNICODE], 1, 
+AX_CHECK_ICU([50],[AC_DEFINE([USE_ICU_UNICODE], 1,
                     [if using icu for unicode string handling])],[AC_MSG_FAILURE([ICU-50 or newer is required])])
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_SEARCH_LIBS([readline], [readline editline],
@@ -664,13 +636,15 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h]
 
 AC_LANG_PUSH([C++])
 
-# If we're using upstream OpenFST then use C++17, otherwise limit to C++14
-AM_COND_IF([WANT_OPENFST_UPSTREAM], [my_CXXFLAGS="-std=c++17"], [my_CXXFLAGS="-std=c++14"])
+# We need exactly C++17. Lower is too old for ICU and OpenFST, but higher is too new for the highest version of OpenFST that we can build against (OpenFST 1.7.9).
+CXXFLAGS="$CXXFLAGS -std=c++17"
+# Needed for M_LN2 and friends
+CPPFLAGS="$CPPFLAGS -D_GNU_SOURCE -D_USE_MATH_DEFINES"
 
 # On 32bit x86, we need to use SSE for precise floating point arithmetics in OpenFST
-AX_CHECK_COMPILE_FLAG([-msse], [my_CXXFLAGS="$my_CXXFLAGS -msse"], [])
-AX_CHECK_COMPILE_FLAG([-msse2], [my_CXXFLAGS="$my_CXXFLAGS -msse2"], [])
-AX_CHECK_COMPILE_FLAG([-mfpmath=sse], [my_CXXFLAGS="$my_CXXFLAGS -mfpmath=sse"], [])
+AX_CHECK_COMPILE_FLAG([-msse], [CPPFLAGS="$CPPFLAGS -msse"], [])
+AX_CHECK_COMPILE_FLAG([-msse2], [CPPFLAGS="$CPPFLAGS -msse2"], [])
+AX_CHECK_COMPILE_FLAG([-mfpmath=sse], [CPPFLAGS="$CPPFLAGS -mfpmath=sse"], [])
 
 AC_CHECK_HEADERS([ext/slist])
 
@@ -678,11 +652,6 @@ AS_IF([test "x$with_sfst" != "xno"],
       [AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])]
       [AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])])
 
-AC_LANG_POP
-AC_LANG_PUSH([C])
-
-AC_LANG_POP
-AC_LANG_PUSH([C])
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_CHECK_HEADERS([readline/readline.h readline/history.h])])
 
@@ -693,7 +662,7 @@ AS_IF([test "x$with_readline" = "xyes"],
 # Checks for structures
 AC_CHECK_DECLS([program_name, program_invocation_name, program_invocation_short_name])
 AC_CHECK_DECLS([rl_completion_suppress_append, rl_completion_matches])
-AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line strndup getline getdelim getopt_long strtod xstrdup set_program_name setprogname setlocale nl_langinfo])
+AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line strndup getline getdelim getopt_long strtod xstrdup set_program_name setprogname setlocale nl_langinfo get_current_dir_name])
 
 AM_CONDITIONAL([WINDOWS], [test x$version_type = xwindows])
 
@@ -717,7 +686,9 @@ then
 	fi
 fi
 
-# Checks for system services
+AS_IF([test "x$with_openfst" != xno], [AC_CHECK_HEADER([fst/fstlib.h], [], AC_MSG_ERROR([could not find OpenFST's fst/fstlib.h in include path]))])
+
+AS_IF([test "x$with_foma" != xno], [PKG_CHECK_MODULES(FOMA, [libfoma >= 0.10.0])])
 
 # config files
 AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
@@ -737,14 +708,6 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  tools/src/parsers/Makefile
                  tools/src/parsers/test/Makefile
 		 back-ends/Makefile
-		 back-ends/dlfcn/Makefile
-		 back-ends/openfstwin/Makefile
-		 back-ends/openfstwin/src/Makefile
-		 back-ends/openfstwin/src/lib/Makefile
-		 back-ends/openfst/Makefile
-		 back-ends/openfst/src/Makefile
-		 back-ends/openfst/src/lib/Makefile
-		 back-ends/foma/Makefile
 		 back-ends/sfst/Makefile
 		 man/Makefile
 		 scripts/Makefile])

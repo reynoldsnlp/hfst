@@ -1,4 +1,3 @@
-AM_CXXFLAGS = ${my_CXXFLAGS}
 AM_CPPFLAGS=-Wno-deprecated
 
 if WANT_SFST

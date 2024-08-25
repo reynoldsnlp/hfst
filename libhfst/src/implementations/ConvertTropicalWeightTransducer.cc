@@ -15,15 +15,9 @@
 #include "HfstBasicTransducer.h"
 #include "TropicalWeightTransducer.h"
 
-#ifdef _MSC_VER
-#include "back-ends/openfstwin/src/include/fst/fstlib.h"
-#else
-#if HAVE_OPENFST_UPSTREAM
+#if HAVE_OPENFST
 #include <fst/fstlib.h>
-#else
-#include "back-ends/openfst/src/include/fst/fstlib.h"
 #endif
-#endif // _MSC_VER
 
 #ifndef _MSC_VER
 namespace fst
@@ -50,12 +44,12 @@ namespace hfst { namespace implementations
   {
     const fst::SymbolTable *inputsym = t->InputSymbols();
     const fst::SymbolTable *outputsym = t->OutputSymbols();
-    
+
     /* An HFST tropical transducer always has an input symbol table. */
     if (has_hfst_header && inputsym == NULL) {
       HFST_THROW(MissingOpenFstInputSymbolTableException);
     }
-  
+
     // An empty transducer
     if (t->Start() == fst::kNoStateId)
       {
@@ -93,7 +87,7 @@ namespace hfst { namespace implementations
     if (inputsym == NULL) {
       HFST_THROW(MissingOpenFstInputSymbolTableException);
     }
-    
+
   }
 
 
@@ -139,43 +133,43 @@ namespace hfst { namespace implementations
   HfstBasicTransducer * ConversionFunctions::
   tropical_ofst_to_hfst_basic_transducer
   (fst::StdVectorFst * t, bool has_hfst_header) {
-    
+
     HfstBasicTransducer * net = new HfstBasicTransducer();
 
     handle_symbol_tables(t, net, has_hfst_header);
-    
+
     StringVector symbol_vector = TropicalWeightTransducer::get_symbol_vector(t);
 
     std::vector<unsigned int> harmonization_vector
       = HfstTropicalTransducerTransitionData::get_harmonization_vector(symbol_vector);
-    
+
     /* This takes care that initial state is always number zero
        and state number zero (if it is not initial) is some other number
        (basically as the number of the initial state in that case, i.e.
        the numbers of initial state and state number zero are swapped) */
     StateId initial_state = t->Start();
-    
+
     /* Go through all states */
     for (fst::StateIterator<fst::StdVectorFst> siter(*t);
          ! siter.Done(); siter.Next())
       {
         StateId s = siter.Value();
-        
+
         HfstState origin = s;
         if (origin == (unsigned int)initial_state)
           origin = 0;
         else if (origin == 0)
           origin = (unsigned int)initial_state;
-        
+
         unsigned int number_of_arcs = t->NumArcs(s);
         net->initialize_transition_vector(s, number_of_arcs);
-        
+
         /* Go through all transitions in a state */
         for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s);
              !aiter.Done(); aiter.Next())
           {
             const fst::StdArc &arc = aiter.Value();
-            
+
             HfstState target = arc.nextstate;
             if (target == (unsigned int)initial_state)
               target = 0;
@@ -206,14 +200,14 @@ namespace hfst { namespace implementations
                                  false), // dummy parameter needed because numbers are used
                                 false); // do not insert symbols to alphabet
           }
-        
+
         if (t->Final(s) != fst::TropicalWeight::Zero()) {
           // Set the state as final
           net->set_final_weight(origin, t->Final(s).Value());
         }
-        
+
       }
-    
+
     // Copy the alphabet
     copy_alphabet(t, net);
 
@@ -231,11 +225,11 @@ namespace hfst { namespace implementations
   fst::StdVectorFst * ConversionFunctions::
   hfst_basic_transducer_to_tropical_ofst
   (const HfstBasicTransducer * net) {
-    
+
     fst::StdVectorFst * t = new fst::StdVectorFst();
     StateId start_state = t->AddState(); // always zero
     t->SetStart(start_state);
-    
+
     // How state numbers are recoded
     std::vector<StateId> state_vector;
     state_vector.push_back(start_state);
@@ -247,7 +241,7 @@ namespace hfst { namespace implementations
     st.AddSymbol(internal_epsilon, 0);
     st.AddSymbol(internal_unknown, 1);
     st.AddSymbol(internal_identity, 2);
-    
+
     // Copy the alphabet
     for (HfstBasicTransducer::HfstAlphabet::const_iterator it
            = net->alphabet.begin();
@@ -281,7 +275,7 @@ namespace hfst { namespace implementations
           } // ... set of transitions gone through
         source_state++;
       } // ... all states gone through
-    
+
     // Go through the final states...
     for (HfstBasicTransducer::FinalWeightMap::const_iterator it
            = net->final_weight_map.begin();
@@ -292,7 +286,7 @@ namespace hfst { namespace implementations
            it->second);
       }
     // ... final states gone through
-    
+
     t->SetInputSymbols(&st);
     return t;
   }
@@ -310,7 +304,7 @@ namespace hfst { namespace implementations
 int main(int argc, char * argv[])
 {
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
-    
+
     std::cout << "ok" << std::endl;
     return 0;
 }
