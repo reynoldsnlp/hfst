@@ -46,6 +46,9 @@ endif
 if WANT_DISJUNCT
 MAYBE_DISJUNCT=hfst-disjunct$(EXEEXT)
 endif
+if WANT_DUMP_ALPHA
+MAYBE_DUMP_ALPHA=hfst-dump-alphabets$(EXEEXT)
+endif
 if WANT_PRIORITY_DISJUNCT
 MAYBE_PRIORITY_DISJUNCT=hfst-priority-disjunct$(EXEEXT)
 endif
@@ -229,7 +232,8 @@ bin_PROGRAMS= \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
 			 $(MAYBE_TRAVERSE) $(MAYBE_GUESSIFY) $(MAYBE_GUESS) \
 			 $(MAYBE_INFO) $(MAYBE_EXPAND_EQUIVALENCES) \
-			 $(MAYBE_ALPHAFIX) $(MAYBE_PATHKILL)
+			 $(MAYBE_ALPHAFIX) $(MAYBE_PATHKILL) \
+			 $(MAYBE_DUMP_ALPHA)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc hfst-tool-metadata.cc
 
@@ -244,6 +248,7 @@ hfst_concatenate_SOURCES=hfst-concatenate.cc $(HFST_COMMON_SRC)
 hfst_conjunct_SOURCES=hfst-conjunct.cc $(HFST_COMMON_SRC)
 hfst_determinize_SOURCES=hfst-determinize.cc $(HFST_COMMON_SRC)
 hfst_disjunct_SOURCES=hfst-disjunct.cc $(HFST_COMMON_SRC)
+hfst_dump_alphabets_SOURCES=hfst-dump-alphabets.cc $(HFST_COMMON_SRC)
 hfst_priority_disjunct_SOURCES=hfst-priority-disjunct.cc $(HFST_COMMON_SRC)
 hfst_multiply_SOURCES=hfst-multiply.cc $(HFST_COMMON_SRC)
 hfst_expand_equivalences_SOURCES=hfst-expand-equivalences.cc $(HFST_COMMON_SRC)

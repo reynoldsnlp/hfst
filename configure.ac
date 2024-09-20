@@ -235,6 +235,12 @@ AC_ARG_ENABLE([determinize],
 			  [enable_determinize=$enableval],
 			  [if test x$enable_no_tools != xno; then enable_determinize=no; else enable_determinize=yes; fi])
 AM_CONDITIONAL([WANT_DETERMINIZE], [test x$enable_determinize != xno])
+AC_ARG_ENABLE([dump-alphabets],
+			  [AS_HELP_STRING([--enable-dump-alphabets],
+							  [build alpahbet dumper @<:@default=yes@:>@])],
+			  [enable_dump_alphabets=$enableval],
+			  [if test x$enable_no_tools != xno; then enable_dump_alphabets=no; else enable_dump_alphabets=yes; fi])
+AM_CONDITIONAL([WANT_DUMP_ALPHA], [test x$enable_dump_alphabets != xno])
 AC_ARG_ENABLE([priority-disjunct],
 			  [AS_HELP_STRING([--enable-priority-disjunct],
 							  [build priority disjunct tool @<:@default=yes@:>@])],
