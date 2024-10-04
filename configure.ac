@@ -701,6 +701,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  test/libhfst/Makefile test/tools/Makefile
                  test/tools/fsmbook-tests/Makefile
                  libhfst/Makefile libhfst/src/Makefile
+                 libhfst/src/c/Makefile
                  libhfst/src/implementations/Makefile
 		 libhfst/src/parsers/Makefile
                  libhfst/hfst.pc
