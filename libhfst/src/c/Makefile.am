@@ -7,11 +7,14 @@
 # See the file COPYING included with this distribution for more
 # information.
 
-lib_LTLIBRARIES = libhfst_c.la
+lib_LTLIBRARIES=libhfst_c.la
 
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
+AM_CPPFLAGS=-I${top_srcdir}/libhfst/src
 
-libhfst_c_la_SOURCES = libhfst_c.cpp
+libhfst_c_la_SOURCES=libhfst_c.cpp
 
-libhfst_c_la_LDFLAGS = -no-undefined -version-info 0:0:0
+libhfst_c_la_LDFLAGS=-no-undefined -version-info 0:0:0
+
+hfstincludedir=$(includedir)/hfst
+hfstinclude_HEADERS=libhfst_c.h
 
