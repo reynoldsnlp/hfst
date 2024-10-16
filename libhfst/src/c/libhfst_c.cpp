@@ -14,70 +14,95 @@
 //
 // I am not totally sure this is the best approach, but it seems to work.
 
-extern "C" {
-    #include <string.h>
+extern "C"
+{
+#include <string.h>
 
-    typedef struct ResultIterator {
+    typedef struct ResultIterator
+    {
         void *begin;
         void *end;
     } ResultIterator;
 
-    typedef struct HfstValue {
+    typedef struct HfstValue
+    {
         float weight;
         char *s;
     } HfstValue;
 
-    void *hfst_empty_transducer() {
+    void *
+    hfst_empty_transducer()
+    {
         hfst::HfstTransducer *fsa = new hfst::HfstTransducer();
         return (void *)fsa;
     }
 
-    void *hfst_input_stream(const char *filename) {
+    void *
+    hfst_input_stream(const char *filename)
+    {
         hfst::HfstInputStream *is = nullptr;
-        try {
+        try
+        {
             is = new hfst::HfstInputStream(filename);
         }
         // Rust cannot handle C++ exceptions (can even C?), so make very sure
         // we never throw one. This is C++-speak for "catch all exceptions".
-        catch (...) {}
+        catch (...)
+        {
+        }
         return (void *)(is);
     }
 
-    void hfst_input_stream_free(void *input_stream) {
+    void
+    hfst_input_stream_free(void *input_stream)
+    {
         assert(input_stream != nullptr);
         delete static_cast<hfst::HfstInputStream *>(input_stream);
         input_stream = nullptr;
     }
 
-    void hfst_input_stream_close(void *his) {
+    void
+    hfst_input_stream_close(void *his)
+    {
         hfst::HfstInputStream *inp = static_cast<hfst::HfstInputStream *>(his);
         inp->close();
     }
 
-    bool hfst_input_stream_is_eof(void *his) {
+    bool
+    hfst_input_stream_is_eof(void *his)
+    {
         hfst::HfstInputStream *inp = static_cast<hfst::HfstInputStream *>(his);
         return inp->is_eof();
     }
 
-    bool hfst_input_stream_is_bad(void *his) {
+    bool
+    hfst_input_stream_is_bad(void *his)
+    {
         hfst::HfstInputStream *inp = static_cast<hfst::HfstInputStream *>(his);
         return inp->is_bad();
     }
 
-    void *hfst_transducer_from_stream(void *his) {
+    void *
+    hfst_transducer_from_stream(void *his)
+    {
         hfst::HfstInputStream *inp = static_cast<hfst::HfstInputStream *>(his);
         hfst::HfstTransducer *fsa = new hfst::HfstTransducer(*inp);
         return static_cast<void *>(fsa);
     }
 
-    void *hfst_lookup(void *self, const char *s) {
+    void *
+    hfst_lookup(void *self, const char *s)
+    {
         hfst::HfstTransducer *fsa = static_cast<hfst::HfstTransducer *>(self);
         hfst::HfstOneLevelPaths *rv = fsa->lookup(s);
         return static_cast<void *>(rv);
     }
 
-    size_t hfst_lookup_results(void *holps, void **results, float *weights) {
-        hfst::HfstOneLevelPaths *v = static_cast<hfst::HfstOneLevelPaths *>(holps);
+    size_t
+    hfst_lookup_results(void *holps, void **results, float *weights)
+    {
+        hfst::HfstOneLevelPaths *v
+            = static_cast<hfst::HfstOneLevelPaths *>(holps);
         size_t i = 0;
         for (auto it : *v)
         {
@@ -99,7 +124,8 @@ extern "C" {
 
     // Create an iterator over the paths in holps, put it on the heap,
     // and return the pointer to it
-    struct ResultIterator *hfst_lookup_iterator(void *holps)
+    struct ResultIterator *
+    hfst_lookup_iterator(void *holps)
     {
         // hfst::HfstOneLevelPaths is really:
         // std::set<
@@ -108,36 +134,43 @@ extern "C" {
         //         std::vector<std::__cxx11::basic_string<char>>
         //      >
         //  >::iterator
-        //hfst::HfstOneLevelPaths::iterator b(v->begin());
-        //hfst::HfstOneLevelPaths::iterator e(v->begin());
-        //auto b_heap = new hfst::HfstOneLevelPaths::iterator(b);
-        //auto e_heap = new hfst::HfstOneLevelPaths::iterator(e);
-        hfst::HfstOneLevelPaths *v = static_cast<hfst::HfstOneLevelPaths *>(holps);
+        // hfst::HfstOneLevelPaths::iterator b(v->begin());
+        // hfst::HfstOneLevelPaths::iterator e(v->begin());
+        // auto b_heap = new hfst::HfstOneLevelPaths::iterator(b);
+        // auto e_heap = new hfst::HfstOneLevelPaths::iterator(e);
+        hfst::HfstOneLevelPaths *v
+            = static_cast<hfst::HfstOneLevelPaths *>(holps);
         ResultIterator *s = (ResultIterator *)malloc(sizeof(ResultIterator));
         s->begin = static_cast<void *>(
-            new hfst::HfstOneLevelPaths::iterator(v->begin())
-        );
+            new hfst::HfstOneLevelPaths::iterator(v->begin()));
         s->end = static_cast<void *>(
-            new hfst::HfstOneLevelPaths::iterator(v->end())
-        );
+            new hfst::HfstOneLevelPaths::iterator(v->end()));
         return s;
     }
 
-    bool hfst_lookup_iterator_done(struct ResultIterator *it) {
-        auto begin = static_cast<hfst::HfstOneLevelPaths::iterator *>(it->begin);
+    bool
+    hfst_lookup_iterator_done(struct ResultIterator *it)
+    {
+        auto begin
+            = static_cast<hfst::HfstOneLevelPaths::iterator *>(it->begin);
         auto end = static_cast<hfst::HfstOneLevelPaths::iterator *>(it->end);
         return *begin == *end;
     }
 
-    void hfst_lookup_iterator_free(struct ResultIterator *it) {
+    void
+    hfst_lookup_iterator_free(struct ResultIterator *it)
+    {
         delete static_cast<hfst::HfstOneLevelPaths::iterator *>(it->begin);
         delete static_cast<hfst::HfstOneLevelPaths::iterator *>(it->end);
         free(it);
     }
 
-    void hfst_lookup_iterator_value(ResultIterator *it, char **s, float *weight) {
+    void
+    hfst_lookup_iterator_value(ResultIterator *it, char **s, float *weight)
+    {
         // extract the iterator
-        auto begin = static_cast<hfst::HfstOneLevelPaths::iterator *>(it->begin);
+        auto begin
+            = static_cast<hfst::HfstOneLevelPaths::iterator *>(it->begin);
         auto pair = **begin;
 
         // the float can just be copied in, easy
@@ -148,11 +181,8 @@ extern "C" {
         // substrings in the vec<string>
         // according to the internet, this is how to do that:
         std::ostringstream os;
-        std::copy(
-            pair.second.begin(),
-            pair.second.end(),
-            std::ostream_iterator<std::string>(os)
-        );
+        std::copy(pair.second.begin(), pair.second.end(),
+                  std::ostream_iterator<std::string>(os));
         // anders: returning this directy (as in: *s = os.str().c_str()),
         // doesn't work. Maybe C++ deallocates the temporary before the
         // function returns
@@ -167,8 +197,11 @@ extern "C" {
         *s = our;
     }
 
-    void hfst_lookup_iterator_next(ResultIterator *it) {
-        auto begin = static_cast<hfst::HfstOneLevelPaths::iterator *>(it->begin);
+    void
+    hfst_lookup_iterator_next(ResultIterator *it)
+    {
+        auto begin
+            = static_cast<hfst::HfstOneLevelPaths::iterator *>(it->begin);
         (*begin)++;
     }
 }
