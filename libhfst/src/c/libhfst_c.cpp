@@ -1,4 +1,4 @@
-#include <hfst/hfst.h>
+#include "hfst.h"
 #include <iterator>
 #include <sstream>
 
