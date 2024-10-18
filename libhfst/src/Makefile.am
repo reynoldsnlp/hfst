@@ -9,7 +9,7 @@
 # See the file COPYING included with this distribution for more
 # information.
 
-SUBDIRS=implementations parsers c
+SUBDIRS=implementations parsers . c
 AUTOMAKE_OPTIONS=subdir-objects
 lib_LTLIBRARIES = libhfst.la
 
