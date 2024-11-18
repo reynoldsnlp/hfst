@@ -704,7 +704,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  libhfst/src/c/Makefile
                  libhfst/src/implementations/Makefile
 		 libhfst/src/parsers/Makefile
-                 libhfst/hfst.pc
+                 libhfst/hfst.pc libhfst/hfst_c.pc
 		 tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
 		 tools/src/hfst-twolc/Makefile
 		 tools/src/hfst-twolc/src/Makefile

@@ -19,4 +19,4 @@ apidoc: Doxyfile
 endif
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = hfst.pc
+pkgconfig_DATA = hfst.pc hfst_c.pc
