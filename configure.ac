@@ -19,7 +19,7 @@
 HFST_NAME=hfst
 HFST_MAJOR=3
 HFST_MINOR=16
-HFST_EXTENSION=0
+HFST_EXTENSION=1
 HFST_VERSION=$HFST_MAJOR.$HFST_MINOR.$HFST_EXTENSION
 
 ### When the VERSION is INCREMENTED, REMEMBER to increment the LONGVERSION too.
@@ -28,10 +28,10 @@ HFST_VERSION=$HFST_MAJOR.$HFST_MINOR.$HFST_EXTENSION
 LIBHFST_NAME=hfst
 LIBHFST_MAJOR=3
 LIBHFST_MINOR=16
-LIBHFST_EXTENSION=0
+LIBHFST_EXTENSION=1
 LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR.$LIBHFST_EXTENSION
 
-AC_INIT([hfst],[3.16.0],[hfst-bugs@helsinki.fi],[hfst])
+AC_INIT([hfst],[3.16.1],[hfst-bugs@helsinki.fi],[hfst])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall std-options foreign check-news subdir-objects])
 
@@ -44,8 +44,8 @@ AC_CONFIG_HEADERS([config.h libhfst/src/hfst.hpp])
 
 AC_SUBST([LIBHFST_MAJOR],     [3])
 AC_SUBST([LIBHFST_MINOR],     [16])
-AC_SUBST([LIBHFST_EXTENSION], [0])
-AC_SUBST([LIBHFST_VERSION],   [3.16.0])
+AC_SUBST([LIBHFST_EXTENSION], [1])
+AC_SUBST([LIBHFST_VERSION],   [3.16.1])
 AC_SUBST([LIBHFST_NAME],      [hfst])
 
 # long version = version vector cast in base 10000, for automatic comparisons
@@ -56,7 +56,7 @@ AC_SUBST([LIBHFST_NAME],      [hfst])
 # $LIBHFST_MINOR * 10000 + $LIBHFST_EXTENSION + "L"
 # NB! It turned out to be not portable, and can't be used!
 
-AC_DEFINE([HFST_LONGVERSION], [300160000L],
+AC_DEFINE([HFST_LONGVERSION], [300160001L],
           [Define to hfst version vector as long in base 10000])
 AC_DEFINE([HFST_REVISION], ["$Revision$"],
           [Automatically substitute to configure.ac revision])
@@ -680,17 +680,15 @@ AC_ARG_ENABLE([python-bindings],
               [enable_python_bindings=no])
 AM_CONDITIONAL([HAVE_PYTHON_BINDINGS], [test x$enable_python_bindings = xyes])
 
-if test "x$enable_python_bindings" = "xyes"
-then
+AS_IF([test "x$enable_python_bindings" = "xyes"], [
 	AM_PATH_PYTHON([3.4], [], [AC_MSG_WARN([Can't generate SWIG wrapper without Python])])
 	AC_CONFIG_FILES([python/Makefile python/test/Makefile])
 
 	AC_ARG_VAR([PYTHON_INSTALL_PARAMS], [Parameters to pass to the Python 3 module install step])
-	if test "x$PYTHON_INSTALL_PARAMS" = "x"
-	then
+	AS_IF([test "x$PYTHON_INSTALL_PARAMS" = "x"], [
 	  PYTHON_INSTALL_PARAMS="--prefix=\$(prefix) --root=\$(DESTDIR)/"
-	fi
-fi
+	])
+])
 
 AS_IF([test "x$with_openfst" != xno], [AC_CHECK_HEADER([fst/fstlib.h], [], AC_MSG_ERROR([could not find OpenFST's fst/fstlib.h in include path]))])
 

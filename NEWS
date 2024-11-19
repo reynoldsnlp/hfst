@@ -5,6 +5,34 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.16.1
+----------------------------
+
+* Bug fixes:
+
+    * hfst-tokenize escapes both \r and \n now
+
+    * regexp parsing more robust with comments and linebreaks
+
+* Removal of some bundled libraries including foma and openfst, install
+  suitable versions to compile support for them
+
+* ICU stabilised as unicode handler over all
+
+* experimental C API for rust bindings (unstable)
+
+* new tools (testing):
+
+    * hfst-check-alpha for checking and comparing alphabets in automata and
+      their metadata
+
+    * hfst-dump-alphabets for reviewing alphabets easier than hfst-summarize
+      grepping
+
+    * hfst-kill-paths for efficient path removal
+
+* introduced clang-format to work towards standard code formatting
+
 Noteworthy changes in 3.16.0
 ----------------------------
 
