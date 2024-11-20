@@ -246,6 +246,21 @@ It is common practice to keep `generated files out of version control
 For further installation instruction refer to file ``INSTALL``, which contains
 the standard installation instructions for GNU autoconf based software.
 
+C-API
+===============
+
+HFST includes an experimental, very limited C API. The API is built into it's
+own library, aptly named `libhfst_c`. On Linux systems, `pkg-config` should
+locate the necessary parts, like the `libhfst_c.so` shared library file, and
+the `libhfst_c.h` header file.
+
+Versioning of the C API is unrelated to the versions of `hfst` itself, use
+the version of `hfst_c` instead. For now, it is pre-1.0, that is, it's not
+stable. Changes must be expected.
+
+Note that there are separate bindings to Python from HFST, so there is no need
+to go through the C API for using HFST from Python.
+
 Troubleshooting
 ===============
 
