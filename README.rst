@@ -107,6 +107,9 @@ Compilation requirements
   - to disable OpenFST support, configure switch ``--without-openfst`` may
     be used (however, this seriously limits the use of HFST)
 
+  - if you have problems linking, make sure openfst is compiled with c++17
+    compilers
+
 - To use the SFST_ backend (default):
 
   - the SFST library version 1.4.6g is bundled with HFST and included
