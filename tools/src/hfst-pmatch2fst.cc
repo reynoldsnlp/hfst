@@ -284,7 +284,6 @@ process_stream(HfstOutputStream &outstream)
 
     // A dummy transducer with an alphabet with all the symbols
     HfstTransducer harmonizer(compilation_format);
-
     // First we need to collect a unified alphabet from all the transducers.
     hfst::StringSet symbols_seen;
     for (std::map<std::string, HfstTransducer *>::const_iterator it
@@ -297,7 +296,8 @@ process_stream(HfstOutputStream &outstream)
         {
             if (symbols_seen.count(*sym) == 0)
             {
-                harmonizer.disjunct(HfstTransducer(*sym, compilation_format));
+                // std::cerr << "DEBUG: " << *sym << std::endl;
+                harmonizer.insert_to_alphabet(*sym);
                 symbols_seen.insert(*sym);
             }
         }
