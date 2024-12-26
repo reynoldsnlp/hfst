@@ -48,7 +48,7 @@ std::string two_level_paths_to_string(const hfst::HfstTwoLevelPaths & paths)
 
 // *** Wrappers for lookup functions *** //
 
-HfstOneLevelPaths lookup_vector(const hfst::HfstTransducer * tr, bool fd, const StringVector& s, int limit = -1, double time_cutoff = 0.0) throw(TransducerIsCyclicException, FunctionNotImplementedException)
+HfstOneLevelPaths lookup_vector(const hfst::HfstTransducer * tr, bool fd, const StringVector& s, int limit = -1, double time_cutoff = 0.0) throw()
 {
   if (tr->get_type() == hfst::HFST_OL_TYPE || tr->get_type() == hfst::HFST_OLW_TYPE)
     {
@@ -66,7 +66,7 @@ HfstOneLevelPaths lookup_vector(const hfst::HfstTransducer * tr, bool fd, const 
   return hfst::extract_output_side(result);
 }
 
-HfstOneLevelPaths lookup_string(const hfst::HfstTransducer * tr, bool fd, const std::string& s, int limit = -1, double time_cutoff = 0.0) throw(TransducerIsCyclicException, FunctionNotImplementedException)
+HfstOneLevelPaths lookup_string(const hfst::HfstTransducer * tr, bool fd, const std::string& s, int limit = -1, double time_cutoff = 0.0) throw()
 {
   if (tr->get_type() == hfst::HFST_OL_TYPE || tr->get_type() == hfst::HFST_OLW_TYPE)
     {

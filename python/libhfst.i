@@ -263,7 +263,7 @@ enum ImplementationType
 // *** Some other functions *** //
 
 bool is_diacritic(const std::string & symbol);
-hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch) throw(HfstException);
+hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch) throw();
 
 // internal functions
 %pythoncode %{
@@ -337,7 +337,7 @@ public:
   void set_property(const std::string& property, const std::string& value);
   std::string get_property(const std::string& property) const;
   const std::map<std::string,std::string>& get_properties() const;
-  bool compare(const HfstTransducer&, bool harmonize=true) const throw(TransducerTypeMismatchException);
+  bool compare(const HfstTransducer&, bool harmonize=true) const throw();
   unsigned int number_of_states() const;
   unsigned int number_of_arcs() const;
   StringSet get_alphabet() const;
@@ -355,22 +355,22 @@ public:
 
   // First versions of all functions returning an HfstTransducer& that return void instead:
 
-  void concatenate(const HfstTransducer& tr, bool harmonize=true) throw(TransducerTypeMismatchException) { self->concatenate(tr, harmonize); }
-  void disjunct(const HfstTransducer& tr, bool harmonize=true) throw(TransducerTypeMismatchException) { self->disjunct(tr, harmonize); }
-  void subtract(const HfstTransducer& tr, bool harmonize=true) throw(TransducerTypeMismatchException) { self->subtract(tr, harmonize); }
-  void intersect(const HfstTransducer& tr, bool harmonize=true) throw(TransducerTypeMismatchException) { self->intersect(tr, harmonize); }
-  void compose(const HfstTransducer& tr, bool harmonize=true) throw(TransducerTypeMismatchException) { self->compose(tr, harmonize); }
+  void concatenate(const HfstTransducer& tr, bool harmonize=true) throw() { self->concatenate(tr, harmonize); }
+  void disjunct(const HfstTransducer& tr, bool harmonize=true) throw() { self->disjunct(tr, harmonize); }
+  void subtract(const HfstTransducer& tr, bool harmonize=true) throw() { self->subtract(tr, harmonize); }
+  void intersect(const HfstTransducer& tr, bool harmonize=true) throw() { self->intersect(tr, harmonize); }
+  void compose(const HfstTransducer& tr, bool harmonize=true) throw() { self->compose(tr, harmonize); }
   void compose_intersect(const HfstTransducerVector &v, bool invert=false, bool harmonize=true) { self->compose_intersect(v, invert, harmonize); }
   void priority_union(const HfstTransducer &another) { self->priority_union(another); }
   void lenient_composition(const HfstTransducer &another, bool harmonize=true) { self->lenient_composition(another, harmonize); }
-  void cross_product(const HfstTransducer &another, bool harmonize=true) throw(TransducersAreNotAutomataException) { self->cross_product(another, harmonize); }
+  void cross_product(const HfstTransducer &another, bool harmonize=true) throw() { self->cross_product(another, harmonize); }
   void shuffle(const HfstTransducer &another, bool harmonize=true) { self->shuffle(another, harmonize); }
   void remove_epsilons() { self->remove_epsilons(); }
   void determinize() { self->determinize(); }
   void minimize() { self->minimize(); }
   void prune() { self->prune(); }
   void eliminate_flags() { self->eliminate_flags(); }
-  void eliminate_flag(const std::string& f) throw(HfstException) { self->eliminate_flag(f); }
+  void eliminate_flag(const std::string& f) throw() { self->eliminate_flag(f); }
   void n_best(unsigned int n) { self->n_best(n); }
   void convert(ImplementationType impl) { self->convert(impl); }
   void repeat_star() { self->repeat_star(); }
@@ -440,13 +440,13 @@ public:
         $self->extract_longest_paths(results, obey_flags);
         return results;
     }
-    hfst::HfstTwoLevelPaths _extract_paths(int max_num=-1, int cycles=-1) const throw(TransducerIsCyclicException)
+    hfst::HfstTwoLevelPaths _extract_paths(int max_num=-1, int cycles=-1) const throw()
     {
       hfst::HfstTwoLevelPaths results;
       $self->extract_paths(results, max_num, cycles);
       return results;
     }
-    hfst::HfstTwoLevelPaths _extract_paths_fd(int max_num=-1, int cycles=-1, bool filter_fd=true) const throw(TransducerIsCyclicException)
+    hfst::HfstTwoLevelPaths _extract_paths_fd(int max_num=-1, int cycles=-1, bool filter_fd=true) const throw()
     {
       hfst::HfstTwoLevelPaths results;
       $self->extract_paths_fd(results, max_num, cycles, filter_fd);
@@ -465,19 +465,19 @@ public:
       return results;
     }
 
-    HfstOneLevelPaths _lookup_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(TransducerIsCyclicException, FunctionNotImplementedException)
+    HfstOneLevelPaths _lookup_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw()
     {
       return hfst::lookup_vector($self, false /*fd*/, s, limit, time_cutoff);
     }
-    HfstOneLevelPaths _lookup_fd_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(TransducerIsCyclicException, FunctionNotImplementedException)
+    HfstOneLevelPaths _lookup_fd_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw()
     {
       return hfst::lookup_vector($self, true /*fd*/, s, limit, time_cutoff);
     }
-    HfstOneLevelPaths _lookup_fd_string(const std::string& s, int limit = -1, double time_cutoff = 0.0) const throw(TransducerIsCyclicException, FunctionNotImplementedException)
+    HfstOneLevelPaths _lookup_fd_string(const std::string& s, int limit = -1, double time_cutoff = 0.0) const throw()
     {
       return hfst::lookup_string($self, true /*fd*/, s, limit, time_cutoff);
     }
-    HfstOneLevelPaths _lookup_string(const std::string & s, int limit = -1, double time_cutoff = 0.0) const throw(TransducerIsCyclicException, FunctionNotImplementedException)
+    HfstOneLevelPaths _lookup_string(const std::string & s, int limit = -1, double time_cutoff = 0.0) const throw()
     {
       return hfst::lookup_string($self, false /*fd*/, s, limit, time_cutoff);
     }
@@ -976,7 +976,7 @@ public:
 ~HfstOutputStream(void);
 HfstOutputStream &flush();
 void close(void);
-hfst::HfstOutputStream & redirect(hfst::HfstTransducer &) throw(StreamIsClosedException);
+hfst::HfstOutputStream & redirect(hfst::HfstTransducer &) throw();
 
 %extend {
 
@@ -1066,14 +1066,14 @@ def __init__(self, **kwargs):
 class HfstInputStream
 {
 public:
-    HfstInputStream(void) throw(StreamNotReadableException, NotTransducerStreamException, EndOfStreamException, TransducerHeaderException);
-    HfstInputStream(const std::string &filename) throw(StreamNotReadableException, NotTransducerStreamException, EndOfStreamException, TransducerHeaderException);
+    HfstInputStream(void) throw();
+    HfstInputStream(const std::string &filename) throw();
     ~HfstInputStream(void);
     void close(void);
     bool is_eof(void);
     bool is_bad(void);
     bool is_good(void);
-    ImplementationType get_type(void) const throw(TransducerTypeMismatchException);
+    ImplementationType get_type(void) const throw();
 
 %extend {
 
@@ -1172,7 +1172,7 @@ class HfstBasicTransducer {
     void add_transition(HfstState s, const hfst::implementations::HfstBasicTransition & transition, bool add_symbols_to_alphabet=true);
     void remove_transition(HfstState s, const hfst::implementations::HfstBasicTransition & transition, bool remove_symbols_from_alphabet=false);
     bool is_final_state(HfstState s) const;
-    float get_final_weight(HfstState s) const throw(StateIsNotFinalException, StateIndexOutOfBoundsException);
+    float get_final_weight(HfstState s) const throw();
     void set_final_weight(HfstState s, const float & weight);
     void remove_final_weight(HfstState s);
 %rename("_transitions") transitions(HfstState s);
@@ -1195,7 +1195,7 @@ class HfstBasicTransducer {
     void disjunct(const StringPairVector &spv, float weight) { self->disjunct(spv, weight); }
     void harmonize(HfstBasicTransducer &another) { self->harmonize(another); }
 
-  HfstTwoLevelPaths _lookup(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight, bool obey_flags) throw(TransducerIsCyclicException)
+  HfstTwoLevelPaths _lookup(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight, bool obey_flags) throw()
   {
     hfst::HfstTwoLevelPaths results;
     $self->lookup(lookup_path, results, infinite_cutoff, max_weight, -1, obey_flags);
