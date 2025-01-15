@@ -1478,9 +1478,11 @@ LogWeightTransducer::remove_epsilons(LogFst *t)
 LogFst *
 LogWeightTransducer::n_best(LogFst *t, unsigned int n)
 {
-    LogFst *n_best_fst = new LogFst();
+    /* LogFst *n_best_fst = new LogFst();
     fst::ShortestPath(*t, n_best_fst, (size_t)n);
-    return n_best_fst;
+    return n_best_fst; */
+    // in openfst 1.8 LogFst does not have necessary algebra for shortest paths
+    HFST_THROW(FunctionNotImplementedException);
 }
 
 LogFst *
