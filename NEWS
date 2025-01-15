@@ -5,6 +5,13 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.16.2
+----------------------------
+
+* Support for >OpenFst-1.8.0
+
+* Optimisations to hfst-pmatch2fst alphabet handling
+
 Noteworthy changes in 3.16.1
 ----------------------------
 
