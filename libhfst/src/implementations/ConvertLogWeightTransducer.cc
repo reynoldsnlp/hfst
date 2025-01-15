@@ -66,12 +66,10 @@ ConversionFunctions::log_ofst_to_hfst_basic_transducer(LogFst *t,
            an input or output symbol table. */
         if (inputsym != NULL)
         {
-            for (fst::SymbolTableIterator it
-                 = fst::SymbolTableIterator(*(inputsym));
-                 !it.Done(); it.Next())
+            for (auto it = inputsym->begin(); it != inputsym->end(); ++it)
             {
-                if (it.Value() != 0) // epsilon is not inserted
-                    net->alphabet.insert(it.Symbol());
+                if (it->Label() != 0) // epsilon is not inserted
+                    net->alphabet.insert(it->Symbol());
             }
         }
         /* If the transducer is an OpenFst transducer, it might have an output
@@ -80,12 +78,10 @@ ConversionFunctions::log_ofst_to_hfst_basic_transducer(LogFst *t,
            input symbol table. */
         if (!has_hfst_header && outputsym != NULL)
         {
-            for (fst::SymbolTableIterator it
-                 = fst::SymbolTableIterator(*(outputsym));
-                 !it.Done(); it.Next())
+            for (auto it = outputsym->begin(); it != outputsym->end(); ++it)
             {
-                if (it.Value() != 0) // epsilon is not inserted
-                    net->alphabet.insert(it.Symbol());
+                if (it->Label() != 0) // epsilon is not inserted
+                    net->alphabet.insert(it->Symbol());
             }
         }
         return net;
@@ -202,17 +198,15 @@ ConversionFunctions::log_ofst_to_hfst_basic_transducer(LogFst *t,
 
     /* Make sure that also the symbols that occur only in the alphabet
        but not in transitions are copied. */
-    for (fst::SymbolTableIterator it = fst::SymbolTableIterator(*(inputsym));
-         !it.Done(); it.Next())
+    for (auto it = inputsym->begin(); it != inputsym->end(); ++it)
     {
-        if (it.Value() != 0) // epsilon is not inserted
-            net->alphabet.insert(it.Symbol());
+        if (it->Label() != 0) // epsilon is not inserted
+            net->alphabet.insert(it->Symbol());
     }
-    for (fst::SymbolTableIterator it = fst::SymbolTableIterator(*(outputsym));
-         !it.Done(); it.Next())
+    for (auto it = outputsym->begin(); it != outputsym->end(); ++it)
     {
-        if (it.Value() != 0) // epsilon is not inserted
-            net->alphabet.insert(it.Symbol());
+        if (it->Label() != 0) // epsilon is not inserted
+            net->alphabet.insert(it->Symbol());
     }
 
     return net;

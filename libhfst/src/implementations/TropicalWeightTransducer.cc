@@ -331,13 +331,12 @@ TropicalWeightTransducer::remove_from_alphabet(StdVectorFst *t,
 {
     assert(t->InputSymbols() != NULL);
     fst::SymbolTable st(t->InputSymbols()->Name());
-    for (fst::SymbolTableIterator it
-         = fst::SymbolTableIterator(*(t->InputSymbols()));
-         !it.Done(); it.Next())
+    for (auto it = t->InputSymbols()->begin(); it != t->InputSymbols()->end();
+         ++it)
     {
-        if (it.Symbol() != symbol)
+        if (it->Symbol() != symbol)
         {
-            st.AddSymbol(it.Symbol(), it.Value());
+            st.AddSymbol(it->Symbol(), it->Label());
         }
     }
     t->SetInputSymbols(&st);
@@ -436,11 +435,10 @@ TropicalWeightTransducer::get_alphabet(StdVectorFst *t)
 {
     assert(t->InputSymbols() != NULL);
     StringSet s;
-    for (fst::SymbolTableIterator it
-         = fst::SymbolTableIterator(*(t->InputSymbols()));
-         !it.Done(); it.Next())
+    for (auto it = t->InputSymbols()->begin(); it != t->InputSymbols()->end();
+         ++it)
     {
-        s.insert(std::string(it.Symbol()));
+        s.insert(std::string(it->Symbol()));
     }
     return s;
 }
@@ -460,12 +458,11 @@ unsigned int
 TropicalWeightTransducer::get_biggest_symbol_number(StdVectorFst *t)
 {
     unsigned int biggest_number = 0;
-    for (fst::SymbolTableIterator it
-         = fst::SymbolTableIterator(*(t->InputSymbols()));
-         !it.Done(); it.Next())
+    for (auto it = t->InputSymbols()->begin(); it != t->InputSymbols()->end();
+         ++it)
     {
-        if (it.Value() > biggest_number)
-            biggest_number = it.Value();
+        if (it->Label() > biggest_number)
+            biggest_number = it->Label();
     }
     return biggest_number;
 }
@@ -498,15 +495,14 @@ TropicalWeightTransducer::create_mapping(fst::StdVectorFst *t1,
 {
     NumberNumberMap km;
     // find the number-to-number mappings for transducer t1
-    for (fst::SymbolTableIterator it
-         = fst::SymbolTableIterator(*(t1->InputSymbols()));
-         !it.Done(); it.Next())
+    for (auto it = t1->InputSymbols()->begin();
+         it != t1->InputSymbols()->end(); ++it)
     {
-        km[(unsigned int)it.Value()]
-            = (unsigned int)t2->InputSymbols()->Find(it.Symbol());
+        km[(unsigned int)it->Label()]
+            = (unsigned int)t2->InputSymbols()->Find(it->Symbol());
 
-        assert(it.Value() >= 0);
-        assert(!(t2->InputSymbols()->Find(it.Symbol()) < 0));
+        assert(it->Label() >= 0);
+        assert(!(t2->InputSymbols()->Find(it->Symbol()) < 0));
     }
 
     return km;
@@ -1921,11 +1917,10 @@ StdVectorFst();
 void
 TropicalWeightTransducer::print_alphabet(const StdVectorFst *t)
 {
-    for (fst::SymbolTableIterator it
-         = fst::SymbolTableIterator(*t->InputSymbols());
-         !it.Done(); it.Next())
+    for (auto it = t->InputSymbols()->begin(); it != t->InputSymbols()->end();
+         ++it)
     {
-        fprintf(stderr, "'%s', ", it.Symbol().c_str());
+        fprintf(stderr, "'%s', ", it->Symbol().c_str());
     }
     fprintf(stderr, "\n");
 }
@@ -2170,7 +2165,7 @@ StdVectorFst *
 TropicalWeightTransducer::extract_input_language(StdVectorFst *t)
 {
     StdVectorFst *proj
-        = new StdVectorFst(ProjectFst<StdArc>(*t, PROJECT_INPUT));
+        = new StdVectorFst(ProjectFst<StdArc>(*t, ProjectType::INPUT));
     // substitute unknown with identity
     StdVectorFst *retval = substitute(proj, 1, 2);
     delete proj;
@@ -2182,7 +2177,7 @@ StdVectorFst *
 TropicalWeightTransducer::extract_output_language(StdVectorFst *t)
 {
     StdVectorFst *proj
-        = new StdVectorFst(ProjectFst<StdArc>(*t, PROJECT_OUTPUT));
+        = new StdVectorFst(ProjectFst<StdArc>(*t, ProjectType::OUTPUT));
     // substitute unknown with identity
     StdVectorFst *retval = substitute(proj, 1, 2);
     delete proj;
@@ -3225,12 +3220,11 @@ TropicalWeightTransducer::get_flag_diacritics(StdVectorFst *t)
 {
     FdTable<int64> *table = new FdTable<int64>();
     const fst::SymbolTable *symbols = t->InputSymbols();
-    for (fst::SymbolTableIterator it = fst::SymbolTableIterator(*symbols);
-         !it.Done(); it.Next())
+    for (auto it = symbols->begin(); it != symbols->end(); ++it)
     {
-        if (FdOperation::is_diacritic(it.Symbol()))
+        if (FdOperation::is_diacritic(it->Symbol()))
         {
-            table->define_diacritic(it.Value(), it.Symbol());
+            table->define_diacritic(it->Label(), it->Symbol());
         }
     }
     return table;

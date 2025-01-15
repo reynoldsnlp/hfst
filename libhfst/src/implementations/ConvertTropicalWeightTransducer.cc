@@ -60,14 +60,12 @@ handle_symbol_tables(fst::StdVectorFst *t, HfstBasicTransducer *net,
            an input or output symbol table. */
         if (inputsym != NULL)
         {
-            for (fst::SymbolTableIterator it
-                 = fst::SymbolTableIterator(*(inputsym));
-                 !it.Done(); it.Next())
+            for (auto it = inputsym->begin(); it != inputsym->end(); ++it)
             {
-                assert(it.Symbol() != "");
+                assert(it->Symbol() != "");
 
-                if (it.Value() != 0) // epsilon is not inserted
-                    net->add_symbol_to_alphabet(it.Symbol());
+                if (it->Label() != 0) // epsilon is not inserted
+                    net->add_symbol_to_alphabet(it->Symbol());
             }
         }
         /* If the transducer is an OpenFst transducer, it might have an output
@@ -76,13 +74,11 @@ handle_symbol_tables(fst::StdVectorFst *t, HfstBasicTransducer *net,
            input symbol table. */
         if (!has_hfst_header && outputsym != NULL)
         {
-            for (fst::SymbolTableIterator it
-                 = fst::SymbolTableIterator(*(outputsym));
-                 !it.Done(); it.Next())
+            for (auto it = outputsym->begin(); it != outputsym->end(); ++it)
             {
-                assert(it.Symbol() != "");
-                if (it.Value() != 0) // epsilon is not inserted
-                    net->add_symbol_to_alphabet(it.Symbol());
+                assert(it->Symbol() != "");
+                if (it->Label() != 0) // epsilon is not inserted
+                    net->add_symbol_to_alphabet(it->Symbol());
             }
         }
         return;
@@ -106,24 +102,20 @@ copy_alphabet(fst::StdVectorFst *t, HfstBasicTransducer *net)
 
     if (inputsym != NULL)
     {
-        for (fst::SymbolTableIterator it
-             = fst::SymbolTableIterator(*(inputsym));
-             !it.Done(); it.Next())
+        for (auto it = inputsym->begin(); it != inputsym->end(); ++it)
         {
-            assert(it.Symbol() != "");
-            if (it.Value() != 0) // epsilon is not inserted
-                net->add_symbol_to_alphabet(it.Symbol());
+            assert(it->Symbol() != "");
+            if (it->Label() != 0) // epsilon is not inserted
+                net->add_symbol_to_alphabet(it->Symbol());
         }
     }
     if (outputsym != NULL)
     {
-        for (fst::SymbolTableIterator it
-             = fst::SymbolTableIterator(*(outputsym));
-             !it.Done(); it.Next())
+        for (auto it = outputsym->begin(); it != outputsym->end(); ++it)
         {
-            assert(it.Symbol() != "");
-            if (it.Value() != 0) // epsilon is not inserted
-                net->add_symbol_to_alphabet(it.Symbol());
+            assert(it->Symbol() != "");
+            if (it->Label() != 0) // epsilon is not inserted
+                net->add_symbol_to_alphabet(it->Symbol());
         }
     }
 }

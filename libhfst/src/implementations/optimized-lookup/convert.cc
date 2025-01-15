@@ -241,13 +241,13 @@ ConvertTransducerAlphabet::populate_symbol_table(
         if (it->second != 0)
             symbol_table.push_back(ofst_symbol_table->Find(it->second));
     }
-    for (fst::SymbolTableIterator it(*ofst_symbol_table); !it.Done();
-         it.Next())
+    for (auto it = ofst_symbol_table->begin(); it != ofst_symbol_table->end();
+         ++it)
     {
-        if (input_symbol_counts.find(it.Value()) == input_symbol_counts.end())
+        if (input_symbol_counts.find(it->Label()) == input_symbol_counts.end())
         {
-            if (all_symbol_set.find(it.Symbol()) != all_symbol_set.end())
-                symbol_table.push_back(it.Symbol());
+            if (all_symbol_set.find(it->Symbol()) != all_symbol_set.end())
+                symbol_table.push_back(it->Symbol());
         }
     }
 }
@@ -255,14 +255,14 @@ ConvertTransducerAlphabet::populate_symbol_table(
 void
 ConvertTransducerAlphabet::set_maps()
 {
-    for (fst::SymbolTableIterator it(*(transducer->InputSymbols()));
-         !it.Done(); it.Next())
+    for (auto it = transducer->InputSymbols()->begin();
+         it != transducer->InputSymbols()->end(); ++it)
     {
         for (size_t i = 0; i < symbol_table.size(); i++)
         {
-            if (symbol_table[i] == it.Symbol())
+            if (symbol_table[i] == it->Symbol())
             {
-                input_symbols_map[it.Value()] = i;
+                input_symbols_map[it->Label()] = i;
                 break;
             }
         }
@@ -270,14 +270,14 @@ ConvertTransducerAlphabet::set_maps()
 
     if (transducer->OutputSymbols() != NULL)
     {
-        for (fst::SymbolTableIterator it(*(transducer->OutputSymbols()));
-             !it.Done(); it.Next())
+        for (auto it = transducer->OutputSymbols()->begin();
+             it != transducer->OutputSymbols()->end(); ++it)
         {
             for (size_t i = 0; i < symbol_table.size(); i++)
             {
-                if (symbol_table[i] == it.Symbol())
+                if (symbol_table[i] == it->Symbol())
                 {
-                    output_symbols_map[it.Value()] = i;
+                    output_symbols_map[it->Label()] = i;
                     break;
                 }
             }
@@ -313,18 +313,18 @@ ConvertTransducerAlphabet::display() const
         std::cout << i << ": " << symbol_table[i] << std::endl;
 
     std::cout << "Initial input symbols (old/new: string):" << std::endl;
-    for (fst::SymbolTableIterator i(*(transducer->InputSymbols())); !i.Done();
-         i.Next())
-        std::cout << i.Value() << "/" << lookup_ofst_input_symbol(i.Value())
-                  << ": " << i.Symbol() << std::endl;
+    for (auto i = transducer->InputSymbols()->begin();
+         i != transducer->InputSymbols()->end(); ++i)
+        std::cout << i->Label() << "/" << lookup_ofst_input_symbol(i->Label())
+                  << ": " << i->Symbol() << std::endl;
     std::cout << "Initial output symbols: (old/new: string)" << std::endl;
     if (transducer->OutputSymbols() != NULL)
     {
-        for (fst::SymbolTableIterator i(*(transducer->InputSymbols()));
-             !i.Done(); i.Next())
-            std::cout << i.Value() << "/"
-                      << lookup_ofst_output_symbol(i.Value()) << ": "
-                      << i.Symbol() << std::endl;
+        for (auto i = transducer->InputSymbols()->begin();
+             i != transducer->InputSymbols()->end(); ++i)
+            std::cout << i->Label() << "/"
+                      << lookup_ofst_output_symbol(i->Label()) << ": "
+                      << i->Symbol() << std::endl;
     }
     else
         std::cout << "[NULL]" << std::endl;
