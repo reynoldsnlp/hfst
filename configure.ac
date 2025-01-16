@@ -685,6 +685,7 @@ AS_IF([test "x$with_readline" = "xyes"],
 AC_CHECK_DECLS([program_name, program_invocation_name, program_invocation_short_name])
 AC_CHECK_DECLS([rl_completion_suppress_append, rl_completion_matches])
 AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line strndup getline getdelim getopt_long strtod xstrdup set_program_name setprogname setlocale nl_langinfo get_current_dir_name])
+AC_CHECK_FUNCS([isatty])
 
 AM_CONDITIONAL([WINDOWS], [test x$version_type = xwindows])
 

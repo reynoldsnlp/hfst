@@ -24,6 +24,13 @@
  */
 
 #include "hfst-optimized-lookup.h"
+// FIXME: while not integrated with hfst commandline
+enum colour_tristate
+{
+    COLOUR_NEVER,
+    COLOUR_ALWAYS,
+    COLOUR_AUTO
+};
 #include "inc/globals-common.h" // some cc files include extern declarations for these variables...
 
 // #ifdef _MSC_VER

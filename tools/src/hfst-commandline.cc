@@ -86,7 +86,29 @@ error_at_line(int status, int errnum, const char *filename,
     }
 }
 #endif
-
+void
+hfst_error_at_line(int status, int errnum, const char *filename,
+                   unsigned int linenum, const char *fmt, ...)
+{
+    maybe_print_colour(stderr, COLOUR_BOLD);
+    fprintf(stderr, "%s.%u: ", filename, linenum);
+    maybe_print_colour(stderr, COLOUR_RED);
+    fprintf(stderr, "Error: ");
+    maybe_print_colour(stderr, COLOUR_RESET);
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    if (errnum != 0)
+    {
+        maybe_print_colour(stderr, COLOUR_MAGENTA);
+        fprintf(stderr, "%s", strerror(errnum));
+        maybe_print_colour(stderr, COLOUR_RESET);
+    }
+    if (status != 0)
+    {
+        exit(status);
+    }
+}
 #ifndef HAVE_ERROR
 void
 error(int status, int errnum, const char *fmt, ...)
@@ -107,6 +129,31 @@ error(int status, int errnum, const char *fmt, ...)
     }
 }
 #endif
+void
+hfst_error(int status, int errnum, const char *fmt, ...)
+{
+    maybe_print_colour(stderr, COLOUR_BOLD);
+    fprintf(stderr, "%s: ", program_name);
+    maybe_print_colour(stderr, COLOUR_RED);
+    fprintf(stderr, "Error: ");
+    maybe_print_colour(stderr, COLOUR_RESET);
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    if (errnum != 0)
+    {
+        maybe_print_colour(stderr, COLOUR_MAGENTA);
+        fprintf(stderr, "%s", strerror(errnum));
+        maybe_print_colour(stderr, COLOUR_RESET);
+    }
+    fprintf(stderr, "\n");
+    if (status != 0)
+    {
+        exit(status);
+    }
+}
+
 #ifndef HAVE_WARNING
 void
 warning(int status, int errnum, const char *fmt, ...)
@@ -127,6 +174,30 @@ warning(int status, int errnum, const char *fmt, ...)
     }
 }
 #endif
+void
+hfst_warning(int status, int errnum, const char *fmt, ...)
+{
+    maybe_print_colour(stderr, COLOUR_BOLD);
+    fprintf(stderr, "%s: ", program_name);
+    maybe_print_colour(stderr, COLOUR_YELLOW);
+    fprintf(stderr, "Warning: ");
+    maybe_print_colour(stderr, COLOUR_RESET);
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    if (errnum != 0)
+    {
+        maybe_print_colour(stderr, COLOUR_MAGENTA);
+        fprintf(stderr, "%s", strerror(errnum));
+        maybe_print_colour(stderr, COLOUR_RESET);
+    }
+    fprintf(stderr, "\n");
+    if (status != 0)
+    {
+        exit(status);
+    }
+}
 
 // deprecated; everything's compatible
 int
@@ -268,7 +339,7 @@ hfst_strtoweight(const char *s)
     }
     else
     {
-        error(EXIT_FAILURE, errno, "%s not a weight", s);
+        hfst_error(EXIT_FAILURE, errno, "%s not a weight", s);
         return rv;
     }
 }
@@ -306,7 +377,7 @@ hfst_strtonumber(const char *s, bool *infinite)
     }
     else
     {
-        error(EXIT_FAILURE, errno, "%s not a number", s);
+        hfst_error(EXIT_FAILURE, errno, "%s not a number", s);
         return rv;
     }
 }
@@ -323,8 +394,8 @@ hfst_strtoul(char *s, int base)
     }
     else
     {
-        error(EXIT_FAILURE, errno, "%s is not a valid unsigned number string",
-              s);
+        hfst_error(EXIT_FAILURE, errno,
+                   "%s is not a valid unsigned number string", s);
         return rv;
     }
 }
@@ -341,8 +412,8 @@ hfst_strtol(char *s, int base)
     }
     else
     {
-        error(EXIT_FAILURE, errno, "%s is not a valid signed number string",
-              s);
+        hfst_error(EXIT_FAILURE, errno,
+                   "%s is not a valid signed number string", s);
         return rv;
     }
 }
@@ -393,15 +464,15 @@ hfst_parse_format_name(const char *s)
              || (strcasecmp(s, "ol") == 0))
     {
         rv = hfst::HFST_OLW_TYPE;
-        warning(0, 0,
-                "Ambiguous format name %s, guessing "
-                "optimized-lookup-weighted",
-                s);
+        hfst_warning(0, 0,
+                     "Ambiguous format name %s, guessing "
+                     "optimized-lookup-weighted",
+                     s);
     }
     else
     {
-        error(EXIT_FAILURE, 0, "Could not parse format name from string %s",
-              s);
+        hfst_error(EXIT_FAILURE, 0,
+                   "Could not parse format name from string %s", s);
         rv = hfst::UNSPECIFIED_TYPE;
         return rv;
     }
@@ -467,7 +538,7 @@ hfst_fopen(const char *filename, const char *mode)
     }
     else
     {
-        error(EXIT_FAILURE, errno, "Could not open '%s'. ", filename);
+        hfst_error(EXIT_FAILURE, errno, "Could not open '%s'. ", filename);
         return NULL;
     }
 }
@@ -478,7 +549,7 @@ hfst_fseek(FILE *stream, long offset, int whence)
     errno = 0;
     if (fseek(stream, offset, whence) != 0)
     {
-        error(EXIT_FAILURE, errno, "fseek failed");
+        hfst_error(EXIT_FAILURE, errno, "fseek failed");
     }
 }
 
@@ -493,7 +564,7 @@ hfst_ftell(FILE *stream)
     }
     else
     {
-        error(EXIT_FAILURE, errno, "ftell failed");
+        hfst_error(EXIT_FAILURE, errno, "ftell failed");
         return -1;
     }
 }
@@ -505,7 +576,7 @@ hfst_fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
     size_t rv = fread(ptr, size, nmemb, stream);
     if ((rv < nmemb) && (ferror(stream)))
     {
-        error(EXIT_FAILURE, errno, "fread failed");
+        hfst_error(EXIT_FAILURE, errno, "fread failed");
     }
     return rv;
 }
@@ -517,7 +588,7 @@ hfst_fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream)
     size_t rv = fwrite(ptr, size, nmemb, stream);
     if ((rv < nmemb) || (ferror(stream)))
     {
-        error(EXIT_FAILURE, errno, "fwrite failed");
+        hfst_error(EXIT_FAILURE, errno, "fwrite failed");
     }
     return rv;
 }
@@ -529,7 +600,7 @@ hfst_tmpfile()
     FILE *rv = tmpfile();
     if (NULL == rv)
     {
-        error(EXIT_FAILURE, errno, "tmpfile failed");
+        hfst_error(EXIT_FAILURE, errno, "tmpfile failed");
     }
     return rv;
 }
@@ -541,7 +612,7 @@ hfst_close(int fd)
     int rv = close(fd);
     if (rv == -1)
     {
-        error(EXIT_FAILURE, errno, "close failed");
+        hfst_error(EXIT_FAILURE, errno, "close failed");
     }
     return rv;
 }
@@ -553,7 +624,7 @@ hfst_open(const char *pathname, int flags)
     int rv = open(pathname, flags);
     if (rv == -1)
     {
-        error(EXIT_FAILURE, errno, "open failed");
+        hfst_error(EXIT_FAILURE, errno, "open failed");
     }
     return rv;
 }
@@ -563,14 +634,15 @@ hfst_read(int fd, void *buf, size_t count)
 {
     if (count > SSIZE_MAX)
     {
-        error(EXIT_FAILURE, 0,
-              "cannot read " SIZE_T_SPECIFIER " bytes in one read(2)", count);
+        hfst_error(EXIT_FAILURE, 0,
+                   "cannot read " SIZE_T_SPECIFIER " bytes in one read(2)",
+                   count);
     }
     errno = 0;
     ssize_t rv = read(fd, buf, count);
     if (rv == -1)
     {
-        error(EXIT_FAILURE, errno, "read failed");
+        hfst_error(EXIT_FAILURE, errno, "read failed");
     }
     return rv;
 }
@@ -582,7 +654,7 @@ hfst_write(int fd, const void *buf, size_t count)
     ssize_t rv = write(fd, buf, count);
     if (rv == -1)
     {
-        error(EXIT_FAILURE, errno, "write failed");
+        hfst_error(EXIT_FAILURE, errno, "write failed");
     }
     return rv;
 }
@@ -591,15 +663,15 @@ int
 hfst_mkstemp(char *templ)
 {
 #ifdef _WIN32
-    error(EXIT_FAILURE, errno,
-          "'int hfst_mkstemp(char * temp1)' not implemented for windows");
+    hfst_error(EXIT_FAILURE, errno,
+               "'int hfst_mkstemp(char * temp1)' not implemented for windows");
     return 1; // keep compiler happy
 #else
     errno = 0;
     int rv = mkstemp(templ);
     if (rv == -1)
     {
-        error(EXIT_FAILURE, errno, "mkstemp failed");
+        hfst_error(EXIT_FAILURE, errno, "mkstemp failed");
     }
     return rv;
 #endif
@@ -612,7 +684,7 @@ hfst_remove(const char *filename)
     int rv = remove(filename);
     if (rv == -1)
     {
-        error(EXIT_FAILURE, errno, "remove %s failed", filename);
+        hfst_error(EXIT_FAILURE, errno, "remove %s failed", filename);
     }
     return rv;
 }
@@ -643,7 +715,7 @@ hfst_strdup(const char *s)
     char *rv = strdup(s);
     if (rv == NULL)
     {
-        error(EXIT_FAILURE, errno, "strdup failed");
+        hfst_error(EXIT_FAILURE, errno, "strdup failed");
     }
     return rv;
 }
@@ -654,7 +726,7 @@ hfst_strndup(const char *s, size_t n)
     char *rv = strndup(s, n);
     if (rv == NULL)
     {
-        error(EXIT_FAILURE, errno, "strndup failed");
+        hfst_error(EXIT_FAILURE, errno, "strndup failed");
     }
     return rv;
 }
@@ -748,7 +820,7 @@ hfst_getdelim(char **lineptr, size_t *n, int delim, FILE *stream)
     rv = getdelim(lineptr, n, delim, stream);
     if ((rv < 0) && errno)
     {
-        error(EXIT_FAILURE, errno, "getdelim failed");
+        hfst_error(EXIT_FAILURE, errno, "getdelim failed");
     }
     return rv;
 }
@@ -761,7 +833,7 @@ hfst_getline(char **lineptr, size_t *n, FILE *stream)
     rv = getline(lineptr, n, stream);
     if ((rv < 0) && errno)
     {
-        error(EXIT_FAILURE, errno, "getline failed");
+        hfst_error(EXIT_FAILURE, errno, "getline failed");
     }
     return rv;
 }
@@ -794,9 +866,9 @@ hfst_setlocale()
     char *rv = setlocale(LC_ALL, "");
     if (NULL == rv)
     {
-        error(EXIT_FAILURE, errno,
-              "Unable to set locale for character "
-              "settings");
+        hfst_error(EXIT_FAILURE, errno,
+                   "Unable to set locale for character "
+                   "settings");
     }
 #else
     char *rv = NULL;
@@ -835,7 +907,7 @@ hfst_malloc(size_t s)
     void *rv = malloc(s);
     if ((rv == NULL) && (s > 0))
     {
-        error(EXIT_FAILURE, errno, "malloc failed");
+        hfst_error(EXIT_FAILURE, errno, "malloc failed");
     }
     return rv;
 }
@@ -846,7 +918,7 @@ hfst_realloc(void *ptr, size_t s)
     void *rv = realloc(ptr, s);
     if ((rv == NULL) && (s > 0))
     {
-        error(EXIT_FAILURE, errno, "realloc failed");
+        hfst_error(EXIT_FAILURE, errno, "realloc failed");
     }
     return rv;
 }
@@ -939,5 +1011,52 @@ extend_options_getenv(int *argc, char ***argv)
         *new_arg_spot = hfst_strdup(new_arg);
         (*argc)++;
         new_arg = strtok(NULL, " ");
+    }
+}
+
+#ifndef HAVE_ISATTY
+int
+isatty(int)
+{
+    return false;
+}
+#endif
+
+bool
+should_colourise()
+{
+    if (colour == COLOUR_AUTO)
+    {
+        // this is not the best heuristic but wfm
+        if (isatty(1))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else if (colour == COLOUR_ALWAYS)
+    {
+        return true;
+    }
+    else if (colour == COLOUR_NEVER)
+    {
+        return false;
+    }
+    else
+    {
+        assert(false);
+        return false;
+    }
+}
+
+void
+maybe_print_colour(FILE *f, const char *colour)
+{
+    if (should_colourise())
+    {
+        fprintf(f, "%s", colour);
     }
 }

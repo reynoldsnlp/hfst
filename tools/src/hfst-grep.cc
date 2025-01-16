@@ -86,7 +86,6 @@ bool print_only_unmatching_filenames = false;
 bool print_only_count = false;
 bool count_matches = false;
 bool print_filename_null = false;
-bool color_matches = false;
 unsigned long before_context = 0;
 unsigned long after_context = 0;
 unsigned long matches = 0;
@@ -386,9 +385,6 @@ parse_options(int argc, char **argv)
             before_context = hfst_strtoul(optarg, 10);
             after_context = hfst_strtoul(optarg, 10);
             break;
-        case COLOR_OPT:
-            color_matches = true;
-            break;
         case 'u':
         case 'U':
             error(EXIT_FAILURE, 0,
@@ -557,7 +553,7 @@ read_matcher(const char *expression)
 void
 extend_matcher_with_options()
 {
-    if (color_matches)
+    if (colour == COLOUR_ALWAYS)
     {
         verbose_printf("Adding color codes to match boundaries...\n");
         HfstTransducer colorStart("@_EPSILON_SYMBOL_@", "[31m", format);

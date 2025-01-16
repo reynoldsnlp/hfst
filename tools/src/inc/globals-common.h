@@ -14,6 +14,8 @@
 bool verbose = false;
 bool silent = false;
 bool debug = false;
+colour_tristate colour = COLOUR_AUTO;
+
 FILE *message_out = stdout;
 #if !HAVE_DECL_PROGRAM_NAME
 const char *program_name = 0;

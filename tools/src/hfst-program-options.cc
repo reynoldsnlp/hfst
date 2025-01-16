@@ -27,7 +27,9 @@ print_common_program_options(FILE *file)
             "  -v, --verbose          Print verbosely while processing\n"
             "  -q, --quiet            Only print fatal erros and requested "
             "output\n"
-            "  -s, --silent           Alias of --quiet\n");
+            "  -s, --silent           Alias of --quiet\n"
+            "      --colour[=WHEN]    Print in colour WHEN:\n"
+            "      --color[=WHEN]     always, never, auto (default)\n");
 }
 
 // One transducer to one transducer:

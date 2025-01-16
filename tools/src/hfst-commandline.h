@@ -45,6 +45,19 @@ namespace hfst
 class HfstInputStream;
 };
 
+/** tristate variable for colour settings where neutral unset is autodetect. */
+enum colour_tristate
+{
+    COLOUR_NEVER,
+    COLOUR_ALWAYS,
+    COLOUR_AUTO
+};
+/** colour setting for messages. */
+extern colour_tristate colour;
+
+/** option "character" for colour */
+#define GETOPT_COLOUR 27
+
 /* These variables should be used in all command line programs.
  * In some cases they may be nonsensical; just define something then.
  */
@@ -122,10 +135,14 @@ extern const char *program_name;
 /** @brief print standard formatted error message and exit if needed */
 void error(int status, int error, const char *format, ...);
 #endif
+/** @brief print standard formatted error message in colours and stuff. */
+void hfst_error(int status, int error, const char *format, ...);
 #ifndef HAVE_WARNING
 /** @brief print standard formatted warning message and exit if needed */
 void warning(int status, int error, const char *format, ...);
 #endif
+/** @brief print standard formatted warning messag in colour and stuff. */
+void hfst_warning(int status, int error, const char *format, ...);
 
 #ifndef HAVE_ERROR_AT_LINE
 /**
@@ -137,6 +154,11 @@ void warning(int status, int error, const char *format, ...);
 void error_at_line(int status, int errnum, const char *filename,
                    unsigned int linenum, const char *fmt, ...);
 #endif
+/**
+ * @brief print potentially colourised erroŕ message whne parsing a file.
+ */
+void hfst_error_at_line(int status, int errnum, const char *filename,
+                        unsigned int linenum, const char *fmt, ...);
 
 /**
  *
@@ -345,6 +367,26 @@ char *hfst_setlocale();
  * @deprecated all formats are compatible in HFST3
  */
 int get_compatible_fst_format(std::istream &is1, std::istream &is2);
+
+/**
+ * @brief check if we should output colours when possible
+ */
+bool should_colourise();
+/**
+ * @brief prints @a colour to @a f if file should be colourised.
+ *
+ * @sa should_colourise
+ */
+void maybe_print_colour(FILE *f, const char *colour);
+
+#define COLOUR_BOLD "\033[01m"
+#define COLOUR_RED "\033[31m"
+#define COLOUR_GREEN "\033[32m"
+#define COLOUR_YELLOW "\033[33m"
+#define COLOUR_BLUE "\033[34m"
+#define COLOUR_MAGENTA "\033[35m"
+#define COLOUR_CYAN "\033[36m"
+#define COLOUR_RESET "\033[0m"
 
 #endif
 // vim: set ft=cpp.doxygen:

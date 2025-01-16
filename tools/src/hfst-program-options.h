@@ -18,7 +18,11 @@ void print_common_program_options(FILE *file);
 #define HFST_GETOPT_COMMON_LONG                                               \
     { "help", no_argument, 0, 'h' }, { "version", no_argument, 0, 'V' },      \
         { "verbose", no_argument, 0, 'v' }, { "quiet", no_argument, 0, 'q' }, \
-        { "silent", no_argument, 0, 's' }, { "debug", no_argument, 0, 'd' }
+        { "silent", no_argument, 0, 's' }, { "debug", no_argument, 0, 'd' },  \
+        { "color", optional_argument, 0, GETOPT_COLOUR },                     \
+    {                                                                         \
+        "colour", optional_argument, 0, GETOPT_COLOUR                         \
+    }
 
 // One transducer to one transducer:
 //   compatible
