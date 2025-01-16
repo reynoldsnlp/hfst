@@ -1,19 +1,17 @@
-=================================
- NEWS for hfst-tools and library
-=================================
+# NEWS for hfst-tools and library
 
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
-Noteworthy changes in 3.16.2
-----------------------------
+## Noteworthy changes in 3.16.2
 
 * Support for >OpenFst-1.8.0
-
+    * only functional change is removal of n-best paths search for log weight
+      automata, it probably has errored out before but has slightly different
+      error now (HfstException instead of openfst exit)
 * Optimisations to hfst-pmatch2fst alphabet handling
 
-Noteworthy changes in 3.16.1
-----------------------------
+## Noteworthy changes in 3.16.1
 
 * Bug fixes:
 
