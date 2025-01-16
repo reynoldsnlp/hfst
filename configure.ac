@@ -642,8 +642,24 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h]
 
 AC_LANG_PUSH([C++])
 
-# We need exactly C++17. Lower is too old for ICU and OpenFST, but higher is too new for the highest version of OpenFST that we can build against (OpenFST 1.7.9).
-CXXFLAGS="$CXXFLAGS -std=c++17"
+found_fstlib_h=no
+# Checks for highest supported C++ standard that the installed OpenFST will work with
+# This settles for C++17 for OpenFST 1.7.9, but higher for >= 1.8.0
+for version in 26 2c 23 2b 20 2a 17; do
+  version_flag="-std=c++${version}"
+  AX_CHECK_COMPILE_FLAG([${version_flag}], [
+      old_cxxflags="$CXXFLAGS"
+      CXXFLAGS="$CXXFLAGS ${version_flag}"
+      AS_IF([test "x$with_openfst" != xno], [AC_CHECK_HEADER([fst/fstlib.h], [found_fstlib_h=yes; break], [])])
+      CXXFLAGS="$old_cxxflags"
+      AS_UNSET([ac_cv_header_fst_fstlib_h])
+    ], [version_flag=none])
+done
+AS_IF([test "$version_flag" = none], [
+  AC_MSG_ERROR([Could not enable at least C++17 - upgrade your compiler])
+])
+CXXFLAGS="$CXXFLAGS ${version_flag}"
+
 # Needed for M_LN2 and friends
 CPPFLAGS="$CPPFLAGS -D_GNU_SOURCE -D_USE_MATH_DEFINES"
 
@@ -690,7 +706,7 @@ AS_IF([test "x$enable_python_bindings" = "xyes"], [
 	])
 ])
 
-AS_IF([test "x$with_openfst" != xno], [AC_CHECK_HEADER([fst/fstlib.h], [], AC_MSG_ERROR([could not find OpenFST's fst/fstlib.h in include path]))])
+AS_IF([test "x$with_openfst" != xno && test "x$found_fstlib_h" != xyes], [AC_CHECK_HEADER([fst/fstlib.h], [], [AC_MSG_ERROR([could not find OpenFST's fst/fstlib.h in include path])])])
 
 AS_IF([test "x$with_foma" != xno], [PKG_CHECK_MODULES(FOMA, [libfoma >= 0.10.0])])
 
