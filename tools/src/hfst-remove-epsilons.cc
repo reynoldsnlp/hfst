@@ -4,7 +4,6 @@
 //!
 //! @author HFST Team
 
-
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, version 3 of the License.
@@ -18,15 +17,15 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifdef HAVE_CONFIG_H
-#  include <config.h>
+#include <config.h>
 #endif
 
 #ifdef WINDOWS
 #include <io.h>
 #endif
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <memory>
 
 #include <cstdio>
@@ -34,20 +33,19 @@
 #include <cstring>
 #include <getopt.h>
 
+#include "HfstInputStream.h"
+#include "HfstOutputStream.h"
+#include "HfstTransducer.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 #include "hfst-tool-metadata.h"
-#include "HfstTransducer.h"
-#include "HfstInputStream.h"
-#include "HfstOutputStream.h"
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
 
-using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
-
+using hfst::HfstTransducer;
 
 // add tools-specific variables here
 
@@ -56,9 +54,11 @@ print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     // Usage line
-    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-           "Remove epsilons from a transducer\n"
-        "\n", program_name);
+    fprintf(message_out,
+            "Usage: %s [OPTIONS...] [INFILE]\n"
+            "Remove epsilons from a transducer\n"
+            "\n",
+            program_name);
 
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out);
@@ -70,26 +70,23 @@ print_usage()
     print_more_info();
 }
 
-
 int
-parse_options(int argc, char** argv)
+parse_options(int argc, char **argv)
 {
     extend_options_getenv(&argc, &argv);
     // use of this function requires options are settable on global scope
     while (true)
     {
-        static const struct option long_options[] =
-        {
-          HFST_GETOPT_COMMON_LONG,
-          HFST_GETOPT_UNARY_LONG,
-          // add tool-specific options here
-            {0,0,0,0}
-        };
+        static const struct option long_options[]
+            = { HFST_GETOPT_COMMON_LONG,
+                HFST_GETOPT_UNARY_LONG,
+                // add tool-specific options here
+                { 0, 0, 0, 0 } };
         int option_index = 0;
         // add tool-specific options here
-        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT,
-                             long_options, &option_index);
+        int c = getopt_long(argc, argv,
+                            HFST_GETOPT_COMMON_SHORT HFST_GETOPT_UNARY_SHORT,
+                            long_options, &option_index);
         if (-1 == c)
         {
             break;
@@ -98,8 +95,8 @@ parse_options(int argc, char** argv)
         switch (c)
         {
 #include "inc/getopt-cases-common.h"
-#include "inc/getopt-cases-unary.h"
 #include "inc/getopt-cases-error.h"
+#include "inc/getopt-cases-unary.h"
         }
     }
 
@@ -109,31 +106,32 @@ parse_options(int argc, char** argv)
 }
 
 int
-process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
+process_stream(HfstInputStream &instream, HfstOutputStream &outstream)
 {
-  //instream.open();
-  //outstream.open();
-    
-  if (!silent)
-    hfst::set_warning_stream(&std::cerr);
+    // instream.open();
+    // outstream.open();
 
-    size_t transducer_n=0;
-    while(instream.is_good())
+    if (!silent)
+        hfst::set_warning_stream(&std::cerr);
+
+    size_t transducer_n = 0;
+    while (instream.is_good())
     {
         transducer_n++;
         HfstTransducer trans(instream);
-        char* inputname = hfst_get_name(trans, inputfilename);
+        char *inputname = hfst_get_name(trans, inputfilename);
         if (strlen(inputname) <= 0)
-          {
-            inputname = strdup(inputfilename);
-          }
-        if (transducer_n==1)
         {
-          verbose_printf("Removing epsilons %s...\n", inputname);
+            inputname = strdup(inputfilename);
+        }
+        if (transducer_n == 1)
+        {
+            verbose_printf("Removing epsilons %s...\n", inputname);
         }
         else
         {
-          verbose_printf("Removing epsilons %s..." SIZE_T_SPECIFIER "\n", inputname, transducer_n);
+            verbose_printf("Removing epsilons %s..." SIZE_T_SPECIFIER "\n",
+                           inputname, transducer_n);
         }
         trans.remove_epsilons();
         hfst_set_name(trans, trans, "remove-epsilons");
@@ -146,11 +144,12 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     return EXIT_SUCCESS;
 }
 
-
-int main( int argc, char **argv ) {
+int
+main(int argc, char **argv)
+{
 #ifdef WINDOWS
-  _setmode(0, _O_BINARY);
-  _setmode(1, _O_BINARY);
+    _setmode(0, _O_BINARY);
+    _setmode(1, _O_BINARY);
 #endif
 
     hfst_set_program_name(argv[0], "0.1", "HfstRemoveEpsilons");
@@ -168,30 +167,35 @@ int main( int argc, char **argv ) {
     {
         fclose(outfile);
     }
-    verbose_printf("Reading from %s, writing to %s\n",
-        inputfilename, outfilename);
+    verbose_printf("Reading from %s, writing to %s\n", inputfilename,
+                   outfilename);
     // here starts the buffer handling part
     std::unique_ptr<HfstInputStream> instream;
-    try {
-      instream.reset((inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream());
-    } catch(const HfstException e)  {
+    try
+    {
+        instream.reset((inputfile != stdin)
+                           ? new HfstInputStream(inputfilename)
+                           : new HfstInputStream());
+    }
+    catch (const HfstException e)
+    {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
     }
-    auto outstream = (outfile != stdout) ?
-        std::make_unique<HfstOutputStream>(outfilename, instream->get_type()) :
-        std::make_unique<HfstOutputStream>(instream->get_type());
-    
-    if ( is_input_stream_in_ol_format(*instream, "hfst-remove-epsilons"))
-      {
+    auto outstream
+        = (outfile != stdout)
+              ? std::make_unique<HfstOutputStream>(outfilename,
+                                                   instream->get_type())
+              : std::make_unique<HfstOutputStream>(instream->get_type());
+
+    if (is_input_stream_in_ol_format(*instream, "hfst-remove-epsilons"))
+    {
         return EXIT_FAILURE;
-      }
+    }
 
     retval = process_stream(*instream, *outstream);
     free(inputfilename);
     free(outfilename);
     return retval;
 }
-
