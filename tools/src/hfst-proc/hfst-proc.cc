@@ -18,6 +18,7 @@
 #endif
 
 #include <cstdio>
+#include "../hfst-commandline.h"
 #include "../inc/globals-common.h"
 
 #include <fstream>
@@ -99,7 +100,7 @@ void stream_error(const char* e)
 void stream_error(std::string e) {stream_error(e.c_str());}
 
 
-bool print_usage(void)
+void print_usage()
 {
   std::cout <<
     "\n" <<
@@ -142,10 +143,9 @@ bool print_usage(void)
     "Report bugs to " << PACKAGE_BUGREPORT << "\n" <<
 #endif
     "\n";
-  return true;
 }
 
-bool print_version(void)
+void print_version()
 {
   std::cout <<
     "\n" <<
@@ -155,13 +155,11 @@ bool print_version(void)
 #endif
     std::endl <<
     "copyright (C) 2009-2011 University of Helsinki\n";
-  return true;
 }
 
-bool print_short_help(void)
+void print_short_help()
 {
   print_usage();
-  return true;
 }
 
 int main(int argc, char **argv)
