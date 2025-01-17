@@ -241,8 +241,8 @@ parse_options(int argc, char **argv)
             }
             else
             {
-                error(EXIT_FAILURE, 0, "Cannot parse %s as function name",
-                      optarg);
+                hfst_error(EXIT_FAILURE, 0, "Cannot parse %s as function name",
+                           optarg);
                 return EXIT_FAILURE;
             }
             break;
@@ -276,9 +276,10 @@ parse_options(int argc, char **argv)
 
     if (arcs_only && ends_only)
     {
-        error(EXIT_FAILURE, 0,
-              "Options '--arcs-only' and '--end-states-only' cannot be used "
-              "at the same time");
+        hfst_error(
+            EXIT_FAILURE, 0,
+            "Options '--arcs-only' and '--end-states-only' cannot be used "
+            "at the same time");
         return EXIT_FAILURE;
     }
 
@@ -290,10 +291,10 @@ parse_options(int argc, char **argv)
     }
     if (upper_bound < lower_bound)
     {
-        warning(0, 0,
-                "Lower bound %f exceeds upper bound %f so reweight will"
-                " never apply",
-                lower_bound, upper_bound);
+        hfst_warning(0, 0,
+                     "Lower bound %f exceeds upper bound %f so reweight will"
+                     " never apply",
+                     lower_bound, upper_bound);
     }
     if (tsv_file_name != 0)
     {
@@ -419,9 +420,9 @@ process_stream(HfstInputStream &instream, HfstOutputStream &outstream)
         HfstTransducer trans(instream);
         if (trans.get_type() == hfst::FOMA_TYPE)
         {
-            warning(0, 0,
-                    "Weighting is not supported in this automaton type;"
-                    "weights will be discarded");
+            hfst_warning(0, 0,
+                         "Weighting is not supported in this automaton type;"
+                         "weights will be discarded");
         }
         char *inputname = hfst_get_name(trans, inputfilename);
         if (transducer_n == 1)
@@ -463,8 +464,8 @@ process_stream(HfstInputStream &instream, HfstOutputStream &outstream)
                 const char *tab = strstr(line, "\t");
                 if (NULL == tab)
                 {
-                    error_at_line(EXIT_FAILURE, 0, tsv_file_name, linen,
-                                  "at least one tab required per line");
+                    hfst_error_at_line(EXIT_FAILURE, 0, tsv_file_name, linen,
+                                       "at least one tab required per line");
                 }
                 const char *endstr = tab + 1;
                 while ((*endstr != '\0') && (*endstr != '\n'))
@@ -557,8 +558,8 @@ main(int argc, char **argv)
     }
     catch (const HfstException &e)
     {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                   inputfilename);
         return EXIT_FAILURE;
     }
     auto outstream

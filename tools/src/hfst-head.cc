@@ -119,7 +119,7 @@ parse_options(int argc, char **argv)
 #include "inc/check-params-unary.h"
     if (head_count == 0)
     {
-        warning(0, 0, "Argument 0 for count is not sensible");
+        hfst_warning(0, 0, "Argument 0 for count is not sensible");
     }
     return EXIT_CONTINUE;
 }
@@ -157,11 +157,11 @@ process_stream(HfstInputStream &instream, HfstOutputStream &outstream)
         }
         if (-head_count > first_but_n.size())
         {
-            warning(0, 0,
-                    "Stream in %s has less than " SIZE_T_SPECIFIER
-                    " automata; "
-                    "Nothing will be written to output",
-                    inputfilename, -head_count);
+            hfst_warning(0, 0,
+                         "Stream in %s has less than " SIZE_T_SPECIFIER
+                         " automata; "
+                         "Nothing will be written to output",
+                         inputfilename, -head_count);
         }
         for (unsigned int i = 0; i < -head_count; i++)
         {
@@ -225,8 +225,8 @@ main(int argc, char **argv)
     }
     catch (const HfstException e)
     {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                   inputfilename);
         return EXIT_FAILURE;
     }
     auto outstream

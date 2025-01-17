@@ -282,24 +282,27 @@ convert_transducers(hfst::HfstTransducer &first, hfst::HfstTransducer &second)
         return;
     else if (ct == 1)
     {
-        verbose_printf("warning: transducers have different types, converting "
-                       "to format %s\n",
-                       hfst_strformat(type1));
+        hfst_warning(0, 0,
+                     "transducers have different types, converting to "
+                     "format %s\n",
+                     hfst_strformat(type1));
         second.convert(type1);
     }
     else if (ct == 2)
     {
-        verbose_printf("warning: transducers have different types, converting "
-                       "to format %s\n",
-                       hfst_strformat(type2));
+        hfst_warning(0, 0,
+                     "transducers have different types, converting to "
+                     "format %s\n",
+                     hfst_strformat(type2));
         first.convert(type2);
     }
     else if (ct == -1)
     {
-        verbose_printf("warning: transducers have different types, converting "
-                       "to format %s,"
-                       " loss of information is possible\n",
-                       hfst_strformat(type1));
+        hfst_warning(0, 0,
+                     "transducers have different types, converting to "
+                     "format %s,"
+                     " loss of information is possible\n",
+                     hfst_strformat(type1));
         second.convert(type1);
     }
     else /* This should not happen. */
@@ -439,8 +442,8 @@ hfst_parse_format_name(const char *s)
     else if ((strcasecmp(s, "openfst") == 0) || (strcasecmp(s, "ofst") == 0))
     {
         rv = hfst::TROPICAL_OPENFST_TYPE;
-        warning(0, 0, "Ambiguous format name %s, guessing openfst-tropical",
-                s);
+        hfst_warning(0, 0,
+                     "Ambiguous format name %s, guessing openfst-tropical", s);
     }
     else if (strcasecmp(s, "foma") == 0)
     {

@@ -404,10 +404,10 @@ parse_options(int argc, char **argv)
             }
             else
             {
-                error(EXIT_FAILURE, 0,
-                      "Unknown output format %s; valid values are: "
-                      "xerox, cg, apertium\n",
-                      optarg);
+                hfst_error(EXIT_FAILURE, 0,
+                           "Unknown output format %s; valid values are: "
+                           "xerox, cg, apertium\n",
+                           optarg);
                 return EXIT_FAILURE;
             }
             break;
@@ -426,10 +426,10 @@ parse_options(int argc, char **argv)
             }
             else
             {
-                error(EXIT_FAILURE, 0,
-                      "Unknown input format %s; valid values are:"
-                      "utf8, spaced, apertium\n",
-                      optarg);
+                hfst_error(EXIT_FAILURE, 0,
+                           "Unknown input format %s; valid values are:"
+                           "utf8, spaced, apertium\n",
+                           optarg);
                 return EXIT_FAILURE;
             }
             break;
@@ -460,7 +460,6 @@ parse_options(int argc, char **argv)
             if (strcmp(optarg, "print-pairs") == 0)
             {
                 print_pairs = true;
-                /* error(EXIT_FAILURE, 0, "Unimplemented pair printing"); */
             }
             else if (strcmp(optarg, "print-space") == 0)
             {
@@ -481,8 +480,8 @@ parse_options(int argc, char **argv)
             }
             else
             {
-                error(EXIT_FAILURE, 0, "Xfst variable %s unrecognised",
-                      optarg);
+                hfst_error(EXIT_FAILURE, 0, "Xfst variable %s unrecognised",
+                           optarg);
             }
             break;
         case 'c':
@@ -518,8 +517,8 @@ parse_options(int argc, char **argv)
             }
             else
             {
-                error(EXIT_FAILURE, 0, "--pipe-mode argument %s unrecognised",
-                      optarg);
+                hfst_error(EXIT_FAILURE, 0,
+                           "--pipe-mode argument %s unrecognised", optarg);
             }
             break;
 
@@ -542,7 +541,7 @@ parse_options(int argc, char **argv)
             }
             else
             {
-                error(
+                hfst_error(
                     EXIT_FAILURE, 0,
                     "--cascade argument %s unrecognised, possible values are\n"
                     "{ union, priority-union, composition }",
@@ -1026,8 +1025,8 @@ string_to_utf8(char *p)
         }
         else
         {
-            error_at_line(EXIT_FAILURE, 0, inputfilename, linen,
-                          "%s not valid UTF-8\n", p);
+            hfst_error_at_line(EXIT_FAILURE, 0, inputfilename, linen,
+                               "%s not valid UTF-8\n", p);
         }
         char *nextu8 = hfst_strndup(p, u8len);
         path->push_back(nextu8);
@@ -1199,16 +1198,16 @@ lookup_simple(const HfstOneLevelPath &s, HfstTransducer &t, bool *infinity,
         if (!silent)
         {
             if (max_number == -1)
-                warning(0, 0,
-                        "Got infinite results, number of results limited "
-                        "to " SIZE_T_SPECIFIER "\n"
-                        "(can be controlled with --max-number=N)",
-                        maxnum);
+                hfst_warning(0, 0,
+                             "Got infinite results, number of results limited "
+                             "to " SIZE_T_SPECIFIER "\n"
+                             "(can be controlled with --max-number=N)",
+                             maxnum);
             else
-                warning(0, 0,
-                        "Got infinite results, number of results limited "
-                        "to " SIZE_T_SPECIFIER "",
-                        maxnum);
+                hfst_warning(0, 0,
+                             "Got infinite results, number of results limited "
+                             "to " SIZE_T_SPECIFIER "",
+                             maxnum);
         }
         if (print_pairs)
             lookup_fd_and_print(NULL, &t, *results, s, &maxnum,
@@ -1500,10 +1499,10 @@ lookup_simple(const HfstOneLevelPath &s, HfstBasicTransducer &t,
     {
         if (!silent && infinite_cutoff > 0)
         {
-            warning(0, 0,
-                    "Got infinite results, number of cycles limited "
-                    "to " SIZE_T_SPECIFIER "",
-                    infinite_cutoff);
+            hfst_warning(0, 0,
+                         "Got infinite results, number of cycles limited "
+                         "to " SIZE_T_SPECIFIER "",
+                         infinite_cutoff);
         }
         lookup_fd_and_print(&t, NULL, *results, s, &infinite_cutoff,
                             print_pairs_at_this_point, print_fail,
@@ -1944,9 +1943,9 @@ process_stream(HfstInputStream &inputstream, FILE *outstream)
         && (inputstream.get_type() == HFST_OL_TYPE
             || inputstream.get_type() == HFST_OLW_TYPE))
     {
-        error(EXIT_FAILURE, 0,
-              "not obeying flags not supported on "
-              "optimized lookup transducers");
+        hfst_error(EXIT_FAILURE, 0,
+                   "not obeying flags not supported on "
+                   "optimized lookup transducers");
     }
 
     // if transducer type is other than optimized_lookup,
@@ -1962,12 +1961,12 @@ process_stream(HfstInputStream &inputstream, FILE *outstream)
     {
         if (!silent)
         {
-            warning(0, 0,
-                    "It is not possible to perform fast lookups with %s "
-                    "format automata.\n"
-                    "Using HFST basic transducer format "
-                    "and performing slow lookups",
-                    hfst_strformat(cascade[0].get_type()));
+            hfst_warning(0, 0,
+                         "It is not possible to perform fast lookups with %s "
+                         "format automata.\n"
+                         "Using HFST basic transducer format "
+                         "and performing slow lookups",
+                         hfst_strformat(cascade[0].get_type()));
         }
     }
     long filesize = -1;
@@ -2143,8 +2142,8 @@ main(int argc, char **argv)
     }
     catch (const HfstException e)
     {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                   inputfilename);
         return EXIT_FAILURE;
     }
     process_stream(*instream, outfile);

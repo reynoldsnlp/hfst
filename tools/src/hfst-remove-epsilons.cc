@@ -179,8 +179,8 @@ main(int argc, char **argv)
     }
     catch (const HfstException e)
     {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                   inputfilename);
         return EXIT_FAILURE;
     }
     auto outstream

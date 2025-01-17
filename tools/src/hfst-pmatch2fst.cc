@@ -220,10 +220,11 @@ process_stream(HfstOutputStream &outstream)
 #ifdef _MSC_VER
     if (inputfile == stdin && !silent)
     {
-        warning(0, 0,
-                "Reading from standard input. UTF-8 characters\n"
-                "outside ascii range are supported only if input comes from a "
-                "file.");
+        hfst_warning(
+            0, 0,
+            "Reading from standard input. UTF-8 characters\n"
+            "outside ascii range are supported only if input comes from a "
+            "file.");
     }
 #endif
 

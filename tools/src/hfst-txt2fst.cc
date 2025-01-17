@@ -182,10 +182,11 @@ parse_options(int argc, char **argv)
     if (output_format == hfst::XFSM_TYPE && read_prolog_format
         && check_negative_epsilon_cycles)
     {
-        error(EXIT_FAILURE, 0,
-              "Error: checking negative epsilon cycles not supported when "
-              "reading in prolog format\n"
-              "and outputting in xfsm format.\n");
+        hfst_error(
+            EXIT_FAILURE, 0,
+            "Error: checking negative epsilon cycles not supported when "
+            "reading in prolog format\n"
+            "and outputting in xfsm format.\n");
         return EXIT_FAILURE;
     }
 
@@ -229,11 +230,12 @@ process_stream(HfstOutputStream &outstream)
                 }
                 catch (const HfstException &e)
                 {
-                    error(EXIT_FAILURE, 0,
-                          "Error when trying to convert text file (prolog) "
-                          "into xfsm format\n"
-                          "Note that the file may contain only one transducer "
-                          "in text format\n");
+                    hfst_error(
+                        EXIT_FAILURE, 0,
+                        "Error when trying to convert text file (prolog) "
+                        "into xfsm format\n"
+                        "Note that the file may contain only one transducer "
+                        "in text format\n");
                     return EXIT_FAILURE;
                 }
             }
@@ -252,9 +254,10 @@ process_stream(HfstOutputStream &outstream)
                     {
                         if (!silent)
                         {
-                            warning(0, 0,
-                                    "Transducer has epsilon cycles with a "
-                                    "negative weight.\n");
+                            hfst_warning(
+                                0, 0,
+                                "Transducer has epsilon cycles with a "
+                                "negative weight.\n");
                         }
                     }
                     else
@@ -271,10 +274,11 @@ process_stream(HfstOutputStream &outstream)
             }
             catch (NotValidPrologFormatException e)
             {
-                error(EXIT_FAILURE, 0,
-                      "Error in processing transducer text file (prolog) on "
-                      "line %u\n",
-                      linecount);
+                hfst_error(
+                    EXIT_FAILURE, 0,
+                    "Error in processing transducer text file (prolog) on "
+                    "line %u\n",
+                    linecount);
                 return EXIT_FAILURE;
             }
         }
@@ -322,9 +326,10 @@ process_stream(HfstOutputStream &outstream)
                     {
                         if (!silent)
                         {
-                            warning(0, 0,
-                                    "Transducer has epsilon cycles with a "
-                                    "negative weight.\n");
+                            hfst_warning(
+                                0, 0,
+                                "Transducer has epsilon cycles with a "
+                                "negative weight.\n");
                         }
                     }
                     else
@@ -337,10 +342,11 @@ process_stream(HfstOutputStream &outstream)
             }
             catch (NotValidAttFormatException e)
             {
-                error(EXIT_FAILURE, 0,
-                      "Error in processing transducer text file (att) on line "
-                      "%u\n",
-                      linecount);
+                hfst_error(
+                    EXIT_FAILURE, 0,
+                    "Error in processing transducer text file (att) on line "
+                    "%u\n",
+                    linecount);
                 return EXIT_FAILURE;
             }
         }
@@ -394,7 +400,8 @@ main(int argc, char **argv)
         verbose_printf("Using optimized lookup weighted output\n");
         break;
     default:
-        error(EXIT_FAILURE, 0, "Unknown format cannot be used as output\n");
+        hfst_error(EXIT_FAILURE, 0,
+                   "Unknown format cannot be used as output\n");
         return EXIT_FAILURE;
     }
 
@@ -402,25 +409,27 @@ main(int argc, char **argv)
     {
         if (strcmp(outfilename, "<stdout>") == 0)
         {
-            error(EXIT_FAILURE, 0,
-                  "Writing to standard output not supported for xfsm "
-                  "transducers,\n"
-                  "use 'hfst-txt2fst [--output|-o] OUTFILE' instead");
+            hfst_error(EXIT_FAILURE, 0,
+                       "Writing to standard output not supported for xfsm "
+                       "transducers,\n"
+                       "use 'hfst-txt2fst [--output|-o] OUTFILE' instead");
             return EXIT_FAILURE;
         }
         if (!read_prolog_format)
         {
-            error(EXIT_FAILURE, 0,
-                  "Writing in att format not supported for xfsm transducers,\n"
-                  "use '--prolog' instead");
+            hfst_error(
+                EXIT_FAILURE, 0,
+                "Writing in att format not supported for xfsm transducers,\n"
+                "use '--prolog' instead");
             return EXIT_FAILURE;
         }
         if (strcmp(inputfilename, "<stdin>") == 0)
         {
-            error(EXIT_FAILURE, 0,
-                  "Reading prolog format from standard input not supported "
-                  "for xfsm transducers,\n"
-                  "use 'hfst-txt2fst [--input|-i] INFILE' instead");
+            hfst_error(
+                EXIT_FAILURE, 0,
+                "Reading prolog format from standard input not supported "
+                "for xfsm transducers,\n"
+                "use 'hfst-txt2fst [--input|-i] INFILE' instead");
             return EXIT_FAILURE;
         }
         else

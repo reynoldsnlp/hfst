@@ -285,20 +285,20 @@ parse_options(int argc, char **argv)
             format = hfst_parse_format_name(optarg);
             break;
         case 'E':
-            error(EXIT_FAILURE, 0,
-                  "POSIX ERE syntax not yet "
-                  "supported");
+            hfst_error(EXIT_FAILURE, 0,
+                       "POSIX ERE syntax not yet "
+                       "supported");
             dialect_posix_ere = true;
             break;
         case 'F':
             dialect_fixed_strings = true;
             break;
         case 'G':
-            error(EXIT_FAILURE, 0, "POSIX BRE syntax not yet supported");
+            hfst_error(EXIT_FAILURE, 0, "POSIX BRE syntax not yet supported");
             dialect_posix_bre = true;
             break;
         case 'P':
-            error(EXIT_FAILURE, 0, "Perl syntax not yet supported");
+            hfst_error(EXIT_FAILURE, 0, "Perl syntax not yet supported");
             dialect_perl = true;
             break;
         case 'X':
@@ -311,7 +311,7 @@ parse_options(int argc, char **argv)
             expfile = hfst_fopen(optarg, "r");
             break;
         case 'I':
-            error(EXIT_FAILURE, 0, "Ignore case not supported");
+            hfst_error(EXIT_FAILURE, 0, "Ignore case not supported");
             break;
         case 'w':
             match_word = true;
@@ -345,22 +345,22 @@ parse_options(int argc, char **argv)
             print_only_matches = true;
             break;
         case BINARYFILES_OPT:
-            error(EXIT_FAILURE, 0, "No binary handling implemented");
+            hfst_error(EXIT_FAILURE, 0, "No binary handling implemented");
             break;
         case 'a':
-            warning(0, 0, "All files are always handled as text");
+            hfst_warning(0, 0, "All files are always handled as text");
             break;
         case 'D':
-            error(EXIT_FAILURE, 0, "No directory handling implemented");
+            hfst_error(EXIT_FAILURE, 0, "No directory handling implemented");
             break;
         case 'r':
-            error(EXIT_FAILURE, 0, "No directory handling implemented");
+            hfst_error(EXIT_FAILURE, 0, "No directory handling implemented");
             break;
         case INCLUDE_OPT:
         case EXCLUDE_OPT:
         case INCLUDEFROM_OPT:
         case EXCLUDEFROM_OPT:
-            error(EXIT_FAILURE, 0, "No directory/globbing implemented");
+            hfst_error(EXIT_FAILURE, 0, "No directory/globbing implemented");
             break;
         case 'L':
             print_only_unmatching_filenames = true;
@@ -387,9 +387,9 @@ parse_options(int argc, char **argv)
             break;
         case 'u':
         case 'U':
-            error(EXIT_FAILURE, 0,
-                  "MSDOS binary format not supported; use "
-                  "fromdos or dos2unix");
+            hfst_error(EXIT_FAILURE, 0,
+                       "MSDOS binary format not supported; use "
+                       "fromdos or dos2unix");
             break;
 
 #include "inc/getopt-cases-error.h"
@@ -398,7 +398,8 @@ parse_options(int argc, char **argv)
     if (!dialect_fixed_strings && !dialect_xerox && !dialect_posix_bre
         && !dialect_posix_ere && !dialect_perl)
     {
-        warning(0, 0, "Dialect not defined, defaulting to Xerox for now!");
+        hfst_warning(0, 0,
+                     "Dialect not defined, defaulting to Xerox for now!");
         dialect_xerox = true;
     }
     if (format == hfst::UNSPECIFIED_TYPE)
@@ -470,8 +471,8 @@ string_to_utf8(char *p)
         }
         else
         {
-            error_at_line(EXIT_FAILURE, 0, inputfilename, linen,
-                          "%s not valid UTF-8\n", p);
+            hfst_error_at_line(EXIT_FAILURE, 0, inputfilename, linen,
+                               "%s not valid UTF-8\n", p);
         }
         char *nextu8 = hfst_strndup(p, u8len);
         path->push_back(nextu8);
@@ -539,7 +540,7 @@ read_matcher(const char *expression)
     }
     else
     {
-        error(EXIT_FAILURE, 0, "dialect unsupported");
+        hfst_error(EXIT_FAILURE, 0, "dialect unsupported");
     }
     verbose_printf("minimizing...\n");
     matcher->minimize();

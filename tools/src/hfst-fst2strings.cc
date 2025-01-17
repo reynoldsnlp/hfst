@@ -235,9 +235,9 @@ parse_options(int argc, char **argv)
             }
             else
             {
-                error(0, EXIT_FAILURE,
-                      "Unrecognised xfst option. "
-                      "available options are obey-flags, print-flags\n");
+                hfst_error(0, EXIT_FAILURE,
+                           "Unrecognised xfst option. "
+                           "available options are obey-flags, print-flags\n");
             }
             break;
         case 'l':
@@ -511,8 +511,8 @@ process_stream(HfstInputStream &instream, std::ostream &outstream)
                 tc.extract_paths(best_paths);
                 if (best_paths.size() != 1)
                 {
-                    error(EXIT_FAILURE, 0,
-                          "n_best(1) produced more than one path");
+                    hfst_error(EXIT_FAILURE, 0,
+                               "n_best(1) produced more than one path");
                 }
                 max_weight = best_paths.begin()->first;
             }
@@ -521,19 +521,21 @@ process_stream(HfstInputStream &instream, std::ostream &outstream)
                 if (instream.get_type() == hfst::HFST_OL_TYPE
                     || instream.get_type() == hfst::HFST_OLW_TYPE)
                 {
-                    error(EXIT_FAILURE, 0,
-                          "option --beam not implemented for optimized lookup "
-                          "format");
+                    hfst_error(
+                        EXIT_FAILURE, 0,
+                        "option --beam not implemented for optimized lookup "
+                        "format");
                 }
                 else
                 {
-                    error(EXIT_FAILURE, 0, "option --beam not implemented");
+                    hfst_error(EXIT_FAILURE, 0,
+                               "option --beam not implemented");
                 }
                 return EXIT_FAILURE;
             }
             catch (const HfstFatalException &e)
             {
-                error(EXIT_FAILURE, 0, "n_best runs out of memory");
+                hfst_error(EXIT_FAILURE, 0, "n_best runs out of memory");
                 return EXIT_FAILURE;
             }
         }
@@ -551,19 +553,20 @@ process_stream(HfstInputStream &instream, std::ostream &outstream)
                 if (instream.get_type() == hfst::HFST_OL_TYPE
                     || instream.get_type() == hfst::HFST_OLW_TYPE)
                 {
-                    error(EXIT_FAILURE, 0,
-                          "option --nbest not implemented for optimized "
-                          "lookup format");
+                    hfst_error(EXIT_FAILURE, 0,
+                               "option --nbest not implemented for optimized "
+                               "lookup format");
                 }
                 else
                 {
-                    error(EXIT_FAILURE, 0, "option --nbest not implemented");
+                    hfst_error(EXIT_FAILURE, 0,
+                               "option --nbest not implemented");
                 }
                 return EXIT_FAILURE;
             }
             catch (const HfstFatalException &e)
             {
-                error(EXIT_FAILURE, 0, "n_best runs out of memory");
+                hfst_error(EXIT_FAILURE, 0, "n_best runs out of memory");
                 return EXIT_FAILURE;
             }
         }
@@ -573,7 +576,7 @@ process_stream(HfstInputStream &instream, std::ostream &outstream)
                 && max_input_length <= 0 && max_output_length <= 0
                 && cycles < 0 && t.is_cyclic())
             {
-                error(
+                hfst_error(
                     EXIT_FAILURE, 0,
                     "Transducer is cyclic. Use one or more of these options: "
                     "-n, -N, -r, -l, -L, -c");
@@ -620,13 +623,14 @@ process_stream(HfstInputStream &instream, std::ostream &outstream)
                 if (instream.get_type() == hfst::HFST_OL_TYPE
                     || instream.get_type() == hfst::HFST_OLW_TYPE)
                 {
-                    error(EXIT_FAILURE, 0,
-                          "option --random not implemented for optimized "
-                          "lookup format");
+                    hfst_error(EXIT_FAILURE, 0,
+                               "option --random not implemented for optimized "
+                               "lookup format");
                 }
                 else
                 {
-                    error(EXIT_FAILURE, 0, "option --random not implemented");
+                    hfst_error(EXIT_FAILURE, 0,
+                               "option --random not implemented");
                 }
                 return EXIT_FAILURE;
             }
@@ -662,8 +666,7 @@ main(int argc, char **argv)
 
     if (max_strings > 0 && max_random_strings > 0 && !silent)
     {
-        fprintf(stderr,
-                "warning: option --max_strings ignored, --random used\n");
+        hfst_warning(0, 0, "option --max_strings ignored, --random used\n");
         max_strings = -1;
     }
 

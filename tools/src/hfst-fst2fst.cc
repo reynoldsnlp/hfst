@@ -59,7 +59,7 @@ set_output_type(ImplementationType type)
 {
     if (output_type != hfst::UNSPECIFIED_TYPE)
     {
-        error(EXIT_FAILURE, 0, "Output type defined several times.");
+        hfst_error(EXIT_FAILURE, 0, "Output type defined several times.");
     }
     output_type = type;
 }
@@ -154,7 +154,9 @@ parse_options(int argc, char **argv)
             set_output_type(hfst_parse_format_name(optarg));
 #ifndef HAVE_XFSM
             if (output_type == hfst::XFSM_TYPE)
-                error(EXIT_FAILURE, 0, "xfsm back-end is not available");
+            {
+                hfst_error(EXIT_FAILURE, 0, "xfsm back-end is not available");
+            }
 #endif
             break;
         case 'b':
@@ -170,7 +172,7 @@ parse_options(int argc, char **argv)
 #ifdef HAVE_XFSM
             set_output_type(hfst::XFSM_TYPE);
 #else
-            error(EXIT_FAILURE, 0, "xfsm back-end is not available");
+            hfst_error(EXIT_FAILURE, 0, "xfsm back-end is not available");
 #endif
             break;
         case 't':
@@ -194,9 +196,9 @@ parse_options(int argc, char **argv)
 
     if (output_type == hfst::UNSPECIFIED_TYPE)
     {
-        error(EXIT_FAILURE, 0,
-              "You must specify an output type "
-              "(one of -S, -F, -t, -x, -l, -O, or -w)");
+        hfst_error(EXIT_FAILURE, 0,
+                   "You must specify an output type "
+                   "(one of -S, -F, -t, -x, -l, -O, or -w)");
     }
 
 #include "inc/check-params-common.h"
@@ -211,9 +213,9 @@ process_stream(HfstInputStream &instream, HfstOutputStream &outstream)
     {
         if (!silent)
         {
-            fprintf(
-                message_out,
-                "warning: converting native foma transducer: "
+            hfst_warning(
+                0, 0,
+                "converting native foma transducer: "
                 "inversion may be needed for hfst-lookup to work as expected "
                 "(hfst-flookup works as foma's flookup)\n");
         }
@@ -291,10 +293,10 @@ main(int argc, char **argv)
     {
         if (strcmp(outfilename, "<stdout>") == 0)
         {
-            error(EXIT_FAILURE, 0,
-                  "Writing to standard output not supported for xfsm "
-                  "transducers,\n"
-                  "use 'hfst-fst2fst [--output|-o] OUTFILE' instead");
+            hfst_error(EXIT_FAILURE, 0,
+                       "Writing to standard output not supported for xfsm "
+                       "transducers,\n"
+                       "use 'hfst-fst2fst [--output|-o] OUTFILE' instead");
             return EXIT_FAILURE;
         }
     }
@@ -309,30 +311,31 @@ main(int argc, char **argv)
     }
     catch (const FileIsInGZFormatException e)
     {
-        error(EXIT_FAILURE, 0,
-              "%s seems to be a gzipped native foma file, you must first "
-              "unzip it",
-              inputfilename);
+        hfst_error(EXIT_FAILURE, 0,
+                   "%s seems to be a gzipped native foma file, you must first "
+                   "unzip it",
+                   inputfilename);
         return EXIT_FAILURE;
     }
     catch (const ImplementationTypeNotAvailableException e)
     {
-        error(EXIT_FAILURE, 0, "%s is in %s format which is not available",
-              inputfilename,
-              hfst::implementation_type_to_format(e.get_type()));
+        hfst_error(EXIT_FAILURE, 0,
+                   "%s is in %s format which is not available", inputfilename,
+                   hfst::implementation_type_to_format(e.get_type()));
         return EXIT_FAILURE;
     }
     catch (const HfstException e)
     {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                   inputfilename);
 #if HAVE_XFSM
         if (inputfile == stdin)
         {
-            error(EXIT_FAILURE, 0,
-                  "note that you cannot read xfsm transducers from standard "
-                  "input,\n"
-                  "use hfst-fst2fst [--input|-i] INFILE instead");
+            hfst_error(
+                EXIT_FAILURE, 0,
+                "note that you cannot read xfsm transducers from standard "
+                "input,\n"
+                "use hfst-fst2fst [--input|-i] INFILE instead");
         }
 #endif
         return EXIT_FAILURE;

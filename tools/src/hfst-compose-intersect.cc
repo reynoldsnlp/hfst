@@ -307,16 +307,17 @@ compose_streams(HfstInputStream &firststream, HfstInputStream &secondstream)
                 throw "Error: hfst-compose-intersect: conversion_type "
                       "returned an invalid integer";
             }
-            warning(0, 0, warnstr.c_str());
+            hfst_warning(0, 0, warnstr.c_str());
         }
         else
         {
-            error(EXIT_FAILURE, 0,
-                  "Transducer type mismatch in %s and %s; "
-                  "formats %s and %s are not compatible for compose-intersect "
-                  "(--do-not-convert was requested)",
-                  firstfilename, secondfilename, hfst_strformat(type1),
-                  hfst_strformat(type2));
+            hfst_error(
+                EXIT_FAILURE, 0,
+                "Transducer type mismatch in %s and %s; "
+                "formats %s and %s are not compatible for compose-intersect "
+                "(--do-not-convert was requested)",
+                firstfilename, secondfilename, hfst_strformat(type1),
+                hfst_strformat(type2));
         }
     }
     else
@@ -386,7 +387,7 @@ compose_streams(HfstInputStream &firststream, HfstInputStream &secondstream)
             std::string symbol;
             if ((symbol = check_all_symbols(lexicon, rules[0])) != "")
             {
-                warning(
+                hfst_warning(
                     0, 0,
                     "\nFound output symbols (e.g. \"%s\") in transducer in\n"
                     "file %s which will be filtered out because they are\n"
@@ -397,11 +398,12 @@ compose_streams(HfstInputStream &firststream, HfstInputStream &secondstream)
             else if ((symbol = check_multi_char_symbols(lexicon, rules[0]))
                      != "")
             {
-                warning(0, 0,
-                        "\nFound output multi-char symbols (\"%s\") in \n"
-                        "transducer in file %s which are not found on the\n"
-                        "input tapes of transducers in file %s.",
-                        symbol.c_str(), firstfilename, secondfilename);
+                hfst_warning(
+                    0, 0,
+                    "\nFound output multi-char symbols (\"%s\") in \n"
+                    "transducer in file %s which are not found on the\n"
+                    "input tapes of transducers in file %s.",
+                    symbol.c_str(), firstfilename, secondfilename);
             }
         }
 
@@ -500,8 +502,8 @@ main(int argc, char **argv)
     }
     catch (const HfstException e)
     {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              firstfilename);
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                   firstfilename);
     }
     try
     {
@@ -511,8 +513,8 @@ main(int argc, char **argv)
     }
     catch (const HfstException e)
     {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              secondfilename);
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                   secondfilename);
     }
 
     retval = compose_streams(*firststream, *secondstream);

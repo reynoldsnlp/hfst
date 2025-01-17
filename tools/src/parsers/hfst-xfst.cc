@@ -155,7 +155,7 @@ parse_options(int argc, char **argv)
 
         switch (c)
         {
-            // copied from "inc/getopt-cases-common.h"
+            // copied from "inc/getopt-cases-common.h" (with exceptions)
         case 'd':
             debug = true;
             break;
@@ -176,6 +176,32 @@ parse_options(int argc, char **argv)
             verbose = false;
             silent = true;
             break;
+        // not using standard case o
+        case GETOPT_COLOUR:
+            if (optarg == 0)
+            {
+                colour = COLOUR_ALWAYS;
+            }
+            else if (strcmp(optarg, "always") == 0)
+            {
+                colour = COLOUR_ALWAYS;
+            }
+            else if (strcmp(optarg, "never") == 0)
+            {
+                colour = COLOUR_NEVER;
+            }
+            else if (strcmp(optarg, "auto") == 0)
+            {
+                colour = COLOUR_NEVER;
+            }
+            else
+            {
+                hfst_error(
+                    EXIT_FAILURE, 0,
+                    "--colour must be one of always, never, or auto, not %s",
+                    optarg);
+            }
+            break;
         case 'f':
             output_format = hfst_parse_format_name(optarg);
             break;
@@ -183,8 +209,8 @@ parse_options(int argc, char **argv)
             scriptfilename = hfst_strdup(optarg);
             break;
             // todo: on windows getopt_long does not support unicode:
-            // e.g. option  -e 'regex U;'  where U is a unicode character is
-            // not possible
+            // e.g. option  -e 'regex U;'  where U is a unicode character
+            // is not possible
         case 'e':
             execute_commands.push_back(std::string(optarg));
             break;
@@ -265,13 +291,13 @@ parse_file(const char *filename, hfst::xfst::XfstCompiler &comp)
     char *line = hfst_file_to_mem(filename);
     if (NULL == line)
     {
-        error(EXIT_FAILURE, 0, "error when reading file %s\n", filename);
+        hfst_error(EXIT_FAILURE, 0, "error when reading file %s\n", filename);
         return EXIT_FAILURE;
     }
 
     if (0 != comp.parse_line(line))
     {
-        error(EXIT_FAILURE, 0, "error when parsing file %s\n", filename);
+        hfst_error(EXIT_FAILURE, 0, "error when parsing file %s\n", filename);
         return EXIT_FAILURE;
     }
     free(line);
@@ -412,16 +438,17 @@ main(int argc, char **argv)
 
     if (pipe_input && (scriptfilename != NULL))
     {
-        error(EXIT_FAILURE, 0,
-              "--pipe-mode and --scriptfile cannot be used simultaneously\n");
+        hfst_error(EXIT_FAILURE, 0,
+                   "--pipe-mode and --scriptfile cannot be used "
+                   "simultaneously\n");
         return EXIT_FAILURE;
     }
 
     if ((startupfilename != NULL) && (scriptfilename != NULL))
     {
-        error(
-            EXIT_FAILURE, 0,
-            "--startupfile and --scriptfile cannot be used simultaneously\n");
+        hfst_error(EXIT_FAILURE, 0,
+                   "--startupfile and --scriptfile cannot be used "
+                   "simultaneously\n");
         return EXIT_FAILURE;
     }
 
@@ -459,8 +486,8 @@ main(int argc, char **argv)
                 cmd.c_str());
             if (0 != comp.parse_line(cmd))
             {
-                error(EXIT_FAILURE, 0, "command '%s' could not be parsed\n",
-                      cmd.c_str());
+                hfst_error(EXIT_FAILURE, 0,
+                           "command '%s' could not be parsed\n", cmd.c_str());
                 return EXIT_FAILURE;
             }
         }
@@ -472,8 +499,9 @@ main(int argc, char **argv)
                 execute_command_and_quit);
             if (0 != comp.parse_line(execute_command_and_quit))
             {
-                error(EXIT_FAILURE, 0, "command '%s' could not be parsed\n",
-                      execute_command_and_quit);
+                hfst_error(EXIT_FAILURE, 0,
+                           "command '%s' could not be parsed\n",
+                           execute_command_and_quit);
                 return EXIT_FAILURE;
             }
             return EXIT_SUCCESS;
@@ -527,8 +555,8 @@ main(int argc, char **argv)
             const HANDLE stdIn = GetStdHandle(STD_INPUT_HANDLE);
             WCHAR buffer[0x1000];
             DWORD numRead = 0;
-            while (ReadConsoleW(stdIn, buffer, size_t((0x1000)/4), &numRead,
-            NULL))
+            while (ReadConsoleW(stdIn, buffer, size_t((0x1000)/4),
+            &numRead, NULL))
               {
                 std::wstring wstr(buffer, numRead);
                 std::string linestr = hfst::wide_string_to_string(wstr);
@@ -583,7 +611,8 @@ main(int argc, char **argv)
         else
         {
 #ifdef HAVE_READLINE
-            // support for backspace and Up/Down keys, needs readline library
+            // support for backspace and Up/Down keys, needs readline
+            // library
 
             verbose_printf("Starting interactive mode...\n");
             comp.setPromptVerbosity(false); // prompts handled manually

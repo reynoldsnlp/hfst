@@ -232,7 +232,7 @@ parse_options(int argc, char **argv)
     {
         if (!silent)
         {
-            warning(0, 0, "Defaulting to OpenFst tropical type");
+            hfst_warning(0, 0, "Defaulting to OpenFst tropical type");
         }
         format = hfst::TROPICAL_OPENFST_TYPE;
     }
@@ -275,7 +275,7 @@ lexc_streams(LexcCompiler &lexc, HfstOutputStream &outstream)
 #ifdef _MSC_VER
             if (!silent)
             {
-                warning(
+                hfst_warning(
                     0, 0,
                     "Reading from standard input. UTF-8 characters outside\n"
                     "ascii range are supported only if input comes from a "
@@ -296,19 +296,21 @@ lexc_streams(LexcCompiler &lexc, HfstOutputStream &outstream)
     {
         if (lexccount == 1)
         {
-            error(EXIT_FAILURE, 0,
-                  "The file %s did not compile cleanly.\n"
-                  "(if there are no error messages above, try -v or -d to "
-                  "get more info)",
-                  lexcfilenames[0]);
+            hfst_error(
+                EXIT_FAILURE, 0,
+                "The file %s did not compile cleanly.\n"
+                "(if there are no error messages above, try -v or -d to "
+                "get more info)",
+                lexcfilenames[0]);
         }
         else
         {
-            error(EXIT_FAILURE, 0,
-                  "The files %s... did not compile cleanly.\n"
-                  "(if there are no error messages above, try -v or -d to "
-                  "get more info)",
-                  lexcfilenames[0]);
+            hfst_error(
+                EXIT_FAILURE, 0,
+                "The files %s... did not compile cleanly.\n"
+                "(if there are no error messages above, try -v or -d to "
+                "get more info)",
+                lexcfilenames[0]);
         }
         return EXIT_FAILURE;
     }

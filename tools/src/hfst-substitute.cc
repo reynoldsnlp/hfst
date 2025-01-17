@@ -246,12 +246,13 @@ parse_options(int argc, char **argv)
             from_pair = label_to_stringpair(from_label);
             if (strlen(from_label) == 0)
             {
-                error(EXIT_FAILURE, 0,
-                      "argument of source label option is "
-                      "empty;\n"
-                      "if you REALLY want to replace epsilons with something, "
-                      "use @0@ or %s",
-                      hfst::internal_epsilon.c_str());
+                hfst_error(
+                    EXIT_FAILURE, 0,
+                    "argument of source label option is "
+                    "empty;\n"
+                    "if you REALLY want to replace epsilons with something, "
+                    "use @0@ or %s",
+                    hfst::internal_epsilon.c_str());
             }
             break;
         case 'F':
@@ -272,12 +273,13 @@ parse_options(int argc, char **argv)
             to_pair = label_to_stringpair(to_label);
             if (strlen(to_label) == 0)
             {
-                error(EXIT_FAILURE, 0,
-                      "argument of target label option is "
-                      "empty;\n"
-                      "if you want to substitute something with epsilons, "
-                      "use @0@ or %s",
-                      hfst::internal_epsilon.c_str());
+                hfst_error(
+                    EXIT_FAILURE, 0,
+                    "argument of target label option is "
+                    "empty;\n"
+                    "if you want to substitute something with epsilons, "
+                    "use @0@ or %s",
+                    hfst::internal_epsilon.c_str());
             }
             break;
         case 'T':
@@ -290,8 +292,6 @@ parse_options(int argc, char **argv)
             fclose(f);
             break;
         case 'R':
-            // error(EXIT_FAILURE, 0, "option --in-order is not
-            // implemented\n");
             in_order = true;
             break;
         case '9':
@@ -306,14 +306,15 @@ parse_options(int argc, char **argv)
 
     if ((from_label == 0) && (from_file_name == 0))
     {
-        error(EXIT_FAILURE, 0,
-              "Must state name of labels to rewrite with -f or -F");
+        hfst_error(EXIT_FAILURE, 0,
+                   "Must state name of labels to rewrite with -f or -F");
         return EXIT_FAILURE;
     }
     if ((to_label == 0) && (to_transducer_filename == 0)
         && (from_file_name == 0))
     {
-        error(EXIT_FAILURE, 0, "Must give target labels with -t, -T or -F");
+        hfst_error(EXIT_FAILURE, 0,
+                   "Must give target labels with -t, -T or -F");
         return EXIT_FAILURE;
     }
 #include "inc/check-params-common.h"
@@ -549,8 +550,8 @@ process_stream(HfstInputStream &instream)
         }
         catch (NotTransducerStreamException ntse)
         {
-            error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-                  to_transducer_filename);
+            hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                       to_transducer_filename);
             return EXIT_FAILURE;
         }
         hfst::ImplementationType to_transducer_type
@@ -585,18 +586,19 @@ process_stream(HfstInputStream &instream)
                     throw "Error: hfst-disjunct: conversion_type returned an "
                           "invalid integer";
                 }
-                warning(0, 0, warnstr.c_str());
+                hfst_warning(0, 0, warnstr.c_str());
                 to_transducer->convert(output_type);
             }
             else
             {
-                error(EXIT_FAILURE, 0,
-                      "Transducer type mismatch in %s and %s; "
-                      "formats %s and %s are not compatible for substitution "
-                      "(--do-not-convert was requested)",
-                      inputfilename, to_transducer_filename,
-                      hfst_strformat(instream_type),
-                      hfst_strformat(to_transducer_type));
+                hfst_error(
+                    EXIT_FAILURE, 0,
+                    "Transducer type mismatch in %s and %s; "
+                    "formats %s and %s are not compatible for substitution "
+                    "(--do-not-convert was requested)",
+                    inputfilename, to_transducer_filename,
+                    hfst_strformat(instream_type),
+                    hfst_strformat(to_transducer_type));
             }
         }
         else
@@ -677,8 +679,9 @@ process_stream(HfstInputStream &instream)
                     }
                     else
                     {
-                        error_at_line(EXIT_FAILURE, 0, from_file_name, line_n,
-                                      "At least one tab required per line");
+                        hfst_error_at_line(
+                            EXIT_FAILURE, 0, from_file_name, line_n,
+                            "At least one tab required per line");
                     }
                 }
                 const char *endstr = tab + 1;
@@ -692,19 +695,21 @@ process_stream(HfstInputStream &instream)
                 to_pair = label_to_stringpair(to_label);
                 if (strlen(from_label) == 0)
                 {
-                    error_at_line(EXIT_FAILURE, 0, from_file_name, line_n,
-                                  "First field is empty;\n"
-                                  "if you REALLY want to replace epsilons with"
-                                  "something, use @0@ or %s",
-                                  hfst::internal_epsilon.c_str());
+                    hfst_error_at_line(
+                        EXIT_FAILURE, 0, from_file_name, line_n,
+                        "First field is empty;\n"
+                        "if you REALLY want to replace epsilons with"
+                        "something, use @0@ or %s",
+                        hfst::internal_epsilon.c_str());
                 }
                 if (strlen(to_label) == 0)
                 {
-                    error_at_line(EXIT_FAILURE, 0, from_file_name, line_n,
-                                  "Second field seems empty;\n"
-                                  "if you want to substitute something with "
-                                  "epsilons, use @0@ or %s",
-                                  hfst::internal_epsilon.c_str());
+                    hfst_error_at_line(
+                        EXIT_FAILURE, 0, from_file_name, line_n,
+                        "Second field seems empty;\n"
+                        "if you want to substitute something with "
+                        "epsilons, use @0@ or %s",
+                        hfst::internal_epsilon.c_str());
                 }
 
                 if (from_pair && to_pair)
@@ -746,11 +751,12 @@ process_stream(HfstInputStream &instream)
                         {
                             if (!silent)
                             {
-                                warning(0, 0,
-                                        "substitution is not supported for "
-                                        "this transducer type"
-                                        " falling back to internal formats "
-                                        "and trying...");
+                                hfst_warning(
+                                    0, 0,
+                                    "substitution is not supported for "
+                                    "this transducer type"
+                                    " falling back to internal formats "
+                                    "and trying...");
                             }
                             fallback = new HfstBasicTransducer(trans);
                             warnedAlready = true;
@@ -792,7 +798,7 @@ process_stream(HfstInputStream &instream)
                 {
                     if (!silent)
                     {
-                        warning(
+                        hfst_warning(
                             0, 0,
                             "substitution is not supported for this "
                             "transducer type"
@@ -953,8 +959,8 @@ main(int argc, char **argv)
     }
     catch (const HfstException e)
     {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                   inputfilename);
         return EXIT_FAILURE;
     }
 

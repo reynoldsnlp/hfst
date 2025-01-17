@@ -212,16 +212,16 @@ compose_streams(HfstInputStream &firststream, HfstInputStream &secondstream)
                 throw "Error: hfst-compose: conversion_type returned an "
                       "invalid integer";
             }
-            warning(0, 0, warnstr.c_str());
+            hfst_warning(0, 0, warnstr.c_str());
         }
         else
         {
-            error(EXIT_FAILURE, 0,
-                  "Transducer type mismatch in %s and %s; "
-                  "formats %s and %s are not compatible for composition "
-                  "(--do-not-convert was requested)",
-                  firstfilename, secondfilename, hfst_strformat(type1),
-                  hfst_strformat(type2));
+            hfst_error(EXIT_FAILURE, 0,
+                       "Transducer type mismatch in %s and %s; "
+                       "formats %s and %s are not compatible for composition "
+                       "(--do-not-convert was requested)",
+                       firstfilename, secondfilename, hfst_strformat(type1),
+                       hfst_strformat(type2));
         }
     }
     else
@@ -271,10 +271,10 @@ compose_streams(HfstInputStream &firststream, HfstInputStream &secondstream)
             {
                 if (not silent)
                 {
-                    warning(0, 0,
-                            "At least one of the arguments contains "
-                            "flag diacritics. Use -F to harmonize them.",
-                            secondname, firstname);
+                    hfst_warning(0, 0,
+                                 "At least one of the arguments contains "
+                                 "flag diacritics. Use -F to harmonize them.",
+                                 secondname, firstname);
                 }
             }
             else
@@ -292,14 +292,15 @@ compose_streams(HfstInputStream &firststream, HfstInputStream &secondstream)
                     }
                     else
                     {
-                        error(EXIT_FAILURE, 0,
-                              "Could not compose %s and %s [" SIZE_T_SPECIFIER
-                              "]:\n"
-                              "formats %s and %s are not compatible for "
-                              "composition (--do-not-convert was requested)",
-                              firstname, secondname, transducer_n_first,
-                              hfst_strformat(firststream.get_type()),
-                              hfst_strformat(secondstream.get_type()));
+                        hfst_error(
+                            EXIT_FAILURE, 0,
+                            "Could not compose %s and %s [" SIZE_T_SPECIFIER
+                            "]:\n"
+                            "formats %s and %s are not compatible for "
+                            "composition (--do-not-convert was requested)",
+                            firstname, secondname, transducer_n_first,
+                            hfst_strformat(firststream.get_type()),
+                            hfst_strformat(secondstream.get_type()));
                     }
                 }
             }
@@ -318,13 +319,14 @@ compose_streams(HfstInputStream &firststream, HfstInputStream &secondstream)
             }
             else
             {
-                error(EXIT_FAILURE, 0,
-                      "Could not compose %s and %s [" SIZE_T_SPECIFIER "]:\n"
-                      "formats %s and %s are not compatible for composition "
-                      "(--do-not-convert was requested)",
-                      firstname, secondname, transducer_n_first,
-                      hfst_strformat(firststream.get_type()),
-                      hfst_strformat(secondstream.get_type()));
+                hfst_error(
+                    EXIT_FAILURE, 0,
+                    "Could not compose %s and %s [" SIZE_T_SPECIFIER "]:\n"
+                    "formats %s and %s are not compatible for composition "
+                    "(--do-not-convert was requested)",
+                    firstname, secondname, transducer_n_first,
+                    hfst_strformat(firststream.get_type()),
+                    hfst_strformat(secondstream.get_type()));
             }
         }
 
@@ -376,20 +378,22 @@ compose_streams(HfstInputStream &firststream, HfstInputStream &secondstream)
 
     if (firststream.is_good())
     {
-        error(EXIT_FAILURE, 0,
-              "second input '%s' contains fewer transducers than first input"
-              " '%s'; this is only possible if the second input contains"
-              " exactly one transducer",
-              secondfilename, firstfilename);
+        hfst_error(
+            EXIT_FAILURE, 0,
+            "second input '%s' contains fewer transducers than first input"
+            " '%s'; this is only possible if the second input contains"
+            " exactly one transducer",
+            secondfilename, firstfilename);
     }
 
     if (secondstream.is_good())
     {
-        error(EXIT_FAILURE, 0,
-              "first input '%s' contains fewer transducers than second input"
-              " '%s'; this is only possible if the first input contains"
-              " exactly one transducer",
-              firstfilename, secondfilename);
+        hfst_error(
+            EXIT_FAILURE, 0,
+            "first input '%s' contains fewer transducers than second input"
+            " '%s'; this is only possible if the first input contains"
+            " exactly one transducer",
+            firstfilename, secondfilename);
     }
 
     firststream.close();
@@ -439,8 +443,8 @@ main(int argc, char **argv)
     }
     catch (const HfstException e)
     {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              firstfilename);
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                   firstfilename);
     }
     try
     {
@@ -450,8 +454,8 @@ main(int argc, char **argv)
     }
     catch (const HfstException e)
     {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              secondfilename);
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                   secondfilename);
     }
     auto outstream
         = (outfile != stdout)

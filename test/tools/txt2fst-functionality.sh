@@ -52,11 +52,11 @@ done
 
 if [ "$1" != '--python' ]; then
     $TOOL -C -f openfst-tropical -i negative_epsilon_cycles.txt > /dev/null 2> test;
-    if ! test `grep 'warning' test | wc -l` = '2'; then
+    if ! test `grep 'Warning' test | wc -l` = '2'; then
 	exit 1
     fi
     $TOOL -C -f openfst-tropical -i no_negative_epsilon_cycles.txt > /dev/null 2> test;
-    if ! test `grep 'warning' test | wc -l` = '0'; then
+    if ! test `grep 'Warning' test | wc -l` = '0'; then
 	exit 1
     fi
 fi

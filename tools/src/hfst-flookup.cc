@@ -394,10 +394,10 @@ parse_options(int argc, char **argv)
             }
             else
             {
-                error(EXIT_FAILURE, 0,
-                      "Unknown output format %s; valid values are: "
-                      "xerox, cg, apertium\n",
-                      optarg);
+                hfst_error(EXIT_FAILURE, 0,
+                           "Unknown output format %s; valid values are: "
+                           "xerox, cg, apertium\n",
+                           optarg);
                 return EXIT_FAILURE;
             }
             break;
@@ -416,10 +416,10 @@ parse_options(int argc, char **argv)
             }
             else
             {
-                error(EXIT_FAILURE, 0,
-                      "Unknown input format %s; valid values are:"
-                      "utf8, spaced, apertium\n",
-                      optarg);
+                hfst_error(EXIT_FAILURE, 0,
+                           "Unknown input format %s; valid values are:"
+                           "utf8, spaced, apertium\n",
+                           optarg);
                 return EXIT_FAILURE;
             }
             break;
@@ -450,7 +450,6 @@ parse_options(int argc, char **argv)
             if (strcmp(optarg, "print-pairs") == 0)
             {
                 print_pairs = true;
-                /* error(EXIT_FAILURE, 0, "Unimplemented pair printing"); */
             }
             else if (strcmp(optarg, "print-space") == 0)
             {
@@ -471,8 +470,8 @@ parse_options(int argc, char **argv)
             }
             else
             {
-                error(EXIT_FAILURE, 0, "Xfst variable %s unrecognised",
-                      optarg);
+                hfst_error(EXIT_FAILURE, 0, "Xfst variable %s unrecognised",
+                           optarg);
             }
         case 'c':
             infinite_cutoff = (size_t)atoi(hfst_strdup(optarg));
@@ -505,8 +504,8 @@ parse_options(int argc, char **argv)
             }
             else
             {
-                error(EXIT_FAILURE, 0, "--pipe-mode argument %s unrecognised",
-                      optarg);
+                hfst_error(EXIT_FAILURE, 0,
+                           "--pipe-mode argument %s unrecognised", optarg);
             }
             break;
 
@@ -1012,8 +1011,8 @@ string_to_utf8(char *p)
         }
         else
         {
-            error_at_line(EXIT_FAILURE, 0, inputfilename, linen,
-                          "%s not valid UTF-8\n", p);
+            hfst_error_at_line(EXIT_FAILURE, 0, inputfilename, linen,
+                               "%s not valid UTF-8\n", p);
         }
         char *nextu8 = hfst_strndup(p, u8len);
         path->push_back(nextu8);
@@ -1173,10 +1172,10 @@ lookup_simple(const HfstOneLevelPath &s, HfstTransducer &t, bool *infinity)
     {
         if (!silent && infinite_cutoff > 0)
         {
-            warning(0, 0,
-                    "Got infinite results, number of cycles limited "
-                    "to " SIZE_T_SPECIFIER "",
-                    infinite_cutoff);
+            hfst_warning(0, 0,
+                         "Got infinite results, number of cycles limited "
+                         "to " SIZE_T_SPECIFIER "",
+                         infinite_cutoff);
         }
         results = t.lookup_fd(s.second, infinite_cutoff, time_cutoff);
         *infinity = true;
@@ -1369,10 +1368,10 @@ lookup_simple(const HfstOneLevelPath &s, HfstBasicTransducer &t,
     {
         if (!silent && infinite_cutoff > 0)
         {
-            warning(0, 0,
-                    "Got infinite results, number of cycles limited "
-                    "to " SIZE_T_SPECIFIER "",
-                    infinite_cutoff);
+            hfst_warning(0, 0,
+                         "Got infinite results, number of cycles limited "
+                         "to " SIZE_T_SPECIFIER "",
+                         infinite_cutoff);
         }
         lookup_fd_and_print(t, *results, s, infinite_cutoff);
         *infinity = true;
@@ -1588,7 +1587,7 @@ process_stream(HfstInputStream &inputstream, FILE *outstream)
             {
                 if (!force_ol)
                 {
-                    error(
+                    hfst_error(
                         EXIT_FAILURE, 0,
                         "lookup not supported for "
                         "optimized lookup transducers: convert to openfst "
@@ -1672,9 +1671,9 @@ process_stream(HfstInputStream &inputstream, FILE *outstream)
         && (inputstream.get_type() == HFST_OL_TYPE
             || inputstream.get_type() == HFST_OLW_TYPE))
     {
-        error(EXIT_FAILURE, 0,
-              "pair printing not supported on "
-              "optimized lookup transducers");
+        hfst_error(EXIT_FAILURE, 0,
+                   "pair printing not supported on "
+                   "optimized lookup transducers");
     }
 
     // if transducer type is other than optimized_lookup,
@@ -1690,12 +1689,12 @@ process_stream(HfstInputStream &inputstream, FILE *outstream)
     {
         if (!silent)
         {
-            warning(0, 0,
-                    "It is not possible to perform fast lookups with %s "
-                    "format automata.\n"
-                    "Using HFST basic transducer format "
-                    "and performing slow lookups",
-                    hfst_strformat(cascade[0].get_type()));
+            hfst_warning(0, 0,
+                         "It is not possible to perform fast lookups with %s "
+                         "format automata.\n"
+                         "Using HFST basic transducer format "
+                         "and performing slow lookups",
+                         hfst_strformat(cascade[0].get_type()));
         }
     }
     long filesize = -1;
@@ -1871,8 +1870,8 @@ main(int argc, char **argv)
     }
     catch (const HfstException e)
     {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                   inputfilename);
         return EXIT_FAILURE;
     }
     process_stream(*instream, outfile);

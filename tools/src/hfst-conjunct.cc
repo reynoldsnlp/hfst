@@ -156,7 +156,7 @@ conjunct_streams(HfstInputStream &firststream, HfstInputStream &secondstream)
                 throw "Error: hfst-conjunct: conversion_type returned an "
                       "invalid integer";
             }
-            warning(0, 0, warnstr.c_str());
+            hfst_warning(0, 0, warnstr.c_str());
         }
         else
         {
@@ -213,10 +213,10 @@ conjunct_streams(HfstInputStream &firststream, HfstInputStream &secondstream)
             {
                 if (not silent)
                 {
-                    warning(0, 0,
-                            "At least one of the argumentes contains "
-                            "flag diacritics. Use -F to harmonize them.",
-                            secondname, firstname);
+                    hfst_warning(0, 0,
+                                 "At least one of the argumentes contains "
+                                 "flag diacritics. Use -F to harmonize them.",
+                                 secondname, firstname);
                 }
             }
             else
@@ -237,13 +237,14 @@ conjunct_streams(HfstInputStream &firststream, HfstInputStream &secondstream)
             }
             else
             {
-                error(EXIT_FAILURE, 0,
-                      "Could not conjunct %s and %s [" SIZE_T_SPECIFIER "]:\n"
-                      "formats %s and %s are not compatible for conjunction "
-                      "(--do-not-convert was requested)",
-                      firstname, secondname, transducer_n_first,
-                      hfst_strformat(firststream.get_type()),
-                      hfst_strformat(secondstream.get_type()));
+                hfst_error(
+                    EXIT_FAILURE, 0,
+                    "Could not conjunct %s and %s [" SIZE_T_SPECIFIER "]:\n"
+                    "formats %s and %s are not compatible for conjunction "
+                    "(--do-not-convert was requested)",
+                    firstname, secondname, transducer_n_first,
+                    hfst_strformat(firststream.get_type()),
+                    hfst_strformat(secondstream.get_type()));
             }
         }
         hfst_set_name(*first, *first, *second, "intersect");
@@ -271,19 +272,20 @@ conjunct_streams(HfstInputStream &firststream, HfstInputStream &secondstream)
 
     if (firststream.is_good())
     {
-        error(EXIT_FAILURE, 0,
-              "second input '%s' contains fewer transducers than first input"
-              " '%s'; this is only possible if the second input contains"
-              " exactly one transducer",
-              secondfilename, firstfilename);
+        hfst_error(
+            EXIT_FAILURE, 0,
+            "second input '%s' contains fewer transducers than first input"
+            " '%s'; this is only possible if the second input contains"
+            " exactly one transducer",
+            secondfilename, firstfilename);
     }
 
     if (secondstream.is_good())
     {
-        error(EXIT_FAILURE, 0,
-              "first input '%s' contains fewer transducers than"
-              " second input '%s'",
-              firstfilename, secondfilename);
+        hfst_error(EXIT_FAILURE, 0,
+                   "first input '%s' contains fewer transducers than"
+                   " second input '%s'",
+                   firstfilename, secondfilename);
     }
     firststream.close();
     secondstream.close();
@@ -331,8 +333,8 @@ main(int argc, char **argv)
     }
     catch (const HfstException e)
     {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              firstfilename);
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                   firstfilename);
     }
     try
     {
@@ -342,8 +344,8 @@ main(int argc, char **argv)
     }
     catch (const HfstException e)
     {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              secondfilename);
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                   secondfilename);
     }
 
     if (is_input_stream_in_ol_format(*firststream, "hfst-conjunct")
