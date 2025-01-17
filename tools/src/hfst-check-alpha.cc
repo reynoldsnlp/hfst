@@ -30,6 +30,7 @@
 #include <fstream>
 #include <getopt.h>
 #include <memory>
+#include <iterator>
 
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"

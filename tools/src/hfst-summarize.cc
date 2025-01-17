@@ -28,6 +28,7 @@
 
 #include <fstream>
 #include <memory>
+#include <iterator>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
