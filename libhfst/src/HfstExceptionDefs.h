@@ -10,14 +10,14 @@
 #ifndef _HFST_EXCEPTION_DEFS_H_
 #define _HFST_EXCEPTION_DEFS_H_
 
-#include <string>
 #include <sstream>
+#include <string>
 
 void hfst_set_exception(std::string name);
 std::string hfst_get_exception();
 
-#include "hfstdll.h"
 #include "HfstDataTypes.h"
+#include "hfstdll.h"
 
 //! @file HfstExceptionDefs.h
 //! @brief A file for exceptions
@@ -26,56 +26,62 @@ std::string hfst_get_exception();
 //! and line number where it was thrown.
 struct HfstException
 {
-  std::string name;
-  std::string file;
-  size_t line;
-  HfstException(void);
-  HfstException(const std::string &name,const std::string &file,size_t line);
-  ~HfstException();
-  //! @brief Get the error message.
-  HFSTDLL std::string operator() (void) const;
-  // An alias for python
-  HFSTDLL std::string what() const;
+    std::string name;
+    std::string file;
+    size_t line;
+    HfstException(void);
+    HfstException(const std::string &name, const std::string &file,
+                  size_t line);
+    ~HfstException();
+    //! @brief Get the error message.
+    HFSTDLL std::string operator()(void) const;
+    // An alias for python
+    HFSTDLL std::string what() const;
 };
 
 //! @brief Macro to throw an exception of type @a E.
 //! Use @a THROW instead of regular @a throw with subclasses of HfstException.
-#define HFST_THROW(E) do {                              \
-    hfst_set_exception(std::string(#E));                \
-    throw E(#E,__FILE__,__LINE__);                    } \
-  while(false)
+#define HFST_THROW(E)                                                         \
+    do                                                                        \
+    {                                                                         \
+        hfst_set_exception(std::string(#E));                                  \
+        throw E(#E, __FILE__, __LINE__);                                      \
+    } while (false)
 
 //! @brief Macro to throw an exception of type @a E with message @a M.
 //! Use @a THROW instead of regular @a throw with subclasses of HfstException.
-#define HFST_THROW_MESSAGE(E,M) do {            \
-    hfst_set_exception(std::string(#E));        \
-    throw E(std::string(#E)+": "+std::string(M) \
-            ,__FILE__,__LINE__); }              \
-  while(false)
+#define HFST_THROW_MESSAGE(E, M)                                              \
+    do                                                                        \
+    {                                                                         \
+        hfst_set_exception(std::string(#E));                                  \
+        throw E(std::string(#E) + ": " + std::string(M), __FILE__, __LINE__); \
+    } while (false)
 
 //! @brief Declare a subclass of @a HfstException of type @a CHILD.
-#define HFST_EXCEPTION_CHILD_DECLARATION(CHILD) \
-    struct CHILD : public HfstException \
-    { CHILD(const std::string &name,const std::string &file,size_t line); }
+#define HFST_EXCEPTION_CHILD_DECLARATION(CHILD)                               \
+    struct CHILD : public HfstException                                       \
+    {                                                                         \
+        CHILD(const std::string &name, const std::string &file, size_t line); \
+    }
 
 //! Define a subclass of @a HfstException of type @a CHILD.
-#define HFST_EXCEPTION_CHILD_DEFINITION(CHILD) \
-    CHILD::CHILD \
-      (const std::string &name,const std::string &file,size_t line):\
-      HfstException(name,file,line)\
-      {}
+#define HFST_EXCEPTION_CHILD_DEFINITION(CHILD)                                \
+    CHILD::CHILD(const std::string &name, const std::string &file,            \
+                 size_t line)                                                 \
+        : HfstException(name, file, line)                                     \
+    {                                                                         \
+    }
 
 //! @brief Macro to catch exceptions thrown with HFST_THROW
-#define HFST_CATCH(E)                                                   \
-    catch (const E &e)                                                  \
-    {                                                                   \
-    std::cerr << e.file << ", line " << e.line << ": " <<       \
-        e() << std::endl;                       \
+#define HFST_CATCH(E)                                                         \
+    catch (const E &e)                                                        \
+    {                                                                         \
+        std::cerr << e.file << ", line " << e.line << ": " << e()             \
+                  << std::endl;                                               \
     }
 
 // Example declaring an exception class SomeHfstException:
-//HFST_EXCEPTION_CHILD_DECLARATION(SomeHfstException);
-
+// HFST_EXCEPTION_CHILD_DECLARATION(SomeHfstException);
 
 //! @brief Two or more HfstTransducers are not of the same type
 HFST_EXCEPTION_CHILD_DECLARATION(HfstTransducerTypeMismatchException);
@@ -92,17 +98,20 @@ try {
 }
 \endverbatim
 */
-//HFST_EXCEPTION_CHILD_DECLARATION(ImplementationTypeNotAvailableException);
+// HFST_EXCEPTION_CHILD_DECLARATION(ImplementationTypeNotAvailableException);
 
 class ImplementationTypeNotAvailableException : public HfstException
 {
- private:
-  hfst::ImplementationType type;
- public:
-  ImplementationTypeNotAvailableException(const std::string &name,const std::string &file,size_t line, hfst::ImplementationType type);
-  hfst::ImplementationType get_type() const;
-};
+  private:
+    hfst::ImplementationType type;
 
+  public:
+    ImplementationTypeNotAvailableException(const std::string &name,
+                                            const std::string &file,
+                                            size_t line,
+                                            hfst::ImplementationType type);
+    hfst::ImplementationType get_type() const;
+};
 
 /** \brief Function has not been implemented (yet). */
 HFST_EXCEPTION_CHILD_DECLARATION(FunctionNotImplementedException);
@@ -192,7 +201,6 @@ try {
 */
 HFST_EXCEPTION_CHILD_DECLARATION(TransducerIsCyclicException);
 
-
 /** \brief The stream does not contain transducers.
 
     Thrown by
@@ -251,7 +259,8 @@ fprintf(stderr, "Read %i transducers in total.\n", (int)transducers.size());
 
 
     thrown by
-    hfst::HfstTransducer::HfstTransducer(FILE*,ImplementationType,const std::string&)
+    hfst::HfstTransducer::HfstTransducer(FILE*,ImplementationType,const
+std::string&)
 */
 HFST_EXCEPTION_CHILD_DECLARATION(NotValidAttFormatException);
 
@@ -276,14 +285,12 @@ state is final.
     Thrown by hfst::implementations::HfstTransitionGraph::get_final_weight. */
 HFST_EXCEPTION_CHILD_DECLARATION(StateIsNotFinalException);
 
-
-
 /** \brief Context transducers are not automata.
 
     This exception is thrown by
-    hfst::rules::replace_up(HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&)
-    when either context transducer does not have equivalent input and
-    output symbols in all its transitions.
+    hfst::rules::replace_up(HfstTransducerPair&, HfstTransducer&, bool,
+StringPairSet&) when either context transducer does not have equivalent input
+and output symbols in all its transitions.
 
     An example:
 
@@ -303,8 +310,6 @@ hfst::rules::replace_up(contexts, mapping, true, alphabet);
 
 */
 HFST_EXCEPTION_CHILD_DECLARATION(ContextTransducersAreNotAutomataException);
-
-
 
 /** \brief Transducers are not automata.
 
@@ -331,7 +336,6 @@ float w = tr.get_final_weight(2);
 */
 HFST_EXCEPTION_CHILD_DECLARATION(StateIndexOutOfBoundsException);
 
-
 /** \brief Transducer has a malformed HFST header.
 
     Thrown by hfst::HfstTransducer(HfstInputStream&)
@@ -340,17 +344,15 @@ HFST_EXCEPTION_CHILD_DECLARATION(StateIndexOutOfBoundsException);
 */
 HFST_EXCEPTION_CHILD_DECLARATION(TransducerHeaderException);
 
-
 /** \brief An OpenFst transducer does not have an input symbol table.
 
-    When converting from OpenFst to tropical or log HFST, the OpenFst transducer
-    must have at least an input symbol table. If the output symbol table
-    is missing, it is assumed to be equivalent to the input symbol table.
+    When converting from OpenFst to tropical or log HFST, the OpenFst
+   transducer must have at least an input symbol table. If the output symbol
+   table is missing, it is assumed to be equivalent to the input symbol table.
 
     Thrown by hfst::HfstTransducer(HfstInputStream&)
 */
 HFST_EXCEPTION_CHILD_DECLARATION(MissingOpenFstInputSymbolTableException);
-
 
 /** \brief Two or more transducers do not have the same type.
 
@@ -374,8 +376,6 @@ foo.disjunct(bar);   // an exception is thrown
 */
 HFST_EXCEPTION_CHILD_DECLARATION(TransducerTypeMismatchException);
 
-
-
 /** \brief The set of transducer pairs is empty.
 
     Thrown by rule functions in namespace #hfst::rules. An example:
@@ -388,8 +388,6 @@ HFST_EXCEPTION_CHILD_DECLARATION(TransducerTypeMismatchException);
 */
 HFST_EXCEPTION_CHILD_DECLARATION(EmptySetOfContextsException);
 
-
-
 /* \brief The type of a transducer is not specified.
 
    This exception is thrown when an ImplementationType argument
@@ -399,12 +397,8 @@ HFST_EXCEPTION_CHILD_DECLARATION(EmptySetOfContextsException);
  */
 HFST_EXCEPTION_CHILD_DECLARATION(SpecifiedTypeRequiredException);
 
-
-
-
 /** \brief An error happened probably due to a bug in the HFST code. */
 HFST_EXCEPTION_CHILD_DECLARATION(HfstFatalException);
-
 
 /** \brief Transducer has wrong type.
 
@@ -428,11 +422,10 @@ HFST_EXCEPTION_CHILD_DECLARATION(SymbolNotFoundException);
 
 HFST_EXCEPTION_CHILD_DECLARATION(FlagDiacriticsAreNotIdentitiesException);
 
-//HFST_EXCEPTION_CHILD_DECLARATION(SymbolRedefinedException);
-//HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasNoStartStateException);
-//HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasMoreThanOneStartStateException);
+// HFST_EXCEPTION_CHILD_DECLARATION(SymbolRedefinedException);
+// HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasNoStartStateException);
+// HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasMoreThanOneStartStateException);
 
 HFST_EXCEPTION_CHILD_DECLARATION(MetadataException);
-
 
 #endif // #ifndef _HFST_EXCEPTION_DEFS_H_
