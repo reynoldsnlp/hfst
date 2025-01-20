@@ -95,7 +95,7 @@ print_usage()
         "transforming\n"
         "                            each regexp into a separate transducer\n"
         //"      --sum (todo)          Sum weights of duplicate strings instead
-        //of \n" "                            taking minimum\n" "      --norm
+        // of \n" "                            taking minimum\n" "      --norm
         //(todo)         Divide each weight by sum of all weights\n" " --log
         //(todo)          Take negative logarithm of each weight\n"
         "  -l, --line                Input is line separated (default)\n"
@@ -134,7 +134,7 @@ print_usage()
         "  echo \" c:d a:o::3 t:g \" | %s    same but with weight 3\n"
         "                                               in the middle\n"
         //"  echo \" {cat}:{dog} ; 3 \" | %s   legacy way of defining
-        //weights\n"
+        // weights\n"
         "  echo \" cat ; dog ; \"3\" \" | %s -S  create transducers\n"
         "                                               \"cat\" and \"dog\" "
         "and \"3\"\n"
@@ -237,9 +237,9 @@ parse_options(int argc, char **argv)
             }
             else
             {
-                fprintf(stderr,
-                        "Error: unknown option to --xerox-composition: '%s'\n",
-                        optarg);
+                hfst_error(EXIT_FAILURE, 0,
+                           "unknown option to --xerox-composition: '%s'\n",
+                           optarg);
                 return EXIT_FAILURE;
             }
         }
@@ -253,8 +253,8 @@ parse_options(int argc, char **argv)
             }
             else
             {
-                fprintf(stderr, "Error: unknown option to --xfst: '%s'\n",
-                        optarg);
+                hfst_error(EXIT_FAILURE, 0,
+                           "Error: unknown option to --xfst: '%s'\n", optarg);
                 return EXIT_FAILURE;
             }
         }
@@ -296,7 +296,7 @@ process_stream(HfstOutputStream &outstream)
     {
         char *filebuf_ = hfst_file_to_mem(inputfilename);
         unsigned int chars_read = 0;
-        HfstTransducer *compiled;
+        HfstTransducer *compiled = nullptr;
 
         while (true)
         {
@@ -308,11 +308,11 @@ process_stream(HfstOutputStream &outstream)
             }
             catch (const HfstException &e)
             {
-                error(EXIT_FAILURE, 0,
-                      "%s: XRE parsing failed "
-                      "in expression #%u separated by semicolons:\n%s",
-                      inputfilename, (unsigned int)transducer_n,
-                      e.what().c_str());
+                hfst_error(EXIT_FAILURE, 0,
+                           "%s: XRE parsing failed "
+                           "in expression #%u separated by semicolons:\n%s",
+                           inputfilename, (unsigned int)transducer_n,
+                           e.what().c_str());
             }
             if (compiled == NULL)
             {
@@ -320,19 +320,19 @@ process_stream(HfstOutputStream &outstream)
                 {
                     if (transducer_n == 1)
                     {
-                        error(EXIT_FAILURE, 0,
-                              "%s: XRE parsing failed: expression #%u "
-                              "contains only whitespace or comments",
-                              inputfilename, (unsigned int)transducer_n);
+                        hfst_error(EXIT_FAILURE, 0,
+                                   "%s: XRE parsing failed: expression #%u "
+                                   "contains only whitespace or comments",
+                                   inputfilename, (unsigned int)transducer_n);
                     }
                     break;
                 }
                 else
                 {
-                    error(EXIT_FAILURE, 0,
-                          "%s: XRE parsing failed "
-                          "in expression #%u separated by semicolons",
-                          inputfilename, (unsigned int)transducer_n);
+                    hfst_error(EXIT_FAILURE, 0,
+                               "%s: XRE parsing failed "
+                               "in expression #%u separated by semicolons",
+                               inputfilename, (unsigned int)transducer_n);
                 }
             }
             for (unsigned int i = 0; i < chars_read; i++)
@@ -367,10 +367,10 @@ process_stream(HfstOutputStream &outstream)
             {
                 if (input_contains_only_whitespace_or_comments)
                 {
-                    error(EXIT_FAILURE, 0,
-                          "%s: XRE parsing failed:"
-                          " input contains only whitespace or comments",
-                          inputfilename);
+                    hfst_error(EXIT_FAILURE, 0,
+                               "%s: XRE parsing failed:"
+                               " input contains only whitespace or comments",
+                               inputfilename);
                 }
                 break;
             }
@@ -391,7 +391,7 @@ process_stream(HfstOutputStream &outstream)
                 continue;
             }
             transducer_n++;
-            HfstTransducer *compiled;
+            HfstTransducer *compiled = nullptr;
             verbose_printf("Compiling expression %u\n", line_count);
             try
             {
@@ -399,15 +399,15 @@ process_stream(HfstOutputStream &outstream)
             }
             catch (HfstException &e)
             {
-                error_at_line(EXIT_FAILURE, 0, inputfilename, line_count,
-                              "XRE parsing failed");
+                hfst_error_at_line(EXIT_FAILURE, 0, inputfilename, line_count,
+                                   "XRE parsing failed\n");
             }
             if (compiled == NULL)
             {
                 if (!comp.contained_only_comments())
                 {
-                    error_at_line(EXIT_FAILURE, 0, inputfilename, line_count,
-                                  "XRE parsing failed");
+                    hfst_error_at_line(EXIT_FAILURE, 0, inputfilename,
+                                       line_count, "XRE parsing failed\n");
                 }
                 continue;
             }
