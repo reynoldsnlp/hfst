@@ -12,6 +12,7 @@
 
 #include <sstream>
 #include <string>
+#include <unistd.h>
 
 void hfst_set_exception(std::string name);
 std::string hfst_get_exception();
@@ -72,12 +73,28 @@ struct HfstException
     {                                                                         \
     }
 
-//! @brief Macro to catch exceptions thrown with HFST_THROW
+//! @brief Macro to catch exceptions thrown with HFST_THROW.
+//!
+//! Doesn't actually handle the error but just prints it on stderr and
+//! ignores it.
 #define HFST_CATCH(E)                                                         \
     catch (const E &e)                                                        \
     {                                                                         \
-        std::cerr << e.file << ", line " << e.line << ": " << e()             \
-                  << std::endl;                                               \
+        if (isatty(1))                                                        \
+        {                                                                     \
+            fprintf(stderr, "\033[01m");                                      \
+        }                                                                     \
+        fprintf(stderr, "%s.%u: ", e.file, e.line);                           \
+        if (isatty(1))                                                        \
+        {                                                                     \
+            fprintf(stderr, "\033[31m");                                      \
+        }                                                                     \
+        fprintf(stderr, "Exception: ");                                       \
+        if (isatty(1))                                                        \
+        {                                                                     \
+            fprintf(stderr, "\033[0m");                                       \
+        }                                                                     \
+        fprintf(stderr, "%s\n", e().c_str());                                 \
     }
 
 // Example declaring an exception class SomeHfstException:

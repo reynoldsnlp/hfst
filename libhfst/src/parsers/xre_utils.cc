@@ -16,6 +16,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
+#include <unistd.h>
 
 #include "HfstTransducer.h"
 #include "HfstXeroxRules.h"
@@ -61,30 +62,71 @@ xreflush(std::ostream *os)
     hfst::xre::XreCompiler::flush(os);
 }
 
+#define COLOUR_BOLD "\033[01m"
+#define COLOUR_RED "\033[31m"
+#define COLOUR_GREEN "\033[32m"
+#define COLOUR_YELLOW "\033[33m"
+#define COLOUR_BLUE "\033[34m"
+#define COLOUR_MAGENTA "\033[35m"
+#define COLOUR_CYAN "\033[36m"
+#define COLOUR_RESET "\033[0m"
+
+static bool
+should_colourise()
+{
+    if (isatty(1))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    return false;
+}
+
 int
 xreerror(yyscan_t scanner, const char *msg)
 {
     if (hfst::xre::verbose_)
     {
         const char *scanner_msg = xreget_text(scanner);
-
         char *buffer = (char *)malloc(strlen(msg) + strlen(hfst::xre::data)
                                       + strlen(scanner_msg) + 100);
-
-        int n = sprintf(buffer, "*** xre parsing failed: %s\n", msg);
+        char *p = buffer;
+        if (should_colourise())
+        {
+            int n = sprintf(p, COLOUR_RED);
+            assert(n >= 0);
+            p += n;
+        }
+        int n = sprintf(p, "*** xre parsing failed: %s\n", msg);
+        assert(n >= 0);
+        p += n;
+        if (should_colourise())
+        {
+            n = sprintf(p, COLOUR_RED);
+            assert(n >= 0);
+            p += n;
+        }
         if (strlen(hfst::xre::data) < 60)
         {
-            n = sprintf(
-                buffer + n, "***    parsing %s [near %s] on line %u\n%c",
-                hfst::xre::data, xreget_text(scanner), hfst::xre::lr, '\0');
+            n = sprintf(p, "***    parsing %s [near %s] on line %u\n%c",
+                        hfst::xre::data, xreget_text(scanner), hfst::xre::lr,
+                        '\0');
         }
         else
         {
-            n = sprintf(
-                buffer + n, "***    parsing %60s [near %s] on line %u...\n%c",
-                hfst::xre::data, xreget_text(scanner), hfst::xre::lr, '\0');
+            n = sprintf(p, "***    parsing %60s [near %s] on line %u...\n%c",
+                        hfst::xre::data, xreget_text(scanner), hfst::xre::lr,
+                        '\0');
         }
-
+        if (should_colourise())
+        {
+            n = sprintf(p, COLOUR_RESET);
+            assert(n >= 0);
+            p += n;
+        }
         std::ostream *err = xreerrstr();
         *(err) << std::string(buffer);
         free(buffer);
@@ -96,9 +138,17 @@ xreerror(yyscan_t scanner, const char *msg)
 int
 xreerror(const char *msg)
 {
-    char buffer[1024];
-    (void)sprintf(buffer, "*** xre parsing failed: %s\n", msg);
-    buffer[1023] = '\0';
+    char *buffer = static_cast<char *>(malloc(strlen(msg) + 128));
+    char *p = buffer;
+    if (should_colourise())
+    {
+        int n = sprintf(p, COLOUR_RED);
+    }
+    int n = sprintf(p, "*** xre parsing failed: %s\n", msg);
+    if (should_colourise())
+    {
+        n = sprintf(p, COLOUR_RESET);
+    }
     std::ostream *err = xreerrstr();
     *err << std::string(buffer);
     xreflush(err);

@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <unistd.h>
 
 // for internal epsilon
 #include "HfstSymbolDefs.h"
@@ -446,6 +447,29 @@ strdup_nonconst_part(const char *token, const char *prefix, const char *suffix,
     return token_part;
 }
 
+#define COLOUR_BOLD "\033[01m"
+#define COLOUR_RED "\033[31m"
+#define COLOUR_GREEN "\033[32m"
+#define COLOUR_YELLOW "\033[33m"
+#define COLOUR_BLUE "\033[34m"
+#define COLOUR_MAGENTA "\033[35m"
+#define COLOUR_CYAN "\033[36m"
+#define COLOUR_RESET "\033[0m"
+
+static bool
+should_colourise()
+{
+    if (isatty(1))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    return false;
+}
+
 void
 error_at_current_token(int, int, const char *format)
 {
@@ -454,7 +478,21 @@ error_at_current_token(int, int, const char *format)
     // fprintf(stderr, "%s: %s %s\n", leader, format, token);
     std::ostream *err = hfst::lexc::lexc_->get_stream(
         (hfst::lexc::lexc_->get_error_stream()));
-    *err << leader << ": " << format << ": " << token << std::endl;
+    if (should_colourise())
+    {
+        *err << COLOUR_BOLD;
+    }
+    *err << leader << ": ";
+    if (should_colourise())
+    {
+        *err << COLOUR_RED;
+    }
+    *err << format << ": ";
+    if (should_colourise())
+    {
+        *err << COLOUR_RESET;
+    }
+    *err << token << std::endl;
     hfst::lexc::lexc_->flush(err);
     free(leader);
 }

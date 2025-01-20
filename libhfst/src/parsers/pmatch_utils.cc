@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <sstream>
+#include <unistd.h>
 
 #include "HfstExceptionDefs.h"
 #include "HfstTransducer.h"
@@ -34,6 +35,29 @@ extern char *pmatchtext;
 extern int pmatchparse();
 extern int pmatchnerrs;
 
+#define COLOUR_BOLD "\033[01m"
+#define COLOUR_RED "\033[31m"
+#define COLOUR_GREEN "\033[32m"
+#define COLOUR_YELLOW "\033[33m"
+#define COLOUR_BLUE "\033[34m"
+#define COLOUR_MAGENTA "\033[35m"
+#define COLOUR_CYAN "\033[36m"
+#define COLOUR_RESET "\033[0m"
+
+static bool
+should_colourise()
+{
+    if (isatty(1))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    return false;
+}
+
 int
 pmatcherror(const char *msg)
 {
@@ -46,7 +70,21 @@ pmatcherror(const char *msg)
     {
         parsedata = std::string(hfst::pmatch::data, 59) + "... [truncated]";
     }
-    std::string errmsg = "pmatch parsing failed: ";
+    std::string errmsg;
+    if (should_colourise())
+    {
+        errmsg.append(COLOUR_BOLD);
+    }
+    errmsg.append("hfst-pmatch:");
+    if (should_colourise())
+    {
+        errmsg.append(COLOUR_RED);
+    }
+    errmsg.append("parsing failed: ");
+    if (should_colourise())
+    {
+        errmsg.append(COLOUR_RESET);
+    }
     errmsg.append(msg);
     errmsg.append("\n*** parsing ");
     errmsg.append(parsedata);
@@ -69,7 +107,21 @@ pmatchwarning(const char *msg)
 {
     if (hfst::pmatch::verbose)
     {
-        std::string warnmsg = "pmatch: ";
+        std::string warnmsg;
+        if (should_colourise())
+        {
+            warnmsg.append(COLOUR_BOLD);
+        }
+        warnmsg.append("hfst-pmatch: ");
+        if (should_colourise())
+        {
+            warnmsg.append(COLOUR_YELLOW);
+        }
+        warnmsg.append("Warning: ");
+        if (should_colourise())
+        {
+            warnmsg.append("COLOUR_RESET");
+        }
         warnmsg.append(msg);
         warnmsg.append(" on line ");
         std::ostringstream ss;
@@ -117,7 +169,21 @@ PmatchUtilityTransducers *utils = NULL;
 void
 warn(std::string warning)
 {
-    std::cerr << "pmatch: warning: " << warning;
+    if (should_colourise())
+    {
+        std::cerr << COLOUR_BOLD;
+    }
+    std::cerr << "hfst-pmatch: ";
+    if (should_colourise())
+    {
+        std::cerr << COLOUR_YELLOW;
+    }
+    std::cerr << "Warning: ";
+    if (should_colourise())
+    {
+        std::cerr << COLOUR_RESET;
+    }
+    std::cerr << warning;
 }
 
 PmatchUtilityTransducers *
