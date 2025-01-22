@@ -84,7 +84,7 @@ struct HfstException
         {                                                                     \
             fprintf(stderr, "\033[01m");                                      \
         }                                                                     \
-        fprintf(stderr, "%s.%u: ", e.file, e.line);                           \
+        fprintf(stderr, "%s.%zu: ", e.file.c_str(), e.line);                  \
         if (isatty(1))                                                        \
         {                                                                     \
             fprintf(stderr, "\033[31m");                                      \
