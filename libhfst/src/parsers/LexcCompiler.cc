@@ -64,6 +64,29 @@ extern int hlexcparse();
 extern int hlexcnerrs;
 extern int hlexclex_destroy();
 
+#define COLOUR_BOLD "\033[01m"
+#define COLOUR_RED "\033[31m"
+#define COLOUR_GREEN "\033[32m"
+#define COLOUR_YELLOW "\033[33m"
+#define COLOUR_BLUE "\033[34m"
+#define COLOUR_MAGENTA "\033[35m"
+#define COLOUR_CYAN "\033[36m"
+#define COLOUR_RESET "\033[0m"
+
+static bool
+should_colourise()
+{
+    if (isatty(1))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    return false;
+}
+
 #ifndef DEBUG_MAIN
 
 namespace hfst
@@ -262,6 +285,10 @@ LexcCompiler::parse(const char *filename)
     if (hlexcin == NULL)
     {
         std::ostream *err = get_stream(error_);
+        if (should_colourise())
+        {
+            *err << COLOUR_RED << "Error: " << COLOUR_RESET;
+        }
         *err << "could not open " << filename << " for reading" << std::endl;
         flush(err);
         parseErrors_ = true;
@@ -721,6 +748,10 @@ LexcCompiler::addXreEntry(const string &regexp, const string &continuation,
     if (newPaths == NULL)
     {
         std::ostream *err = get_stream(error_);
+        if (should_colourise())
+        {
+            *err << COLOUR_RED << "Error: " << COLOUR_RESET;
+        }
         *err << "Unable to parse regular expression" << std::endl;
         flush(err);
         parseErrors_ = true;
@@ -833,13 +864,25 @@ LexcCompiler::setCurrentLexiconName(const string &lexiconName)
     else if ((firstLexicon) && (lexiconName != "Root"))
     {
         if (!quiet_)
+        {
+            if (should_colourise())
+            {
+                *err << COLOUR_YELLOW << "Warnign: " << COLOUR_RESET;
+            }
             *err << "first lexicon is not named Root" << std::endl;
+        }
         setInitialLexiconName(lexiconName);
     }
     else if ((!firstLexicon) && (lexiconName == "Root"))
     {
         if (!quiet_)
+        {
+            if (should_colourise())
+            {
+                *err << COLOUR_YELLOW << "Warnign: " << COLOUR_RESET;
+            }
             *err << "Root is not first the first lexicon" << std::endl;
+        }
         setInitialLexiconName(lexiconName);
     }
     if (!firstLexicon && !quiet_)
@@ -883,9 +926,15 @@ LexcCompiler::compileLexical()
     if (warnings_generated && treat_warnings_as_errors_)
     {
         if (!quiet_)
-            *err << "*** ERROR: could not parse lexc file: treating warnings "
+        {
+            if (should_colourise())
+            {
+                *err << COLOUR_RED << "*** ERROR: " << COLOUR_RESET;
+            }
+            *err << "could not parse lexc file: treating warnings "
                     "as errors [--Werror] ***"
                  << std::endl;
+        }
         flush(err);
         return 0;
     }
@@ -1289,7 +1338,11 @@ LexcCompiler::printConnectedness(bool &warnings_generated)
             {
                 if (!quiet_)
                 {
-                    *err << "Warning: Sublexicon is mentioned but not "
+                    if (should_colourise())
+                    {
+                        *err << COLOUR_YELLOW << "Warnign: " << COLOUR_RESET;
+                    }
+                    *err << "Sublexicon is mentioned but not "
                             "defined. ("
                          << *s << ") " << std::endl;
                     flush(err);
@@ -1302,8 +1355,11 @@ LexcCompiler::printConnectedness(bool &warnings_generated)
             warnings_generated = true;
             if (!quiet_)
             {
-                *err << "Warning: Sublexicons defined but not used"
-                     << std::endl;
+                if (should_colourise())
+                {
+                    *err << COLOUR_YELLOW << "Warnign: " << COLOUR_RESET;
+                }
+                *err << "Sublexicons defined but not used" << std::endl;
                 for (vector<string>::iterator s = lexMinusCont.begin();
                      s != lexMinusContEnd; ++s)
                 {
