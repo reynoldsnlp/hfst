@@ -18,5 +18,14 @@ apidoc: Doxyfile
 	$(DOXYGEN) $<
 endif
 
+if EMSCRIPTEN
+all-local: src/libhfst.la
+	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(WASM_LDFLAGS) --use-port=icu -O3 \
+	  src/.libs/libhfst.a \
+	  $(FOMA_LIB) \
+	  $(OPENFST_LIB) \
+	  -o libhfst.js
+endif
+
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = hfst.pc hfst_c.pc

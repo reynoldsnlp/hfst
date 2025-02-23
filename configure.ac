@@ -35,6 +35,16 @@ AC_INIT([hfst],[3.16.2],[hfst-bugs@helsinki.fi],[hfst])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall std-options foreign check-news subdir-objects])
 
+# Initialize git submodules only when using Emscripten
+if test "x$EMSCRIPTEN" = "x1" ; then
+    AC_MSG_NOTICE([Initializing git submodules for Emscripten build...])
+    if test -d ".git"; then
+        git submodule update --init || AC_MSG_ERROR([Failed to initialize git submodules])
+    else
+        AC_MSG_WARN([Not a git repository - assuming dependencies are already in place in wasm-libs/ ])
+    fi
+fi
+
 # For automake >= 1.12
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
@@ -560,6 +570,16 @@ AC_ARG_ENABLE([xfst],
 			  [if test x$enable_no_tools != xno; then enable_xfst=no; else enable_xfst=yes; fi])
 AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
 
+# Check if we're building with Emscripten
+AM_CONDITIONAL([EMSCRIPTEN], [test "x$EMSCRIPTEN" = "x1"])
+if test "x$EMSCRIPTEN" = "x1"; then
+  AC_SUBST([WASM_LDFLAGS], ["-s EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -s EXPORTED_FUNCTIONS=['_malloc','_free'] -s ALLOW_MEMORY_GROWTH=1 -s MODULARIZE=1 -s EXPORT_NAME='createHfstModule'"])
+  # Set paths for dependency libraries when using Emscripten
+  AC_SUBST([FOMA_LIB], ["$srcdir/wasm-libs/libfoma.a"])
+  AC_SUBST([OPENFST_LIB], ["$srcdir/wasm-libs/libfst.a"])
+  AC_SUBST([FOMA_INCLUDE_DIR], ["$srcdir/wasm-libs/foma/foma"])
+  AC_SUBST([OPENFST_INCLUDE_DIR], ["$srcdir/wasm-libs/openfst-copy/src/include"])
+fi
 
 # Disable stress tests by default
 AC_ARG_ENABLE([stress-tests],
@@ -625,8 +645,14 @@ AC_LANG_PUSH([C])
 
 AC_LANG_POP
 
-AX_CHECK_ICU([50],[AC_DEFINE([USE_ICU_UNICODE], 1,
+# ICU checks only if not using Emscripten
+if test "x$EMSCRIPTEN" != "x1"; then
+  AX_CHECK_ICU([50],[AC_DEFINE([USE_ICU_UNICODE], 1,
                     [if using icu for unicode string handling])],[AC_MSG_FAILURE([ICU-50 or newer is required])])
+else
+  AC_DEFINE([USE_ICU_UNICODE], 1, [Using Emscripten ICU port])
+fi
+
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_SEARCH_LIBS([readline], [readline editline],
                       [AC_DEFINE([HAVE_READLINE], 1, [if readline can be used])],
@@ -684,7 +710,14 @@ AS_IF([test "x$with_readline" = "xyes"],
 # Checks for structures
 AC_CHECK_DECLS([program_name, program_invocation_name, program_invocation_short_name])
 AC_CHECK_DECLS([rl_completion_suppress_append, rl_completion_matches])
-AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line strndup getline getdelim getopt_long strtod xstrdup set_program_name setprogname setlocale nl_langinfo get_current_dir_name])
+
+AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line strndup getline getdelim getopt_long strtod set_program_name setprogname setlocale nl_langinfo get_current_dir_name])
+# Emscripten does not have xstrdup, but configure thinks it does, so set HAVE_XSTRDUP manually
+if test "x$EMSCRIPTEN" != "x1"; then
+  AC_CHECK_FUNCS([xstrdup])
+else
+  AC_DEFINE([HAVE_XSTRDUP], [0], [Define to 0 when using Emscripten])
+fi
 AC_CHECK_FUNCS([isatty])
 
 AM_CONDITIONAL([WINDOWS], [test x$version_type = xwindows])
@@ -707,18 +740,48 @@ AS_IF([test "x$enable_python_bindings" = "xyes"], [
 	])
 ])
 
-AS_IF([test "x$with_openfst" != xno && test "x$found_fstlib_h" != xyes], [AC_CHECK_HEADER([fst/fstlib.h], [], [AC_MSG_ERROR([could not find OpenFST's fst/fstlib.h in include path])])])
+# For Emscripten build, add OpenFST include path
+if test "x$EMSCRIPTEN" = "x1"; then
+    # Save old CPPFLAGS
+    OLD_CPPFLAGS="$CPPFLAGS"
+    # Add OpenFST include path for header checks
+    CPPFLAGS="$CPPFLAGS -I$srcdir/../openfst-copy/src/include"
+fi
 
-AS_IF([test "x$with_foma" != xno], [PKG_CHECK_MODULES(FOMA, [libfoma >= 0.10.0])])
+# Check for OpenFST header
+AS_IF([test "x$with_openfst" != xno && test "x$found_fstlib_h" != xyes],
+      [AC_CHECK_HEADER([fst/fstlib.h], [],
+                      [AC_MSG_ERROR([could not find OpenFST's fst/fstlib.h in include path])])])
+
+# Restore original CPPFLAGS if using Emscripten
+if test "x$EMSCRIPTEN" = "x1"; then
+    CPPFLAGS="$OLD_CPPFLAGS"
+fi
+
+# Skip foma library check if using Emscripten
+AS_IF([test "x$EMSCRIPTEN" != "x1"], [
+  AS_IF([test "x$with_foma" != xno], [PKG_CHECK_MODULES(FOMA, [libfoma >= 0.10.0])])
+], [
+  # When using Emscripten, just set the FOMA_ variables without checking
+  AS_IF([test "x$with_foma" != xno], [
+    FOMA_CFLAGS=""
+    FOMA_LIBS="-lfoma"
+    AC_SUBST(FOMA_CFLAGS)
+    AC_SUBST(FOMA_LIBS)
+  ])
+])
 
 # config files
-AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
+AC_CONFIG_FILES([Makefile
+                 wasm-libs/Makefile
+                 doc/Makefile
+                 test/Makefile
                  test/libhfst/Makefile test/tools/Makefile
                  test/tools/fsmbook-tests/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/c/Makefile
                  libhfst/src/implementations/Makefile
-		 libhfst/src/parsers/Makefile
+                 libhfst/src/parsers/Makefile
                  libhfst/hfst.pc libhfst/hfst_c.pc
 		 tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
 		 tools/src/hfst-twolc/Makefile

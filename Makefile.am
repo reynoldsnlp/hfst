@@ -17,7 +17,12 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = back-ends libhfst tools test doc man scripts
+SUBDIRS = .
+if EMSCRIPTEN
+SUBDIRS += wasm-libs libhfst
+else
+SUBDIRS += back-ends libhfst tools test doc man scripts
+endif
 
 if HAVE_PYTHON_BINDINGS
 SUBDIRS += python
