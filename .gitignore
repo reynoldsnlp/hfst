@@ -19,6 +19,8 @@
 *.la
 *.a
 *.lib
+*.wasm
+libhfst.js
 
 # trs and log files
 *.trs
@@ -316,3 +318,10 @@ hfst-eliminate-flags
 
 /.ccls-cache
 /compile_commands.json
+
+# Uncomment these once openfst tarballs can be used instead of reynoldsnlp/openfst-copy
+# /wasm-libs/openfst
+# /wasm-libs/openfst-*.tar.gz
+
+# IDE config files
+.vscode

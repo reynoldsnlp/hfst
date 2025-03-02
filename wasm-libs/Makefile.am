@@ -8,16 +8,16 @@ libfoma.a:
 	cd foma/foma && \
 	git pull && \
 	emcmake cmake . && \
-	$(EMMAKE) make clean && \
-	$(EMMAKE) make CFLAGS="-O3" && \
+	$(EMMAKE) make VERBOSE=1 && \
 	cp libfoma.a $(abs_builddir)/
 
 libfst.a:
-	set -x && \
-	cd openfst-copy && \
-	$(EMMAKE) make clean && \
-	$(EMMAKE) make CXXFLAGS="-O3" && \
-	cp src/lib/libfst.a $(abs_builddir)/
+	cd openfst && \
+	emconfigure ./configure --enable-static --disable-shared && \
+	$(EMMAKE) make VERBOSE=1 && \
+	cp src/lib/.libs/libfst.a $(abs_builddir)/
 
 clean-local:
-	rm -f libfoma.a libfst.a
+	rm -f libfoma.a libfst.a && \
+	cd foma/foma && make clean && cd ../.. && \
+	cd openfst && make clean

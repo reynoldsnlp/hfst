@@ -2,27 +2,29 @@
 
 set -ex
 
-# Source emsdk environment
+echo "Source emsdk environment"
 source ~/repos/emsdk/emsdk_env.sh
 
-./autogen.sh  # Only needed first time
-automake
+# ./autogen.sh  # Only needed first time
+autoreconf -fiv
 
-# Configure with Emscripten
+echo "Configure with Emscripten"
 emconfigure ./configure \
   --host=wasm32-unknown-emscripten \
-  --enable-all-tools=no \
   --with-sfst=no \
   --with-foma=yes \
   --with-openfst=yes \
-  --enable-all-tools=no \
-  --enable-minimal-tools \
+  --enable-no-tools \
   --disable-load-so-entries \
   --with-readline=no \
+  VERBOSE=1 \
   EMSCRIPTEN=1 \
-  CXXFLAGS="--use-port=icu -O3" \
-  LDFLAGS="--use-port=icu -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -s EXPORTED_FUNCTIONS=['_malloc','_free'] -s ALLOW_MEMORY_GROWTH=1"
+  CPPFLAGS="-I$(pwd)/wasm-libs/foma/foma -I$(pwd)/wasm-libs/openfst/src/include" \
+  CXXFLAGS="--use-port=icu"
+# TODO: optimization with -O3 or -O4
 
-# Build wasm dependencies and libhfst
+echo "Build dependencies in wasm-libs"
 emmake make -C wasm-libs VERBOSE=1
+echo "Build libhfst"
 emmake make -C libhfst VERBOSE=1
+echo "Successfully completed!"

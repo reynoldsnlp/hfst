@@ -20,11 +20,13 @@ endif
 
 if EMSCRIPTEN
 all-local: src/libhfst.la
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(WASM_LDFLAGS) --use-port=icu -O3 \
-	  src/.libs/libhfst.a \
-	  $(FOMA_LIB) \
-	  $(OPENFST_LIB) \
+	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(WASM_LDFLAGS) \
+	  src/EmscriptenBindings.o \
+	  $(abs_top_builddir)/wasm-libs/libfst.a \
+	  $(abs_top_builddir)/wasm-libs/libfoma.a \
+	  -Wl,--whole-archive src/.libs/libhfst.a -Wl,--no-whole-archive \
 	  -o libhfst.js
+
 endif
 
 pkgconfigdir = $(libdir)/pkgconfig
