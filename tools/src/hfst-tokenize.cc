@@ -24,6 +24,7 @@
 #include <iterator>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include <vector>
 #include <map>
@@ -193,7 +194,241 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer * dictionary)
     return retval;
 }
 
-// TODO: lambda this when C++11 available everywhere
+// Helper functions for tokenize_text
+inline void trim(std::string& str) {
+    while (!str.empty() && (std::isspace(str.back()) || str.back() == 0)) {
+        str.pop_back();
+    }
+    while (!str.empty() && (std::isspace(str.front()) || str.front() == 0)) {
+        str.erase(0, 1);
+    }
+}
+
+inline void maybe_erase_newline(string& input_text, bool keep_newlines)
+{
+    if(!keep_newlines && input_text.size() > 0 && input_text.at(input_text.size() - 1) == '\n') {
+        // Remove final newline
+        input_text.erase(input_text.size() -1, 1);
+    }
+}
+
+// Process input function that writes to string instead of stream
+void process_input_string(hfst_ol::PmatchContainer & container,
+                         const std::string& input_text,
+                         std::ostringstream& outstream,
+                         const TokenizeSettings& settings,
+                         bool blankline_separated,
+                         bool superblanks,
+                         bool keep_newlines)
+{
+    // Prepare the output stream format
+    if(settings.output_format == cg || settings.output_format == giellacg || settings.output_format == visl) {
+        outstream << std::fixed << std::setprecision(10);
+    }
+
+    if(settings.output_format == visl) {
+        std::istringstream istr(input_text);
+        std::string line;
+        while (std::getline(istr, line)) {
+            trim(line);
+            if (!line.empty()) {
+                if (line.front() == '<' && line.back() == '>') {
+                    print_nonmatching_sequence(line, outstream, settings);
+                }
+                else {
+                    match_and_print(container, outstream, line, settings);
+                }
+            }
+            else {
+                outstream << '\n';
+            }
+        }
+        return;
+    }
+
+    if(settings.output_format == giellacg || superblanks) {
+        std::istringstream istr(input_text);
+        std::string line;
+        bool in_blank = false;
+        std::ostringstream cur;
+
+        while (std::getline(istr, line)) {
+            line += '\n'; // Restore the newline that getline removes
+            bool escaped = false;
+            for(size_t i = 0; i < line.size(); ++i) {
+                if(escaped) {
+                    cur << line[i];
+                    escaped = false;
+                    continue;
+                }
+                else if(superblanks && !in_blank && line[i] == '[') {
+                    std::string cur_str = cur.str();
+                    if(!cur_str.empty()) {
+                        match_and_print(container, outstream, cur_str, settings);
+                    }
+                    cur.str("");
+                    cur.clear();
+                    cur << line[i];
+                    in_blank = true;
+                }
+                else if(superblanks && in_blank && line[i] == ']') {
+                    cur << line[i];
+                    if(i+1 < line.size() && line[i+1] == '[') {
+                        // Join consecutive superblanks
+                        ++i;
+                        cur << line[i];
+                    }
+                    else {
+                        in_blank = false;
+                        print_nonmatching_sequence(cur.str(), outstream, settings);
+                        cur.str("");
+                        cur.clear();
+                    }
+                }
+                else if(!in_blank && line[i] == '\n') {
+                    cur << line[i];
+                    std::string cur_str = cur.str();
+                    if (settings.verbose) {
+                        std::cout << "processing: " << cur_str << "\\n" << std::endl;
+                    }
+                    if(!cur_str.empty()) {
+                        match_and_print(container, outstream, cur_str, settings);
+                    }
+                    cur.str("");
+                    cur.clear();
+                }
+                else if(line[i] == '\0') {
+                    std::string cur_str = cur.str();
+                    if (settings.verbose) {
+                        std::cout << "processing: " << cur_str << "\\0" << std::endl;
+                    }
+                    if(!cur_str.empty()) {
+                        match_and_print(container, outstream, cur_str, settings);
+                    }
+                    cur.str("");
+                    cur.clear();
+                    outstream << "<STREAMCMD:FLUSH>" << std::endl; // CG format uses this instead of \0
+                }
+                else {
+                    cur << line[i];
+                }
+                escaped = (line[i] == '\\');
+            }
+        }
+
+        // Process any remaining text
+        std::string cur_str = cur.str();
+        if(!cur_str.empty()) {
+            if(in_blank) {
+                print_nonmatching_sequence(cur_str, outstream, settings);
+            }
+            else {
+                match_and_print(container, outstream, cur_str, settings);
+            }
+        }
+
+        return;
+    }
+
+    // Handle standard blankline-separated or newline-separated text
+    if(blankline_separated) {
+        std::istringstream istr(input_text);
+        std::string line;
+        std::string paragraph;
+
+        while (std::getline(istr, line)) {
+            if (line.empty()) {
+                maybe_erase_newline(paragraph, keep_newlines);
+                match_and_print(container, outstream, paragraph, settings);
+                paragraph.clear();
+            } else {
+                paragraph.append(line).append("\n");
+            }
+        }
+
+        if (!paragraph.empty()) {
+            maybe_erase_newline(paragraph, keep_newlines);
+            match_and_print(container, outstream, paragraph, settings);
+        }
+    }
+    else {
+        // Process line by line
+        std::istringstream istr(input_text);
+        std::string line;
+
+        while (std::getline(istr, line)) {
+            maybe_erase_newline(line, keep_newlines);
+            match_and_print(container, outstream, line, settings);
+        }
+    }
+}
+
+hfst_ol::PmatchContainer create_pmatch_container(std::ifstream& instream, const std::string& ruleset_filename, const TokenizeSettings& local_settings) {
+    std::map<std::string, std::string> first_header_attributes;
+    try {
+        first_header_attributes = hfst_ol::PmatchContainer::parse_hfst3_header(instream);
+        instream.seekg(0);
+        instream.clear();
+    } catch(TransducerHeaderException & e) {
+        throw std::runtime_error(ruleset_filename +
+            " doesn't look like a HFST archive. Exception thrown: " + e.what());
+    }
+
+    if (first_header_attributes.count("name") == 0 ||
+        first_header_attributes["name"] != "TOP") {
+        if (local_settings.verbose) {
+            std::cerr << "No TOP automaton found, using naive tokeniser\n";
+        }
+        hfst::HfstInputStream is(ruleset_filename);
+        HfstTransducer* dictionary = new HfstTransducer(is);
+        hfst_ol::PmatchContainer naive_container = make_naive_tokenizer(dictionary);
+        delete dictionary;
+        instream.close();
+        return naive_container;
+    } else {
+        if (local_settings.verbose) {
+            std::cerr << "TOP automaton seen, treating as pmatch script...\n";
+        }
+        hfst_ol::PmatchContainer pmatch_container(instream);
+        instream.close();
+        return pmatch_container;
+    }
+}
+
+std::string tokenize_text(const std::string& ruleset_filename,
+                         const std::string& input_text,
+                         const TokenizeSettings& local_settings,
+                         bool use_superblanks = false,
+                         bool use_blankline_separated = true,
+                         bool use_keep_newlines = false)
+{
+    std::ostringstream result;
+
+    try {
+        std::ifstream instream(ruleset_filename.c_str(), std::ifstream::binary);
+        if (!instream.good()) {
+            throw std::runtime_error("Could not open file " + ruleset_filename);
+        }
+
+        hfst_ol::PmatchContainer container = create_pmatch_container(instream, ruleset_filename, local_settings);
+
+        container.set_verbose(local_settings.verbose);
+        container.set_single_codepoint_tokenization(!local_settings.tokenize_multichar);
+
+        // Process the input with our stream-to-string version
+        process_input_string(container, input_text, result, local_settings,
+                           use_blankline_separated, use_superblanks, use_keep_newlines);
+
+        return result.str();
+
+    } catch(HfstException & e) {
+        throw std::runtime_error(std::string("HfstException: ") + e.what());
+    } catch(std::exception & e) {
+        throw;
+    }
+}
+
+// The original process_input functions for CLI operation
 inline void process_input_0delim_print(hfst_ol::PmatchContainer & container,
                                        std::ostream & outstream,
                                        std::ostringstream& cur)
@@ -204,65 +439,6 @@ inline void process_input_0delim_print(hfst_ol::PmatchContainer & container,
     }
     cur.clear();
     cur.str(string());
-}
-
-inline void trim(std::string& str) {
-    while (!str.empty() && (std::isspace(str.back()) || str.back() == 0)) {
-        str.pop_back();
-    }
-    while (!str.empty() && (std::isspace(str.front()) || str.front() == 0)) {
-        str.erase(0, 1);
-    }
-}
-
-int process_input_visl(hfst_ol::PmatchContainer& container, std::ostream& outstream) {
-    size_t bufsize = 0;
-    char *buffer = 0;
-    std::string line;
-
-    ssize_t len = 0;
-    while ((len = hfst_getline(&buffer, &bufsize, inputfile)) > 0) {
-        line.assign(buffer, buffer+len);
-        trim(line);
-        if (!line.empty()) {
-            if (line.front() == '<' && line.back() == '>') {
-                print_nonmatching_sequence(line, outstream, settings);
-            }
-            else {
-                match_and_print(container, outstream, line, settings);
-            }
-        }
-        else {
-            outstream << '\n';
-        }
-        outstream.flush();
-
-        buffer[0] = 0;
-        len = 0;
-
-        if (feof(inputfile)) {
-            break;
-        }
-    }
-
-    if (len < 0) {
-        len = 0;
-    }
-
-    line.assign(buffer, buffer+len);
-    trim(line);
-    if (!line.empty()) {
-        if (line.front() == '<' && line.back() == '>') {
-            print_nonmatching_sequence(line, outstream, settings);
-        }
-        else {
-            match_and_print(container, outstream, line, settings);
-        }
-    }
-    outstream.flush();
-
-    free(buffer);
-    return EXIT_SUCCESS;
 }
 
 template<bool do_superblank>
@@ -341,12 +517,54 @@ int process_input_0delim(hfst_ol::PmatchContainer & container,
     return EXIT_SUCCESS;
 }
 
-inline void maybe_erase_newline(string& input_text)
-{
-    if(!keep_newlines && input_text.size() > 0 && input_text.at(input_text.size() - 1) == '\n') {
-        // Remove final newline
-        input_text.erase(input_text.size() -1, 1);
+int process_input_visl(hfst_ol::PmatchContainer& container, std::ostream& outstream) {
+    size_t bufsize = 0;
+    char *buffer = 0;
+    std::string line;
+
+    ssize_t len = 0;
+    while ((len = hfst_getline(&buffer, &bufsize, inputfile)) > 0) {
+        line.assign(buffer, buffer+len);
+        trim(line);
+        if (!line.empty()) {
+            if (line.front() == '<' && line.back() == '>') {
+                print_nonmatching_sequence(line, outstream, settings);
+            }
+            else {
+                match_and_print(container, outstream, line, settings);
+            }
+        }
+        else {
+            outstream << '\n';
+        }
+        outstream.flush();
+
+        buffer[0] = 0;
+        len = 0;
+
+        if (feof(inputfile)) {
+            break;
+        }
     }
+
+    if (len < 0) {
+        len = 0;
+    }
+
+    line.assign(buffer, buffer+len);
+    trim(line);
+    if (!line.empty()) {
+        if (line.front() == '<' && line.back() == '>') {
+            print_nonmatching_sequence(line, outstream, settings);
+        }
+        else {
+            match_and_print(container, outstream, line, settings);
+        }
+    }
+    outstream.flush();
+
+    free(buffer);
+    return EXIT_SUCCESS;
 }
 
 int process_input(hfst_ol::PmatchContainer & container,
@@ -376,7 +594,7 @@ int process_input(hfst_ol::PmatchContainer & container,
         verbose_printf("Processing blankline separated input\n");
         while (hfst_getline(&line, &bufsize, inputfile) > 0) {
             if (line[0] == '\n') {
-                maybe_erase_newline(input_text);
+                maybe_erase_newline(input_text, keep_newlines);
                 match_and_print(container, outstream, input_text, settings);
                 input_text.clear();
             } else {
@@ -386,7 +604,7 @@ int process_input(hfst_ol::PmatchContainer & container,
             line = NULL;
         }
         if (!input_text.empty()) {
-            maybe_erase_newline(input_text);
+            maybe_erase_newline(input_text, keep_newlines);
             match_and_print(container, outstream, input_text, settings);
         }
     }
@@ -395,7 +613,7 @@ int process_input(hfst_ol::PmatchContainer & container,
         verbose_printf("Processing non-separated input\n");
         while (hfst_getline(&line, &bufsize, inputfile) > 0) {
             input_text = line;
-            maybe_erase_newline(input_text);
+            maybe_erase_newline(input_text, keep_newlines);
             match_and_print(container, outstream, input_text, settings);
             free(line);
             line = NULL;
@@ -570,12 +788,27 @@ int parse_options(int argc, char** argv)
 
 
 
-    return EXIT_FAILURE;
+    return EXIT_FAILURE;  // TODO unreachable?
 }
 
-bool first_transducer_is_called_TOP(const HfstTransducer & dictionary)
-{
-    return dictionary.get_name() == "TOP";
+// Function to read the entire file content into a string
+std::string read_file_to_string(FILE* file) {
+    std::ostringstream result;
+    char* line = NULL;
+    size_t bufsize = 0;
+    ssize_t len;
+
+    while ((len = hfst_getline(&line, &bufsize, file)) > 0) {
+        result.write(line, len);
+        free(line);
+        line = NULL;
+    }
+
+    if (line != NULL) {
+        free(line);
+    }
+
+    return result.str();
 }
 
 int main(int argc, char ** argv)
@@ -588,60 +821,87 @@ int main(int argc, char ** argv)
     }
     verbose_printf("Reading from %s, writing to %s\n",
                    tokenizer_filename.c_str(), outfilename);
-    std::ifstream instream(tokenizer_filename.c_str(),
-                           std::ifstream::binary);
-    if (!instream.good()) {
-        std::cerr << "Could not open file " << tokenizer_filename << std::endl;
-        return EXIT_FAILURE;
-    }
+
     try {
-        // To decide whether we're working with something produced by a
-        // pmatch ruleset, we want to know whether the first transducer
-        // is named TOP. To do this, rather than load the whole thing
-        // into a HfstTransducer, we read just the header variables
-        // with a function in the hfst_ol namespace. This is not really the
-        // place for such a function, so perhaps it should be reimplemented
-        // as a static member of HfstTransducer in the future, TODO.
-        std::map<std::string, std::string> first_header_attributes;
-        try {
-            first_header_attributes = hfst_ol::PmatchContainer::parse_hfst3_header(instream);
-            instream.seekg(0);
-            instream.clear();
-        } catch(TransducerHeaderException & e) {
-            std::cerr << tokenizer_filename <<
-                " doesn't look like a HFST archive. Exiting.\n"
-                "Exception thrown:\n" << e.what() << std::endl;
-            return 1;
-        }
-        if (first_header_attributes.count("name") == 0 ||
-                first_header_attributes["name"] != "TOP") {
-            verbose_printf("No TOP automaton found, using naive tokeniser?\n");
-            hfst::HfstInputStream is(tokenizer_filename);
-            HfstTransducer * dictionary = new HfstTransducer(is);
-            instream.close();
-            hfst_ol::PmatchContainer container = make_naive_tokenizer(dictionary);
-            delete dictionary;
-            container.set_verbose(verbose);
-            container.set_single_codepoint_tokenization(!settings.tokenize_multichar);
-            return process_input(container, std::cout);
+        // First, determine if we should use the new tokenize_text function or the original process_input
+        // If we're reading from stdin and writing to stdout, we use the original approach for efficiency
+        if (inputfile == stdin) {
+            // Use the original functionality with direct processing of input/output streams
+            std::ifstream instream(tokenizer_filename.c_str(), std::ifstream::binary);
+            if (!instream.good()) {
+                std::cerr << "Could not open file " << tokenizer_filename << std::endl;
+                return EXIT_FAILURE;
+            }
+
+            // Check if we're working with a pmatch ruleset or naive tokenizer
+            std::map<std::string, std::string> first_header_attributes;
+            try {
+                first_header_attributes = hfst_ol::PmatchContainer::parse_hfst3_header(instream);
+                instream.seekg(0);
+                instream.clear();
+            } catch(TransducerHeaderException & e) {
+                std::cerr << tokenizer_filename <<
+                    " doesn't look like an HFST archive. Exiting.\n"
+                    "Exception thrown:\n" << e.what() << std::endl;
+                return 1;
+            }
+
+            if (first_header_attributes.count("name") == 0 ||
+                    first_header_attributes["name"] != "TOP") {
+                verbose_printf("No TOP automaton found, using naive tokeniser?\n");
+                hfst::HfstInputStream is(tokenizer_filename);
+                HfstTransducer * dictionary = new HfstTransducer(is);
+                instream.close();
+                hfst_ol::PmatchContainer container = make_naive_tokenizer(dictionary);
+                delete dictionary;
+                container.set_verbose(verbose);
+                container.set_single_codepoint_tokenization(!settings.tokenize_multichar);
+                return process_input(container, std::cout);
+            } else {
+                verbose_printf("TOP automaton seen, treating as pmatch script...\n");
+                hfst_ol::PmatchContainer container(instream);
+                container.set_verbose(verbose);
+                container.set_single_codepoint_tokenization(!settings.tokenize_multichar);
+                return process_input(container, std::cout);
+            }
         } else {
-            verbose_printf("TOP automaton seen, treating as pmatch script...\n");
-            hfst_ol::PmatchContainer container(instream);
-            container.set_verbose(verbose);
-            container.set_single_codepoint_tokenization(!settings.tokenize_multichar);
-            return process_input(container, std::cout);
+            // Use the new tokenize_text function for in-memory processing
+            // Read the input file into a string
+            std::string input_text = read_file_to_string(inputfile);
+
+            // Call the tokenize_text function
+            std::string result = tokenize_text(
+                tokenizer_filename,
+                input_text,
+                settings,
+                superblanks,
+                blankline_separated,
+                keep_newlines
+            );
+
+            // Write the result to the output file
+            if (outfile != stdout) {
+                std::ofstream out(outfilename);
+                if (!out) {
+                    std::cerr << "Could not open file " << outfilename << " for writing" << std::endl;
+                    return EXIT_FAILURE;
+                }
+                out << result;
+                out.close();
+            } else {
+                std::cout << result;
+            }
+
+            return EXIT_SUCCESS;
         }
     } catch(HfstException & e) {
         std::cerr << "Exception thrown:\n" << e.what() << std::endl;
         return 1;
+    } catch(std::runtime_error & e) {
+        std::cerr << "Runtime error: " << e.what() << std::endl;
+        return 1;
+    } catch(std::exception & e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
+        return 1;
     }
-
-//     if (outfile != stdout) {
-//         std::filebuf fb;
-// fb.open(outfilename, std::ios::out);
-// std::ostream outstream(&fb);
-// return process_input(container, outstream);
-// fb.close();
-//     } else {
-
 }
