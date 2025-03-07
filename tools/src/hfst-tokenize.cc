@@ -184,7 +184,7 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer * dictionary,
     return retval;
 }
 
-// Process input with 0-delimeter and print (refactored to remove global vars)
+// TODO: lambda this when C++11 available everywhere
 inline void process_input_0delim_print(hfst_ol::PmatchContainer & container,
                                        std::ostream & outstream,
                                        std::ostringstream& cur,
@@ -207,7 +207,6 @@ inline void trim(std::string& str) {
     }
 }
 
-// Process input with VISL format (uses streams instead of FILE*)
 int process_input_visl(hfst_ol::PmatchContainer& container,
                      std::ostream& outstream,
                      std::istream& instream,
@@ -239,7 +238,6 @@ int process_input_visl(hfst_ol::PmatchContainer& container,
     return EXIT_SUCCESS;
 }
 
-// Generic 0-delim processor with superblank handling parameter (uses streams)
 template<bool do_superblank>
 int process_input_0delim(hfst_ol::PmatchContainer & container,
                          std::ostream & outstream,
@@ -334,7 +332,6 @@ inline void maybe_erase_newline(string& input_text, bool keep_newlines)
     }
 }
 
-// Main input processing function (uses streams instead of FILE*)
 int process_input(hfst_ol::PmatchContainer & container,
                   std::ostream & outstream,
                   std::istream & instream,
@@ -399,7 +396,6 @@ int process_input(hfst_ol::PmatchContainer & container,
     return EXIT_SUCCESS;
 }
 
-// Parse command line options (refactored to return settings)
 int parse_options(int argc, char** argv,
                  std::string& tokenizer_filename,
                  TokenizeSettings& settings,
@@ -573,7 +569,6 @@ int main(int argc, char ** argv)
     hfst_set_program_name(argv[0], "0.1", "HfstTokenize");
     hfst_setlocale();
 
-    // Variables previously declared as globals
     std::string tokenizer_filename;
     TokenizeSettings settings;
     bool superblanks = false;
