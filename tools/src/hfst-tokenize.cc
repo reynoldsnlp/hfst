@@ -62,14 +62,6 @@ using hfst_ol::LocationVector;
 using hfst_ol::LocationVectorVector;
 using namespace hfst_ol_tokenize;
 
-static bool superblanks = false; // Input is apertium-style superblanks (overrides blankline_separated)
-static bool blankline_separated = true; // Input is separated by blank lines (as opposed to single newlines)
-static bool keep_newlines = false;
-static int token_number = 1;
-std::string tokenizer_filename;
-static hfst::ImplementationType default_format = hfst::TROPICAL_OPENFST_TYPE;
-TokenizeSettings settings;
-
 void
 print_usage()
 {
@@ -114,9 +106,8 @@ print_usage()
     fprintf(message_out, "\n");
 }
 
-
-
-hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer * dictionary)
+hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer * dictionary,
+                                             hfst::ImplementationType default_format)
 {
     HfstTransducer * word_boundary = hfst::pmatch::PmatchUtilityTransducers::
         make_latin1_whitespace_acceptor(default_format);
@@ -193,10 +184,11 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer * dictionary)
     return retval;
 }
 
-// TODO: lambda this when C++11 available everywhere
+// Process input with 0-delimeter and print (refactored to remove global vars)
 inline void process_input_0delim_print(hfst_ol::PmatchContainer & container,
                                        std::ostream & outstream,
-                                       std::ostringstream& cur)
+                                       std::ostringstream& cur,
+                                       const TokenizeSettings& settings)
 {
     const std::string& input_text{cur.str()};
     if(!input_text.empty()) {
@@ -215,14 +207,16 @@ inline void trim(std::string& str) {
     }
 }
 
-int process_input_visl(hfst_ol::PmatchContainer& container, std::ostream& outstream) {
-    size_t bufsize = 0;
-    char *buffer = 0;
+// Process input with VISL format (uses streams instead of FILE*)
+int process_input_visl(hfst_ol::PmatchContainer& container,
+                     std::ostream& outstream,
+                     std::istream& instream,
+                     const TokenizeSettings& settings) {
     std::string line;
 
-    ssize_t len = 0;
-    while ((len = hfst_getline(&buffer, &bufsize, inputfile)) > 0) {
-        line.assign(buffer, buffer+len);
+    while (std::getline(instream, line)) {
+        // Add back the newline that getline removes
+        line += '\n';
         trim(line);
         if (!line.empty()) {
             if (line.front() == '<' && line.back() == '>') {
@@ -237,111 +231,102 @@ int process_input_visl(hfst_ol::PmatchContainer& container, std::ostream& outstr
         }
         outstream.flush();
 
-        buffer[0] = 0;
-        len = 0;
-
-        if (feof(inputfile)) {
+        if (instream.eof()) {
             break;
         }
     }
 
-    if (len < 0) {
-        len = 0;
-    }
-
-    line.assign(buffer, buffer+len);
-    trim(line);
-    if (!line.empty()) {
-        if (line.front() == '<' && line.back() == '>') {
-            print_nonmatching_sequence(line, outstream, settings);
-        }
-        else {
-            match_and_print(container, outstream, line, settings);
-        }
-    }
-    outstream.flush();
-
-    free(buffer);
     return EXIT_SUCCESS;
 }
 
+// Generic 0-delim processor with superblank handling parameter (uses streams)
 template<bool do_superblank>
 int process_input_0delim(hfst_ol::PmatchContainer & container,
-                         std::ostream & outstream)
+                         std::ostream & outstream,
+                         std::istream & instream,
+                         const TokenizeSettings& settings,
+                         bool verbose)
 {
-    char * line = NULL;
-    size_t bufsize = 0;
     bool in_blank = false;
     std::ostringstream cur;
-    ssize_t len = -1;
-    while ((len = hfst_getdelim(&line, &bufsize, '\0', inputfile)) > 0) {
-        bool escaped = false; // beginning of line is necessarily unescaped
-        for(ssize_t i = 0; i < len; ++i) {
-            if(escaped) {
-                cur << line[i];
-                escaped = false;
-                continue;
+
+    // For binary/pipe input handling, we need to read character by character
+    // and handle NUL characters specially
+    int c;
+    while ((c = instream.get()) != EOF) {
+        // Check for NUL character - this is critical for the flushing test
+        if (c == '\0') {
+            if (verbose) {
+                std::cout << "processing before NUL: " << cur.str() << std::endl;
             }
-            else if(do_superblank && !in_blank && line[i] == '[') {
-                process_input_0delim_print(container, outstream, cur);
-                cur << line[i];
-                in_blank = true;
-            }
-            else if(do_superblank && in_blank && line[i] == ']') {
-                cur << line[i];
-                if(i+1 < len && line[i+1] == '[') {
-                    // Join consecutive superblanks
-                    ++i;
-                    cur << line[i];
-                }
-                else {
-                    in_blank = false;
-                    print_nonmatching_sequence(cur.str(), outstream, settings);
-                    cur.clear();
-                    cur.str(string());
-                }
-            }
-            else if(!in_blank && line[i] == '\n') {
-                cur << line[i];
-                if (verbose) {
-                    std::cout << "processing: " << cur.str() << "\\n" <<
-                                 std::endl;
-                }
-                process_input_0delim_print(container, outstream, cur);
-            }
-            else if(line[i] == '\0') {
-                if (verbose) {
-                    std::cout << "processing: " << cur.str() << "\\0" <<
-                                 std::endl;
-                }
-                process_input_0delim_print(container, outstream, cur);
-                outstream << "<STREAMCMD:FLUSH>" << std::endl; // CG format uses this instead of \0
-                outstream.flush();
-                if(outstream.bad()) {
-                    std::cerr << "hfst-tokenize: Could not flush file" << std::endl;
-                }
-            }
-            else {
-                cur << line[i];
-            }
-            escaped = (line[i] == '\\');
+
+            // Process current buffer before the NUL
+            process_input_0delim_print(container, outstream, cur, settings);
+
+            // Output the flush command
+            outstream << "<STREAMCMD:FLUSH>" << std::endl;
+            outstream.flush();
+
+            // Continue to next character
+            continue;
         }
-        free(line);
-        line = NULL;
-        if(std::feof(inputfile)) {
-            break;
+
+        bool escaped = (c == '\\');
+        if (escaped) {
+            // Get the next character after escape
+            int next = instream.get();
+            if (next == EOF) {
+                // End of file after escape character - just add the escape
+                cur << static_cast<char>(c);
+            } else {
+                // Add both escape and the character after it
+                cur << static_cast<char>(c);
+                cur << static_cast<char>(next);
+            }
+        }
+        else if(do_superblank && !in_blank && c == '[') {
+            process_input_0delim_print(container, outstream, cur, settings);
+            cur << static_cast<char>(c);
+            in_blank = true;
+        }
+        else if(do_superblank && in_blank && c == ']') {
+            cur << static_cast<char>(c);
+            // Check for consecutive superblanks
+            int next = instream.peek();
+            if (next == '[') {
+                instream.get(); // consume the character
+                cur << static_cast<char>(next);
+            } else {
+                in_blank = false;
+                print_nonmatching_sequence(cur.str(), outstream, settings);
+                cur.clear();
+                cur.str(string());
+            }
+        }
+        else if(!in_blank && c == '\n') {
+            cur << static_cast<char>(c);
+            if (verbose) {
+                std::cout << "processing at newline: " << cur.str() << "\\n" << std::endl;
+            }
+            process_input_0delim_print(container, outstream, cur, settings);
+        }
+        else {
+            cur << static_cast<char>(c);
         }
     }
+
+    // Process any remaining text
     if(in_blank) {
         print_nonmatching_sequence(cur.str(), outstream, settings);
     }
-    else {
-        process_input_0delim_print(container, outstream, cur);
+    else if(!cur.str().empty()) {
+        process_input_0delim_print(container, outstream, cur, settings);
     }
+
     return EXIT_SUCCESS;
 }
 
-inline void maybe_erase_newline(string& input_text)
+inline void maybe_erase_newline(string& input_text, bool keep_newlines)
 {
     if(!keep_newlines && input_text.size() > 0 && input_text.at(input_text.size() - 1) == '\n') {
         // Remove final newline
@@ -349,63 +334,78 @@ inline void maybe_erase_newline(string& input_text)
     }
 }
 
+// Main input processing function (uses streams instead of FILE*)
 int process_input(hfst_ol::PmatchContainer & container,
-                  std::ostream & outstream)
+                  std::ostream & outstream,
+                  std::istream & instream,
+                  const TokenizeSettings& settings,
+                  bool superblanks,
+                  bool blankline_separated,
+                  bool keep_newlines,
+                  bool verbose)
 {
     if(settings.output_format == cg || settings.output_format == giellacg || settings.output_format == visl) {
         outstream << std::fixed << std::setprecision(10);
     }
     if(settings.output_format == giellacg || superblanks) {
         if(superblanks) {
-            verbose_printf("Processign giellacg with superblanks\n");
-            return process_input_0delim<true>(container, outstream);
+            verbose_printf("Processing giellacg with superblanks\n");
+            return process_input_0delim<true>(container, outstream, instream, settings, verbose);
         }
         else {
-            verbose_printf("Processign giellacg without superblanks\n");
-            return process_input_0delim<false>(container, outstream);
+            verbose_printf("Processing giellacg without superblanks\n");
+            return process_input_0delim<false>(container, outstream, instream, settings, verbose);
         }
     }
     if(settings.output_format == visl) {
-        verbose_printf("Processign VISL CG 3\n");
-        return process_input_visl(container, outstream);
+        verbose_printf("Processing VISL CG 3\n");
+        return process_input_visl(container, outstream, instream, settings);
     }
-    string input_text;
-    char * line = NULL;
-    size_t bufsize = 0;
+
+    std::string input_text;
+    std::string line;
+
     if(blankline_separated) {
         verbose_printf("Processing blankline separated input\n");
-        while (hfst_getline(&line, &bufsize, inputfile) > 0) {
-            if (line[0] == '\n') {
-                maybe_erase_newline(input_text);
+        while (std::getline(instream, line)) {
+            // Add back the newline that getline removes
+            line += '\n';
+
+            if (line == "\n") {
+                maybe_erase_newline(input_text, keep_newlines);
                 match_and_print(container, outstream, input_text, settings);
                 input_text.clear();
             } else {
                 input_text.append(line);
             }
-            free(line);
-            line = NULL;
         }
         if (!input_text.empty()) {
-            maybe_erase_newline(input_text);
+            maybe_erase_newline(input_text, keep_newlines);
             match_and_print(container, outstream, input_text, settings);
         }
     }
     else {
         // newline or non-separated
         verbose_printf("Processing non-separated input\n");
-        while (hfst_getline(&line, &bufsize, inputfile) > 0) {
-            input_text = line;
-            maybe_erase_newline(input_text);
-            match_and_print(container, outstream, input_text, settings);
-            free(line);
-            line = NULL;
+        while (std::getline(instream, line)) {
+            // Add back the newline that getline removes
+            line += '\n';
+
+            maybe_erase_newline(line, keep_newlines);
+            match_and_print(container, outstream, line, settings);
         }
     }
 
     return EXIT_SUCCESS;
 }
 
-int parse_options(int argc, char** argv)
+// Parse command line options (refactored to return settings)
+int parse_options(int argc, char** argv,
+                 std::string& tokenizer_filename,
+                 TokenizeSettings& settings,
+                 bool& superblanks,
+                 bool& blankline_separated,
+                 bool& keep_newlines)
 {
     extend_options_getenv(&argc, &argv);
     // use of this function requires options are settable on global scope
@@ -535,40 +535,30 @@ int parse_options(int argc, char** argv)
             break;
 #include "inc/getopt-cases-error.h"
         }
+    }
 
     if (verbose) {
         settings.verbose = true;
     }
 
+    // no more options, we should now be at the input filename
+    if ((optind + 1) < argc)
+    {
+        std::cerr << "More than one input file given\n";
+        return EXIT_FAILURE;
+    }
+    else if ((optind + 1) == argc)
+    {
+        tokenizer_filename = argv[optind];
+        return EXIT_CONTINUE;
+    }
+    else
+    {
+        std::cerr << "No input file given\n";
+        return EXIT_FAILURE;
     }
 
-//            if (!inputNamed)
-//        {
-//            inputfile = stdin;
-//            inputfilename = hfst_strdup("<stdin>");
-//        }
-
-        // no more options, we should now be at the input filename
-        if ( (optind + 1) < argc)
-        {
-            std::cerr << "More than one input file given\n";
-            return EXIT_FAILURE;
-        }
-        else if ( (optind + 1) == argc)
-        {
-            tokenizer_filename = argv[(optind)];
-            return EXIT_CONTINUE;
-        }
-        else
-        {
-            std::cerr << "No input file given\n";
-            return EXIT_FAILURE;
-        }
-
-
 #include "inc/check-params-common.h"
-
-
 
     return EXIT_FAILURE;
 }
@@ -582,10 +572,21 @@ int main(int argc, char ** argv)
 {
     hfst_set_program_name(argv[0], "0.1", "HfstTokenize");
     hfst_setlocale();
-    int retval = parse_options(argc, argv);
+
+    // Variables previously declared as globals
+    std::string tokenizer_filename;
+    TokenizeSettings settings;
+    bool superblanks = false;
+    bool blankline_separated = true;
+    bool keep_newlines = false;
+    hfst::ImplementationType default_format = hfst::TROPICAL_OPENFST_TYPE;
+
+    int retval = parse_options(argc, argv, tokenizer_filename, settings,
+                              superblanks, blankline_separated, keep_newlines);
     if (retval != EXIT_CONTINUE) {
         return retval;
     }
+
     verbose_printf("Reading from %s, writing to %s\n",
                    tokenizer_filename.c_str(), outfilename);
     std::ifstream instream(tokenizer_filename.c_str(),
@@ -613,35 +614,69 @@ int main(int argc, char ** argv)
                 "Exception thrown:\n" << e.what() << std::endl;
             return 1;
         }
+
+        // Handle input streams setup
+        std::istream* input_stream = &std::cin;
+        std::ifstream input_file;
+
+        if (inputfile != stdin) {
+            // Make sure we're using binary mode to match the old behavior
+            input_file.open(inputfilename, std::ios::in | std::ios::binary);
+            if (!input_file.is_open()) {
+                std::cerr << "Could not open input file " << inputfilename << std::endl;
+                return EXIT_FAILURE;
+            }
+            input_stream = &input_file;
+        }
+
+        // Handle output streams setup - always use stdout if no output file specified
+        std::ostream* output_stream = &std::cout;
+        std::ofstream output_file;
+
+        // Only attempt to open output file if a filename was actually specified
+        if (outfile != stdout && outfilename != NULL && outfilename[0] != '\0') {
+            // Create the output file
+            output_file.open(outfilename);
+            if (!output_file.is_open()) {
+                std::cerr << "Could not open output file " << outfilename << std::endl;
+                return EXIT_FAILURE;
+            }
+            output_stream = &output_file;
+        }
+
+        int result;
         if (first_header_attributes.count("name") == 0 ||
                 first_header_attributes["name"] != "TOP") {
             verbose_printf("No TOP automaton found, using naive tokeniser?\n");
             hfst::HfstInputStream is(tokenizer_filename);
             HfstTransducer * dictionary = new HfstTransducer(is);
             instream.close();
-            hfst_ol::PmatchContainer container = make_naive_tokenizer(dictionary);
+            hfst_ol::PmatchContainer container = make_naive_tokenizer(dictionary, default_format);
             delete dictionary;
             container.set_verbose(verbose);
             container.set_single_codepoint_tokenization(!settings.tokenize_multichar);
-            return process_input(container, std::cout);
+            result = process_input(container, *output_stream, *input_stream, settings,
+                               superblanks, blankline_separated, keep_newlines, verbose);
         } else {
             verbose_printf("TOP automaton seen, treating as pmatch script...\n");
             hfst_ol::PmatchContainer container(instream);
             container.set_verbose(verbose);
             container.set_single_codepoint_tokenization(!settings.tokenize_multichar);
-            return process_input(container, std::cout);
+            result = process_input(container, *output_stream, *input_stream, settings,
+                               superblanks, blankline_separated, keep_newlines, verbose);
         }
+
+        // Make sure to properly close files
+        if (input_file.is_open()) {
+            input_file.close();
+        }
+        if (output_file.is_open()) {
+            output_file.close();
+        }
+
+        return result;
     } catch(HfstException & e) {
         std::cerr << "Exception thrown:\n" << e.what() << std::endl;
         return 1;
     }
-
-//     if (outfile != stdout) {
-//         std::filebuf fb;
-// fb.open(outfilename, std::ios::out);
-// std::ostream outstream(&fb);
-// return process_input(container, outstream);
-// fb.close();
-//     } else {
-
 }
