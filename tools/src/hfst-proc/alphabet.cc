@@ -515,39 +515,30 @@ ProcTransducerAlphabet::symbols_to_string(const SymbolNumberVector &symbols,
 bool
 ProcTransducerAlphabet::is_punctuation(const char *c) const
 {
-    static const char *punct_ranges[8][2]
-        = { { "!", "/" }, { ":", "@" }, { "[", "`" }, { "{", "~" },
-            { "¡", "¿" }, { "‐", "⁞" }, { "₠", "₸" }, { "∀", "⋿" } };
-    const char *individual_chars = "×÷";
-    for (int i = 0; i < 8; i++)
+    icu::UnicodeString us = icu::UnicodeString::fromUTF8(c);
+    if (us.countChar32() == 1)
     {
-        if (strcmp(c, punct_ranges[i][0]) >= 0
-            && strcmp(c, punct_ranges[i][1]) <= 0)
-        {
-            // a hack to filter out symbols (e.g. tags) that may start with
-            // punctuation and then contain ASCII text. Tags should be treated
-            // as alphabetic.
-            for (; *c != '\0'; c++)
-            {
-                if (isalnum(*c))
-                    return false;
-            }
-            return true;
-        }
+        return u_ispunct(us.charAt(0))
+               || u_charType(us.charAt(0)) == U_MATH_SYMBOL;
     }
-
-    return (strstr(individual_chars, c) != NULL);
+    else
+    {
+        return false;
+    }
 }
 
 bool
 ProcTransducerAlphabet::is_space(const char *c) const
 {
-    // http://en.wikipedia.org/w/index.php?title=Space_%28punctuation%29&oldid=376453673#Table_of_spaces
-    static const char *space_chars
-        = "   ᠎         ​‌‍  ⁠　﻿";
-    if (isspace(c[0]))
-        return true;
-    return (strstr(space_chars, c) != NULL);
+    icu::UnicodeString us = icu::UnicodeString::fromUTF8(c);
+    if (us.countChar32() == 1)
+    {
+        return u_isUWhiteSpace(us.charAt(0));
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool
