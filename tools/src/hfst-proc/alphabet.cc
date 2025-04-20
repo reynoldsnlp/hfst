@@ -454,35 +454,16 @@ ProcTransducerAlphabet::caps_helper(const char *in, int &case_res)
 int
 ProcTransducerAlphabet::utf8_str_to_int(const char *c)
 {
-    if ((unsigned char)c[0] <= 127)
-        return (unsigned char)c[0];
-    else if ((c[0] & (128 + 64 + 32 + 16)) == (128 + 64 + 32 + 16))
-        return (((unsigned char)c[0]) << 24) + (((unsigned char)c[1]) << 16)
-               + (((unsigned char)c[2]) << 8) + ((unsigned char)c[3]);
-    else if ((c[0] & (128 + 64 + 32)) == (128 + 64 + 32))
-        return (((unsigned char)c[0]) << 16) + (((unsigned char)c[1]) << 8)
-               + ((unsigned char)c[2]);
-    else if ((c[0] & (128 + 64)) == (128 + 64))
-        return (((unsigned char)c[0]) << 8) + ((unsigned char)c[1]);
-    else
-        stream_error("Invalid UTF-8 character found");
-    return -1;
+    icu::UnicodeString us = icu::UnicodeString::fromUTF8(c);
+    return us.char32At(0);
 }
+
 std::string
 ProcTransducerAlphabet::utf8_int_to_str(int c)
 {
-    std::string res;
-    for (int i = 3; i >= 0; i--)
-    {
-        if (c & (0xFF << (8 * i)))
-        {
-            for (; i >= 0; i--)
-                res.push_back((char)((c & (0xFF << (8 * i))) >> (8 * i))
-                              & 0xFF);
-            return res;
-        }
-    }
-    return "";
+    std::string rv;
+    icu::UnicodeString us = icu::UnicodeString(c);
+    return us.toUTF8String(rv);
 }
 
 std::string
