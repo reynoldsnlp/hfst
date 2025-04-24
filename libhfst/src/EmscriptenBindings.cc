@@ -49,29 +49,6 @@ namespace {
         return U_ICU_VERSION;
     }
 
-    // Function to initialize ICU data
-    bool initialize_ICU_data() {
-        static bool icuDataInitialized = false;
-        static bool initializationSuccess = false; // Store result
-        if (icuDataInitialized) {
-            return initializationSuccess; // Return stored result
-        }
-
-        UErrorCode status = U_ZERO_ERROR;
-        udata_setCommonData(U_ICUDATA_ENTRY_POINT, &status);
-
-        initializationSuccess = U_SUCCESS(status); // Store success/failure
-        icuDataInitialized = true; // Mark as attempted
-
-        if (!initializationSuccess) {
-             std::cerr << "Error: udata_setCommonData failed: "
-                       << u_errorName(status) << std::endl;
-        } else {
-             std::cerr << "ICU data set successfully via udata_setCommonData." << std::endl;
-        }
-        return initializationSuccess;
-    }
-
     // Structure to represent a form in a token analysis
     struct TokenizeForm {
         std::string form;
@@ -342,9 +319,6 @@ namespace {
     // Helper function for tokenizing text using PmatchContainer
     val tokenizeText(hfst_ol::PmatchContainer& container, const std::string& text, const val& jsSettings) {
         try {
-            // Initialize ICU data if needed
-            initialize_ICU_data();
-
             TokenizeSettings settings = jsToTokenizeSettings(jsSettings);
 
             // Set up a string stream for output
@@ -424,9 +398,6 @@ namespace {
     // Helper function for structured tokenization
     val tokenizeTextStructured(hfst_ol::PmatchContainer& container, const std::string& text, const val& jsSettings) {
         try {
-            // Initialize ICU data if needed
-            initialize_ICU_data();
-
             TokenizeSettings settings = jsToTokenizeSettings(jsSettings);
 
             // This is a simplified implementation since the actual match_text function is not available
@@ -471,9 +442,6 @@ namespace {
 
 // Main binding function
 EMSCRIPTEN_BINDINGS(hfst_module) {
-    // Initialize ICU data at module load time
-    //initialize_ICU_data();
-
     // Bind ImplementationType enum
     enum_<ImplementationType>("ImplementationType")
         .value("SFST_TYPE", SFST_TYPE)
@@ -569,7 +537,6 @@ EMSCRIPTEN_BINDINGS(hfst_module) {
     function("createPmatchContainerFromBuffer", &createPmatchContainerFromBuffer, allow_raw_pointers());
     function("getDefaultTokenizeSettings", &getDefaultTokenizeSettings);
     function("getIcuVersion", &getIcuVersion);
-    function("initialize_ICU_data", &initialize_ICU_data);  // Export the initialization function to JS
 }
 
 #endif // __EMSCRIPTEN__

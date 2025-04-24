@@ -6,35 +6,58 @@
 
 set -ex
 
+if ! [ -d libhfst ]; then
+    echo "Please run this script in the HFST root directory."
+    exit 1
+fi
+
 HFST_DIR="$(pwd)"
 DEPS_DIR="${HFST_DIR}/wasm-deps"
+INCLUDE_DIR="${DEPS_DIR}/include"
+LIB_DIR="${DEPS_DIR}/lib"
+mkdir -p ${INCLUDE_DIR}
+mkdir -p ${LIB_DIR}
 
-sudo apt-get update
+APT_UPDATE_STAMP="/tmp/apt-update-stamp"
+if [ ! -f ${APT_UPDATE_STAMP} ]; then
+    sudo apt-get update
+    touch ${APT_UPDATE_STAMP}
+else
+    echo "apt-get update already done. Skipping..."
+fi
 sudo apt-get install -y \
     autoconf \
     automake \
     bison \
     build-essential \
     cmake \
+    curl \
     flex \
+    git \
     libtool \
     pkg-config \
     python3 \
+    python3-jsonschema \
+    unzip \
     zlib1g-dev
 
-[[ -d emsdk ]] || git clone https://github.com/emscripten-core/emsdk
-cd emsdk
-./emsdk install latest
-./emsdk activate latest
-source emsdk_env.sh
-cd ..
+if ! [ -d emsdk ]; then
+    git clone https://github.com/emscripten-core/emsdk.git
+fi
+if [ -z $(which emcc) ]; then
+    pushd emsdk
+    ./emsdk install latest
+    ./emsdk activate latest
+    . emsdk_env.sh
+    popd
+fi
 
-# Build wasm dependencies
-mkdir -p ${DEPS_DIR}/lib
-
-# Foma
+echo '
+=======================================================================
+====================== Building Foma ==================================
+======================================================================='
 cd ${DEPS_DIR}
-if [ -f libfoma.a ]; then
+if [ -f "${LIB_DIR}/libfoma.a" ]; then
   echo "Foma already built (wasm-deps/libfoma.a exists), skipping..."
 else
   echo "Building Foma..."
@@ -42,13 +65,17 @@ else
   cd foma/foma
   git pull
   emcmake cmake .
-  emmake make -j$(nproc)
-  cp libfoma.a ${DEPS_DIR}/lib/
+  emmake make # -j$(nproc)
+  cp libfoma.a ${LIB_DIR}/
 fi
 
-# OpenFst
+
+echo '
+=======================================================================
+====================== Building OpenFST ===============================
+======================================================================='
 cd ${DEPS_DIR}
-if [ -f libfst.a ]; then
+if [ -f "${LIB_DIR}/libfst.a" ]; then
   echo "OpenFst already built (wasm-deps/libfst.a exists), skipping..."
 else
   echo "Building OpenFst..."
@@ -56,163 +83,115 @@ else
   cd openfst
   autoreconf -fiv
   emconfigure ./configure --enable-static --disable-shared
-  emmake make -j$(nproc)
-  cp src/lib/.libs/libfst.a ${DEPS_DIR}/lib/
+  emmake make # -j$(nproc)
+  cp src/lib/.libs/libfst.a ${LIB_DIR}/
   [ -d ${DEPS_DIR}/include/fst ] || ln -s ${DEPS_DIR}/openfst/src/include/fst ${DEPS_DIR}/include/
 fi
 
-# ICU
+echo '
+=======================================================================
+====================== Building ICU ===================================
+======================================================================='
 cd ${DEPS_DIR}
-if [ -f lib/libicuuc.a ]; then
-  echo "ICU already built (wasm-deps/lib/libicuuc.a exists), skipping..."
-else
-  LATEST_TAG=$(curl -s https://api.github.com/repos/unicode-org/icu/releases/latest | grep tag_name | cut -d '"' -f 4)
-  echo "Latest ICU tag: $LATEST_TAG"
-  # Extract version part (e.g., 77-1)
-  ICU_VERSION_PART=${LATEST_TAG#release-}
-  # Replace the first hyphen with an underscore (e.g., 77_1)
-  ICU_VERSION_UNDERSCORE=${ICU_VERSION_PART/-/_}
-  # get latest release source
-  ICU_VERSION_MAJOR=$(echo ${ICU_VERSION_PART} | cut -d - -f 1)
-  if [ ! -d icu ]; then
-    INSTALL_DIR="$(pwd)/icu-static-install"
-    # Construct the archive name
-    ARCHIVE_NAME="icu4c-${ICU_VERSION_UNDERSCORE}-src.tgz"
-    ARCHIVE_URL="https://github.com/unicode-org/icu/releases/download/${LATEST_TAG}/${ARCHIVE_NAME}"
-    curl -L -o "$ARCHIVE_NAME" "$ARCHIVE_URL"
-    tar -xf "$ARCHIVE_NAME"
-  fi
-  cd icu/source
-  ./runConfigureICU Linux
-  make -j$(nproc)
+# ICU_SRC_URL="https://github.com/unicode-org/icu/releases/download/release-77-1/icu4c-77_1-src.tgz"
+ICU_SRC_URL=$(curl -s https://api.github.com/repos/unicode-org/icu/releases/latest | grep '/icu4c-.*-src.tgz"' | cut -d '"' -f 4)
+ICU_SRC_TGZ=$(basename ${ICU_SRC_URL})
+ICU_DATA_URL=${ICU_SRC_URL/-src.tgz/-data.zip}
+ICU_DATA_ZIP=$(basename ${ICU_DATA_URL})
 
-  # Build WASM ICU in a separate directory
-  cd ${DEPS_DIR}/icu
-  mkdir -p wasm-build
-  cd wasm-build
-  echo "Building WASM ICU library..."
-  emconfigure ../source/runConfigureICU Linux \
-    --prefix="${DEPS_DIR}" \
-    --host=wasm32-unknown-emscripten \
-    --disable-extras \
-    --disable-layout \
-    --disable-layoutex \
-    --disable-samples \
-    --disable-shared \
-    --disable-tests \
-    --disable-tools \
-    --enable-static \
-    --with-data-packaging=static \
-    --with-cross-build="${DEPS_DIR}/icu/source"
-  cp ../source/config/mh-linux ../source/config/mh-unknown  # Configure cannot detect emscripten platform; it suggested using linux template
-  emmake make -j$(nproc)
-  emmake make install
-
-#######################################################################
-# Manually build minimal libicudata.a with only character brkitr data #
-#######################################################################
-ICU_NATIVE_BUILD_DIR="${DEPS_DIR}/icu/source"
-ICU_WASM_BUILD_DIR="${DEPS_DIR}/icu/wasm-build"
-ICU_MIN_DATA_DIR="${DEPS_DIR}/icu/minimal-data-tmp"
-FULL_DATA_FILE="${ICU_NATIVE_BUILD_DIR}/data/in/icudt${ICU_VERSION_MAJOR}l.dat"
-MINIMAL_DAT_FILE="${ICU_MIN_DATA_DIR}/icudt${ICU_VERSION_MAJOR}l_minimal.dat"
-
-# Ensure native tools are built
-if [ ! -x "${ICU_NATIVE_BUILD_DIR}/bin/icupkg" ] || [ ! -x "${ICU_NATIVE_BUILD_DIR}/bin/genccode" ]; then
-  echo "Error: Native ICU tools (icupkg, genccode) not found or not executable in ${ICU_NATIVE_BUILD_DIR}/bin"
-  exit 1
-fi
-if [ ! -f "${FULL_DATA_FILE}" ]; then
-    echo "Error: Full ICU data file not found at ${FULL_DATA_FILE}"
-    # Attempt to find it elsewhere, common alternative location:
-    ALT_FULL_DATA_FILE="${ICU_NATIVE_BUILD_DIR}/stubdata/icudt${ICU_VERSION_MAJOR}l.dat"
-    if [ -f "${ALT_FULL_DATA_FILE}" ]; then
-        echo "Found data file at alternative location: ${ALT_FULL_DATA_FILE}"
-        FULL_DATA_FILE="${ALT_FULL_DATA_FILE}"
-    else
-        echo "Could not find ICU data file. Please check the ICU native build output."
-        exit 1
+if ! [ -d icu ]; then
+    curl -L -o "${ICU_SRC_TGZ}" "${ICU_SRC_URL}"
+    tar -xvf "${ICU_SRC_TGZ}"
+    # Hide dat file to force make to rebuild data using filter
+    ORIG_DAT="$(pwd)/icu/source/data/in/icudt??l.dat"
+    if [ -f ${ORIG_DAT} ]; then
+        mv ${ORIG_DAT} ${ORIG_DAT}.hidden
     fi
+    # Let config assume that emscripten build is Linux
+    cp icu/source/config/mh-linux icu/source/config/mh-unknown
 fi
 
-# Clean up previous attempts
-rm -rf "${ICU_MIN_DATA_DIR}"
-mkdir -p "${ICU_MIN_DATA_DIR}"
-
-# List of essential data items for character break iteration and basic functionality
-# Add more locales (e.g., res/en.res, res/de.res) or data types if needed.
-DATA_ITEMS="brkitr/char.brk cnvalias.icu pool.res"
-LIST_FILE="/tmp/minimal_list.txt"
-echo "${DATA_ITEMS}" | tr ' ' '\n' > "${LIST_FILE}"
-
-# Extract necessary items using native icupkg
-echo "Extracting data items: ${DATA_ITEMS}"
-# Extract items from the full data file into the minimal data directory
-"${ICU_NATIVE_BUILD_DIR}/bin/icupkg" \
-    --extract "${LIST_FILE}" \
-    --destdir "${ICU_MIN_DATA_DIR}" \
-    "${FULL_DATA_FILE}"
-ls -R "${ICU_MIN_DATA_DIR}"
-
-echo "Creating minimal data archive: ${MINIMAL_DAT_FILE}"
-rm -f "${MINIMAL_DAT_FILE}"
-"${ICU_NATIVE_BUILD_DIR}/bin/icupkg" \
-    --type l \
-    --add "${LIST_FILE}" \
-    --sourcedir "${ICU_MIN_DATA_DIR}" \
-    new \
-    "${MINIMAL_DAT_FILE}"
-
-# Check if the minimal data file was created
-if [ ! -f "${MINIMAL_DAT_FILE}" ]; then
-    echo "Error: icupkg failed to create ${MINIMAL_DAT_FILE}"
-    exit 1
+if ! [ -f icu/source/data/locales/root.txt ]; then
+    curl -L -o "${ICU_DATA_ZIP}" "${ICU_DATA_URL}"
+    mv icu/source/data icu/source/data_from_src_tgz
+    unzip "${ICU_DATA_ZIP}" -d icu/source/
 fi
 
-# Compile libicudata.a from MINIMAL_DAT_FILE
-MINIMAL_DATA_C_FILE="${ICU_MIN_DATA_DIR}/icudt${ICU_VERSION_MAJOR}l_minimal_dat.c"
-MINIMAL_DATA_C_FILE="${ICU_MIN_DATA_DIR}/icudt${ICU_VERSION_MAJOR}l_dat.c"  # TODO DELETE ME
-MINIMAL_DATA_O_FILE="${ICU_MIN_DATA_DIR}/icudt${ICU_VERSION_MAJOR}l_minimal_dat.o"
-MINIMAL_DATA_O_FILE="${ICU_MIN_DATA_DIR}/icudt${ICU_VERSION_MAJOR}l_dat.o"  # TODO DELETE ME
-MINIMAL_DATA_LIB_DEST="${DEPS_DIR}/lib/libicudata.a"
+export ICU_DATA_FILTER_FILE="$(pwd)/data-filter.json"
+echo '{
+  "strategy": "additive",
 
-# Generate C code from the minimal data archive using native genccode
-echo "Generating C source from minimal data: ${MINIMAL_DATA_C_FILE}"
-"${ICU_NATIVE_BUILD_DIR}/bin/genccode" \
-    --name icudt${ICU_VERSION_MAJOR}_dat \
-    --destdir "${ICU_MIN_DATA_DIR}" \
-    "${FULL_DATA_FILE}"  # TODO DELETE ME and uncomment the next line
-    # "${MINIMAL_DAT_FILE}"
+  "localeFilter": {
+    "filterType": "language",
+    "includelist": ["en"]
+  },
 
-# Compile the generated C code to an object file using emcc
-echo "Compiling data source with emcc: ${MINIMAL_DATA_O_FILE}"
-emcc -c "${MINIMAL_DATA_C_FILE}" -o "${MINIMAL_DATA_O_FILE}"
+  "featureFilters": {
+    "brkitr_rules":        "include",
+    "brkitr_tree":         "include",
 
-# Archive the object file into libicudata.a using emar
-echo "Archiving data object into: ${MINIMAL_DATA_LIB_DEST}"
-emar rcs "${MINIMAL_DATA_LIB_DEST}" "${MINIMAL_DATA_O_FILE}"
+    "cnvalias":            "include",
+    "ulayout":             "include",
+    "uemoji":              "include",
 
-# Optional: Clean up temporary directory
-# rm -rf "${ICU_MIN_DATA_DIR}"
+    "brkitr_dictionaries": "include",
+    "brkitr_lstm":         "include",
+    "brkitr_adaboost":     "include"
+  }
+}' > ${ICU_DATA_FILTER_FILE}
 
-echo "Minimal ICU data library created successfully at ${MINIMAL_DATA_LIB_DEST}."
+pushd icu/source
 
+# Build ICU natively (host build) to generate required tools and ICU data
+echo '=================== Building ICU (native tools) ======================='
+mkdir -p native-build
+pushd native-build
+NATIVE_ICU_DIR=$(pwd)
+if [ -f "bin/pkgdata" ]; then
+  echo "ICU native tools already built (native-build/bin/pkgdata exists), skipping..."
+else
+  ../configure --disable-shared --enable-static VERBOSE=1
+  make -j$(nproc) VERBOSE=1
+fi
+popd
+
+echo '====================== Building ICU (wasm) ==========================='
+mkdir -p wasm-build
+pushd wasm-build
+if [ -f "lib/libicudata.a" ]; then
+  echo "ICU wasm libs already built (wasm-build/lib/libicudata.a exists), skipping..."
+else
+  export PKGDATA_OPTS="--without-assembly -O ../data/icupkg.inc"
+  PKG_CONFIG_LIBDIR="${LIB_DIR}/pkgconfig" emconfigure ../configure \
+      --host=wasm32-unknown-emscripten \
+      --prefix="${DEPS_DIR}" \
+      --with-cross-build="${NATIVE_ICU_DIR}" \
+      --enable-static=yes \
+      --disable-shared \
+      --with-data-packaging=static \
+      --enable-icu-config \
+      --disable-extras \
+      --disable-samples \
+      --disable-tests \
+      VERBOSE=1
+
+  emmake make -j$(nproc) install
+  popd
+  popd
+echo "WebAssembly ICU build complete. Static libraries are in ${LIB_DIR}"
 fi
 
 
-
-
-
-# Build libhfst
+echo '
+=======================================================================
+====================== Building LibHFST ===============================
+======================================================================='
 cd ${HFST_DIR}
 
-# if [ -f configure ]; then
-#     autoreconf
-# else
-#     ./autogen.sh
-# fi
+if [ ! -f configure ]; then
+    ./autogen.sh
+fi
 
-echo "Configure with Emscripten"
 emconfigure ./configure \
   --host=wasm32-unknown-emscripten \
   --with-sfst=no \
@@ -221,16 +200,17 @@ emconfigure ./configure \
   --enable-no-tools \
   --disable-load-so-entries \
   --with-readline=no \
-  --with-icu=${DEPS_DIR} \
   CPPFLAGS="-I${DEPS_DIR}/include -I${DEPS_DIR}/foma/foma" \
   FOMA_CFLAGS="-I${DEPS_DIR}/foma/foma" \
-  FOMA_LIBS="-L${DEPS_DIR} -lfoma" \
-  LDFLAGS="-L${DEPS_DIR}/lib" \
-  VERBOSE=1 \
-  EMSCRIPTEN=1
+  FOMA_LIBS="-L${LIB_DIR} -lfoma" \
+  LDFLAGS="-L${LIB_DIR}" \
+  VERBOSE=1
 # TODO: optimization with -O3 or -O4
 
 echo "Build libhfst"
 emmake make -C libhfst VERBOSE=1 -j$(nproc)
 
-echo "Successfully completed!"
+echo '
+=======================================================================
+==================== LibHFST WASM build complete ======================
+======================================================================='

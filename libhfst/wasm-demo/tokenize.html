@@ -16,7 +16,7 @@
 
   <div>
     <h2>2. Tokenize words</h2>
-    <input type="text" id="textInput" placeholder="Enter a word to analyze">
+    <textarea id="textInput" placeholder="Enter text to analyze" rows="10" cols="80"></textarea>
     <br>
     <select id="outputFormatSelect">
       <option value="0">tokenize</option>
@@ -113,16 +113,27 @@
       try {
         const results = currentTransducer.tokenize(text, tokenizeSettings);
         console.log(`String results (${text}):`, results);
-        let resultsHtml = `<p>Tokenization results:</p><pre>${results}</pre>`;
-        resultsDiv.innerHTML = resultsHtml;
+
+        // Clear previous results and add new structure
+        resultsDiv.innerHTML = '<p>Tokenization results:</p>'; // Keep the paragraph
+        const preElement = document.createElement('pre');
+        preElement.textContent = results; // Use textContent for automatic escaping
+        resultsDiv.appendChild(preElement);
 
         const structuredResults = currentTransducer.tokenizeStructured(text, tokenizeSettings);
         console.log(`Structured results (${text}):`, structuredResults);
-        let structuredResultsHtml = `<p>Tokenization results (structured):</p><pre>${JSON.stringify(results, null, 2)}</pre>`;
-        structuredResultsDiv.innerHTML = structuredResultsHtml;
+
+        // Clear previous results and add new structure for structured results
+        structuredResultsDiv.innerHTML = '<p>Tokenization results (structured):</p>'; // Keep the paragraph
+        const structuredPreElement = document.createElement('pre');
+        structuredPreElement.textContent = JSON.stringify(structuredResults, null, 2); // Use textContent
+        structuredResultsDiv.appendChild(structuredPreElement);
+
       } catch (error) {
         console.error('Error in lookup:', error);
+        // Use textContent here too for safety
         resultsDiv.textContent = 'Error analyzing word: ' + error.message;
+        structuredResultsDiv.textContent = ''; // Clear structured results on error
       }
     }
   </script>

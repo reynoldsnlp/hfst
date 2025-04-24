@@ -561,8 +561,9 @@ AC_ARG_ENABLE([xfst],
 AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
 
 # Check if we're building with Emscripten
-AM_CONDITIONAL([EMSCRIPTEN], [test "x$EMSCRIPTEN" = "x1"])
-if test "x$EMSCRIPTEN" = "x1"; then
+# TODO use $host_alias instead of EMSCRIPTEN environment variable
+AM_CONDITIONAL([EMSCRIPTEN], [AS_CASE(["$host_alias"], [wasm*-*-*], [true], [false])])
+AS_IF([AS_CASE(["$host_alias"], [wasm*-*-*], [true], [false])], [
     AC_SUBST([WASM_LDFLAGS], ["-lembind \
 				-s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','FS'] \
 				-s EXPORTED_FUNCTIONS=['_malloc','_free'] \
@@ -573,7 +574,7 @@ if test "x$EMSCRIPTEN" = "x1"; then
 				-s INITIAL_MEMORY=64MB \
 				-s MAXIMUM_MEMORY=4GB \
 				-s NO_DISABLE_EXCEPTION_CATCHING"])
-fi
+])
 
 # Disable stress tests by default
 AC_ARG_ENABLE([stress-tests],
@@ -641,12 +642,12 @@ AC_LANG_PUSH([C])
 AC_LANG_POP
 
 # ICU checks only if not using Emscripten
-if test "x$EMSCRIPTEN" != "x1"; then
+AS_IF([AS_CASE(["$host_alias"], [wasm*-*-*], [false], [true])], [
   AX_CHECK_ICU([50],[AC_DEFINE([USE_ICU_UNICODE], 1,
                     [if using icu for unicode string handling])],[AC_MSG_FAILURE([ICU-50 or newer is required])])
-else
+], [
   AC_DEFINE([USE_ICU_UNICODE], 1, [Using Emscripten ICU port])
-fi
+])
 
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_SEARCH_LIBS([readline], [readline editline],
@@ -708,11 +709,11 @@ AC_CHECK_DECLS([rl_completion_suppress_append, rl_completion_matches])
 
 AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line strndup getline getdelim getopt_long strtod set_program_name setprogname setlocale nl_langinfo get_current_dir_name])
 # Emscripten does not have xstrdup, but configure thinks it does, so set HAVE_XSTRDUP manually
-if test "x$EMSCRIPTEN" != "x1"; then
+AS_IF([AS_CASE(["$host_alias"], [wasm*-*-*], [false], [true])], [
   AC_CHECK_FUNCS([xstrdup])
-else
+], [
   AC_DEFINE([HAVE_XSTRDUP], [0], [Define to 0 when using Emscripten])
-fi
+])
 AC_CHECK_FUNCS([isatty])
 
 AM_CONDITIONAL([WINDOWS], [test x$version_type = xwindows])
@@ -736,12 +737,12 @@ AS_IF([test "x$enable_python_bindings" = "xyes"], [
 ])
 
 # For Emscripten build, add OpenFST include path
-if test "x$EMSCRIPTEN" = "x1"; then
+AS_IF([AS_CASE(["$host_alias"], [wasm*-*-*], [true], [false])], [
     # Save old CPPFLAGS
     OLD_CPPFLAGS="$CPPFLAGS"
     # Add OpenFST include path for header checks
     CPPFLAGS="$CPPFLAGS -I$srcdir/wasm-deps/openfst/src/include"
-fi
+])
 
 # Check for OpenFST header
 AS_IF([test "x$with_openfst" != xno && test "x$found_fstlib_h" != xyes],
@@ -749,12 +750,12 @@ AS_IF([test "x$with_openfst" != xno && test "x$found_fstlib_h" != xyes],
                       [AC_MSG_ERROR([could not find OpenFST's fst/fstlib.h in include path])])])
 
 # Restore original CPPFLAGS if using Emscripten
-if test "x$EMSCRIPTEN" = "x1"; then
+AS_IF([AS_CASE(["$host_alias"], [wasm*-*-*], [true], [false])], [
     CPPFLAGS="$OLD_CPPFLAGS"
-fi
+])
 
 # Skip foma library check if using Emscripten
-AS_IF([test "x$EMSCRIPTEN" != "x1"], [
+AS_IF([AS_CASE(["$host_alias"], [wasm*-*-*], [false], [true])], [
   AS_IF([test "x$with_foma" != xno], [PKG_CHECK_MODULES(FOMA, [libfoma >= 0.10.0])])
 ], [
   # When using Emscripten, just set the FOMA_ variables without checking

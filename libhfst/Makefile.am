@@ -29,7 +29,6 @@ all-local: src/libhfst.la
 	  $(abs_top_builddir)/wasm-deps/lib/libicudata.a \
 	  $(abs_top_builddir)/wasm-deps/lib/libicui18n.a \
 	  -o libhfst.js
-	# TODO ensure link order is correct
 
 endif
 
