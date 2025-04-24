@@ -19,7 +19,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = .
 if EMSCRIPTEN
-SUBDIRS += wasm-libs libhfst
+SUBDIRS += libhfst
 else
 SUBDIRS += back-ends libhfst tools test doc man scripts
 endif

@@ -35,27 +35,6 @@ AC_INIT([hfst],[3.16.2],[hfst-bugs@helsinki.fi],[hfst])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall std-options foreign check-news subdir-objects])
 
-# When using Emscripten, initialize foma git submodule and download openfst
-if test "x$EMSCRIPTEN" = "x1" ; then
-    AC_MSG_NOTICE([Initializing foma git submodule for Emscripten build...])
-    if test -d ".git"; then
-        git submodule update --init || AC_MSG_ERROR([Failed to initialize git submodules])
-    else
-        AC_MSG_WARN([Not a git repository - assuming dependencies are already in place in wasm-libs/ ])
-    fi
-	# If and when OpenFST merges changes in reynoldsnlp/openfst-copy, we can use the following
-	# instead of the submodule:
-	# if ! test -d "wasm-libs/openfst"; then
-	# 	AC_MSG_NOTICE([Downloading OpenFST for Emscripten build...])
-	# 	OPENFST_VERSION=1.8.4
-	# 	URL="https://www.openfst.org/twiki/pub/FST/FstDownload/openfst-${OPENFST_VERSION}.tar.gz"
-	# 	wget -q $URL
-	# 	mkdir -p wasm-libs/openfst
-	# 	tar -xzf "openfst-${OPENFST_VERSION}.tar.gz" -C wasm-libs/openfst --strip-components=1
-	# 	rm "openfst-${OPENFST_VERSION}.tar.gz"
-	# fi
-fi
-
 # For automake >= 1.12
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
@@ -584,18 +563,16 @@ AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
 # Check if we're building with Emscripten
 AM_CONDITIONAL([EMSCRIPTEN], [test "x$EMSCRIPTEN" = "x1"])
 if test "x$EMSCRIPTEN" = "x1"; then
-    AC_SUBST([WASM_LDFLAGS], ["--use-port=icu \
-	                           -lembind \
-	                           -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','FS'] \
-	                           -s EXPORTED_FUNCTIONS=['_malloc','_free'] \
-                               -s ALLOW_MEMORY_GROWTH=1 \
-							   -s ASSERTIONS=2 \
-                               -s MODULARIZE=1 \
-                               -s EXPORT_NAME='createHfstModule' \
-                               -s FORCE_FILESYSTEM=1"])
-    # Set paths for dependency libraries when using Emscripten
-    AC_SUBST([FOMA_INCLUDE_DIR], ["$abs_top_srcdir/wasm-libs/foma/foma"])
-    AC_SUBST([OPENFST_INCLUDE_DIR], ["$abs_top_srcdir/wasm-libs/openfst/src/include"])
+    AC_SUBST([WASM_LDFLAGS], ["-lembind \
+				-s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','FS'] \
+				-s EXPORTED_FUNCTIONS=['_malloc','_free'] \
+				-s ALLOW_MEMORY_GROWTH=1 \
+				-s ASSERTIONS=2 \
+				-s MODULARIZE=1 \
+				-s EXPORT_NAME='createHfstModule' \
+				-s INITIAL_MEMORY=64MB \
+				-s MAXIMUM_MEMORY=4GB \
+				-s NO_DISABLE_EXCEPTION_CATCHING"])
 fi
 
 # Disable stress tests by default
@@ -763,7 +740,7 @@ if test "x$EMSCRIPTEN" = "x1"; then
     # Save old CPPFLAGS
     OLD_CPPFLAGS="$CPPFLAGS"
     # Add OpenFST include path for header checks
-    CPPFLAGS="$CPPFLAGS -I$srcdir/wasm-libs/openfst/src/include"
+    CPPFLAGS="$CPPFLAGS -I$srcdir/wasm-deps/openfst/src/include"
 fi
 
 # Check for OpenFST header
@@ -791,7 +768,6 @@ AS_IF([test "x$EMSCRIPTEN" != "x1"], [
 
 # config files
 AC_CONFIG_FILES([Makefile
-                 wasm-libs/Makefile
                  doc/Makefile
                  test/Makefile
                  test/libhfst/Makefile test/tools/Makefile

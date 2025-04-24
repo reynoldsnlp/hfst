@@ -73,7 +73,7 @@ libhfst.js
 # Back-up files
 *~
 
-# Generated files in installation check 
+# Generated files in installation check
 /check_installation/check-hfst-*.tar.gz
 /check_installation/python_tests/
 /check_installation/tool_tests/
@@ -213,7 +213,7 @@ stamp-h?
 /libhfst/src/parsers/htwolcpre3-lexer.cc
 /libhfst/src/parsers/htwolcpre3-parser.cc
 /libhfst/src/parsers/htwolcpre3-parser.hh
-										
+
 # Otherwise generated code
 /libhfst/hfst.pc
 /libhfst/hfst_c.pc
@@ -319,9 +319,7 @@ hfst-eliminate-flags
 /.ccls-cache
 /compile_commands.json
 
-# Uncomment these once openfst tarballs can be used instead of reynoldsnlp/openfst-copy
-# /wasm-libs/openfst
-# /wasm-libs/openfst-*.tar.gz
+/wasm-deps/
 
 # IDE config files
 .vscode

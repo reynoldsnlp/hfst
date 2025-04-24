@@ -2,38 +2,70 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Blank HFST WASM Demo</title>
+  <title>HFST WASM Lookup Demo</title>
 </head>
 
 <body>
-  <h1>French Word Analysis</h1>
-  <input type="text" id="wordInput" placeholder="Enter a French word">
-  <button id="analyzeButton" disabled>Analyze</button>
-  <div id="results"></div>
+  <h1>HFST Word Analysis</h1>
+
+  <div>
+    <h2>1. Upload an HFST transducer file</h2>
+    <input type="file" id="transducerFile">
+    <div id="uploadStatus">Please upload a transducer file</div>
+  </div>
+
+  <div>
+    <h2>2. Analyze words</h2>
+    <input type="text" id="wordInput" placeholder="Enter a word to analyze">
+    <button id="analyzeButton" disabled>Analyze</button>
+    <div id="results"></div>
+  </div>
 
   <!-- Load the libhfst.js file -->
   <script src="../libhfst.js"></script>
   <script>
     let hfst;
-    let french_transducer;
-    prepareResources();
+    let currentTransducer = null;
 
-    async function prepareResources() {
+    // Initialize HFST module
+    async function initHfst() {
       console.log('Loading HFST module...');
       await createHfstModule().then((hfstModule) => {
         hfst = hfstModule;
         console.log('    ...HFST module loaded as `hfst`');
+
+        // Enable file upload once HFST is ready
+        document.getElementById('transducerFile').addEventListener('change', handleFileUpload);
       });
-      console.log('Loading French analyzer...');
-      await hfst.FS.createPreloadedFile('/', 'french.hfst.ol', './french.hfst.ol', true, false);
-      // Wait until the file is loaded
-      while (!hfst.FS.analyzePath('/french.hfst.ol').exists) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    // Handle transducer file upload
+    async function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const uploadStatus = document.getElementById('uploadStatus');
+      uploadStatus.textContent = `Loading ${file.name}...`;
+
+      try {
+        // Read the file
+        const arrayBuffer = await file.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+
+        // Write to Emscripten's filesystem
+        const filename = `/${file.name}`;
+        hfst.FS.writeFile(filename, uint8Array);
+
+        // Load the transducer
+        currentTransducer = loadTransducer(filename);
+
+        uploadStatus.textContent = `Transducer "${file.name}" loaded successfully!`;
+        document.getElementById('analyzeButton').disabled = false;
+      } catch (error) {
+        console.error('Error loading transducer:', error);
+        uploadStatus.textContent = `Error: ${error.message}`;
+        document.getElementById('analyzeButton').disabled = true;
       }
-      console.log('    ...french.hfst.ol file loaded in Emscripten filesystem...');
-      french_transducer = loadTransducer("/french.hfst.ol");
-      console.log('    ...French analyzer loaded as `french_transducer`', french_transducer);
-      document.getElementById('analyzeButton').disabled = false;
     }
 
     function loadTransducer(path) {
@@ -47,6 +79,9 @@
       return transducer;
     }
 
+    // Initialize the application
+    initHfst();
+
     document.getElementById('analyzeButton').addEventListener('click', analyzeWord);
 
     function analyzeWord() {
@@ -58,8 +93,13 @@
         return;
       }
 
+      if (!currentTransducer) {
+        resultsDiv.textContent = 'Please upload a transducer file first';
+        return;
+      }
+
       try {
-        const results = french_transducer.lookup(word);
+        const results = currentTransducer.lookup(word);
         console.log(`Results (${word}):`, results);
 
         if (results.length === 0) {

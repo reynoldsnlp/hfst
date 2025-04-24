@@ -11,10 +11,12 @@
 
 #include <unicode/brkiter.h>
 #include <unicode/unistr.h>
+#include <unicode/locid.h> // Include header for Locale
+#include <iostream>        // Include for std::cerr
+#include <unicode/uclean.h> // Include for u_cleanup
+
 static UErrorCode characterBoundaryStatus = U_ZERO_ERROR;
-static icu::BreakIterator *characterBoundary
-    = icu::BreakIterator::createCharacterInstance(NULL,
-                                                  characterBoundaryStatus);
+static icu::BreakIterator *characterBoundary = nullptr;
 
 namespace hfst_ol_tokenize
 {
@@ -299,6 +301,34 @@ u8_first_codepoint_size(const unsigned char *c)
     {
         return 0;
     }
+}
+
+/**
+ * Initialize the BreakIterator if it hasn't been initialized yet.
+ * Returns true if initialization succeeded, false otherwise.
+ */
+bool initializeBreakIterator()
+{
+    if (characterBoundary == nullptr)
+    {
+        characterBoundaryStatus = U_ZERO_ERROR;
+        // Explicitly request the root locale's break iterator
+        characterBoundary = icu::BreakIterator::createCharacterInstance(icu::Locale::getRoot(), characterBoundaryStatus);
+        if (U_FAILURE(characterBoundaryStatus)) {
+            std::cerr << "Error: ICU character boundary iterator initialization failed (using root locale): "
+                      << u_errorName(characterBoundaryStatus) << std::endl;
+            // Clean up potentially partially allocated iterator on failure
+            delete characterBoundary;
+            characterBoundary = nullptr;
+            // Consider calling u_cleanup() here if ICU might be left in a bad state,
+            // though it might affect other ICU usage if called prematurely.
+            // u_cleanup();
+            return false;
+        }
+        // Optional: Add a success message for debugging
+        // std::cerr << "ICU character boundary iterator initialized successfully (using root locale)." << std::endl;
+    }
+    return true;
 }
 
 /**
@@ -1137,6 +1167,8 @@ void
 match_and_print(hfst_ol::PmatchContainer &container, std::ostream &outstream,
                 const string &input_text, const TokenizeSettings &s)
 {
+    initializeBreakIterator();
+
     LocationVectorVector locations
         = container.locate(input_text, s.time_cutoff);
     if (locations.size() == 0 && s.print_all)

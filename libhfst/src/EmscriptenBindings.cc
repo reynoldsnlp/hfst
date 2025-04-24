@@ -14,11 +14,13 @@
 #endif
 
 #include <emscripten/bind.h>
+#include <iostream>
 #include <string>
-#include <vector>
-#include <map>
-#include <set>
+#include <unicode/udata.h>  // Add ICU data header
+#include <unicode/uvernum.h>
+#include <unicode/uversion.h>
 #include <utility>
+#include <vector>
 
 #include "HfstDataTypes.h"
 #include "HfstTransducer.h"
@@ -28,9 +30,73 @@
 #include "HfstTokenizer.h"
 #include "implementations/HfstBasicTransducer.h"
 #include "implementations/HfstBasicTransition.h"
+#include "implementations/optimized-lookup/pmatch.h"
+#include "implementations/optimized-lookup/pmatch_tokenize.h"
 
 using namespace hfst;
 using namespace emscripten;
+using namespace hfst_ol_tokenize;
+
+// Declare the ICU data symbol using the standard macro.
+// This tells the compiler that this symbol exists externally.
+extern "C" const char U_ICUDATA_ENTRY_POINT [];
+
+// Define token-related structures needed for tokenization
+namespace {
+    // Function to get the ICU version used during build
+    std::string getIcuVersion() {
+        // U_ICU_VERSION is a macro defined by ICU headers (e.g., "74.2")
+        return U_ICU_VERSION;
+    }
+
+    // Function to initialize ICU data
+    bool initialize_ICU_data() {
+        static bool icuDataInitialized = false;
+        static bool initializationSuccess = false; // Store result
+        if (icuDataInitialized) {
+            return initializationSuccess; // Return stored result
+        }
+
+        UErrorCode status = U_ZERO_ERROR;
+        udata_setCommonData(U_ICUDATA_ENTRY_POINT, &status);
+
+        initializationSuccess = U_SUCCESS(status); // Store success/failure
+        icuDataInitialized = true; // Mark as attempted
+
+        if (!initializationSuccess) {
+             std::cerr << "Error: udata_setCommonData failed: "
+                       << u_errorName(status) << std::endl;
+        } else {
+             std::cerr << "ICU data set successfully via udata_setCommonData." << std::endl;
+        }
+        return initializationSuccess;
+    }
+
+    // Structure to represent a form in a token analysis
+    struct TokenizeForm {
+        std::string form;
+        float weight;
+    };
+
+    // Structure to represent an analysis of a token
+    struct TokenizeAnalysis {
+        float weight;
+        std::vector<TokenizeForm> forms;
+    };
+
+    // Structure to represent a token
+    struct TokenizeToken {
+        std::string token;
+        float weight;
+        std::vector<TokenizeAnalysis> analyses;
+    };
+
+    // Structure to hold tokenization results
+    struct TokenizeResult {
+        std::vector<TokenizeToken> tokens;
+        std::vector<std::string> nonTokenized;
+    };
+}
 
 // Helper functions for data conversion between C++ and JavaScript
 namespace {
@@ -112,6 +178,83 @@ namespace {
         delete paths;
         return jsArray;
     }
+
+    // Convert TokenizeSettings to/from JS object
+    val tokenizeSettingsToJs(const TokenizeSettings& settings) {
+        val jsObj = val::object();
+        jsObj.set("output_format", static_cast<int>(settings.output_format));
+        jsObj.set("tokenize_multichar", settings.tokenize_multichar);
+        jsObj.set("print_all", settings.print_all);
+        jsObj.set("print_weights", settings.print_weights);
+        jsObj.set("beam", settings.beam);
+        jsObj.set("time_cutoff", settings.time_cutoff);
+        jsObj.set("max_weight_classes", settings.max_weight_classes);
+        jsObj.set("dedupe", settings.dedupe);
+        jsObj.set("verbose", settings.verbose);
+        jsObj.set("hack_uncompose", settings.hack_uncompose);
+        return jsObj;
+    }
+
+    TokenizeSettings jsToTokenizeSettings(const val& jsObj) {
+        TokenizeSettings settings;
+        settings.output_format = static_cast<OutputFormat>(jsObj["output_format"].as<int>());
+        settings.tokenize_multichar = jsObj["tokenize_multichar"].as<bool>();
+        settings.print_all = jsObj["print_all"].as<bool>();
+        settings.print_weights = jsObj["print_weights"].as<bool>();
+        settings.beam = jsObj["beam"].as<float>();
+        settings.time_cutoff = jsObj["time_cutoff"].as<float>();
+        settings.max_weight_classes = jsObj["max_weight_classes"].as<int>();
+        settings.dedupe = jsObj["dedupe"].as<bool>();
+        settings.verbose = jsObj["verbose"].as<bool>();
+        settings.hack_uncompose = jsObj["hack_uncompose"].as<bool>();
+        return settings;
+    }
+
+    // Convert TokenizeResults to JS object
+    val tokenizeResultsToJs(const TokenizeResult& result) {
+        val jsObj = val::object();
+
+        // Convert token vector
+        val tokens = val::array();
+        for (const auto& token : result.tokens) {
+            val tokenObj = val::object();
+            tokenObj.set("token", token.token);
+            tokenObj.set("weight", token.weight);
+
+            // Convert analyses
+            val analyses = val::array();
+            for (const auto& analysis : token.analyses) {
+                val analysisObj = val::object();
+                analysisObj.set("weight", analysis.weight);
+
+                // Convert form vector
+                val forms = val::array();
+                for (const auto& form : analysis.forms) {
+                    val formObj = val::object();
+                    formObj.set("form", form.form);
+                    formObj.set("weight", form.weight);
+                    forms.call<void>("push", formObj);
+                }
+
+                analysisObj.set("forms", forms);
+                analyses.call<void>("push", analysisObj);
+            }
+
+            tokenObj.set("analyses", analyses);
+            tokens.call<void>("push", tokenObj);
+        }
+
+        jsObj.set("tokens", tokens);
+
+        // Convert non-tokenized segments
+        val nonTokenized = val::array();
+        for (const auto& segment : result.nonTokenized) {
+            nonTokenized.call<void>("push", segment);
+        }
+        jsObj.set("nonTokenized", nonTokenized);
+
+        return jsObj;
+    }
 }
 
 // Wrapper functions for C++ methods that need special handling
@@ -172,10 +315,165 @@ namespace {
         // There's no global setter in the API, we'll have to do this per-instance
         // This is a simplification for JavaScript API
     }
+
+    // Get the symbols from a PmatchContainer
+    val getPmatchContainerSymbols(const hfst_ol::PmatchContainer& container) {
+        // Create a set of symbols - we need to extract these from the transducers
+        // Since PmatchContainer doesn't expose an API to get all symbols directly
+        StringSet symbols;
+
+        // Extract what we can from the public API
+        // In a real implementation, we might need to look at the configuration
+        // or other public interfaces to get symbols
+
+        // Just create an empty set for now
+        return stringSetToJs(symbols);
+    }
+
+    // Check if a container has a specific symbol
+    bool pmatchContainerHasSymbol(hfst_ol::PmatchContainer& container, const std::string& symbol) {
+        // We can't directly check the symbol table, so we'll have to use other methods
+        // For now, return false since we don't have a direct way to check
+        // In a real implementation, we might be able to check from configuration
+        // or check if certain operations with the symbol work
+        return false;
+    }
+
+    // Helper function for tokenizing text using PmatchContainer
+    val tokenizeText(hfst_ol::PmatchContainer& container, const std::string& text, const val& jsSettings) {
+        try {
+            // Initialize ICU data if needed
+            initialize_ICU_data();
+
+            TokenizeSettings settings = jsToTokenizeSettings(jsSettings);
+
+            // Set up a string stream for output
+            std::ostringstream out;
+
+            // Perform tokenization
+            match_and_print(container, out, text, settings);
+
+            // Return the tokenized result
+            return val(out.str());
+        } catch (const HfstException& e) {
+            return val::null();
+        }
+    }
+
+    // Helper function for creating a new PmatchContainer
+    hfst_ol::PmatchContainer* createPmatchContainer(const std::string& filename) {
+        try {
+            std::ifstream instream(filename, std::ifstream::binary);
+            if (!instream.good()) {
+                return nullptr;
+            }
+            return new hfst_ol::PmatchContainer(instream);
+        } catch (const HfstException& e) {
+            return nullptr;
+        }
+    }
+
+    // Helper function for creating a new PmatchContainer from ArrayBuffer
+    hfst_ol::PmatchContainer* createPmatchContainerFromBuffer(const val& buffer) {
+        try {
+            // Get buffer size
+            size_t bufferSize = buffer["byteLength"].as<size_t>();
+
+            // Create a temporary file
+            std::string tempFilename = "/tmp/pmatch_data_XXXXXX";
+            int fd = mkstemp(&tempFilename[0]);
+            if (fd == -1) {
+                return nullptr;
+            }
+
+            // Get buffer data
+            val uint8Array = val::global("Uint8Array").new_(buffer);
+
+            // Write buffer to file
+            for (size_t i = 0; i < bufferSize; ++i) {
+                uint8_t byte = uint8Array[i].as<uint8_t>();
+                if (write(fd, &byte, 1) != 1) {
+                    close(fd);
+                    unlink(tempFilename.c_str());
+                    return nullptr;
+                }
+            }
+
+            // Close file
+            close(fd);
+
+            // Create PmatchContainer
+            std::ifstream instream(tempFilename, std::ifstream::binary);
+            if (!instream.good()) {
+                unlink(tempFilename.c_str());
+                return nullptr;
+            }
+
+            hfst_ol::PmatchContainer* container = new hfst_ol::PmatchContainer(instream);
+
+            // Clean up
+            instream.close();
+            unlink(tempFilename.c_str());
+
+            return container;
+        } catch (const HfstException& e) {
+            return nullptr;
+        }
+    }
+
+    // Helper function for structured tokenization
+    val tokenizeTextStructured(hfst_ol::PmatchContainer& container, const std::string& text, const val& jsSettings) {
+        try {
+            // Initialize ICU data if needed
+            initialize_ICU_data();
+
+            TokenizeSettings settings = jsToTokenizeSettings(jsSettings);
+
+            // This is a simplified implementation since the actual match_text function is not available
+            // We'll parse the result of match_and_print and convert it to our TokenizeResult structure
+            std::ostringstream out;
+            match_and_print(container, out, text, settings);
+            std::string result_str = out.str();
+
+            // Create a placeholder result (in real implementation, you'd parse the result_str)
+            TokenizeResult result;
+
+            // Example token parsing (simplified)
+            size_t pos = 0;
+            while ((pos = result_str.find("\n", pos)) != std::string::npos) {
+                std::string token_line = result_str.substr(0, pos);
+
+                // Simple parsing example (would need more complex logic in real implementation)
+                if (!token_line.empty()) {
+                    TokenizeToken token;
+                    token.token = token_line;
+                    token.weight = 0.0f;
+                    result.tokens.push_back(token);
+                }
+
+                result_str = result_str.substr(pos + 1);
+                pos = 0;
+            }
+
+            // Convert result to JS object
+            return tokenizeResultsToJs(result);
+        } catch (const HfstException& e) {
+            return val::null();
+        }
+    }
+
+    // Default TokenizeSettings object
+    val getDefaultTokenizeSettings() {
+        TokenizeSettings settings;
+        return tokenizeSettingsToJs(settings);
+    }
 }
 
 // Main binding function
 EMSCRIPTEN_BINDINGS(hfst_module) {
+    // Initialize ICU data at module load time
+    //initialize_ICU_data();
+
     // Bind ImplementationType enum
     enum_<ImplementationType>("ImplementationType")
         .value("SFST_TYPE", SFST_TYPE)
@@ -187,6 +485,17 @@ EMSCRIPTEN_BINDINGS(hfst_module) {
         .value("HFST_OLW_TYPE", HFST_OLW_TYPE)
         .value("UNSPECIFIED_TYPE", UNSPECIFIED_TYPE)
         .value("ERROR_TYPE", ERROR_TYPE);
+
+    // Bind OutputFormat enum for tokenization
+    enum_<OutputFormat>("OutputFormat")
+        .value("tokenize", tokenize)
+        .value("space_separated", space_separated)
+        .value("xerox", xerox)
+        .value("cg", cg)
+        .value("finnpos", finnpos)
+        .value("giellacg", giellacg)
+        .value("conllu", conllu)
+        .value("visl", visl);
 
     // ********** HfstTransducer **********
     class_<HfstTransducer>("HfstTransducer")
@@ -242,9 +551,25 @@ EMSCRIPTEN_BINDINGS(hfst_module) {
         .function("add_skip_symbol", &HfstTokenizer::add_skip_symbol)
         .function("add_multichar_symbol", &HfstTokenizer::add_multichar_symbol);
 
+    // ********** PmatchContainer for tokenization **********
+    class_<hfst_ol::PmatchContainer>("PmatchContainer")
+        .constructor(&createPmatchContainer, allow_raw_pointers())
+        .function("set_verbose", &hfst_ol::PmatchContainer::set_verbose)
+        .function("set_single_codepoint_tokenization", &hfst_ol::PmatchContainer::set_single_codepoint_tokenization)
+        .function("hasSymbol", &pmatchContainerHasSymbol)
+        .function("getSymbols", &getPmatchContainerSymbols)
+        .function("tokenize", &tokenizeText)
+        .function("tokenizeStructured", &tokenizeTextStructured)
+        .function("parse_hfst3_header", &hfst_ol::PmatchContainer::parse_hfst3_header);
+
     // ********** Module-level functions **********
     function("get_default_fst_type", &getDefaultFstType);
     function("set_default_fst_type", &setDefaultFstType);
+    function("createPmatchContainer", &createPmatchContainer, allow_raw_pointers());
+    function("createPmatchContainerFromBuffer", &createPmatchContainerFromBuffer, allow_raw_pointers());
+    function("getDefaultTokenizeSettings", &getDefaultTokenizeSettings);
+    function("getIcuVersion", &getIcuVersion);
+    function("initialize_ICU_data", &initialize_ICU_data);  // Export the initialization function to JS
 }
 
 #endif // __EMSCRIPTEN__

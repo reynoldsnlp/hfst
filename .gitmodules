@@ -1,6 +1,0 @@
-[submodule "wasm-libs/foma"]
-	path = wasm-libs/foma
-	url = https://github.com/mhulden/foma.git
-[submodule "wasm-libs/openfst"]
-	path = wasm-libs/openfst
-	url = https://github.com/reynoldsnlp/openfst-copy.git

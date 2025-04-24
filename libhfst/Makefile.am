@@ -22,10 +22,14 @@ if EMSCRIPTEN
 all-local: src/libhfst.la
 	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(WASM_LDFLAGS) \
 	  src/EmscriptenBindings.o \
-	  $(abs_top_builddir)/wasm-libs/libfst.a \
-	  $(abs_top_builddir)/wasm-libs/libfoma.a \
+	  $(abs_top_builddir)/wasm-deps/lib/libfst.a \
+	  $(abs_top_builddir)/wasm-deps/lib/libfoma.a \
 	  -Wl,--whole-archive src/.libs/libhfst.a -Wl,--no-whole-archive \
+	  $(abs_top_builddir)/wasm-deps/lib/libicuuc.a \
+	  $(abs_top_builddir)/wasm-deps/lib/libicudata.a \
+	  $(abs_top_builddir)/wasm-deps/lib/libicui18n.a \
 	  -o libhfst.js
+	# TODO ensure link order is correct
 
 endif
 
