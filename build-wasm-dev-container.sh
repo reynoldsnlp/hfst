@@ -4,7 +4,7 @@
 # This script builds the HFST library for WebAssembly using Emscripten.
 # It is intended to be run in a fresh Ubuntu container.
 
-set -ex
+set -e
 
 if ! [ -d libhfst ]; then
     echo "Please run this script in the HFST root directory."
@@ -52,7 +52,7 @@ if [ -z $(which emcc) ]; then
     popd
 fi
 
-echo '
+FOMA_HEADING='
 =======================================================================
 ====================== Building Foma ==================================
 ======================================================================='
@@ -60,7 +60,7 @@ cd ${DEPS_DIR}
 if [ -f "${LIB_DIR}/libfoma.a" ]; then
   echo "Foma already built (wasm-deps/libfoma.a exists), skipping..."
 else
-  echo "Building Foma..."
+  echo "${FOMA_HEADING}"
   [ -d foma ] || git clone https://github.com/mhulden/foma.git
   cd foma/foma
   git pull
@@ -70,7 +70,7 @@ else
 fi
 
 
-echo '
+OPENFST_HEADING='
 =======================================================================
 ====================== Building OpenFST ===============================
 ======================================================================='
@@ -78,7 +78,7 @@ cd ${DEPS_DIR}
 if [ -f "${LIB_DIR}/libfst.a" ]; then
   echo "OpenFst already built (wasm-deps/libfst.a exists), skipping..."
 else
-  echo "Building OpenFst..."
+  echo "${OPENFST_HEADING}"
   [ -d openfst ] || git clone https://github.com/TinoDidriksen/openfst.git
   cd openfst
   autoreconf -fiv
@@ -88,9 +88,9 @@ else
   [ -d ${DEPS_DIR}/include/fst ] || ln -s ${DEPS_DIR}/openfst/src/include/fst ${DEPS_DIR}/include/
 fi
 
-echo '
+ICU_HEADING='
 =======================================================================
-====================== Building ICU ===================================
+====================== Building ICU native ============================
 ======================================================================='
 cd ${DEPS_DIR}
 # ICU_SRC_URL="https://github.com/unicode-org/icu/releases/download/release-77-1/icu4c-77_1-src.tgz"
@@ -150,6 +150,7 @@ NATIVE_ICU_DIR=$(pwd)
 if [ -f "bin/pkgdata" ]; then
   echo "ICU native tools already built (native-build/bin/pkgdata exists), skipping..."
 else
+  echo "${ICU_HEADING}"
   ../configure --disable-shared --enable-static VERBOSE=1
   make -j$(nproc) VERBOSE=1
 fi
@@ -161,6 +162,7 @@ pushd wasm-build
 if [ -f "lib/libicudata.a" ]; then
   echo "ICU wasm libs already built (wasm-build/lib/libicudata.a exists), skipping..."
 else
+  echo "${ICU_HEADING/native/wasm}"
   export PKGDATA_OPTS="--without-assembly -O ../data/icupkg.inc"
   PKG_CONFIG_LIBDIR="${LIB_DIR}/pkgconfig" emconfigure ../configure \
       --host=wasm32-unknown-emscripten \
@@ -205,6 +207,7 @@ emconfigure ./configure \
   FOMA_LIBS="-L${LIB_DIR} -lfoma" \
   LDFLAGS="-L${LIB_DIR}" \
   VERBOSE=1
+
 # TODO: optimization with -O3 or -O4
 
 echo "Build libhfst"
@@ -214,3 +217,4 @@ echo '
 =======================================================================
 ==================== LibHFST WASM build complete ======================
 ======================================================================='
+echo -e "\a"  # Beep when done

@@ -41,7 +41,7 @@ using namespace hfst_ol_tokenize;
 // This tells the compiler that this symbol exists externally.
 extern "C" const char U_ICUDATA_ENTRY_POINT [];
 
-// Define token-related structures needed for tokenization
+// Helper functions for data conversion between C++ and JavaScript
 namespace {
     // Function to get the ICU version used during build
     std::string getIcuVersion() {
@@ -49,34 +49,6 @@ namespace {
         return U_ICU_VERSION;
     }
 
-    // Structure to represent a form in a token analysis
-    struct TokenizeForm {
-        std::string form;
-        float weight;
-    };
-
-    // Structure to represent an analysis of a token
-    struct TokenizeAnalysis {
-        float weight;
-        std::vector<TokenizeForm> forms;
-    };
-
-    // Structure to represent a token
-    struct TokenizeToken {
-        std::string token;
-        float weight;
-        std::vector<TokenizeAnalysis> analyses;
-    };
-
-    // Structure to hold tokenization results
-    struct TokenizeResult {
-        std::vector<TokenizeToken> tokens;
-        std::vector<std::string> nonTokenized;
-    };
-}
-
-// Helper functions for data conversion between C++ and JavaScript
-namespace {
     // Convert JS array to C++ StringVector
     StringVector jsArrayToStringVector(const val& jsArray) {
         StringVector result;
@@ -186,52 +158,6 @@ namespace {
         settings.hack_uncompose = jsObj["hack_uncompose"].as<bool>();
         return settings;
     }
-
-    // Convert TokenizeResults to JS object
-    val tokenizeResultsToJs(const TokenizeResult& result) {
-        val jsObj = val::object();
-
-        // Convert token vector
-        val tokens = val::array();
-        for (const auto& token : result.tokens) {
-            val tokenObj = val::object();
-            tokenObj.set("token", token.token);
-            tokenObj.set("weight", token.weight);
-
-            // Convert analyses
-            val analyses = val::array();
-            for (const auto& analysis : token.analyses) {
-                val analysisObj = val::object();
-                analysisObj.set("weight", analysis.weight);
-
-                // Convert form vector
-                val forms = val::array();
-                for (const auto& form : analysis.forms) {
-                    val formObj = val::object();
-                    formObj.set("form", form.form);
-                    formObj.set("weight", form.weight);
-                    forms.call<void>("push", formObj);
-                }
-
-                analysisObj.set("forms", forms);
-                analyses.call<void>("push", analysisObj);
-            }
-
-            tokenObj.set("analyses", analyses);
-            tokens.call<void>("push", tokenObj);
-        }
-
-        jsObj.set("tokens", tokens);
-
-        // Convert non-tokenized segments
-        val nonTokenized = val::array();
-        for (const auto& segment : result.nonTokenized) {
-            nonTokenized.call<void>("push", segment);
-        }
-        jsObj.set("nonTokenized", nonTokenized);
-
-        return jsObj;
-    }
 }
 
 // Wrapper functions for C++ methods that need special handling
@@ -327,7 +253,6 @@ namespace {
             // Perform tokenization
             match_and_print(container, out, text, settings);
 
-            // Return the tokenized result
             return val(out.str());
         } catch (const HfstException& e) {
             return val::null();
@@ -392,44 +317,6 @@ namespace {
             return container;
         } catch (const HfstException& e) {
             return nullptr;
-        }
-    }
-
-    // Helper function for structured tokenization
-    val tokenizeTextStructured(hfst_ol::PmatchContainer& container, const std::string& text, const val& jsSettings) {
-        try {
-            TokenizeSettings settings = jsToTokenizeSettings(jsSettings);
-
-            // This is a simplified implementation since the actual match_text function is not available
-            // We'll parse the result of match_and_print and convert it to our TokenizeResult structure
-            std::ostringstream out;
-            match_and_print(container, out, text, settings);
-            std::string result_str = out.str();
-
-            // Create a placeholder result (in real implementation, you'd parse the result_str)
-            TokenizeResult result;
-
-            // Example token parsing (simplified)
-            size_t pos = 0;
-            while ((pos = result_str.find("\n", pos)) != std::string::npos) {
-                std::string token_line = result_str.substr(0, pos);
-
-                // Simple parsing example (would need more complex logic in real implementation)
-                if (!token_line.empty()) {
-                    TokenizeToken token;
-                    token.token = token_line;
-                    token.weight = 0.0f;
-                    result.tokens.push_back(token);
-                }
-
-                result_str = result_str.substr(pos + 1);
-                pos = 0;
-            }
-
-            // Convert result to JS object
-            return tokenizeResultsToJs(result);
-        } catch (const HfstException& e) {
-            return val::null();
         }
     }
 
@@ -527,7 +414,6 @@ EMSCRIPTEN_BINDINGS(hfst_module) {
         .function("hasSymbol", &pmatchContainerHasSymbol)
         .function("getSymbols", &getPmatchContainerSymbols)
         .function("tokenize", &tokenizeText)
-        .function("tokenizeStructured", &tokenizeTextStructured)
         .function("parse_hfst3_header", &hfst_ol::PmatchContainer::parse_hfst3_header);
 
     // ********** Module-level functions **********

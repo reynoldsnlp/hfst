@@ -2,11 +2,11 @@
 
 <head>
   <meta charset="utf-8">
-  <title>HFST WASM Lookup Demo</title>
+  <title>HFST WASM Tokenization Demo</title>
 </head>
 
 <body>
-  <h1>HFST Word Analysis</h1>
+  <h1>HFST Text Tokenization</h1>
 
   <div>
     <h2>1. Upload an HFST transducer file</h2>
@@ -30,7 +30,6 @@
     </select>
     <button id="tokenizeButton" disabled>Tokenize</button>
     <div id="results"></div>
-    <div id="structuredResults"></div>
   </div>
 
   <!-- Load the libhfst.js file -->
@@ -92,16 +91,48 @@
     function tokenize() {
       let text = document.getElementById('textInput').value.trim();
       const outputFormat = parseInt(document.getElementById('outputFormatSelect').value);
-      console.log('Output format:', outputFormat);
-      tokenizeSettings.output_format = outputFormat;
-      console.log('Tokenize settings:', tokenizeSettings);
       const resultsDiv = document.getElementById('results');
-      const structuredResultsDiv = document.getElementById('structuredResults');
+
+      // Reset settings to defaults before applying format-specific ones
+      tokenizeSettings.print_all = false;
+      tokenizeSettings.print_weights = false;
+      tokenizeSettings.dedupe = false;
+      tokenizeSettings.hack_uncompose = false;
+      // Note: beam, time_cutoff, max_weight_classes are not exposed in the UI, keep defaults
+
+      // Apply settings based on output format, mirroring hfst-tokenize CLI
+      tokenizeSettings.output_format = outputFormat;
+      switch (outputFormat) {
+        case hfst.OutputFormat.giellacg.value: // 5
+          tokenizeSettings.print_all = true;
+          tokenizeSettings.print_weights = true;
+          tokenizeSettings.dedupe = true;
+          tokenizeSettings.hack_uncompose = true;
+          // hfst-tokenize also sets max_weight_classes = 2 if not set, but we don't expose it here
+          break;
+        case hfst.OutputFormat.visl.value: // 7
+          tokenizeSettings.print_all = true;
+          tokenizeSettings.print_weights = false; // Explicitly false as per -L flag
+          tokenizeSettings.dedupe = true;
+          break;
+        // Other formats use the defaults set above
+        case hfst.OutputFormat.tokenize.value: // 0
+        case hfst.OutputFormat.space_separated.value: // 1
+        case hfst.OutputFormat.xerox.value: // 2
+        case hfst.OutputFormat.cg.value: // 3
+        case hfst.OutputFormat.finnpos.value: // 4
+        case hfst.OutputFormat.conllu.value: // 6
+        default:
+          // Defaults are already set
+          break;
+      }
+
+      console.log('Tokenize settings:', tokenizeSettings);
 
       if (!text) {
         // TODO remove autofill
         // resultsDiv.textContent = 'Please upload a transducer file first';
-        text = 'Мы уже работаем над этим. What do you mean?';
+        text = 'Мы уже работаем над этим. What do you mean? Не за что!';
         document.getElementById('textInput').value = text;
       }
 
@@ -117,23 +148,12 @@
         // Clear previous results and add new structure
         resultsDiv.innerHTML = '<p>Tokenization results:</p>'; // Keep the paragraph
         const preElement = document.createElement('pre');
-        preElement.textContent = results; // Use textContent for automatic escaping
+        preElement.textContent = results;
         resultsDiv.appendChild(preElement);
-
-        const structuredResults = currentTransducer.tokenizeStructured(text, tokenizeSettings);
-        console.log(`Structured results (${text}):`, structuredResults);
-
-        // Clear previous results and add new structure for structured results
-        structuredResultsDiv.innerHTML = '<p>Tokenization results (structured):</p>'; // Keep the paragraph
-        const structuredPreElement = document.createElement('pre');
-        structuredPreElement.textContent = JSON.stringify(structuredResults, null, 2); // Use textContent
-        structuredResultsDiv.appendChild(structuredPreElement);
 
       } catch (error) {
         console.error('Error in lookup:', error);
-        // Use textContent here too for safety
         resultsDiv.textContent = 'Error analyzing word: ' + error.message;
-        structuredResultsDiv.textContent = ''; // Clear structured results on error
       }
     }
   </script>
