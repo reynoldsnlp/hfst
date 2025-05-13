@@ -230,7 +230,7 @@ print_nonmatching_sequence(std::string const &str, std::ostream &outstream,
     }
     else if (s.output_format == jsonl)
     {
-        outstream << "{\"t\":\"";
+        outstream << "{\"t\":\":";
         print_json_escaped(str, outstream);
         outstream << "\"}";
     }
@@ -962,14 +962,81 @@ empty_to_underscore(std::string to_test)
     return to_test;
 }
 
+// Helper function to process a single JSON segment and its subreadings recursively
+void process_json_segment(std::pair<hfst::StringVector::const_iterator, hfst::StringVector::const_iterator> segment,
+                         std::vector<std::pair<hfst::StringVector::const_iterator, hfst::StringVector::const_iterator>> &remaining_segments,
+                         hfst_ol::Weight const &weight,
+                         std::ostream &outstream,
+                         const TokenizeSettings &s,
+                         bool &first_tag)
+{
+    hfst::StringVector::const_iterator seg_beg = segment.first;
+    hfst::StringVector::const_iterator seg_end = segment.second;
+
+    // Find first tag in the segment
+    hfst::StringVector::const_iterator first_tag_it = seg_end;
+    for (auto it = seg_beg; it != seg_end; ++it) {
+        if (it->compare("@PMATCH_BACKTRACK@") == 0) continue;
+        if (is_cg_tag(*it)) {
+            first_tag_it = it;
+            break;
+        }
+    }
+
+    // Build lemma
+    std::ostringstream lemma_ss;
+    for (auto it = seg_beg; it != first_tag_it; ++it) {
+        if (it->compare("@PMATCH_BACKTRACK@") == 0) continue;
+        lemma_ss << *it;
+    }
+
+    // Build tags list
+    std::vector<std::string> tags;
+    for (auto it = first_tag_it; it != seg_end; ++it) {
+        if (it->compare("@PMATCH_BACKTRACK@") == 0) continue;
+        if (is_cg_tag(*it)) {
+            std::string tag = *it;
+            tag.erase(0, tag.find_first_not_of(' '));
+            tags.push_back(tag);
+        }
+    }
+
+    // Output this segment's data
+    outstream << "{\"l\":\"";
+    print_json_escaped(lemma_ss.str(), outstream);
+    outstream << "\",\"ts\":[";
+
+    bool first_tag_local = true;
+    for (const auto &tag : tags) {
+        if (!first_tag_local) {
+            outstream << ",";
+        }
+        outstream << "\"";
+        print_json_escaped(tag, outstream);
+        outstream << "\"";
+        first_tag_local = false;
+    }
+    outstream << "]";
+
+    // Process next subreading if available
+    if (!remaining_segments.empty()) {
+        outstream << ",\"s\":";
+        auto next_segment = remaining_segments.front();
+        remaining_segments.erase(remaining_segments.begin());
+        process_json_segment(next_segment, remaining_segments, weight, outstream, s, first_tag);
+    }
+
+    outstream << "}";
+}
+
 void
 print_json_reading(hfst::StringVector::const_iterator out_beg,
                    hfst::StringVector::const_iterator out_end,
                    hfst_ol::Weight const &weight,
-                   hfst::StringVector::const_iterator in_beg, // needed for recursion logic
-                   hfst::StringVector::const_iterator in_end, // needed for recursion logic
-                   size_t &part, // Current part index for sub-reading recursion
-                   const Location *loc, // Original location for parts info
+                   hfst::StringVector::const_iterator in_beg,
+                   hfst::StringVector::const_iterator in_end,
+                   size_t &part,
+                   const Location *loc,
                    std::ostream &outstream, const TokenizeSettings &s,
                    bool &first_reading)
 {
@@ -981,99 +1048,47 @@ print_json_reading(hfst::StringVector::const_iterator out_beg,
 
     outstream << "{";
 
-    // Find lemma and tags
-    std::string lemma_str = "";
-    std::vector<std::string> tags;
-    hfst::StringVector::const_iterator current_out_beg = out_beg;
-    hfst::StringVector::const_iterator sub_out_end = out_end; // End for potential sub-reading
-    hfst::StringVector::const_iterator first_tag_it = sub_out_end; // Iterator pointing to the first tag found
+    // We need to split the output into segments based on the separator and analyze them separately
+    std::vector<std::pair<hfst::StringVector::const_iterator, hfst::StringVector::const_iterator>> segments;
 
-    // Check for sub-reading separator from the right
-    hfst::StringVector::const_iterator sub_sep_it = out_end;
-    bool sub_found = false;
+    // Find all separators from right to left and build segments
+    hfst::StringVector::const_iterator segment_end = out_end;
     size_t out_part_idx = (part > 0) ? loc->output_parts.at(part - 1) : 0;
+    hfst::StringVector::const_iterator segment_start = (out_part_idx > 0) ?
+        (loc->output_symbol_strings.begin() + out_part_idx) : out_beg;
 
-    // Adjust out_beg based on input parts (like giellacg logic)
-    if (out_part_idx > 0 && (loc->output_symbol_strings.begin() + out_part_idx) > current_out_beg) {
-         current_out_beg = loc->output_symbol_strings.begin() + out_part_idx;
-    }
-
-
-    for (hfst::StringVector::const_iterator it = out_end; it != current_out_beg; --it)
-    {
-         if (subreading_separator.compare(*(it-1)) == 0)
-         {
-             sub_sep_it = it - 1; // Point to the separator
-             sub_out_end = sub_sep_it; // Current reading ends before separator
-             sub_found = true;
-             break;
-         }
-    }
-
-    // Find the first tag within the current segment [current_out_beg, sub_out_end)
-    for (hfst::StringVector::const_iterator it = current_out_beg; it != sub_out_end; ++it) {
-        if (it->compare("@PMATCH_BACKTRACK@") == 0) continue;
-        if (is_cg_tag(*it)) {
-            first_tag_it = it;
-            break;
+    // Scan from right to left to find all separators
+    bool found_separator = false;
+    for (hfst::StringVector::const_iterator it = out_end; it > segment_start; --it) {
+        if (it != out_end && subreading_separator.compare(*(it-1)) == 0) {
+            // Found a separator - add segment from separator+1 to current segment_end
+            segments.push_back(std::make_pair(it, segment_end));
+            segment_end = it - 1; // Move end to before the separator
+            found_separator = true;
         }
     }
 
-    // Build lemma string from symbols before the first tag
-    std::ostringstream lemma_ss;
-    for (hfst::StringVector::const_iterator it = current_out_beg; it != first_tag_it; ++it) {
-        if (it->compare("@PMATCH_BACKTRACK@") == 0) continue;
-        // We already know these are not tags from the previous loop
-        lemma_ss << *it;
-    }
-    lemma_str = lemma_ss.str();
+    // Add the leftmost segment (or the only segment if no separators)
+    segments.push_back(std::make_pair(segment_start, segment_end));
 
+    // Process all segments recursively
+    if (!segments.empty()) {
+        // Start with the rightmost segment (main reading)
+        auto main_segment = segments[0];
 
-    // Collect tags from the first tag onwards
-    for (hfst::StringVector::const_iterator it = first_tag_it; it != sub_out_end; ++it) {
-        if (it->compare("@PMATCH_BACKTRACK@") == 0) continue;
-        if (is_cg_tag(*it)) { // Only add actual tags
-            std::string candidate = *it;
-            // Remove leading spaces
-            candidate.erase(0, candidate.find_first_not_of(' '));
-            tags.push_back(candidate);        }
-        // Ignore non-tag symbols interspersed with or after tags for simplicity
-    }
-
-    if (s.print_weights)
-    {
-        tags.push_back(format_weight_as_CG_numeric_tag(weight));
-    }
-
-    // Print lemma
-    outstream << "\"l\":\"";
-    print_json_escaped(lemma_str, outstream);
-    outstream << "\",";
-
-    // Print tags
-    outstream << "\"ts\":[";
-    bool first_tag = true;
-    for (const auto &tag : tags)
-    {
-        if (!first_tag)
-        {
-            outstream << ",";
+        // Create a list of remaining segments (subreadings)
+        std::vector<std::pair<hfst::StringVector::const_iterator, hfst::StringVector::const_iterator>> remaining_segments;
+        for (size_t i = 1; i < segments.size(); i++) {
+            remaining_segments.push_back(segments[i]);
         }
-        outstream << "\"";
-        print_json_escaped(tag, outstream);
-        outstream << "\"";
-        first_tag = false;
-    }
-    outstream << "]";
 
-    if (sub_found)
-    {
-        outstream << ",\"s\":";
-        size_t next_part = part; // part is passed by value effectively, but ensure clarity
-        bool first_sub_reading = true; // Reset for the sub-reading context
-        print_json_reading(loc->output_symbol_strings.begin(), sub_sep_it, weight,
-                           loc->input_symbol_strings.begin(), in_beg,
-                           next_part, loc, outstream, s, first_sub_reading);
+        // Process main segment and recursively handle subreadings
+        bool dummy_first_tag = true;
+        process_json_segment(main_segment, remaining_segments, weight, outstream, s, dummy_first_tag);
+    }
+    else {
+        // This should never happen, but just in case
+        outstream << "\"l\":\"\",\"ts\":[]";
     }
 
     outstream << "}";
