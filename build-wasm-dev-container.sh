@@ -18,6 +18,11 @@ LIB_DIR="${DEPS_DIR}/lib"
 mkdir -p ${INCLUDE_DIR}
 mkdir -p ${LIB_DIR}
 
+OPTIM_FLAGS="-O3"
+OPTIM_LD_FLAGS="-O3 --closure 1"
+OPTIM_FLAGS=""
+OPTIM_LD_FLAGS=""
+
 APT_UPDATE_STAMP="/tmp/apt-update-stamp"
 if [ ! -f ${APT_UPDATE_STAMP} ]; then
     sudo apt-get update
@@ -162,7 +167,7 @@ pushd wasm-build
 if [ -f "lib/libicudata.a" ]; then
   echo "ICU wasm libs already built (wasm-build/lib/libicudata.a exists), skipping..."
 else
-  echo "${ICU_HEADING/native/wasm}"
+  echo "${ICU_HEADING/native/ wasm }"
   export PKGDATA_OPTS="--without-assembly -O ../data/icupkg.inc"
   PKG_CONFIG_LIBDIR="${LIB_DIR}/pkgconfig" emconfigure ../configure \
       --host=wasm32-unknown-emscripten \

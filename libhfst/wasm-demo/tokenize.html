@@ -27,6 +27,7 @@
       <option value="5" selected>giellacg</option>
       <option value="6">conllu</option>
       <option value="7">visl</option>
+      <option value="8">jsonl</option>
     </select>
     <button id="tokenizeButton" disabled>Tokenize</button>
     <div id="results"></div>
@@ -104,6 +105,7 @@
       tokenizeSettings.output_format = outputFormat;
       switch (outputFormat) {
         case hfst.OutputFormat.giellacg.value: // 5
+        case hfst.OutputFormat.jsonl.value: // 8 - Apply same settings as giellacg
           tokenizeSettings.print_all = true;
           tokenizeSettings.print_weights = true;
           tokenizeSettings.dedupe = true;

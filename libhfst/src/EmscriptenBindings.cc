@@ -350,7 +350,8 @@ EMSCRIPTEN_BINDINGS(hfst_module) {
         .value("finnpos", finnpos)
         .value("giellacg", giellacg)
         .value("conllu", conllu)
-        .value("visl", visl);
+        .value("visl", visl)
+        .value("jsonl", jsonl);
 
     // ********** HfstTransducer **********
     class_<HfstTransducer>("HfstTransducer")
