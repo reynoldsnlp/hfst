@@ -31,8 +31,13 @@ LIB_DIR="${DEPS_DIR}/lib"
 mkdir -p ${INCLUDE_DIR}
 mkdir -p ${LIB_DIR}
 
-OPTIM_FLAGS="-O3"
-OPTIM_LD_FLAGS="-O3 --closure 1"
+OPTIM_FLAGS="-Oz"
+OPTIM_LD_FLAGS="-Oz --closure 1"
+
+NPROC=$(nproc)
+if [ ${NPROC} -gt 1 ]; then
+    NPROC=$((${NPROC} - 1))
+fi
 
 APT_UPDATE_STAMP="/tmp/apt-update-stamp"
 if [ ! -f ${APT_UPDATE_STAMP} ]; then
@@ -48,6 +53,7 @@ sudo apt-get install -y \
     build-essential \
     cmake \
     curl \
+    default-jre \
     flex \
     git \
     libtool \
@@ -81,8 +87,8 @@ else
   [ -d foma ] || git clone https://github.com/mhulden/foma.git
   cd foma/foma
   git pull
-  emcmake cmake .
-  emmake make # -j$(nproc)
+  CFLAGS="${OPTIM_FLAGS}" CXXFLAGS="${OPTIM_FLAGS}" LDFLAGS="${OPTIM_LD_FLAGS}" emcmake cmake .
+  CFLAGS="${OPTIM_FLAGS}" CXXFLAGS="${OPTIM_FLAGS}" LDFLAGS="${OPTIM_LD_FLAGS}" emmake make -j"${NPROC}"
   cp libfoma.a ${LIB_DIR}/
 fi
 
@@ -99,8 +105,8 @@ else
   [ -d openfst ] || git clone https://github.com/TinoDidriksen/openfst.git
   cd openfst
   autoreconf -fiv
-  emconfigure ./configure --enable-static --disable-shared  # TODO more flags needed for libhfst?
-  emmake make # -j$(nproc)
+  CFLAGS="${OPTIM_FLAGS}" CXXFLAGS="${OPTIM_FLAGS}" LDFLAGS="${OPTIM_LD_FLAGS}" emconfigure ./configure --enable-static --disable-shared  # TODO more flags needed for libhfst?
+  CFLAGS="${OPTIM_FLAGS}" CXXFLAGS="${OPTIM_FLAGS}" LDFLAGS="${OPTIM_LD_FLAGS}" emmake make # -j"${NPROC}" multithreaded build fails
   cp src/lib/.libs/libfst.a ${LIB_DIR}/
   [ -d ${DEPS_DIR}/include/fst ] || ln -s ${DEPS_DIR}/openfst/src/include/fst ${DEPS_DIR}/include/
 fi
@@ -169,7 +175,7 @@ if [ -f "bin/pkgdata" ]; then
 else
   echo "${ICU_HEADING/______/native}"
   ../configure --disable-shared --enable-static VERBOSE=1
-  make -j$(nproc) VERBOSE=1
+  make -j"${NPROC}" VERBOSE=1
 fi
 popd
 
@@ -181,7 +187,9 @@ if [ -f "lib/libicudata.a" ]; then
 else
   echo "${ICU_HEADING/______/ wasm }"
   export PKGDATA_OPTS="--without-assembly -O ../data/icupkg.inc"
-  PKG_CONFIG_LIBDIR="${LIB_DIR}/pkgconfig" emconfigure ../configure \
+  PKG_CONFIG_LIBDIR="${LIB_DIR}/pkgconfig" \
+  CFLAGS="${OPTIM_FLAGS}" CXXFLAGS="${OPTIM_FLAGS}" LDFLAGS="${OPTIM_LD_FLAGS}" \
+  emconfigure ../configure \
       --host=wasm32-unknown-emscripten \
       --prefix="${DEPS_DIR}" \
       --with-cross-build="${NATIVE_ICU_DIR}" \
@@ -194,7 +202,7 @@ else
       --disable-tests \
       VERBOSE=1
 
-  emmake make -j$(nproc) install
+  CFLAGS="${OPTIM_FLAGS}" CXXFLAGS="${OPTIM_FLAGS}" LDFLAGS="${OPTIM_LD_FLAGS}" emmake make -j"${NPROC}" install
   popd
   popd
 echo "WebAssembly ICU build complete. Static libraries are in ${LIB_DIR}"
@@ -221,26 +229,25 @@ emconfigure ./configure \
   --enable-no-tools \
   --disable-load-so-entries \
   --with-readline=no \
+  CFLAGS="${OPTIM_FLAGS}" \
+  CXXFLAGS="${OPTIM_FLAGS}" \
   CPPFLAGS="-I${DEPS_DIR}/include -I${DEPS_DIR}/foma/foma" \
   FOMA_CFLAGS="-I${DEPS_DIR}/foma/foma" \
   FOMA_LIBS="-L${LIB_DIR} -lfoma" \
-  LDFLAGS="-L${LIB_DIR} \
+  LDFLAGS="${OPTIM_LD_FLAGS} \
+           -L${LIB_DIR} \
            -lembind \
            -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','FS'] \
            -s EXPORTED_FUNCTIONS=['_malloc','_free'] \
            -s ALLOW_MEMORY_GROWTH=1 \
-           -s ASSERTIONS=2 \
            -s MODULARIZE=1 \
            -s EXPORT_NAME='createHfstModule' \
            -s INITIAL_MEMORY=64MB \
-           -s MAXIMUM_MEMORY=4GB \
-           -s NO_DISABLE_EXCEPTION_CATCHING" \
+           -s MAXIMUM_MEMORY=4GB" \
   VERBOSE=1
 
-# TODO: optimization with -O3 or -O4
-
 echo "Build libhfst"
-emmake make -C libhfst VERBOSE=1 -j$(nproc)
+CFLAGS="${OPTIM_FLAGS}" CXXFLAGS="${OPTIM_FLAGS}" LDFLAGS="${OPTIM_LD_FLAGS}" emmake make -C libhfst VERBOSE=1 -j"${NPROC}"
 
 echo '
 =======================================================================
