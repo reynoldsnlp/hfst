@@ -20,7 +20,7 @@ endif
 
 if EMSCRIPTEN
 all-local: src/libhfst.la
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(WASM_LDFLAGS) \
+	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) \
 	  src/EmscriptenBindings.o \
 	  $(abs_top_builddir)/wasm-deps/lib/libfst.a \
 	  $(abs_top_builddir)/wasm-deps/lib/libfoma.a \

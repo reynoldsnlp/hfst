@@ -20,8 +20,6 @@ mkdir -p ${LIB_DIR}
 
 OPTIM_FLAGS="-O3"
 OPTIM_LD_FLAGS="-O3 --closure 1"
-OPTIM_FLAGS=""
-OPTIM_LD_FLAGS=""
 
 APT_UPDATE_STAMP="/tmp/apt-update-stamp"
 if [ ! -f ${APT_UPDATE_STAMP} ]; then
@@ -87,7 +85,7 @@ else
   [ -d openfst ] || git clone https://github.com/TinoDidriksen/openfst.git
   cd openfst
   autoreconf -fiv
-  emconfigure ./configure --enable-static --disable-shared
+  emconfigure ./configure --enable-static --disable-shared  # TODO more flags needed for libhfst?
   emmake make # -j$(nproc)
   cp src/lib/.libs/libfst.a ${LIB_DIR}/
   [ -d ${DEPS_DIR}/include/fst ] || ln -s ${DEPS_DIR}/openfst/src/include/fst ${DEPS_DIR}/include/
@@ -95,7 +93,7 @@ fi
 
 ICU_HEADING='
 =======================================================================
-====================== Building ICU native ============================
+====================== Building ICU ______ ============================
 ======================================================================='
 cd ${DEPS_DIR}
 # ICU_SRC_URL="https://github.com/unicode-org/icu/releases/download/release-77-1/icu4c-77_1-src.tgz"
@@ -155,7 +153,7 @@ NATIVE_ICU_DIR=$(pwd)
 if [ -f "bin/pkgdata" ]; then
   echo "ICU native tools already built (native-build/bin/pkgdata exists), skipping..."
 else
-  echo "${ICU_HEADING}"
+  echo "${ICU_HEADING/______/native}"
   ../configure --disable-shared --enable-static VERBOSE=1
   make -j$(nproc) VERBOSE=1
 fi
@@ -167,7 +165,7 @@ pushd wasm-build
 if [ -f "lib/libicudata.a" ]; then
   echo "ICU wasm libs already built (wasm-build/lib/libicudata.a exists), skipping..."
 else
-  echo "${ICU_HEADING/native/ wasm }"
+  echo "${ICU_HEADING/______/ wasm }"
   export PKGDATA_OPTS="--without-assembly -O ../data/icupkg.inc"
   PKG_CONFIG_LIBDIR="${LIB_DIR}/pkgconfig" emconfigure ../configure \
       --host=wasm32-unknown-emscripten \
@@ -199,6 +197,8 @@ if [ ! -f configure ]; then
     ./autogen.sh
 fi
 
+autoreconf -fiv
+
 emconfigure ./configure \
   --host=wasm32-unknown-emscripten \
   --with-sfst=no \
@@ -210,7 +210,17 @@ emconfigure ./configure \
   CPPFLAGS="-I${DEPS_DIR}/include -I${DEPS_DIR}/foma/foma" \
   FOMA_CFLAGS="-I${DEPS_DIR}/foma/foma" \
   FOMA_LIBS="-L${LIB_DIR} -lfoma" \
-  LDFLAGS="-L${LIB_DIR}" \
+  LDFLAGS="-L${LIB_DIR} \
+           -lembind \
+           -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','FS'] \
+           -s EXPORTED_FUNCTIONS=['_malloc','_free'] \
+           -s ALLOW_MEMORY_GROWTH=1 \
+           -s ASSERTIONS=2 \
+           -s MODULARIZE=1 \
+           -s EXPORT_NAME='createHfstModule' \
+           -s INITIAL_MEMORY=64MB \
+           -s MAXIMUM_MEMORY=4GB \
+           -s NO_DISABLE_EXCEPTION_CATCHING" \
   VERBOSE=1
 
 # TODO: optimization with -O3 or -O4
@@ -222,4 +232,3 @@ echo '
 =======================================================================
 ==================== LibHFST WASM build complete ======================
 ======================================================================='
-echo -e "\a"  # Beep when done

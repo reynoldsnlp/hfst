@@ -561,20 +561,7 @@ AC_ARG_ENABLE([xfst],
 AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
 
 # Check if we're building with Emscripten
-# TODO use $host_alias instead of EMSCRIPTEN environment variable
 AM_CONDITIONAL([EMSCRIPTEN], [AS_CASE(["$host_alias"], [wasm*-*-*], [true], [false])])
-AS_IF([AS_CASE(["$host_alias"], [wasm*-*-*], [true], [false])], [
-    AC_SUBST([WASM_LDFLAGS], ["-lembind \
-				-s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','FS'] \
-				-s EXPORTED_FUNCTIONS=['_malloc','_free'] \
-				-s ALLOW_MEMORY_GROWTH=1 \
-				-s ASSERTIONS=2 \
-				-s MODULARIZE=1 \
-				-s EXPORT_NAME='createHfstModule' \
-				-s INITIAL_MEMORY=64MB \
-				-s MAXIMUM_MEMORY=4GB \
-				-s NO_DISABLE_EXCEPTION_CATCHING"])
-])
 
 # Disable stress tests by default
 AC_ARG_ENABLE([stress-tests],
@@ -736,47 +723,18 @@ AS_IF([test "x$enable_python_bindings" = "xyes"], [
 	])
 ])
 
-# For Emscripten build, add OpenFST include path
-AS_IF([AS_CASE(["$host_alias"], [wasm*-*-*], [true], [false])], [
-    # Save old CPPFLAGS
-    OLD_CPPFLAGS="$CPPFLAGS"
-    # Add OpenFST include path for header checks
-    CPPFLAGS="$CPPFLAGS -I$srcdir/wasm-deps/openfst/src/include"
-])
+AS_IF([test "x$with_openfst" != xno && test "x$found_fstlib_h" != xyes], [AC_CHECK_HEADER([fst/fstlib.h], [], [AC_MSG_ERROR([could not find OpenFST's fst/fstlib.h in include path])])])
 
-# Check for OpenFST header
-AS_IF([test "x$with_openfst" != xno && test "x$found_fstlib_h" != xyes],
-      [AC_CHECK_HEADER([fst/fstlib.h], [],
-                      [AC_MSG_ERROR([could not find OpenFST's fst/fstlib.h in include path])])])
-
-# Restore original CPPFLAGS if using Emscripten
-AS_IF([AS_CASE(["$host_alias"], [wasm*-*-*], [true], [false])], [
-    CPPFLAGS="$OLD_CPPFLAGS"
-])
-
-# Skip foma library check if using Emscripten
-AS_IF([AS_CASE(["$host_alias"], [wasm*-*-*], [false], [true])], [
-  AS_IF([test "x$with_foma" != xno], [PKG_CHECK_MODULES(FOMA, [libfoma >= 0.10.0])])
-], [
-  # When using Emscripten, just set the FOMA_ variables without checking
-  AS_IF([test "x$with_foma" != xno], [
-    FOMA_CFLAGS=""
-    FOMA_LIBS="-lfoma"
-    AC_SUBST(FOMA_CFLAGS)
-    AC_SUBST(FOMA_LIBS)
-  ])
-])
+AS_IF([test "x$with_foma" != xno], [PKG_CHECK_MODULES(FOMA, [libfoma >= 0.10.0])])
 
 # config files
-AC_CONFIG_FILES([Makefile
-                 doc/Makefile
-                 test/Makefile
+AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  test/libhfst/Makefile test/tools/Makefile
                  test/tools/fsmbook-tests/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/c/Makefile
                  libhfst/src/implementations/Makefile
-                 libhfst/src/parsers/Makefile
+		 libhfst/src/parsers/Makefile
                  libhfst/hfst.pc libhfst/hfst_c.pc
 		 tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
 		 tools/src/hfst-twolc/Makefile
