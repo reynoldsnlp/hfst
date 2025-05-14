@@ -27,12 +27,13 @@ libhfst.js
 *.log
 
 # Transducer files
-*.hfst
-*.ofst
-*.sfst
 *.foma
-*.hfstol
 *.genhfstol
+*.hfst
+*.hfstol
+*.ofst
+*.pmhfst
+*.sfst
 
 # Generated Python files and folders
 /python/__pycache__/
@@ -72,6 +73,7 @@ libhfst.js
 
 # Back-up files
 *~
+.DS_Store
 
 # Generated files in installation check
 /check_installation/check-hfst-*.tar.gz

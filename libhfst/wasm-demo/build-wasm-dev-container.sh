@@ -2,13 +2,26 @@
 
 
 # This script builds the HFST library for WebAssembly using Emscripten.
-# It is intended to be run in a fresh Ubuntu container.
+# It is intended to be run from the root dir of the repository in a fresh
+# Debian/Ubuntu container.
 
 set -e
 
 if ! [ -d libhfst ]; then
-    echo "Please run this script in the HFST root directory."
+    echo "Please run this script from the HFST root directory."
     exit 1
+fi
+
+# Check if we are running in a Docker container
+if [ -f /.dockerenv ]; then
+    echo "Running in a Docker container. Proceeding with build."
+else
+    echo "This script is intended to be run in a Debian/Ubuntu container."
+    read -p "Do you want to continue? (y/n) " answer
+    if [[ ! $answer =~ ^[Yy]$ ]]; then
+        echo "Exiting."
+        exit 1
+    fi
 fi
 
 HFST_DIR="$(pwd)"
@@ -44,6 +57,7 @@ sudo apt-get install -y \
     unzip \
     zlib1g-dev
 
+cd ${DEPS_DIR}
 if ! [ -d emsdk ]; then
     git clone https://github.com/emscripten-core/emsdk.git
 fi

@@ -16,7 +16,7 @@
 
   <div>
     <h2>2. Tokenize words</h2>
-    <textarea id="textInput" placeholder="Enter text to analyze" rows="10" cols="80"></textarea>
+    <textarea id="textInput" placeholder="Enter text to tokenize" rows="10" cols="80"></textarea>
     <br>
     <select id="outputFormatSelect">
       <option value="0">tokenize</option>
@@ -132,10 +132,8 @@
       console.log('Tokenize settings:', tokenizeSettings);
 
       if (!text) {
-        // TODO remove autofill
-        // resultsDiv.textContent = 'Please upload a transducer file first';
-        text = 'Мы уже работаем над этим. What do you mean? Не за что!';
-        document.getElementById('textInput').value = text;
+        resultsDiv.textContent = 'No text provided. Enter text above.';
+        return;
       }
 
       if (!currentTransducer) {
@@ -145,7 +143,7 @@
 
       try {
         const results = currentTransducer.tokenize(text, tokenizeSettings);
-        console.log(`String results (${text}):`, results);
+        console.log(`results (${text}):`, results);
 
         // Clear previous results and add new structure
         resultsDiv.innerHTML = '<p>Tokenization results:</p>'; // Keep the paragraph
