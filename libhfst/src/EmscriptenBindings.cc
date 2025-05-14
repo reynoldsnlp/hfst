@@ -16,7 +16,7 @@
 #include <emscripten/bind.h>
 #include <iostream>
 #include <string>
-#include <unicode/udata.h>  // Add ICU data header
+#include <unicode/udata.h>
 #include <unicode/uvernum.h>
 #include <unicode/uversion.h>
 #include <utility>
@@ -37,8 +37,6 @@ using namespace hfst;
 using namespace emscripten;
 using namespace hfst_ol_tokenize;
 
-// Declare the ICU data symbol using the standard macro.
-// This tells the compiler that this symbol exists externally.
 extern "C" const char U_ICUDATA_ENTRY_POINT [];
 
 // Helper functions for data conversion between C++ and JavaScript
@@ -81,23 +79,6 @@ namespace {
     // Convert JS object to C++ StringPair
     StringPair jsObjectToStringPair(const val& jsObj) {
         return {jsObj["first"].as<std::string>(), jsObj["second"].as<std::string>()};
-    }
-
-    // Convert C++ StringPair to JS object
-    val stringPairToJs(const StringPair& pair) {
-        val jsObj = val::object();
-        jsObj.set("first", pair.first);
-        jsObj.set("second", pair.second);
-        return jsObj;
-    }
-
-    // Convert C++ StringPairVector to JS array
-    val stringPairVectorToJs(const StringPairVector& vec) {
-        val jsArray = val::array();
-        for (const auto& pair : vec) {
-            jsArray.call<void>("push", stringPairToJs(pair));
-        }
-        return jsArray;
     }
 
     // Convert C++ HfstOneLevelPaths to JS array
@@ -207,39 +188,6 @@ namespace {
         } catch (const HfstException& e) {
             // Just ignore exceptions, JavaScript will have to handle this case
         }
-    }
-
-    // Global functions for FST type management
-    ImplementationType getDefaultFstType() {
-        return hfst::TROPICAL_OPENFST_TYPE; // Default value, could be customized
-    }
-
-    void setDefaultFstType(ImplementationType type) {
-        // There's no global setter in the API, we'll have to do this per-instance
-        // This is a simplification for JavaScript API
-    }
-
-    // Get the symbols from a PmatchContainer
-    val getPmatchContainerSymbols(const hfst_ol::PmatchContainer& container) {
-        // Create a set of symbols - we need to extract these from the transducers
-        // Since PmatchContainer doesn't expose an API to get all symbols directly
-        StringSet symbols;
-
-        // Extract what we can from the public API
-        // In a real implementation, we might need to look at the configuration
-        // or other public interfaces to get symbols
-
-        // Just create an empty set for now
-        return stringSetToJs(symbols);
-    }
-
-    // Check if a container has a specific symbol
-    bool pmatchContainerHasSymbol(hfst_ol::PmatchContainer& container, const std::string& symbol) {
-        // We can't directly check the symbol table, so we'll have to use other methods
-        // For now, return false since we don't have a direct way to check
-        // In a real implementation, we might be able to check from configuration
-        // or check if certain operations with the symbol work
-        return false;
     }
 
     // Helper function for tokenizing text using PmatchContainer
@@ -412,14 +360,10 @@ EMSCRIPTEN_BINDINGS(hfst_module) {
         .constructor(&createPmatchContainer, allow_raw_pointers())
         .function("set_verbose", &hfst_ol::PmatchContainer::set_verbose)
         .function("set_single_codepoint_tokenization", &hfst_ol::PmatchContainer::set_single_codepoint_tokenization)
-        .function("hasSymbol", &pmatchContainerHasSymbol)
-        .function("getSymbols", &getPmatchContainerSymbols)
         .function("tokenize", &tokenizeText)
         .function("parse_hfst3_header", &hfst_ol::PmatchContainer::parse_hfst3_header);
 
     // ********** Module-level functions **********
-    function("get_default_fst_type", &getDefaultFstType);
-    function("set_default_fst_type", &setDefaultFstType);
     function("createPmatchContainer", &createPmatchContainer, allow_raw_pointers());
     function("createPmatchContainerFromBuffer", &createPmatchContainerFromBuffer, allow_raw_pointers());
     function("getDefaultTokenizeSettings", &getDefaultTokenizeSettings);
