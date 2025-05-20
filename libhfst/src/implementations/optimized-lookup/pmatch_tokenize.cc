@@ -1046,8 +1046,6 @@ print_json_reading(hfst::StringVector::const_iterator out_beg,
     }
     first_reading = false;
 
-    outstream << "{";
-
     // We need to split the output into segments based on the separator and analyze them separately
     std::vector<std::pair<hfst::StringVector::const_iterator, hfst::StringVector::const_iterator>> segments;
 
@@ -1090,8 +1088,6 @@ print_json_reading(hfst::StringVector::const_iterator out_beg,
         // This should never happen, but just in case
         outstream << "\"l\":\"\",\"ts\":[]";
     }
-
-    outstream << "}";
 }
 
 void
