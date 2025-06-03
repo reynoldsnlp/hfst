@@ -230,7 +230,7 @@ print_nonmatching_sequence(std::string const &str, std::ostream &outstream,
     }
     else if (s.output_format == jsonl)
     {
-        outstream << "{\"t\":\":";
+        outstream << "{\"t\":\"";
         print_json_escaped(str, outstream);
         outstream << "\"}";
     }
