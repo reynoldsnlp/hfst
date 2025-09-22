@@ -682,11 +682,43 @@ locate_fullmatch(hfst_ol::PmatchContainer &container, string &form,
 }
 
 void
+print_splitlocs_r(std::ostream &outstream, LocationVectorVector splitlocs,
+                  size_t bottom, size_t depth, size_t indent,
+                  vector<std::ostringstream> &out, const TokenizeSettings &s)
+{
+    // std::cerr << "bottom depth indent" << bottom << " " << depth << " "
+    //           << indent << std::endl;
+    auto locs = splitlocs.at(bottom - depth);
+    for (auto loc : locs)
+    {
+        out.at(depth).clear();
+        out.at(depth).str(string());
+        print_reading_giellacg(&loc, indent, true, out.at(depth), s);
+        if (depth == bottom)
+        {
+            for (vector<std::ostringstream>::const_iterator it = out.begin();
+                 it != out.end(); ++it)
+            {
+                // std::cerr << "DEBUGS 9 " << it->str() << std::endl;
+                outstream << it->str();
+            }
+        }
+        else
+        {
+            print_splitlocs_r(outstream, splitlocs, bottom, depth + 1,
+                              indent + 1, out, s);
+        }
+    }
+    // std::cerr << "DEBUGS X " << std::endl;
+}
+
+void
 print_location_vector_giellacg(hfst_ol::PmatchContainer &container,
                                LocationVector const &locations,
                                std::ostream &outstream,
                                const TokenizeSettings &s)
 {
+    // std::cerr << "DEBUGS1 " << locations.at(0).output << std::endl;
     outstream << "\"<";
     print_escaping_backslashes(locations.at(0).input, outstream);
     outstream << ">\"" << std::endl;
@@ -726,7 +758,7 @@ print_location_vector_giellacg(hfst_ol::PmatchContainer &container,
     }
     // The rest of the function handles possible backtracking:
     hfst::StringVector in_syms = locations.at(0).input_symbol_strings;
-
+    // std::cerr << "DEBUGS2 " << locations.at(0).output << std::endl;
     for (std::set<SplitPoints>::const_iterator bt_points = backtrack.begin();
          bt_points != backtrack.end(); ++bt_points)
     {
@@ -795,9 +827,16 @@ print_location_vector_giellacg(hfst_ol::PmatchContainer &container,
         vector<pair<LocationVector, size_t> > stack;
         // In CG the *last* word is the least indented, so start from
         // the end of splitlocs, indentation being 1 tab:
-        stack.push_back(make_pair(splitlocs.at(bottom), 0));
-        while (!stack.empty() && !stack.back().first.empty())
+        //
+        print_splitlocs_r(outstream, splitlocs, bottom, depth, 1, out, s);
+#if 0
+            while (!stack.empty() /*&& !stack.back().first.empty()*/)
         {
+            if (stack.back().first.empty())
+            {
+                std::cerr << "DEBUGS X " << std::endl;
+                stack.pop_back();
+            }
             LocationVector &locs = stack.back().first;
             const Location loc = locs.back();
             locs.pop_back();
@@ -805,6 +844,7 @@ print_location_vector_giellacg(hfst_ol::PmatchContainer &container,
             out.at(depth).clear();
             out.at(depth).str(string());
             // (ignore splitpoints of splitpoints)
+            // std::cerr << "DEBUGS 8 " << depth << std::endl;
             const size_t new_indent
                 = print_reading_giellacg(&loc, indent, true, out.at(depth), s)
                       .second;
@@ -814,6 +854,7 @@ print_location_vector_giellacg(hfst_ol::PmatchContainer &container,
                      = out.begin();
                      it != out.end(); ++it)
                 {
+                    // std::cerr << "DEBUGS 9 " << it->str() << std::endl;
                     outstream << it->str();
                 }
             }
@@ -825,6 +866,7 @@ print_location_vector_giellacg(hfst_ol::PmatchContainer &container,
                     stack.push_back(
                         make_pair(splitlocs.at(bottom - depth), new_indent));
                 }
+                stack.push_back(make_pair(splitlocs.at(bottom), 0));
             }
             else if (locs.empty())
             {
@@ -832,6 +874,7 @@ print_location_vector_giellacg(hfst_ol::PmatchContainer &container,
                 stack.pop_back();
             }
         }
+#endif
     }
 }
 

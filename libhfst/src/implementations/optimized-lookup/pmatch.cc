@@ -1162,6 +1162,10 @@ PmatchAlphabet::get_special(SpecialSymbol special) const
 void
 PmatchContainer::process(const std::string &input_str)
 {
+    if (verbose)
+    {
+        std::cerr << "PC::processing " << input_str << std::endl;
+    }
     initialize_input(input_str.c_str());
     unsigned int input_pos = 0;
     unsigned int printable_input_pos = 0;
