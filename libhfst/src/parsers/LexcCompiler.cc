@@ -867,7 +867,7 @@ LexcCompiler::setCurrentLexiconName(const string &lexiconName)
         {
             if (should_colourise())
             {
-                *err << COLOUR_YELLOW << "Warnign: " << COLOUR_RESET;
+                *err << COLOUR_YELLOW << "Warning: " << COLOUR_RESET;
             }
             *err << "first lexicon is not named Root" << std::endl;
         }
@@ -879,7 +879,7 @@ LexcCompiler::setCurrentLexiconName(const string &lexiconName)
         {
             if (should_colourise())
             {
-                *err << COLOUR_YELLOW << "Warnign: " << COLOUR_RESET;
+                *err << COLOUR_YELLOW << "Warning: " << COLOUR_RESET;
             }
             *err << "Root is not first the first lexicon" << std::endl;
         }
@@ -1340,7 +1340,7 @@ LexcCompiler::printConnectedness(bool &warnings_generated)
                 {
                     if (should_colourise())
                     {
-                        *err << COLOUR_YELLOW << "Warnign: " << COLOUR_RESET;
+                        *err << COLOUR_YELLOW << "Warning: " << COLOUR_RESET;
                     }
                     *err << "Sublexicon is mentioned but not "
                             "defined. ("
@@ -1357,7 +1357,7 @@ LexcCompiler::printConnectedness(bool &warnings_generated)
             {
                 if (should_colourise())
                 {
-                    *err << COLOUR_YELLOW << "Warnign: " << COLOUR_RESET;
+                    *err << COLOUR_YELLOW << "Warning: " << COLOUR_RESET;
                 }
                 *err << "Sublexicons defined but not used" << std::endl;
                 for (vector<string>::iterator s = lexMinusCont.begin();
