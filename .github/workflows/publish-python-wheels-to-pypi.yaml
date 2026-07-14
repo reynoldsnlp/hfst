@@ -51,7 +51,6 @@ jobs:
       fail-fast: false
       matrix:
         build-id:
-          - cp312-pyodide_wasm32
           - cp313-pyodide_wasm32
     steps:
       - uses: actions/checkout@v7
