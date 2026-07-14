@@ -1,7 +1,7 @@
 
 This folder contains the SWIG interface (libhfst.i), the hand-written C++
 extension code (hfst_*_extensions.cpp) and the pure-Python package (hfst/) for
-the HFST Python bindings. The bindings require Python 3.8 or newer.
+the HFST Python bindings. The bindings require Python 3.9 or newer.
 
 The packaging itself lives at the top of the repository: a single pyproject.toml
 and setup.py build the bindings in two modes, so the same configuration is used

@@ -53,7 +53,7 @@ try:
         __version__ = _pkg_version("hfst")
     except PackageNotFoundError:
         __version__ = "unknown"
-except ImportError:  # Python < 3.8
+except ImportError:  # Older Python versions
     __version__ = "unknown"
 
 import hfst.exceptions
@@ -1356,4 +1356,3 @@ class ImplementationType:
     HFST2_TYPE = libhfst.HFST2_TYPE
     UNSPECIFIED_TYPE = libhfst.UNSPECIFIED_TYPE
     ERROR_TYPE = libhfst.ERROR_TYPE
-

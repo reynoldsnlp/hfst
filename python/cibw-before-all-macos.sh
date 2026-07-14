@@ -40,13 +40,22 @@ READLINE_PREFIX="$(brew --prefix readline)"
 export PKG_CONFIG_PATH="$ICU_PREFIX/lib/pkgconfig:$READLINE_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
 export CPPFLAGS="-I$ICU_PREFIX/include -I$READLINE_PREFIX/include $CPPFLAGS"
 export LDFLAGS="-L$ICU_PREFIX/lib -L$READLINE_PREFIX/lib $LDFLAGS"
+if [ "$(uname -m)" = "arm64" ]; then
+    case "${MACOSX_DEPLOYMENT_TARGET:-}" in
+        ""|10.*) export MACOSX_DEPLOYMENT_TARGET=11.0 ;;
+    esac
+else
+    case "${MACOSX_DEPLOYMENT_TARGET:-}" in
+        ""|10.[0-9]|10.10|10.11) export MACOSX_DEPLOYMENT_TARGET=10.12 ;;
+    esac
+fi
 
 # ----- OpenFst -----
 git_clone "$OPENFST_REF" "$OPENFST_REPO" "$BUILD_DIR/openfst"
 cd "$BUILD_DIR/openfst"
 [ -x ./configure ] || ./autogen.sh || autoreconf -fvi
 ./configure --prefix=/usr/local --enable-static --disable-shared --with-pic \
-    CXXFLAGS="-fPIC -O2 -std=c++17"
+    CXXFLAGS="-fPIC -O2 -std=c++17 -mmacosx-version-min=$MACOSX_DEPLOYMENT_TARGET"
 make -j"$(sysctl -n hw.ncpu)"
 sudo make install
 
