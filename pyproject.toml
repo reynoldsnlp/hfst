@@ -36,7 +36,6 @@ Repository = "https://github.com/hfst/hfst"
 # Build CPython wheels for Linux + macOS + Pyodide. Windows is deferred (needs
 # the unistd.h -> io.h / flex-signature fixups from the old copy-files-win.sh).
 build = "cp3*-manylinux_x86_64 cp3*-manylinux_aarch64 cp3*-macosx_* cp312-pyodide_wasm32 cp313-pyodide_wasm32"
-skip = "cp36-* cp37-* cp38-*"
 build-frontend = "build"
 
 # Generated flex/bison sources are shipped in the sdist; SWIG runs during the

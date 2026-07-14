@@ -21,9 +21,9 @@ jobs:
             archs: x86_64
           - os: ubuntu-latest
             archs: aarch64
-          - os: macos-13    # x86_64
+          - os: macos-15-intel  # x86_64
             archs: auto
-          - os: macos-14    # arm64
+          - os: macos-15        # arm64
             archs: auto
     steps:
       - uses: actions/checkout@v7
