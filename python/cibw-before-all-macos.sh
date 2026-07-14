@@ -40,15 +40,9 @@ READLINE_PREFIX="$(brew --prefix readline)"
 export PKG_CONFIG_PATH="$ICU_PREFIX/lib/pkgconfig:$READLINE_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
 export CPPFLAGS="-I$ICU_PREFIX/include -I$READLINE_PREFIX/include $CPPFLAGS"
 export LDFLAGS="-L$ICU_PREFIX/lib -L$READLINE_PREFIX/lib $LDFLAGS"
-if [ "$(uname -m)" = "arm64" ]; then
-    case "${MACOSX_DEPLOYMENT_TARGET:-}" in
-        ""|10.*|11.*|12.*|13.*) export MACOSX_DEPLOYMENT_TARGET=14.0 ;;
-    esac
-else
-    case "${MACOSX_DEPLOYMENT_TARGET:-}" in
-        ""|10.*|11.*|12.*) export MACOSX_DEPLOYMENT_TARGET=13.0 ;;
-    esac
-fi
+case "${MACOSX_DEPLOYMENT_TARGET:-}" in
+    ""|10.*|11.*|12.*|13.*|14.*) export MACOSX_DEPLOYMENT_TARGET=15.0 ;;
+esac
 
 # ----- OpenFst -----
 git_clone "$OPENFST_REF" "$OPENFST_REPO" "$BUILD_DIR/openfst"
