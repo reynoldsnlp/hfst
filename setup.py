@@ -172,6 +172,9 @@ if platform.startswith("linux") or platform == "darwin":
     extra_compile_args += ["-std=c++20", "-Wno-sign-compare", "-Wno-strict-prototypes"]
     libraries.append("dl")
 if platform == "darwin":
+    include_dirs.insert(0, os.path.join("python", "macos-compat"))
+    define_macros.append(("HAVE_EXT_HASH_MAP", "1"))
+    define_macros.append(("HAVE_EXT_HASH_SET", "1"))
     extra_compile_args += ["-stdlib=libc++"]
     extra_link_args += ["-stdlib=libc++"]
 elif platform == "win32":

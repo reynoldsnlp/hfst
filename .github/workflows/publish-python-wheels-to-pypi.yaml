@@ -26,20 +26,20 @@ jobs:
           - os: macos-14    # arm64
             archs: auto
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up QEMU (for aarch64 emulation)
         if: matrix.archs == 'aarch64'
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
         with:
           platforms: arm64
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.21
+        uses: pypa/cibuildwheel@v4.1.0
         env:
           CIBW_ARCHS_LINUX: ${{ matrix.archs }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.archs }}
           path: ./wheelhouse/*.whl
@@ -48,7 +48,7 @@ jobs:
     name: Build sdist
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install codegen tools
         run: sudo apt-get -qy update && sudo apt-get -qy install --no-install-recommends bison flex
@@ -59,7 +59,7 @@ jobs:
       - name: Build sdist
         run: pipx run build --sdist
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: sdist
           path: ./dist/*.tar.gz
@@ -74,7 +74,7 @@ jobs:
     permissions:
       id-token: write   # Trusted Publishing (OIDC) — no stored token needed.
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true

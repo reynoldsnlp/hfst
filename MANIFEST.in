@@ -14,6 +14,7 @@ include python/hfst_*_extensions.cpp
 recursive-include python/hfst *.py
 include python/generate-parsers.sh
 include python/cibw-before-all-*.sh
+recursive-include python/macos-compat *
 include python/pypi/README.rst
 
 # libhfst C++ sources + headers.
@@ -42,4 +43,3 @@ prune lgpl-release
 prune python/doc
 prune docker
 recursive-exclude . *.o *.lo *.la
-
