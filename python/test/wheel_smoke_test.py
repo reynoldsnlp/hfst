@@ -13,9 +13,13 @@ import hfst
 
 print("hfst version:", hfst.__version__)
 
-# All three back-ends should be compiled into the wheel.
+# Desktop wheels include all three back-ends. Pyodide follows the wasm build and
+# disables SFST, but still exercises OpenFst and foma.
 missing = []
-for name in ("SFST_TYPE", "TROPICAL_OPENFST_TYPE", "FOMA_TYPE"):
+required_backends = ["TROPICAL_OPENFST_TYPE", "FOMA_TYPE"]
+if sys.platform != "emscripten":
+    required_backends.insert(0, "SFST_TYPE")
+for name in required_backends:
     impl = getattr(hfst.ImplementationType, name)
     if not hfst.HfstTransducer.is_implementation_type_available(impl):
         missing.append(name)

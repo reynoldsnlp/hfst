@@ -10,11 +10,11 @@ two mutually exclusive link modes.
 Two build modes
 ---------------
 
-* **static** (default) — compile the whole of ``libhfst`` (plus the in-tree
-  ``sfst`` back-end) directly into ``_libhfst`` and link the external back-ends
-  (OpenFst ``-lfst``, foma ``-lfoma``), ICU and readline. This is what
-  ``cibuildwheel`` uses to produce self-contained wheels; ``auditwheel`` /
-  ``delocate`` then vendor the external shared libraries into the wheel.
+* **static** (default) — compile the whole of ``libhfst`` directly into
+  ``_libhfst`` and link the external back-ends (OpenFst ``-lfst``, foma
+  ``-lfoma``), ICU and readline. Desktop wheels also compile the in-tree
+  ``sfst`` back-end; Pyodide wheels disable SFST/readline and use
+  Emscripten-built OpenFst/foma/ICU from ``python/cibw-before-build-pyodide.sh``.
 
 * **shared** — set ``HFST_USE_SHARED_LIB=1`` to instead link against an
   already-installed ``libhfst`` (``-lhfst``) and compile only the SWIG wrapper.
@@ -57,6 +57,13 @@ class build_py(_build_py):
 
 def _bool_env(name):
     return os.environ.get(name, "").strip().lower() in ("1", "true", "yes", "on")
+
+
+def _enabled_env(name, default=True):
+    value = os.environ.get(name, "").strip().lower()
+    if not value:
+        return default
+    return value not in ("0", "false", "no", "off")
 
 
 def read_version():
@@ -117,6 +124,15 @@ def ensure_generated_parsers():
 
 platform = sys.platform
 use_shared_lib = _bool_env("HFST_USE_SHARED_LIB")
+is_pyodide = (
+    platform == "emscripten"
+    or "pyodide" in os.environ.get("CIBUILDWHEEL_BUILD_IDENTIFIER", "")
+    or bool(os.environ.get("PYODIDE_ROOT"))
+)
+with_openfst = _enabled_env("HFST_WITH_OPENFST", True)
+with_foma = _enabled_env("HFST_WITH_FOMA", True)
+with_sfst = _enabled_env("HFST_WITH_SFST", not is_pyodide)
+with_icu = _enabled_env("HFST_WITH_ICU", True)
 
 swig_include_dir = os.path.join("libhfst", "src")
 swig_opts = ["-c++", "-I" + swig_include_dir, "-Wall"]
@@ -145,20 +161,26 @@ for extra in os.environ.get("HFST_EXTRA_LIBRARY_DIRS", "").split(os.pathsep):
 if os.path.isdir("/usr/local/lib"):
     library_dirs.append("/usr/local/lib")
 
-define_macros = [
-    ("HAVE_OPENFST", None),
-    ("HAVE_OPENFST_LOG", None),
-    ("HAVE_FOMA", None),
-    ("HAVE_SFST", None),
-    ("USE_ICU_UNICODE", "1"),
-]
+define_macros = []
+libraries = []
 
-libraries = ["fst", "foma", "icuuc", "icui18n", "icudata"]
+if with_openfst:
+    define_macros.append(("HAVE_OPENFST", None))
+    define_macros.append(("HAVE_OPENFST_LOG", None))
+    libraries.append("fst")
+if with_foma:
+    define_macros.append(("HAVE_FOMA", None))
+    libraries.append("foma")
+if with_sfst:
+    define_macros.append(("HAVE_SFST", None))
+if with_icu:
+    define_macros.append(("USE_ICU_UNICODE", "1"))
+    libraries += ["icui18n", "icuuc", "icudata"]
 
 extra_compile_args = []
 extra_link_args = []
 
-include_readline = platform.startswith("linux") or platform == "darwin"
+include_readline = (platform.startswith("linux") or platform == "darwin") and not is_pyodide
 if _bool_env("HFST_NO_READLINE"):
     include_readline = False
 if include_readline:
@@ -168,10 +190,11 @@ if include_readline:
 
 # HFST uses C++20 library features (std::string::starts_with/ends_with,
 # std::set::contains), so C++20 is the minimum standard.
-if platform.startswith("linux") or platform == "darwin":
+if platform.startswith("linux") or platform == "darwin" or is_pyodide:
     extra_compile_args += ["-std=c++20", "-Wno-sign-compare", "-Wno-strict-prototypes"]
+if (platform.startswith("linux") or platform == "darwin") and not is_pyodide:
     libraries.append("dl")
-if platform == "darwin":
+if platform == "darwin" and not is_pyodide:
     include_dirs.insert(0, os.path.join("python", "macos-compat"))
     define_macros.append(("HAVE_EXT_HASH_MAP", "1"))
     define_macros.append(("HAVE_EXT_HASH_SET", "1"))
@@ -190,7 +213,7 @@ if use_shared_lib:
     if lib_dir:
         library_dirs.append(lib_dir)
         extra_link_args.append("-Wl,-rpath," + os.path.abspath(lib_dir))
-    define_macros = [("USE_ICU_UNICODE", "1")]
+    define_macros = [("USE_ICU_UNICODE", "1")] if with_icu else []
 else:
     ensure_generated_parsers()
     ext_sources = [os.path.join("python", "libhfst.i")]
@@ -208,8 +231,9 @@ else:
     # Committed + flex/bison-generated parser sources (all are compiled).
     ext_sources += sources("libhfst/src/parsers/*.cc")
     ext_sources += sources("libhfst/src/parsers/*/*.cc")
-    # In-tree SFST back-end.
-    ext_sources += sources("back-ends/sfst/*.cc")
+    if with_sfst:
+        # In-tree SFST back-end.
+        ext_sources += sources("back-ends/sfst/*.cc")
 
 libhfst_module = Extension(
     "_libhfst",

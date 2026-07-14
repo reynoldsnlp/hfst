@@ -42,11 +42,11 @@ export CPPFLAGS="-I$ICU_PREFIX/include -I$READLINE_PREFIX/include $CPPFLAGS"
 export LDFLAGS="-L$ICU_PREFIX/lib -L$READLINE_PREFIX/lib $LDFLAGS"
 if [ "$(uname -m)" = "arm64" ]; then
     case "${MACOSX_DEPLOYMENT_TARGET:-}" in
-        ""|10.*) export MACOSX_DEPLOYMENT_TARGET=11.0 ;;
+        ""|10.*|11.*|12.*|13.*) export MACOSX_DEPLOYMENT_TARGET=14.0 ;;
     esac
 else
     case "${MACOSX_DEPLOYMENT_TARGET:-}" in
-        ""|10.[0-9]|10.10|10.11) export MACOSX_DEPLOYMENT_TARGET=10.12 ;;
+        ""|10.*|11.*|12.*) export MACOSX_DEPLOYMENT_TARGET=13.0 ;;
     esac
 fi
 
@@ -65,6 +65,7 @@ FOMA_SRC="$BUILD_DIR/foma"
 [ -f "$FOMA_SRC/CMakeLists.txt" ] || FOMA_SRC="$BUILD_DIR/foma/foma"
 cmake -S "$FOMA_SRC" -B "$BUILD_DIR/foma-build" \
     -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOSX_DEPLOYMENT_TARGET" \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
     -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_BUILD_TYPE=Release

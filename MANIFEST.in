@@ -13,7 +13,7 @@ include python/libhfst.i python/docstrings.i
 include python/hfst_*_extensions.cpp
 recursive-include python/hfst *.py
 include python/generate-parsers.sh
-include python/cibw-before-all-*.sh
+include python/cibw-before-*.sh
 recursive-include python/macos-compat *
 include python/pypi/README.rst
 
