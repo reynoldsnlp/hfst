@@ -19,20 +19,12 @@ jobs:
         include:
           - os: ubuntu-latest
             archs: x86_64
-          - os: ubuntu-latest
-            archs: aarch64
           - os: macos-15-intel  # x86_64
             archs: auto
           - os: macos-15        # arm64
             archs: auto
     steps:
       - uses: actions/checkout@v7
-
-      - name: Set up QEMU (for aarch64 emulation)
-        if: matrix.archs == 'aarch64'
-        uses: docker/setup-qemu-action@v4
-        with:
-          platforms: arm64
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v4.1.0
@@ -42,6 +34,22 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.archs }}
+          path: ./wheelhouse/*.whl
+
+  build_linux_aarch64_wheels:
+    name: Wheels on ubuntu-24.04-arm (aarch64)
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v4.1.0
+        env:
+          CIBW_ARCHS_LINUX: aarch64
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: wheels-ubuntu-24.04-arm-aarch64
           path: ./wheelhouse/*.whl
 
   # Pyodide/Emscripten wheels are disabled until foma can build with Emscripten
@@ -90,7 +98,7 @@ jobs:
 
   publish:
     name: Publish to PyPI
-    needs: [build_wheels, make_sdist]
+    needs: [build_wheels, build_linux_aarch64_wheels, make_sdist]
     runs-on: ubuntu-latest
     # Only publish on a version tag or a GitHub release.
     if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
