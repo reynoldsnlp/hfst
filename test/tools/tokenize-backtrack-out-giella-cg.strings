@@ -7,9 +7,9 @@
 : 
 "<skuvla busse>"
 	"skuvlabusse" N ErrSpace <W:0.0>
-	"busset" V <W:0.0> "<busse>"
-		"skuvla" N <W:0.0> "<skuvla >"
 	"busse" N <W:0.0> "<busse>"
+		"skuvla" N <W:0.0> "<skuvla >"
+	"busset" V <W:0.0> "<busse>"
 		"skuvla" N <W:0.0> "<skuvla >"
 : 
 "<Jan.>"

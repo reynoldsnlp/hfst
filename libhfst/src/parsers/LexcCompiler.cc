@@ -22,6 +22,9 @@
 #include <string>
 #include <vector>
 
+#include <unicode/ubrk.h>
+#include <unicode/ustring.h>
+
 using std::map;
 using std::pair;
 using std::set;
@@ -101,10 +104,13 @@ LexcCompiler *lexc_ = 0;
 LexcCompiler::LexcCompiler()
     : quiet_(false), verbose_(false), align_strings_(false),
       with_flags_(false), minimize_flags_(false), rename_flags_(false),
-      treat_warnings_as_errors_(false),
-      allow_multiple_sublexicon_definitions_(false), error_(&std::cerr),
-      format_(TROPICAL_OPENFST_TYPE), xre_(TROPICAL_OPENFST_TYPE),
-      initialLexiconName_("Root"), totalEntries_(0), currentEntries_(0),
+      split_characters_(false), treat_warnings_as_errors_(false),
+      warn_everything_(false), warn_missing_lexicons_(false),
+      warn_unused_lexicons_(false), warn_repeated_lexicons_(false),
+      warn_missing_alphabets_(false), warn_unnecessary_escapes_(false),
+      error_(&std::cerr), format_(TROPICAL_OPENFST_TYPE),
+      xre_(TROPICAL_OPENFST_TYPE), initialLexiconName_("Root"),
+      totalEntries_(0), currentEntries_(0),
 #ifdef WINDOWS
       output_to_console_(false), winoss_(std::ostringstream()),
       redirected_stream_(NULL),
@@ -119,10 +125,12 @@ LexcCompiler::LexcCompiler()
 LexcCompiler::LexcCompiler(ImplementationType impl)
     : quiet_(false), verbose_(false), align_strings_(false),
       with_flags_(false), minimize_flags_(false), rename_flags_(false),
-      treat_warnings_as_errors_(false),
-      allow_multiple_sublexicon_definitions_(false), error_(&std::cerr),
-      format_(impl), xre_(impl), initialLexiconName_("Root"), totalEntries_(0),
-      currentEntries_(0),
+      split_characters_(false), treat_warnings_as_errors_(false),
+      warn_everything_(false), warn_missing_lexicons_(false),
+      warn_unused_lexicons_(false), warn_repeated_lexicons_(false),
+      warn_missing_alphabets_(false), warn_unnecessary_escapes_(false),
+      error_(&std::cerr), format_(impl), xre_(impl),
+      initialLexiconName_("Root"), totalEntries_(0), currentEntries_(0),
 #ifdef WINDOWS
       output_to_console_(false), winoss_(std::ostringstream()),
       redirected_stream_(NULL),
@@ -145,10 +153,12 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags,
                            bool alignStrings)
     : quiet_(false), verbose_(false), align_strings_(alignStrings),
       with_flags_(withFlags), minimize_flags_(false), rename_flags_(false),
-      treat_warnings_as_errors_(false),
-      allow_multiple_sublexicon_definitions_(false), error_(&std::cerr),
-      format_(impl), xre_(impl), initialLexiconName_("Root"), totalEntries_(0),
-      currentEntries_(0),
+      split_characters_(false), treat_warnings_as_errors_(false),
+      warn_everything_(false), warn_missing_lexicons_(false),
+      warn_unused_lexicons_(false), warn_repeated_lexicons_(false),
+      warn_missing_alphabets_(false), warn_unnecessary_escapes_(false),
+      error_(&std::cerr), format_(impl), xre_(impl),
+      initialLexiconName_("Root"), totalEntries_(0), currentEntries_(0),
 #ifdef WINDOWS
       output_to_console_(false), winoss_(std::ostringstream()),
       redirected_stream_(NULL),
@@ -190,6 +200,7 @@ LexcCompiler::reset()
     lexiconNames_.clear();
     noFlags_.clear();
     continuations_.clear();
+    alphabets_.clear();
     currentLexiconName_ = ""; // ?
     string hash("#");
     lexiconNames_.insert(hash);
@@ -229,6 +240,8 @@ LexcCompiler::flush(std::ostream *oss)
         redirected_stream_ = NULL;
         winoss_.str("");
     }
+#else
+    (void)oss;
 #endif
 }
 
@@ -356,6 +369,97 @@ LexcCompiler::setTreatWarningsAsErrors(bool value)
     return *this;
 }
 
+bool
+LexcCompiler::isStrictAlphabets()
+{
+    return warn_missing_alphabets_;
+}
+
+void
+LexcCompiler::setStrictAlphabets(bool strictness)
+{
+    warn_missing_alphabets_ = strictness;
+}
+
+bool
+LexcCompiler::hasSplitCharacters()
+{
+    return split_characters_;
+}
+
+void
+LexcCompiler::setSplitCharacters(bool splitness)
+{
+    split_characters_ = splitness;
+}
+
+bool
+LexcCompiler::isWarning(const char *warning)
+{
+    if (strcmp(warning, "-Wone-sided-flags") == 0)
+    {
+        return warn_one_sided_flags_;
+    }
+    else if (strcmp(warning, "-Wmissing-lexicons") == 0)
+    {
+        return warn_missing_lexicons_;
+    }
+    else if (strcmp(warning, "-Wunused-lexicons") == 0)
+    {
+        return warn_unused_lexicons_;
+    }
+    else if (strcmp(warning, "-Wrepeated-lexicons") == 0)
+    {
+        return warn_repeated_lexicons_;
+    }
+    else if (strcmp(warning, "-Wmissing-alphabets") == 0)
+    {
+        return warn_missing_alphabets_;
+    }
+    else if (strcmp(warning, "-Wunnecessary-escapes") == 0)
+    {
+        return warn_unnecessary_escapes_;
+    }
+    else
+    {
+        fprintf(stderr, "unknown warning %s\n", warning);
+    }
+    return false;
+}
+
+void
+LexcCompiler::setWarning(const char *warning, bool value)
+{
+    if (strcmp(warning, "-Wone-sided-flags") == 0)
+    {
+        warn_one_sided_flags_ = value;
+    }
+    else if (strcmp(warning, "-Wmissing-lexicons") == 0)
+    {
+        warn_missing_lexicons_ = value;
+    }
+    else if (strcmp(warning, "-Wunused-lexicons") == 0)
+    {
+        warn_unused_lexicons_ = value;
+    }
+    else if (strcmp(warning, "-Wrepeated-lexicons") == 0)
+    {
+        warn_repeated_lexicons_ = value;
+    }
+    else if (strcmp(warning, "-Wmissing-alphabets") == 0)
+    {
+        warn_missing_alphabets_ = value;
+    }
+    else if (strcmp(warning, "-Wunnecessary-escapes") == 0)
+    {
+        warn_unnecessary_escapes_ = value;
+    }
+    else
+    {
+        fprintf(stderr, "unknown warning %s\n", warning);
+    }
+}
+
 void
 LexcCompiler::set_error_stream(std::ostream *os)
 {
@@ -372,7 +476,7 @@ LexcCompiler::get_error_stream()
 LexcCompiler &
 LexcCompiler::setAllowMultipleSublexiconDefinitions(bool value)
 {
-    allow_multiple_sublexicon_definitions_ = value;
+    warn_repeated_lexicons_ = value;
     return *this;
 }
 
@@ -413,6 +517,7 @@ LexcCompiler::addNoFlag(const string &lexname)
 LexcCompiler &
 LexcCompiler::addAlphabet(const string &alpha)
 {
+    alphabets_.insert(alpha);
     tokenizer_.add_multichar_symbol(alpha);
     if (!quiet_ && verbose_)
     {
@@ -422,15 +527,103 @@ LexcCompiler::addAlphabet(const string &alpha)
     return *this;
 }
 
+LexcCompiler &
+LexcCompiler::unicodeCheck_(const string &data)
+{
+    if (split_characters_)
+    {
+        return *this;
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    UChar *ICUdata = (UChar *)malloc(sizeof(UChar) * (data.length() + 1));
+    int32_t length = 0;
+    ICUdata = u_strFromUTF8(ICUdata, data.length() + 1, &length, data.c_str(),
+                            -1, &status);
+    if (U_FAILURE(status))
+    {
+        fprintf(stderr, "ICU error converting UTF-8 %s to UChars: %s\n",
+                data.c_str(), u_errorName(status));
+    }
+    status = U_ZERO_ERROR;
+    UBreakIterator *graphemes;
+    graphemes = ubrk_open(UBRK_CHARACTER, "C", NULL, -1, &status);
+    if (U_FAILURE(status))
+    {
+        fprintf(stderr, "ICU error trying to open grapheme segmenter: %s\n",
+                u_errorName(status));
+    }
+    status = U_ZERO_ERROR;
+    ubrk_setText(graphemes, ICUdata, length, &status);
+    if (U_FAILURE(status))
+    {
+        fprintf(stderr, "ICU error trying to get graphemes from %s: %s\n",
+                data.c_str(), u_errorName(status));
+    }
+    status = U_ZERO_ERROR;
+    int32_t prev = 0;
+    int32_t next = 0;
+    for (prev = ubrk_first(graphemes); prev != UBRK_DONE;
+         next = ubrk_next(graphemes))
+    {
+        if ((prev != next) && (next != UBRK_DONE))
+        {
+            status = U_ZERO_ERROR;
+            char *grapheme
+                = (char *)malloc(sizeof(char) * (next - prev) * 4 + 1);
+            grapheme = u_strToUTF8(grapheme, (next - prev) * 4 + 1, &length,
+                                   &ICUdata[prev], next - prev, &status);
+            if (U_FAILURE(status))
+            {
+                fprintf(stderr, "ICU error getting UTF-8 from grpaheme: %s\n",
+                        u_errorName(status));
+            }
+            if (!alphabets_.contains(grapheme))
+            {
+                char *errm
+                    = (char *)malloc(sizeof(char) * (strlen(grapheme) + 128));
+                sprintf(errm, "adding %s into Alphabets", grapheme);
+                if (u_strHasMoreChar32Than(&ICUdata[prev], next - prev, 1))
+                {
+
+                    if (treat_warnings_as_errors_)
+                    {
+                        error_at_current_token(0, 0, errm);
+                        parseErrors_ = true;
+                    }
+                    else
+                    {
+                        warning_at_current_token(0, 0, errm);
+                    }
+                    fprintf(stderr, "(This unicode sequence was treated as "
+                                    "several characters in older versions of "
+                                    "hfst-lexc)\n");
+                    fprintf(stderr,
+                            "To prevent future problems, add %s (U+%04X "
+                            "U+%04X...) to "
+                            "Multichar_Symbols section\n\n",
+                            grapheme, ICUdata[prev], ICUdata[prev + 1]);
+                    addAlphabet(grapheme);
+                }
+                // free(errm);
+            }
+            // free(grapheme);
+        }
+        prev = next;
+    }
+    // ubrk_close(graphemes);
+    // free(ICUdata);
+    return *this;
+}
+
 // Construct vector nameJoiner data contJoiner and add to trie
 LexcCompiler &
 LexcCompiler::addStringEntry(const string &data, const string &continuation,
                              double weight)
 {
     // string str = replace_zero(data);
-
     currentEntries_++;
     totalEntries_++;
+    unicodeCheck_(data);
     continuations_.insert(continuation);
     string encodedCont = string(continuation);
     if (with_flags_)
@@ -470,8 +663,8 @@ LexcCompiler::addStringEntry(const string &data, const string &continuation,
     tokenizer_.add_multichar_symbol(joinerEnc);
     tokenizer_.add_multichar_symbol("0");      // epsilon
     tokenizer_.add_multichar_symbol("@ZERO@"); // literal zero
-    StringPairVector newVector(
-        tokenizer_.tokenize(joinerEnc + data + encodedCont));
+    StringPairVector newVector(tokenizer_.tokenize(
+        joinerEnc + data + encodedCont, split_characters_));
     // "0"      -> "@0@"  (single symbols)
     // "@ZERO@" -> "0"    (everywhere)
     std::string zero("@ZERO@");
@@ -497,60 +690,88 @@ LexcCompiler::addStringEntry(const string &data, const string &continuation,
         {
             it->second.replace(start_pos, zero.length(), "0");
         }
+        if (!alphabets_.contains(it->first))
+        {
+            if ((it->first.starts_with("@")) && (it->first.ends_with("@")))
+            {
+                continue;
+            }
+            if ((it->first.starts_with("$")) && (it->first.ends_with("$")))
+            {
+                continue;
+            }
+            if (warn_missing_alphabets_)
+            {
+                char *errm
+                    = (char *)malloc(sizeof(char) * it->first.length() + 48);
+                sprintf(errm, "Adding %s to Alphabets [Wmissing-alphabets]",
+                        it->first.c_str());
+                if (treat_warnings_as_errors_)
+                {
+                    error_at_current_token(0, 0, errm);
+                    parseErrors_ = true;
+                }
+                else
+                {
+                    warning_at_current_token(0, 0, errm);
+                }
+            }
+            addAlphabet(it->first.c_str());
+        }
     }
     stringsTrie_.disjunct(newVector, hfst::double_to_float(weight));
 
     return *this;
 }
 
-// to handle information to warn_about_one_sided_flags_
-static bool treat_one_sided_flags_as_errors_ = false;
-static bool quiet_one_sided_flags_ = false;
-static std::ostream *errorstr_ = NULL;
-
-static void
-warn_about_one_sided_flags(
+// callback function to stuff so static and uses global singleton :-(
+void
+LexcCompiler::warn_about_one_sided_flags(
     const std::pair<std::string, std::string> &symbol_pair)
 {
     if (FdOperation::is_diacritic(symbol_pair.first))
     {
         if (symbol_pair.first != symbol_pair.second)
         {
-            if (treat_one_sided_flags_as_errors_)
+            char *errm = (char *)malloc(sizeof(char *)
+                                            * (symbol_pair.first.length()
+                                               + symbol_pair.second.length())
+                                        + 128);
+            sprintf(errm, "one-sided flag diacritic %s:%s [-Wone-sided-flags]",
+                    symbol_pair.first.c_str(), symbol_pair.second.c_str());
+            if (hfst::lexc::lexc_->warn_one_sided_flags_
+                && hfst::lexc::lexc_->treat_warnings_as_errors_)
             {
-                // error messages are always printed
-                *errorstr_ << std::endl
-                           << "*** ERROR: one-sided flag diacritic: "
-                           << symbol_pair.first << ":" << symbol_pair.second
-                           << " [--Werror]" << std::endl;
-                lexc_->flush(errorstr_);
-                throw "one-sided flag";
+                error_at_current_token(0, 0, errm);
+                hfst::lexc::lexc_->parseErrors_ = true;
             }
-            if (!quiet_one_sided_flags_)
+            if (hfst::lexc::lexc_->warn_one_sided_flags_)
             {
-                hfst::lexc::error_at_current_token(
-                    0, 0, "Warning: one-sided flag diacritic.");
+                warning_at_current_token(0, 0, errm);
             }
+            free(errm);
         }
         return;
     }
-    if (FdOperation::is_diacritic(symbol_pair.second))
+    else if (FdOperation::is_diacritic(symbol_pair.second))
     {
-        if (treat_one_sided_flags_as_errors_)
+        char *errm = (char *)malloc(
+            sizeof(char *)
+                * (symbol_pair.first.length() + symbol_pair.second.length())
+            + 128);
+        sprintf(errm, "one-sided flag diacritic %s:%s [-Wone-sided-flags]",
+                symbol_pair.first.c_str(), symbol_pair.second.c_str());
+        if (hfst::lexc::lexc_->warn_one_sided_flags_
+            && hfst::lexc::lexc_->treat_warnings_as_errors_)
         {
-            // error messages are always printed
-            *hfst::lexc::errorstr_
-                << std::endl
-                << "*** ERROR: one-sided flag diacritic: " << symbol_pair.first
-                << ":" << symbol_pair.second << " [--Werror]" << std::endl;
-            lexc_->flush(errorstr_);
-            throw "one-sided flag";
+            error_at_current_token(0, 0, errm);
+            hfst::lexc::lexc_->parseErrors_ = true;
         }
-        if (!quiet_one_sided_flags_)
+        if (hfst::lexc::lexc_->warn_one_sided_flags_)
         {
-            hfst::lexc::error_at_current_token(
-                0, 0, "Warning: one-sided flag diacritic.");
+            warning_at_current_token(0, 0, errm);
         }
+        free(errm);
     }
 }
 
@@ -563,6 +784,8 @@ LexcCompiler::addStringPairEntry(const string &upper, const string &lower,
 
     currentEntries_++;
     totalEntries_++;
+    unicodeCheck_(upper);
+    unicodeCheck_(lower);
     continuations_.insert(continuation);
     string encodedCont = string(continuation);
     if (with_flags_)
@@ -605,15 +828,13 @@ LexcCompiler::addStringPairEntry(const string &upper, const string &lower,
     tokenizer_.add_multichar_symbol("@ZERO@"); // literal zero
 
     // information for function pointer &warn_about_one_sided_flags
-    treat_one_sided_flags_as_errors_ = treat_warnings_as_errors_;
-    quiet_one_sided_flags_ = quiet_;
-    errorstr_ = this->get_stream(this->error_);
 
     StringPairVector newVector;
 
     if (align_strings_)
     {
-        StringPairVector tmp = tokenizer_.tokenize(upper, lower);
+        StringPairVector tmp
+            = tokenizer_.tokenize(upper, lower, split_characters_);
         vector<string> one;
         vector<string> two;
 
@@ -642,17 +863,18 @@ LexcCompiler::addStringPairEntry(const string &upper, const string &lower,
         }
         std::string as2 = ss2.str();
 
-        newVector = tokenizer_.tokenize(joinerEnc + as1 + encodedCont,
-                                        joinerEnc + as2 + encodedCont,
-                                        &warn_about_one_sided_flags);
+        newVector = tokenizer_.tokenize(
+            joinerEnc + as1 + encodedCont, joinerEnc + as2 + encodedCont,
+            split_characters_,
+            &hfst::lexc::LexcCompiler::warn_about_one_sided_flags);
     }
     else
     {
         StringPairVector upperV;
-        upperV = tokenizer_.tokenize(upper);
+        upperV = tokenizer_.tokenize(upper, split_characters_);
 
         StringPairVector lowerV;
-        lowerV = tokenizer_.tokenize(lower);
+        lowerV = tokenizer_.tokenize(lower, split_characters_);
 
         int upperSize = hfst::size_t_to_int(upperV.size());
         int lowerSize = hfst::size_t_to_int(lowerV.size());
@@ -664,10 +886,10 @@ LexcCompiler::addStringPairEntry(const string &upper, const string &lower,
             {
                 epsilons = epsilons + string("@@ANOTHER_EPSILON@@");
             }
-            newVector = tokenizer_.tokenize(joinerEnc + upper + encodedCont,
-                                            joinerEnc + lower + epsilons
-                                                + encodedCont,
-                                            &warn_about_one_sided_flags);
+            newVector = tokenizer_.tokenize(
+                joinerEnc + upper + encodedCont,
+                joinerEnc + lower + epsilons + encodedCont, split_characters_,
+                &hfst::lexc::LexcCompiler::warn_about_one_sided_flags);
         }
         else if (upperSize < lowerSize)
         {
@@ -678,13 +900,15 @@ LexcCompiler::addStringPairEntry(const string &upper, const string &lower,
             }
             newVector = tokenizer_.tokenize(
                 joinerEnc + upper + epsilons + encodedCont,
-                joinerEnc + lower + encodedCont, &warn_about_one_sided_flags);
+                joinerEnc + lower + encodedCont, split_characters_,
+                &hfst::lexc::LexcCompiler::warn_about_one_sided_flags);
         }
         else
         {
-            newVector = tokenizer_.tokenize(joinerEnc + upper + encodedCont,
-                                            joinerEnc + lower + encodedCont,
-                                            &warn_about_one_sided_flags);
+            newVector = tokenizer_.tokenize(
+                joinerEnc + upper + encodedCont,
+                joinerEnc + lower + encodedCont, split_characters_,
+                &hfst::lexc::LexcCompiler::warn_about_one_sided_flags);
         }
     }
     std::string zero("@ZERO@");
@@ -709,6 +933,62 @@ LexcCompiler::addStringPairEntry(const string &upper, const string &lower,
         if (start_pos != std::string::npos)
         {
             it->second.replace(start_pos, zero.length(), "0");
+        }
+        if (!alphabets_.contains(it->first))
+        {
+            if ((it->first.starts_with("@")) && (it->first.ends_with("@")))
+            {
+                continue;
+            }
+            if ((it->first.starts_with("$")) && (it->first.ends_with("$")))
+            {
+                continue;
+            }
+            if (warn_missing_alphabets_)
+            {
+                char *errm
+                    = (char *)malloc(sizeof(char) * it->first.length() + 48);
+                sprintf(errm, "Adding %s to Alphabets [-Wmissing-alphabets]",
+                        it->first.c_str());
+                if (treat_warnings_as_errors_)
+                {
+                    error_at_current_token(0, 0, errm);
+                    parseErrors_ = true;
+                }
+                else
+                {
+                    warning_at_current_token(0, 0, errm);
+                }
+            }
+            addAlphabet(it->first.c_str());
+        }
+        if (!alphabets_.contains(it->second))
+        {
+            if ((it->second.starts_with("@")) && (it->second.ends_with("@")))
+            {
+                continue;
+            }
+            if ((it->second.starts_with("$")) && (it->second.ends_with("$")))
+            {
+                continue;
+            }
+            if (warn_missing_alphabets_)
+            {
+                char *errm
+                    = (char *)malloc(sizeof(char) * it->second.length() + 48);
+                sprintf(errm, "Adding %s to Alphabets [-Wmissing-alphabets]",
+                        it->second.c_str());
+                if (treat_warnings_as_errors_)
+                {
+                    error_at_current_token(0, 0, errm);
+                    parseErrors_ = true;
+                }
+                else
+                {
+                    warning_at_current_token(0, 0, errm);
+                }
+            }
+            addAlphabet(it->second.c_str());
         }
     }
 
@@ -747,18 +1027,64 @@ LexcCompiler::addXreEntry(const string &regexp, const string &continuation,
     HfstTransducer *newPaths = xre_.compile(regexp);
     if (newPaths == NULL)
     {
-        std::ostream *err = get_stream(error_);
-        if (should_colourise())
-        {
-            *err << COLOUR_RED << "Error: " << COLOUR_RESET;
-        }
-        *err << "Unable to parse regular expression" << std::endl;
-        flush(err);
+        error_at_current_token(0, 0, "Unable to parse regular expression");
         parseErrors_ = true;
         return *this;
     }
 
     newPaths->optimize();
+    auto newAlphabets = newPaths->get_alphabet();
+    for (const auto &newAlpha : newAlphabets)
+    {
+        if (!alphabets_.contains(newAlpha))
+        {
+            UErrorCode status = U_ZERO_ERROR;
+            UChar *ICUdata
+                = (UChar *)malloc(sizeof(UChar) * (newAlpha.length() + 1));
+            int32_t length = 0;
+            ICUdata = u_strFromUTF8(ICUdata, newAlpha.length() + 1, &length,
+                                    newAlpha.c_str(), -1, &status);
+            if (U_FAILURE(status))
+            {
+                fprintf(stderr,
+                        "ICU error converting UTF-8 %s to UChars: %s\n",
+                        newAlpha.c_str(), u_errorName(status));
+            }
+            char *errm
+                = (char *)malloc(sizeof(char) * (newAlpha.length() + 128));
+            sprintf(errm,
+                    "implicit Alphabet %s in regex "
+                    "[-Wmissing-alphabets]",
+                    newAlpha.c_str());
+            if (newAlpha == "@_EPSILON_SYMBOL_@"
+                || newAlpha == "@_UNKNOWN_SYMBOL_@"
+                || newAlpha == "@_IDENTITY_SYMBOL_@")
+            {
+                continue;
+            }
+            else if (u_strHasMoreChar32Than(ICUdata, -1, 1))
+            {
+                warning_at_current_token(0, 0, errm);
+                fprintf(stderr,
+                        "you shoudl add %s to Multichar_Symbols section\n",
+
+                        newAlpha.c_str());
+                fprintf(stderr, "U+%04X U+%04X ...\n", *(ICUdata),
+                        *(ICUdata + 1));
+            }
+            else if (warn_missing_alphabets_ && treat_warnings_as_errors_)
+            {
+                error_at_current_token(0, 0, errm);
+                parseErrors_ = true;
+            }
+            else if (warn_missing_alphabets_)
+            {
+                warning_at_current_token(0, 0, errm);
+            }
+            addAlphabet(newAlpha);
+            free(errm);
+        }
+    }
 
     // encode key
     // keep regexps with different continuations separate
@@ -805,7 +1131,7 @@ LexcCompiler::addXreEntry(const string &regexp, const string &continuation,
     }
     tokenizer_.add_multichar_symbol(joinerEnc);
     StringPairVector newVector(
-        tokenizer_.tokenize(joinerEnc + regex_key + encodedCont));
+        tokenizer_.tokenize(joinerEnc + regex_key + encodedCont, false));
     stringsTrie_.disjunct(newVector, hfst::double_to_float(weight));
 
     return *this;
@@ -833,10 +1159,21 @@ LexcCompiler::setCurrentLexiconName(const string &lexiconName)
     static bool firstLexicon = true;
     currentLexiconName_ = lexiconName;
 
-    if (!allow_multiple_sublexicon_definitions_)
+    if (lexiconNames_.find(lexiconName) != lexiconNames_.end())
     {
-        if (lexiconNames_.find(lexiconName) != lexiconNames_.end())
-            throw("Lexicon is defined more than once!");
+        if (!warn_repeated_lexicons_ && treat_warnings_as_errors_)
+        {
+            error_at_current_token(0, 0,
+                                   "Lexicon is defined more than once! "
+                                   "[-Wrepeated-lexicons]");
+            parseErrors_ = true;
+        }
+        else if (warn_repeated_lexicons_)
+        {
+            warning_at_current_token(0, 0,
+                                     "Lexicon is defined more than once! "
+                                     "[-Wrepeated-lexicons]");
+        }
     }
 
     lexiconNames_.insert(lexiconName);
@@ -863,25 +1200,29 @@ LexcCompiler::setCurrentLexiconName(const string &lexiconName)
     }
     else if ((firstLexicon) && (lexiconName != "Root"))
     {
-        if (!quiet_)
+        if (treat_warnings_as_errors_)
         {
-            if (should_colourise())
-            {
-                *err << COLOUR_YELLOW << "Warnign: " << COLOUR_RESET;
-            }
-            *err << "first lexicon is not named Root" << std::endl;
+            error_at_current_token(0, 0, "first lexicon is not named Root");
+            parseErrors_ = true;
+        }
+        else
+        {
+            warning_at_current_token(0, 0, "first lexicon is not named Root");
         }
         setInitialLexiconName(lexiconName);
     }
     else if ((!firstLexicon) && (lexiconName == "Root"))
     {
-        if (!quiet_)
+        if (treat_warnings_as_errors_)
         {
-            if (should_colourise())
-            {
-                *err << COLOUR_YELLOW << "Warnign: " << COLOUR_RESET;
-            }
-            *err << "Root is not first the first lexicon" << std::endl;
+            error_at_current_token(0, 0,
+                                   "Root is not first the first lexicon");
+            parseErrors_ = true;
+        }
+        else
+        {
+            warning_at_current_token(0, 0,
+                                     "Root is not first the first lexicon");
         }
         setInitialLexiconName(lexiconName);
     }
@@ -913,28 +1254,23 @@ LexcCompiler::setInitialLexiconName(const string &lexiconName)
 HfstTransducer *
 LexcCompiler::compileLexical()
 {
-
+    std::ostream *err = get_stream(error_);
     if (parseErrors_)
     {
+        *err << "compilation aborted due to previous errors" << std::endl;
         return 0;
     }
-
-    std::ostream *err = get_stream(error_);
-
     bool warnings_generated = false;
     printConnectedness(warnings_generated);
     if (warnings_generated && treat_warnings_as_errors_)
     {
-        if (!quiet_)
+        if (should_colourise())
         {
-            if (should_colourise())
-            {
-                *err << COLOUR_RED << "*** ERROR: " << COLOUR_RESET;
-            }
-            *err << "could not parse lexc file: treating warnings "
-                    "as errors [--Werror] ***"
-                 << std::endl;
+            *err << COLOUR_RED << "*** ERROR: " << COLOUR_RESET;
         }
+        *err << "missing or unused LEXICONs (see above) and -Werror has "
+                "been enabled"
+             << std::endl;
         flush(err);
         return 0;
     }
@@ -983,7 +1319,7 @@ LexcCompiler::compileLexical()
 
             // joiners trie version (later compose)
             StringPairVector newVector(
-                tokenizer_.tokenize(joinerEnc + joinerEnc));
+                tokenizer_.tokenize(joinerEnc + joinerEnc, false));
             joinersTrie_.disjunct(newVector, 0);
 
             allJoinersToEpsilon.insert(
@@ -1040,12 +1376,12 @@ LexcCompiler::compileLexical()
 
             // joiners trie version (later compose)
             StringPairVector newVector(
-                tokenizer_.tokenize(flagPstring + flagRstring));
+                tokenizer_.tokenize(flagPstring + flagRstring, false));
             joinersTrie_.disjunct(newVector, 0);
         }
     }
 
-    /// get right side of every pair
+    // get right side of every pair
     HfstBasicTransducer fsm(lexicons);
     StringSet rightSymbols;
     // Go through all states
@@ -1081,7 +1417,7 @@ LexcCompiler::compileLexical()
     {
         String alph = *it;
         tokenizer_.add_multichar_symbol(alph);
-        StringPairVector newVector(tokenizer_.tokenize(alph));
+        StringPairVector newVector(tokenizer_.tokenize(alph, false));
         joinersTrie_.disjunct(newVector, 0);
     }
 
@@ -1336,14 +1672,18 @@ LexcCompiler::printConnectedness(bool &warnings_generated)
             for (vector<string>::iterator s = contMinusLex.begin();
                  s != contMinusLexEnd; ++s)
             {
-                if (!quiet_)
+                if (!quiet_ && warn_missing_lexicons_)
                 {
-                    if (should_colourise())
+                    if (should_colourise() && treat_warnings_as_errors_)
                     {
-                        *err << COLOUR_YELLOW << "Warnign: " << COLOUR_RESET;
+                        *err << COLOUR_RED << "ERROR: " << COLOUR_RESET;
+                    }
+                    else if (should_colourise())
+                    {
+                        *err << COLOUR_YELLOW << "Warning: " << COLOUR_RESET;
                     }
                     *err << "Sublexicon is mentioned but not "
-                            "defined. ("
+                            "defined. [-Wmissing-lexicons] ("
                          << *s << ") " << std::endl;
                     flush(err);
                 }
@@ -1353,13 +1693,18 @@ LexcCompiler::printConnectedness(bool &warnings_generated)
         if (lexMinusContEnd - lexMinusCont.begin() > 0)
         {
             warnings_generated = true;
-            if (!quiet_)
+            if (!quiet_ && warn_unused_lexicons_)
             {
-                if (should_colourise())
+                if (should_colourise() && treat_warnings_as_errors_)
                 {
-                    *err << COLOUR_YELLOW << "Warnign: " << COLOUR_RESET;
+                    *err << COLOUR_RED << "ERROR: " << COLOUR_RESET;
                 }
-                *err << "Sublexicons defined but not used" << std::endl;
+                else if (should_colourise())
+                {
+                    *err << COLOUR_YELLOW << "Warning: " << COLOUR_RESET;
+                }
+                *err << "Sublexicons defined but not used [-Wunused-lexicons]"
+                     << std::endl;
                 for (vector<string>::iterator s = lexMinusCont.begin();
                      s != lexMinusContEnd; ++s)
                 {
@@ -1372,7 +1717,6 @@ LexcCompiler::printConnectedness(bool &warnings_generated)
     }
     return *this;
 }
-
 }
 }
 

@@ -238,7 +238,8 @@ ProcTransducerAlphabet::check_for_overlapping() const
             {
                 std::string ch = chars[j];
                 if (!is_alphabetic(ch.c_str())
-                    || symbolizer.find_symbol(ch.c_str()) == NO_SYMBOL_NUMBER)
+                    || symbolizer.find_symbol(ch.c_str()) == NO_SYMBOL_NUMBER
+                    || ch.length() > 1)
                 {
                     overlaps = false;
                     break;
@@ -330,10 +331,13 @@ ProcTransducerAlphabet::calculate_caps()
         int case_res = 0; // -1 = lower, 1 = upper
         std::string switched;
         if (is_alphabetic(i))
+        {
             switched = caps_helper(symbol_table[i].c_str(), case_res);
+        }
         else
+        {
             case_res = 0;
-
+        }
         if (case_res < 0)
         {
             symbol_properties_table[i].lower = i;
@@ -349,9 +353,10 @@ ProcTransducerAlphabet::calculate_caps()
             symbol_properties_table[i].upper = i;
         }
         else
+        {
             symbol_properties_table[i].lower = symbol_properties_table[i].upper
                 = NO_SYMBOL_NUMBER;
-
+        }
         if (to_lower(i) == to_upper(i)
             && symbol_properties_table[i].lower != NO_SYMBOL_NUMBER)
         {

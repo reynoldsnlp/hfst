@@ -63,10 +63,18 @@ static bool with_flags = false;
 static bool minimize_flags = false;
 static bool rename_flags = false;
 static bool treat_warnings_as_errors = false;
+static bool warn_everything = false;
+static bool warn_missing_lexicons = false;
+static bool warn_unused_lexicons = false;
+static bool warn_repeated_lexicons = false;
+static bool warn_one_sided_flags = false;
+static bool warn_missing_alphabets = false;
+static bool warn_unnecessary_escapes = false;
 static bool xerox_composition
     = true; // Compatibility with Xerox tools is the default
 static bool encode_weights = false;
 static bool enc = false;
+static bool split_characters = false;
 
 void
 print_usage()
@@ -82,25 +90,36 @@ print_usage()
             "Input/Output options:\n"
             "  -f, --format=FORMAT     compile into FORMAT transducer\n"
             "  -o, --output=OUTFILE    write result into OUTFILE\n");
-    fprintf(message_out,
-            "Lexc options:\n"
-            "  -A, --alignStrings      align characters in input and output "
-            "strings\n"
-            "  -E, --encode-weights    encode weights when minimizing "
-            "(default is false)\n"
-            "  -F, --withFlags         use flags to hyperminimize result\n"
-            "  -M, --minimizeFlags     if --withFlags is used, minimize the "
-            "number of flags\n"
-            "  -R, --renameFlags       if --withFlags and --minimizeFlags are "
-            "used, rename\n"
-            "                          flags (for testing)\n"
-            "  -x, --xerox-composition=VALUE Whether flag diacritics are "
-            "treated as ordinary\n"
-            "                                symbols in composition (default "
-            "is true).\n"
-            "  -X, --xfst=VARIABLE     toggle xfst compatibility option "
-            "VARIABLE.\n"
-            "  -W, --Werror            treat warnings as errors\n");
+    fprintf(
+        message_out,
+        "Lexc options:\n"
+        "  -A, --alignStrings      align characters in input and output "
+        "strings\n"
+        "  -E, --encode-weights    encode weights when minimizing "
+        "(default is false)\n"
+        "  -F, --withFlags         use flags to hyperminimize result\n"
+        "  -M, --minimizeFlags     if --withFlags is used, minimize the "
+        "number of flags\n"
+        "  -R, --renameFlags       if --withFlags and --minimizeFlags are "
+        "used, rename\n"
+        "                          flags (for testing)\n"
+        "  -x,\n"
+        "  --xerox-composition=BOOL   Whether flag diacritics are "
+        "treated as ordinary\n"
+        "                             symbols in composition (default "
+        "is true).\n"
+        "  -X, --xfst=VARIABLE     toggle xfst compatibility option "
+        "VARIABLE.\n"
+        "   --split-characters     disable unicode character parsing for "
+        "multichars\n"
+        "   -Wall                  enable all warnings:\n"
+        "   -Wone-sided-flags      warn about one sided flag diacritics\n"
+        "   -Wrepeated-lexicons    warn about repeat lexicon names\n"
+        "   -Wmissing-lexicons     warn about lexicons used but missing\n"
+        "   -Wunused-lexicons      warn about lexicons defined but unused\n"
+        "   -Wmissing-alphabets    warn about implicit alphabets\n"
+        "   -Wunnecessary-escapes  warn about unneeded %%-escapes\n"
+        "   -Werror                treat warnings as errors\n");
     fprintf(message_out, "\n");
     fprintf(message_out,
             "If INFILE or OUTFILE are omitted or -, standard streams will "
@@ -108,7 +127,7 @@ print_usage()
             "The possible values for FORMAT are { sfst, openfst-tropical, "
             "openfst-log,\n"
             "foma, optimized-lookup-unweighted, optimized-lookup-weighted }.\n"
-            "VALUEs recognized are {true,ON,yes} and {false,OFF,no}.\n"
+            "BOOL is one of {true,ON,yes} or {false,OFF,no}.\n"
             "Xfst variables are {flag-is-epsilon (default OFF)}.\n");
     fprintf(message_out,
             "\n"
@@ -150,11 +169,13 @@ parse_options(int argc, char **argv)
                 { "renameFlags", no_argument, 0, 'R' },
                 { "xerox-composition", required_argument, 0, 'x' },
                 { "xfst", required_argument, 0, 'X' },
-                { "Werror", no_argument, 0, 'W' },
+                { "Werror", no_argument, 0, 'Q' },
+                { "Wstuff", required_argument, 0, 'W' },
+                { "split-characters", no_argument, 0, '9' },
                 { 0, 0, 0, 0 } };
         int option_index = 0;
         int c = getopt_long(argc, argv,
-                            HFST_GETOPT_COMMON_SHORT "Ef:o:AFMRx:X:W",
+                            HFST_GETOPT_COMMON_SHORT "Ef:o:AFMRx:X:QW:9",
                             long_options, &option_index);
         if (-1 == c)
         {
@@ -219,10 +240,91 @@ parse_options(int argc, char **argv)
             }
         }
         break;
-        case 'W':
+        case 'Q':
             treat_warnings_as_errors = true;
+            warn_one_sided_flags = true;
+            warn_missing_lexicons = true;
+            warn_unused_lexicons = true;
+            warn_repeated_lexicons = true;
+            // compatibility?? might change later:
+            warn_unnecessary_escapes = false;
+            warn_missing_alphabets = false;
+            fprintf(stderr, "Warning: --Werror is deprecated, "
+                            "use -Werror -Wall instead\n");
             break;
-
+        case 'W':
+            if (strcmp(optarg, "error") == 0)
+            {
+                treat_warnings_as_errors = true;
+            }
+            else if (strcmp(optarg, "all") == 0)
+            {
+                warn_one_sided_flags = true;
+                warn_everything = true;
+                warn_missing_lexicons = true;
+                warn_unused_lexicons = true;
+                warn_repeated_lexicons = true;
+                warn_missing_alphabets = true;
+                warn_unnecessary_escapes = true;
+                warn_missing_alphabets = true;
+            }
+            else if (strcmp(optarg, "one-sided-flags") == 0)
+            {
+                warn_one_sided_flags = true;
+            }
+            else if (strcmp(optarg, "no-one-sided-flags") == 0)
+            {
+                warn_one_sided_flags = false;
+            }
+            else if (strcmp(optarg, "unused-lexicons") == 0)
+            {
+                warn_unused_lexicons = true;
+            }
+            else if (strcmp(optarg, "no-unused-lexicons") == 0)
+            {
+                warn_unused_lexicons = false;
+            }
+            else if (strcmp(optarg, "repeated-lexicons") == 0)
+            {
+                warn_repeated_lexicons = true;
+            }
+            else if (strcmp(optarg, "no-repeated-lexicons") == 0)
+            {
+                warn_repeated_lexicons = false;
+            }
+            else if (strcmp(optarg, "missing-lexicons") == 0)
+            {
+                warn_missing_lexicons = true;
+            }
+            else if (strcmp(optarg, "no-missing-lexicons") == 0)
+            {
+                warn_missing_lexicons = false;
+            }
+            else if (strcmp(optarg, "missing-alphabets") == 0)
+            {
+                warn_missing_alphabets = true;
+            }
+            else if (strcmp(optarg, "no-missing-alphabets") == 0)
+            {
+                warn_missing_alphabets = false;
+            }
+            else if (strcmp(optarg, "unnecessary-escapes") == 0)
+            {
+                warn_unnecessary_escapes = true;
+            }
+            else if (strcmp(optarg, "no-unnecessary-escapes") == 0)
+            {
+                warn_unnecessary_escapes = false;
+            }
+            else
+            {
+                fprintf(stderr, "Unknown warning option %s\n", optarg);
+                return EXIT_FAILURE;
+            }
+            break;
+        case '9':
+            split_characters = true;
+            break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -277,7 +379,8 @@ lexc_streams(LexcCompiler &lexc, HfstOutputStream &outstream)
             {
                 hfst_warning(
                     0, 0,
-                    "Reading from standard input. UTF-8 characters outside\n"
+                    "Reading from standard input. UTF-8 characters "
+                    "outside\n"
                     "ascii range are supported only if input comes from a "
                     "file.");
             }
@@ -390,6 +493,51 @@ main(int argc, char **argv)
     if (treat_warnings_as_errors)
     {
         lexc.setTreatWarningsAsErrors(true);
+    }
+    lexc.setWarning("-Wone-sided-flags", warn_one_sided_flags);
+    lexc.setWarning("-Wunused-lexicons", warn_unused_lexicons);
+    lexc.setWarning("-Wrepeated-lexicons", warn_repeated_lexicons);
+    lexc.setWarning("-Wmissing-lexicons", warn_missing_lexicons);
+    lexc.setWarning("-Wmissing-alphabets", warn_missing_alphabets);
+    lexc.setWarning("-Wunnecessary-escapes", warn_unnecessary_escapes);
+    if (!silent && verbose)
+    {
+        printf("Warning settings: ");
+        if (treat_warnings_as_errors)
+        {
+            printf(" -Werror (fail on all warnings)");
+        }
+        if (warn_one_sided_flags)
+        {
+            printf(" -Wone-sided-flags");
+        }
+        if (warn_unused_lexicons)
+        {
+            printf(" -Wunused-lexicons");
+        }
+        if (warn_repeated_lexicons)
+        {
+            printf(" -Wrepeated-lexicons");
+        }
+        if (warn_missing_lexicons)
+        {
+            printf(" -Wmissing-lexicons");
+        }
+        if (warn_missing_alphabets)
+        {
+            printf(" -Wmissing-alphabets");
+        }
+        if (warn_unnecessary_escapes)
+        {
+            printf(" -Wunnecessary-escapes");
+        }
+        printf("\n");
+    }
+    if (split_characters)
+    {
+        fprintf(stderr,
+                "Warningn: Disabling unicode character tokenisation\n");
+        lexc.setSplitCharacters(true);
     }
     retval = lexc_streams(lexc, *outstream);
     for (unsigned int i = 0; i < lexccount; i++)
